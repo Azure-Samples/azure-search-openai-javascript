@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
 
-name: azure-search-openai-demo
+name: azure-search-openai-javascript
 metadata:
-  template: azure-search-openai-demo@0.0.2-beta
+  template: azure-search-openai-javascript@0.0.1-beta
 services:
   backend:
     project: ./app/backend
@@ -12,12 +12,12 @@ services:
       prepackage:
         windows:
           shell: pwsh
-          run:  cd ../frontend;npm install;npm run build
+          run:  cd ../..;npm ci;npm run build
           interactive: true
           continueOnError: false
         posix:
           shell: sh
-          run:  cd ../frontend;npm install;npm run build
+          run:  cd ../..;npm ci;npm run build
           interactive: true
           continueOnError: false
 hooks:

@@ -145,6 +145,7 @@ cython_debug/
 npm-debug.log*
 node_modules
 static/
+dist/
 
 # macOS
 *.DS_Store*

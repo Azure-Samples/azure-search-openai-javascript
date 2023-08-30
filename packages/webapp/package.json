@@ -1,11 +1,8 @@
 {
-  "name": "frontend",
+  "name": "webapp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "engines": {
-    "node": ">=14.0.0"
-  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
