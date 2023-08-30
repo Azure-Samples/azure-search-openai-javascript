@@ -105,7 +105,7 @@ Execute the following command, if you don't have any pre-existing Azure services
 
 It will look like the following:
 
-!['Output from running azd up'](assets/endpoint.png)
+!['Output from running azd up'](docs/endpoint.png)
 
 > NOTE: It may take a minute for the application to be fully deployed. If you see a "Python Developer" welcome screen, then wait a minute and refresh the page.
 
