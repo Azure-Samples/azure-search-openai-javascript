@@ -9,6 +9,7 @@
   "scripts": {
     "test": "npm run test -ws --if-present",
     "build": "npm run build -ws --if-present",
+    "build:webapp": "npm run build --workspace=webapp",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "npm run lint -ws --if-present",
