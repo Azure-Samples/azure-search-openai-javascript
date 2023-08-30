@@ -1,0 +1,40 @@
+##################################################################
+# VS Code with REST Client extension is needed to use this file.
+# Download at: https://aka.ms/vscode/rest-client
+##################################################################
+
+@api_host = http://localhost:3000
+
+
+# Chat with the bot
+POST {{api_host}}/chat
+Content-Type: application/json
+
+{
+  "history": [{ "user": "What happens in a performance review?" }],
+  "approach":"rrr",
+  "overrides": {
+    "retrieval_mode": "hybrid",
+    "semantic_ranker": true,
+    "semantic_captions": false,
+    "top": 3,
+    "suggest_followup_questions": false
+  }
+}
+
+###
+
+# Ask a question
+POST {{api_host}}/ask
+Content-Type: application/json
+
+{
+  "question": "What does a Product Manager do?",
+  "approach":"rrr",
+  "overrides": {
+    "retrieval_mode": "hybrid",
+    "semantic_ranker": true,
+    "semantic_captions": false,
+    "top": 3
+  }
+}
