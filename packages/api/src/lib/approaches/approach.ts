@@ -1,9 +1,16 @@
-// TODO: improve typings
+import { HistoryMessage } from '../message';
 
-export interface ChatApproach {
-  run(history: any[], overrides: Record<string, any>): Promise<any>;
+export interface ChatQueryResponse {
+  data_points: string[];
+  answer: string;
+  thoughts: string;
 }
 
+export interface ChatApproach {
+  run(history: HistoryMessage[], overrides: Record<string, any>): Promise<ChatQueryResponse>;
+}
+
+// TODO: improve typing
 export interface AskApproach {
   run(q: string, overrides: Record<string, any>): Promise<any>;
 }
