@@ -5,7 +5,7 @@ import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 
 export type AzureClients = {
   credential: DefaultAzureCredential;
-  search: SearchClient<unknown>;
+  search: SearchClient<any>;
   blobContainer: ContainerClient;
 };
 
@@ -19,7 +19,7 @@ export default fp(
     const credential = new DefaultAzureCredential();
 
     // Set up Azure clients
-    const searchClient = new SearchClient(
+    const searchClient = new SearchClient<any>(
       `https://${config.azureSearchService}.search.windows.net`,
       config.azureSearchIndex,
       credential,
