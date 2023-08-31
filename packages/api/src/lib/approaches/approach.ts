@@ -1,16 +1,15 @@
 import { HistoryMessage } from '../message';
 
-export interface ChatQueryResponse {
+export interface ApproachResponse {
   data_points: string[];
   answer: string;
   thoughts: string;
 }
 
 export interface ChatApproach {
-  run(history: HistoryMessage[], overrides: Record<string, any>): Promise<ChatQueryResponse>;
+  run(history: HistoryMessage[], overrides: Record<string, any>): Promise<ApproachResponse>;
 }
 
-// TODO: improve typing
 export interface AskApproach {
-  run(q: string, overrides: Record<string, any>): Promise<any>;
+  run(q: string, overrides: Record<string, any>): Promise<ApproachResponse>;
 }

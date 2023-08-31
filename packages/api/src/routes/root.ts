@@ -9,6 +9,14 @@ export type ChatRequest = FastifyRequest<{
   };
 }>;
 
+export type AskRequest = FastifyRequest<{
+  Body: {
+    approach: string;
+    question: string;
+    overrides: Record<string, any>;
+  };
+}>;
+
 const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   fastify.get('/', async function (request, reply) {
     return { root: true };
@@ -38,6 +46,39 @@ const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       const { history, overrides } = request.body;
       try {
         return await chatApproach.run(history, overrides);
+      } catch (_error: unknown) {
+        const error = _error as Error;
+        fastify.log.error(error);
+        reply.code(500);
+        return { error: `Unknown server error: ${error.message}` };
+      }
+    },
+  });
+
+  fastify.post('/ask', {
+    schema: {
+      body: {
+        type: 'object',
+        properties: {
+          approach: {
+            type: 'string',
+          },
+        },
+      },
+    },
+    handler: async function (request: AskRequest, reply) {
+      const { approach } = request.body;
+      const askApproach = fastify.approaches.ask[approach];
+      if (!askApproach) {
+        reply.code(400);
+        return {
+          error: `Ask approach "${approach}" is unknown or not implemented.`,
+        };
+      }
+
+      const { overrides, question } = request.body;
+      try {
+        return await askApproach.run(question, overrides);
       } catch (_error: unknown) {
         const error = _error as Error;
         fastify.log.error(error);

@@ -1,10 +1,10 @@
 import { SearchClient } from '@azure/search-documents';
-import { ChatApproach, ChatQueryResponse } from './approach.js';
+import { ChatApproach, ApproachResponse } from './approach.js';
 import { OpenAiClients } from '../../plugins/openai.js';
 import { removeNewlines } from '../util/index.js';
 import { MessageBuilder } from '../message-builder.js';
 import { getTokenLimit } from '../model-helpers.js';
-import { HistoryMessage, Message, messageToString } from '../message.js';
+import { HistoryMessage, Message, messagesToString } from '../message.js';
 
 const SYSTEM_MESSAGE_CHAT_CONVERSATION = `Assistant helps the company employees with their healthcare plan questions, and questions about the employee handbook. Be brief in your answers.
 Answer ONLY with the facts listed in the list of sources below. If there isn't enough information below, say you don't know. Do not generate answers that don't use the sources below. If asking a clarifying question to the user would help, ask the question.
@@ -44,7 +44,7 @@ export class ChatReadRetrieveRead implements ChatApproach {
   chatGptTokenLimit: number;
 
   constructor(
-    private search: SearchClient<unknown>,
+    private search: SearchClient<any>,
     private openai: OpenAiClients,
     private chatGptModel: string,
     private sourcePageField: string,
@@ -53,7 +53,7 @@ export class ChatReadRetrieveRead implements ChatApproach {
     this.chatGptTokenLimit = getTokenLimit(chatGptModel);
   }
 
-  async run(history: HistoryMessage[], overrides: Record<string, any>): Promise<ChatQueryResponse> {
+  async run(history: HistoryMessage[], overrides: Record<string, any>): Promise<ApproachResponse> {
     const hasText = ['text', 'hybrid', undefined].includes(overrides?.retrieval_mode);
     // const hasVectors = ['vectors', 'hybrid', undefined].includes(overrides?.retrieval_mode);
     const useSemanticCaption = Boolean(overrides?.use_semantic_caption) && hasText;
@@ -196,7 +196,7 @@ export class ChatReadRetrieveRead implements ChatApproach {
     });
 
     const chatContent = finalChatCompletion.choices[0].message.content ?? '';
-    const messageToDisplay = messages.map((m) => messageToString(m)).join('\n\n');
+    const messageToDisplay = messagesToString(messages);
 
     return {
       data_points: results,
