@@ -4,12 +4,7 @@ import { OpenAiClients } from '../../plugins/openai.js';
 import { removeNewlines } from '../util/index.js';
 import { MessageBuilder } from '../message-builder.js';
 import { getTokenLimit } from '../model-helpers.js';
-import { Message, messageToString } from '../message.js';
-
-export interface HistoryMessage {
-  bot?: string;
-  user?: string;
-}
+import { HistoryMessage, Message, messageToString } from '../message.js';
 
 export interface QueryResponse {
   data_points: string[];
@@ -55,7 +50,7 @@ export class ChatReadRetrieveReadApproach implements ChatApproach {
   chatGptTokenLimit: number;
 
   constructor(
-    private searchClient: SearchClient<unknown>,
+    private search: SearchClient<unknown>,
     private openai: OpenAiClients,
     private chatGptModel: string,
     private sourcePageField: string,
@@ -123,7 +118,7 @@ export class ChatReadRetrieveReadApproach implements ChatApproach {
     let searchResults;
     // TODO: JS SDK is missing features: https://github.com/anfibiacreativa/azure-search-open-ai-javascript/issues/21
     // if (overrides?.semantic_ranker && hasText) {
-    //   searchResults = await this.searchClient.search(queryText, {
+    //   searchResults = await this.search.search(queryText, {
     //     filter,
     //     queryType: 'semantic',
     //     queryLanguage: 'en-us',
@@ -136,7 +131,7 @@ export class ChatReadRetrieveReadApproach implements ChatApproach {
     //     vectorFields: queryVector ? 'embedding' : undefined,
     //   }
     // } else {
-    searchResults = await this.searchClient.search(queryText, {
+    searchResults = await this.search.search(queryText, {
       filter,
       top,
       // vector: queryVector,
@@ -157,7 +152,7 @@ export class ChatReadRetrieveReadApproach implements ChatApproach {
     } else {
       for await (const result of searchResults.results) {
         // TODO: ensure typings
-        const doc = result as any;
+        const doc = result.document as any;
         results.push(`${doc[this.sourcePageField]}: ${removeNewlines(doc[this.contentField])}`);
       }
     }
@@ -170,7 +165,7 @@ export class ChatReadRetrieveReadApproach implements ChatApproach {
     // Allow client to replace the entire prompt, or to inject into the exiting prompt using >>>
     const promptOverride = overrides?.prompt_override;
     let systemMessage: string;
-    if (promptOverride.startsWith('>>>')) {
+    if (promptOverride?.startsWith('>>>')) {
       systemMessage = SYSTEM_MESSAGE_CHAT_CONVERSATION.replace(
         '{follow_up_questions_prompt}',
         followUpQuestionsPrompt,
