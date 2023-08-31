@@ -54,7 +54,7 @@ export default fp(
   },
   {
     name: 'openai',
-    dependencies: ['azure'],
+    dependencies: ['azure', 'config'],
   },
 );
 

@@ -6,6 +6,6 @@
  * removeNewlines('Hello\nworld\r\n!');
  * // output: 'Hello world !'
  */
-export function removeNewlines(s: string): string {
+export function removeNewlines(s: string = ''): string {
   return s.replaceAll(/\n/g, ' ').replaceAll(/\r/g, ' ');
 }
