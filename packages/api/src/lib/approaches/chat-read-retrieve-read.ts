@@ -40,7 +40,7 @@ const QUERY_PROMPT_FEW_SHOTS: Message[] = [
  * It first retrieves top documents from search, then constructs a prompt with them, and then uses
  * OpenAI to generate an completion (answer) with that prompt.
  */
-export class ChatReadRetrieveReadApproach implements ChatApproach {
+export class ChatReadRetrieveRead implements ChatApproach {
   chatGptTokenLimit: number;
 
   constructor(
