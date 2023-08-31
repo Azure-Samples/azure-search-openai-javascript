@@ -23,8 +23,10 @@
   },
   "dependencies": {
     "@azure/identity": "^3.3.0",
+    "@azure/monitor-opentelemetry": "^1.0.0-beta.2",
     "@azure/search-documents": "^11.3.2",
     "@azure/storage-blob": "^12.15.0",
+    "@dqbd/tiktoken": "^1.0.7",
     "@fastify/autoload": "^5.0.0",
     "@fastify/cors": "^8.3.0",
     "@fastify/sensible": "^5.0.0",
