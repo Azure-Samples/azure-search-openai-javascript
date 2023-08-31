@@ -7,6 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
+    "start": "concurrently npm:start:* --kill-others",
+    "start:webapp": "npm run dev --workspace=webapp",
+    "start:api": "npm run dev --workspace=api",
     "test": "npm run test -ws --if-present",
     "build": "npm run build -ws --if-present",
     "build:webapp": "npm run build --workspace=webapp",
@@ -21,6 +24,9 @@
   "workspaces": [
     "packages/*"
   ],
+  "devDependencies": {
+    "concurrently": "^8.2.1"
+  },
   "engines": {
     "node": ">=18",
     "npm": ">=8"
