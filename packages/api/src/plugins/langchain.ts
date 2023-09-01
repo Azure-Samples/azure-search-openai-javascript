@@ -4,8 +4,8 @@ import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 
 export type LangchainService = {
-  getChat(): Promise<ChatOpenAI>;
-  getEmbeddings(): Promise<OpenAIEmbeddings>;
+  getChat(options?: Partial<OpenAIChatInput>): Promise<ChatOpenAI>;
+  getEmbeddings(options?: Partial<OpenAIChatInput>): Promise<OpenAIEmbeddings>;
 };
 
 export default fp(
