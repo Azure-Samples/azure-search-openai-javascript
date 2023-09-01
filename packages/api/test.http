@@ -30,7 +30,7 @@ Content-Type: application/json
 
 {
   "question": "What does a Product Manager do?",
-  "approach":"rrr",
+  "approach":"rtr",
   "overrides": {
     "retrieval_mode": "hybrid",
     "semantic_ranker": true,

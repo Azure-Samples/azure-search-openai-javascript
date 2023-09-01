@@ -1,8 +1,7 @@
 import { SearchClient } from '@azure/search-documents';
 import { OpenAiClients } from '../../plugins/openai.js';
-import { removeNewlines } from '../util/index.js';
 import { MessageBuilder } from '../message-builder.js';
-import { AskApproach } from './approach.js';
+import { ApproachBase, AskApproach } from './approach.js';
 import { messagesToString } from '../message.js';
 
 const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant helping Contoso Inc employees with their healthcare plan questions and employee handbook questions.
@@ -30,81 +29,19 @@ const ANSWER = `In-network deductibles are $500 for employee and $1000 for famil
  * It first retrieves top documents from search, then constructs a prompt with them, and then uses
  * OpenAI to generate an completion (answer) with that prompt.
  */
-export class AskRetrieveThenReadApproach implements AskApproach {
+export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
   constructor(
-    private search: SearchClient<any>,
-    private openai: OpenAiClients,
-    private chatGptModel: string,
-    private sourcePageField: string,
-    private contentField: string,
-  ) {}
+    search: SearchClient<any>,
+    openai: OpenAiClients,
+    chatGptModel: string,
+    sourcePageField: string,
+    contentField: string,
+  ) {
+    super(search, openai, chatGptModel, sourcePageField, contentField);
+  }
 
   async run(q: string, overrides: Record<string, any>): Promise<any> {
-    const hasText = ['text', 'hybrid', undefined].includes(overrides?.retrieval_mode);
-    // const hasVectors = ['vectors', 'hybrid', undefined].includes(overrides?.retrieval_mode);
-    const useSemanticCaption = Boolean(overrides?.use_semantic_caption) && hasText;
-    const top = overrides?.top ? Number(overrides?.top) : 3;
-    const excludeCategory: string | undefined = overrides?.exclude_category;
-    const filter = excludeCategory ? `category ne '${excludeCategory.replace("'", "''")}'` : undefined;
-
-    // If retrieval mode includes vectors, compute an embedding for the query
-    // let queryVector;
-    // if (hasVectors) {
-    //   let openAiEmbeddings = await this.openai.getEmbeddings();
-    //   const result = await openAiEmbeddings.create({
-    //     model: 'text-embedding-ada-002',
-    //     input: queryText!,
-    //   });
-    //   queryVector = result.data[0].embedding;
-    // }
-
-    // Only keep the text query if the retrieval mode uses text, otherwise drop it
-    const queryText = hasText ? q : '';
-
-    // Use semantic L2 reranker if requested and if retrieval mode is text or hybrid (vectors + text)
-    let searchResults;
-    // TODO: JS SDK is missing features: https://github.com/anfibiacreativa/azure-search-open-ai-javascript/issues/21
-    // if (overrides?.semantic_ranker && hasText) {
-    //   searchResults = await this.search.search(queryText, {
-    //     filter,
-    //     queryType: 'semantic',
-    //     queryLanguage: 'en-us',
-    //     querySpeller: 'lexicon',
-    //     semanticConfigurationName: 'default',
-    //     top,
-    //     queryCaption: useSemanticCaption ? 'extractive|highlight-false' : undefined,
-    //     vector: queryVector,
-    //     topK: queryVector ? 50 : undefined,
-    //     vectorFields: queryVector ? 'embedding' : undefined,
-    //   }
-    // } else {
-    searchResults = await this.search.search(queryText, {
-      filter,
-      top,
-      // vector: queryVector,
-      // topK: queryVector ? 50 : undefined,
-      // vectorFields: queryVector ? 'embedding' : undefined,
-    });
-    // }
-
-    let results: string[] = [];
-    if (useSemanticCaption) {
-      for await (const result of searchResults.results) {
-        // TODO: ensure typings
-        const doc = result as any;
-        const captions = doc['@search.captions'];
-        const captionsText = captions.map((c: any) => c.text).join(' . ');
-        results.push(`${doc[this.sourcePageField]}: ${removeNewlines(captionsText)}`);
-      }
-    } else {
-      for await (const result of searchResults.results) {
-        // TODO: ensure typings
-        const doc = result.document as any;
-        results.push(`${doc[this.sourcePageField]}: ${removeNewlines(doc[this.contentField])}`);
-      }
-    }
-    const content = results.join('\n');
-
+    const { query, results, content } = await this.searchDocuments(q, overrides);
     const messageBuilder = new MessageBuilder(overrides?.prompt_template || SYSTEM_CHAT_TEMPLATE, this.chatGptModel);
 
     // Add user question
@@ -131,7 +68,7 @@ export class AskRetrieveThenReadApproach implements AskApproach {
     return {
       data_points: results,
       answer: chatCompletion.choices[0].message.content ?? '',
-      thoughts: `Question:<br>${queryText}<br><br>Prompt:<br>${messageToDisplay.replace('\n', '<br>')}`,
+      thoughts: `Question:<br>${query}<br><br>Prompt:<br>${messageToDisplay.replace('\n', '<br>')}`,
     };
   }
 }

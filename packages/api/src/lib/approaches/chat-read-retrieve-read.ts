@@ -1,7 +1,6 @@
 import { SearchClient } from '@azure/search-documents';
-import { ChatApproach, ApproachResponse } from './approach.js';
+import { ChatApproach, ApproachResponse, ApproachBase } from './approach.js';
 import { OpenAiClients } from '../../plugins/openai.js';
-import { removeNewlines } from '../util/index.js';
 import { MessageBuilder } from '../message-builder.js';
 import { getTokenLimit } from '../model-helpers.js';
 import { HistoryMessage, Message, messagesToString } from '../message.js';
@@ -40,27 +39,22 @@ const QUERY_PROMPT_FEW_SHOTS: Message[] = [
  * It first retrieves top documents from search, then constructs a prompt with them, and then uses
  * OpenAI to generate an completion (answer) with that prompt.
  */
-export class ChatReadRetrieveRead implements ChatApproach {
+export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
   chatGptTokenLimit: number;
 
   constructor(
-    private search: SearchClient<any>,
-    private openai: OpenAiClients,
-    private chatGptModel: string,
-    private sourcePageField: string,
-    private contentField: string,
+    search: SearchClient<any>,
+    openai: OpenAiClients,
+    chatGptModel: string,
+    sourcePageField: string,
+    contentField: string,
   ) {
+    super(search, openai, chatGptModel, sourcePageField, contentField);
     this.chatGptTokenLimit = getTokenLimit(chatGptModel);
   }
 
   async run(history: HistoryMessage[], overrides: Record<string, any>): Promise<ApproachResponse> {
-    const hasText = ['text', 'hybrid', undefined].includes(overrides?.retrieval_mode);
-    // const hasVectors = ['vectors', 'hybrid', undefined].includes(overrides?.retrieval_mode);
-    const useSemanticCaption = Boolean(overrides?.use_semantic_caption) && hasText;
-    const top = overrides?.top ? Number(overrides?.top) : 3;
-    const excludeCategory: string | undefined = overrides?.exclude_category;
-    const filter = excludeCategory ? `category ne '${excludeCategory.replace("'", "''")}'` : undefined;
-    const userQ = 'Generate search query for: ' + history[history.length - 1].user;
+    const userQuery = 'Generate search query for: ' + history[history.length - 1].user;
 
     // STEP 1: Generate an optimized keyword search query based on the chat history and the last question
     // -----------------------------------------------------------------------
@@ -69,9 +63,9 @@ export class ChatReadRetrieveRead implements ChatApproach {
       QUERY_PROMPT_TEMPLATE,
       this.chatGptModel,
       history,
-      userQ,
+      userQuery,
       QUERY_PROMPT_FEW_SHOTS,
-      this.chatGptTokenLimit - userQ.length,
+      this.chatGptTokenLimit - userQuery.length,
     );
 
     const openAiChat = await this.openai.getChat();
@@ -92,65 +86,7 @@ export class ChatReadRetrieveRead implements ChatApproach {
     // STEP 2: Retrieve relevant documents from the search index with the GPT optimized query
     // -----------------------------------------------------------------------
 
-    // If retrieval mode includes vectors, compute an embedding for the query
-    // let queryVector;
-    // if (hasVectors) {
-    //   let openAiEmbeddings = await this.openai.getEmbeddings();
-    //   const result = await openAiEmbeddings.create({
-    //     model: 'text-embedding-ada-002',
-    //     input: queryText!,
-    //   });
-    //   queryVector = result.data[0].embedding;
-    // }
-
-    // Only keep the text query if the retrieval mode uses text, otherwise drop it
-    if (!hasText) {
-      queryText = undefined;
-    }
-
-    // Use semantic L2 reranker if requested and if retrieval mode is text or hybrid (vectors + text)
-    let searchResults;
-    // TODO: JS SDK is missing features: https://github.com/anfibiacreativa/azure-search-open-ai-javascript/issues/21
-    // if (overrides?.semantic_ranker && hasText) {
-    //   searchResults = await this.search.search(queryText, {
-    //     filter,
-    //     queryType: 'semantic',
-    //     queryLanguage: 'en-us',
-    //     querySpeller: 'lexicon',
-    //     semanticConfigurationName: 'default',
-    //     top,
-    //     queryCaption: useSemanticCaption ? 'extractive|highlight-false' : undefined,
-    //     vector: queryVector,
-    //     topK: queryVector ? 50 : undefined,
-    //     vectorFields: queryVector ? 'embedding' : undefined,
-    //   }
-    // } else {
-    searchResults = await this.search.search(queryText, {
-      filter,
-      top,
-      // vector: queryVector,
-      // topK: queryVector ? 50 : undefined,
-      // vectorFields: queryVector ? 'embedding' : undefined,
-    });
-    // }
-
-    let results: string[] = [];
-    if (useSemanticCaption) {
-      for await (const result of searchResults.results) {
-        // TODO: ensure typings
-        const doc = result as any;
-        const captions = doc['@search.captions'];
-        const captionsText = captions.map((c: any) => c.text).join(' . ');
-        results.push(`${doc[this.sourcePageField]}: ${removeNewlines(captionsText)}`);
-      }
-    } else {
-      for await (const result of searchResults.results) {
-        // TODO: ensure typings
-        const doc = result.document as any;
-        results.push(`${doc[this.sourcePageField]}: ${removeNewlines(doc[this.contentField])}`);
-      }
-    }
-    const content = results.join('\n');
+    const { query, results, content } = await this.searchDocuments(queryText, overrides);
     const followUpQuestionsPrompt = overrides?.suggest_followup_questions ? FOLLOW_UP_QUESTIONS_PROMPT_CONTENT : '';
 
     // STEP 3: Generate a contextual and content specific answer using the search results and chat history
@@ -201,7 +137,7 @@ export class ChatReadRetrieveRead implements ChatApproach {
     return {
       data_points: results,
       answer: chatContent,
-      thoughts: `Searched for:<br>${queryText}<br><br>Conversations:<br>${messageToDisplay.replace('\n', '<br>')}`,
+      thoughts: `Searched for:<br>${query}<br><br>Conversations:<br>${messageToDisplay.replace('\n', '<br>')}`,
     };
   }
 

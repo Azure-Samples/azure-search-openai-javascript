@@ -1,5 +1,5 @@
 import fp from 'fastify-plugin';
-import { AskApproach, AskRetrieveThenReadApproach, ChatApproach, ChatReadRetrieveRead } from '../lib/index.js';
+import { AskApproach, AskRetrieveThenRead, ChatApproach, ChatReadRetrieveRead } from '../lib/index.js';
 
 export type Approaches = {
   chat: Record<string, ChatApproach>;
@@ -24,7 +24,7 @@ export default fp(
         ),
       },
       ask: {
-        rtr: new AskRetrieveThenReadApproach(
+        rtr: new AskRetrieveThenRead(
           fastify.azure.search,
           fastify.openai,
           config.azureOpenAiChatGptModel,
