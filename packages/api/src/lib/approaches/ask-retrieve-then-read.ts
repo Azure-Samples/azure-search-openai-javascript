@@ -40,12 +40,12 @@ export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
     super(search, openai, chatGptModel, sourcePageField, contentField);
   }
 
-  async run(q: string, overrides: Record<string, any>): Promise<any> {
-    const { query, results, content } = await this.searchDocuments(q, overrides);
+  async run(userQuery: string, overrides: Record<string, any>): Promise<any> {
+    const { query, results, content } = await this.searchDocuments(userQuery, overrides);
     const messageBuilder = new MessageBuilder(overrides?.prompt_template || SYSTEM_CHAT_TEMPLATE, this.chatGptModel);
 
     // Add user question
-    const userContent = `${q}\nSources:\n${content}`;
+    const userContent = `${userQuery}\nSources:\n${content}`;
     messageBuilder.appendMessage('user', userContent);
 
     // Add shots/samples. This helps model to mimic response and make sure they match rules laid out in system message.
