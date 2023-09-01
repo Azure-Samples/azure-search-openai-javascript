@@ -1,8 +1,9 @@
 import { SearchClient } from '@azure/search-documents';
 import { OpenAiClients } from '../../plugins/openai.js';
-import { MessageBuilder } from '../message-builder.js';
-import { ApproachBase, AskApproach } from './approach.js';
 import { messagesToString } from '../message.js';
+import { MessageBuilder } from '../message-builder.js';
+import { AskApproach } from './approach.js';
+import { ApproachBase } from './approach-base.js';
 
 const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant helping Contoso Inc employees with their healthcare plan questions and employee handbook questions.
 Use 'you' to refer to the individual asking the questions even if they ask with 'I'.
