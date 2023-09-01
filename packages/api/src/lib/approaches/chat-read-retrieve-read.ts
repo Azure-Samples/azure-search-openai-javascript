@@ -1,5 +1,5 @@
 import { SearchClient } from '@azure/search-documents';
-import { OpenAiClients } from '../../plugins/openai.js';
+import { OpenAiService } from '../../plugins/openai.js';
 import { ChatApproach, ApproachResponse } from './approach.js';
 import { ApproachBase } from './approach-base.js';
 import { HistoryMessage, Message, messagesToString } from '../message.js';
@@ -45,7 +45,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
 
   constructor(
     search: SearchClient<any>,
-    openai: OpenAiClients,
+    openai: OpenAiService,
     chatGptModel: string,
     sourcePageField: string,
     contentField: string,

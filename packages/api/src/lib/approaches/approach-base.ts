@@ -1,5 +1,5 @@
 import { SearchClient } from '@azure/search-documents';
-import { OpenAiClients } from '../../plugins/openai.js';
+import { OpenAiService } from '../../plugins/openai.js';
 import { removeNewlines } from '../util/index.js';
 
 export interface SearchDocumentsResult {
@@ -11,7 +11,7 @@ export interface SearchDocumentsResult {
 export class ApproachBase {
   constructor(
     protected search: SearchClient<any>,
-    protected openai: OpenAiClients,
+    protected openai: OpenAiService,
     protected chatGptModel: string,
     protected sourcePageField: string,
     protected contentField: string,

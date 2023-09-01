@@ -1,5 +1,5 @@
 import { SearchClient } from '@azure/search-documents';
-import { OpenAiClients } from '../../plugins/openai.js';
+import { OpenAiService } from '../../plugins/openai.js';
 import { messagesToString } from '../message.js';
 import { MessageBuilder } from '../message-builder.js';
 import { AskApproach } from './approach.js';
@@ -33,7 +33,7 @@ const ANSWER = `In-network deductibles are $500 for employee and $1000 for famil
 export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
   constructor(
     search: SearchClient<any>,
-    openai: OpenAiClients,
+    openai: OpenAiService,
     chatGptModel: string,
     sourcePageField: string,
     contentField: string,
