@@ -3,9 +3,14 @@ import { AccessToken } from '@azure/core-http';
 import { OpenAI } from 'openai';
 import { Chat, Embeddings } from 'openai/resources/index';
 
-export type OpenAiClients = {
+export type OpenAiService = {
   getChat(): Promise<Chat>;
   getEmbeddings(): Promise<Embeddings>;
+  getApiToken(): Promise<string>;
+  config: {
+    apiVersion: string;
+    apiUrl: string;
+  };
 };
 
 const AZURE_OPENAI_API_VERSION = '2023-05-15';
@@ -53,6 +58,14 @@ export default fp(
         await refreshOpenAiToken();
         return embeddingsClient.embeddings;
       },
+      async getApiToken() {
+        await refreshOpenAiToken();
+        return openAiToken.token;
+      },
+      config: {
+        apiVersion: AZURE_OPENAI_API_VERSION,
+        apiUrl: openAiUrl,
+      },
     });
   },
   {
@@ -64,6 +77,6 @@ export default fp(
 // When using .decorate you have to specify added properties for Typescript
 declare module 'fastify' {
   export interface FastifyInstance {
-    openai: OpenAiClients;
+    openai: OpenAiService;
   }
 }
