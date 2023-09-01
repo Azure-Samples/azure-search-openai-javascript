@@ -8,6 +8,9 @@ export type OpenAiClients = {
   getEmbeddings(): Promise<Embeddings>;
 };
 
+const AZURE_OPENAI_API_VERSION = '2023-05-15';
+const AZURE_COGNITIVE_SERVICES_AD_SCOPE = 'https://cognitiveservices.azure.com/.default';
+
 export default fp(
   async (fastify, opts) => {
     const config = fastify.config;
@@ -21,11 +24,11 @@ export default fp(
 
     const refreshOpenAiToken = async () => {
       if (!openAiToken || openAiToken.expiresOnTimestamp < Date.now() + 60 * 1000) {
-        openAiToken = await fastify.azure.credential.getToken('https://cognitiveservices.azure.com/.default');
+        openAiToken = await fastify.azure.credential.getToken(AZURE_COGNITIVE_SERVICES_AD_SCOPE);
 
         const commonOptions = {
           apiKey: openAiToken.token,
-          defaultQuery: { 'api-version': '2023-05-15' },
+          defaultQuery: { 'api-version': AZURE_OPENAI_API_VERSION },
           defaultHeaders: { 'api-key': openAiToken.token },
         };
 
