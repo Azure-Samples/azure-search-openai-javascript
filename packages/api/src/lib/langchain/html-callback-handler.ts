@@ -8,7 +8,6 @@ const STYLES = {
   Blue: { open: '<span style="color:blue">', close: '</span>' },
   Green: { open: '<span style="color:green">', close: '</span>' },
   Red: { open: '<span style="color:red">', close: '</span>' },
-  Grey: { open: '<span style="color:darkgrey">', close: '</span>' },
 };
 
 export class HtmlCallbackHandler extends BaseTracer {
@@ -26,47 +25,21 @@ export class HtmlCallbackHandler extends BaseTracer {
     return result;
   }
 
-  getParents(run: Run) {
-    const parents: Run[] = [];
-    let currentRun = run;
-    while (currentRun.parent_run_id) {
-      const parent = this.runMap.get(currentRun.parent_run_id);
-      if (parent) {
-        parents.push(parent);
-        currentRun = parent;
-      } else {
-        break;
-      }
-    }
-    return parents;
+  onLLMStart(run: Run): void {
+    this.html += `LLM prompts:<br>${run.inputs.prompts.map(toHtml).join('<br>')}<br><br>`;
   }
 
-  getBreadcrumbs(run: Run) {
-    const parents = this.getParents(run).reverse();
-    const string = [...parents, run]
-      .map((parent, i, arr) => {
-        const name = `${parent.execution_order}:${parent.run_type}:${parent.name}`;
-        return i === arr.length - 1 ? wrap(STYLES.Bold, name) : name;
-      })
-      .join(' > ');
-    return wrap(STYLES.Grey, string);
-  }
-
-  onLlmStart(run: Run): void {
-    this.html += `LLM prompts:<br>${run.inputs.prompts.map(toHtml).join('<br>')}<br>`;
-  }
-
-  onLlmEnd(run: Run): void {
+  onLLMEnd(run: Run): void {
     // Do nothing
   }
 
-  onLlmError(run: Run): void {
-    this.html += `${wrap(STYLES.Red, `LLM error: ${toHtml(tryJsonStringify(run.error, '[error]'))}`)}<br>`;
+  onLLMError(run: Run): void {
+    this.html += `${wrap(STYLES.Red, `LLM error: ${toHtml(tryJsonStringify(run.error, '[error]'))}`)}<br><br>`;
   }
 
   onChainStart(run: Run): void {
     const crumbs = this.getBreadcrumbs(run);
-    this.html += `[chain/start] [${crumbs}] Entering chain<br>`;
+    this.html += `[chain/start] [${crumbs}] Entering chain<br><br>`;
   }
 
   onChainEnd(run: Run): void {
@@ -77,7 +50,7 @@ export class HtmlCallbackHandler extends BaseTracer {
     this.html += `${wrap(
       STYLES.Red,
       `[chain/error] Chain error: ${toHtml(tryJsonStringify(run.error, '[error]'))}`,
-    )}<br>`;
+    )}<br><br>`;
   }
 
   onToolStart(run: Run): void {
@@ -93,7 +66,7 @@ export class HtmlCallbackHandler extends BaseTracer {
     this.html += `${wrap(
       STYLES.Red,
       `[tool/error] Tool error: ${toHtml(tryJsonStringify(run.error, '[error]'))}`,
-    )}<br>`;
+    )}<br><br>`;
   }
 
   onText(run: Run): void {
@@ -105,13 +78,38 @@ export class HtmlCallbackHandler extends BaseTracer {
     const agentRun = run as AgentRun;
     const action = agentRun.actions[agentRun.actions.length - 1];
     const crumbs = this.getBreadcrumbs(run);
-    this.html += `[agent/action] [${crumbs}] Agent selected action:<br>${action.log}<br>`;
+    this.html += `[agent/action] [${crumbs}] Agent selected action:<br>${action.log}<br><br>`;
   }
 
   onAgentFinish(run: Run): void {
     const agentRun = run as AgentRun;
     const action = agentRun.actions[agentRun.actions.length - 1];
-    this.html += `${toHtml(action.log)}<br>`;
+    this.html += `${toHtml(action.log)}<br><br>`;
+  }
+
+  private getParents(run: Run) {
+    const parents: Run[] = [];
+    let currentRun = run;
+    while (currentRun.parent_run_id) {
+      const parent = this.runMap.get(currentRun.parent_run_id);
+      if (parent) {
+        parents.push(parent);
+        currentRun = parent;
+      } else {
+        break;
+      }
+    }
+    return parents;
+  }
+
+  private getBreadcrumbs(run: Run) {
+    const parents = this.getParents(run).reverse();
+    return [...parents, run]
+      .map((parent, i, arr) => {
+        const name = `${parent.execution_order}:${parent.run_type}:${parent.name}`;
+        return i === arr.length - 1 ? wrap(STYLES.Bold, name) : name;
+      })
+      .join(' > ');
   }
 }
 
