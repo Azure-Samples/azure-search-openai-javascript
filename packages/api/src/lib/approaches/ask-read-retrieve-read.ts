@@ -1,11 +1,12 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SearchClient } from '@azure/search-documents';
-import { DynamicTool } from 'langchain/tools';
+import { DynamicTool, ToolParams } from 'langchain/tools';
 import { initializeAgentExecutorWithOptions } from 'langchain/agents';
+import { CallbackManager, ConsoleCallbackHandler } from 'langchain/callbacks';
 import { OpenAiService } from '../../plugins/openai.js';
 import { LangchainService } from '../../plugins/langchain.js';
-import { CsvLookupTool } from '../util/index.js';
+import { CsvLookupTool, HtmlCallbackHandler } from '../util/index.js';
 import { AskApproach } from './approach.js';
 import { ApproachBase } from './approach-base.js';
 
@@ -53,6 +54,11 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
   async run(userQuery: string, overrides: Record<string, any>): Promise<any> {
     let searchResults: string[] = [];
 
+    const htmlTracer = new HtmlCallbackHandler();
+    const callbackManager = new CallbackManager();
+    callbackManager.addHandler(new ConsoleCallbackHandler());
+    callbackManager.addHandler(htmlTracer);
+
     const searchAndStore = async (query: string): Promise<string> => {
       const { results, content } = await this.searchDocuments(query, overrides);
       searchResults = results;
@@ -65,8 +71,9 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
         func: searchAndStore,
         description:
           'useful for searching employee handbook informations, such as healthcare plans, retirement plans, etc',
+        callbacks: callbackManager,
       }),
-      new EmployeeInfoTool('Employee1'),
+      new EmployeeInfoTool('Employee1', { callbacks: callbackManager }),
     ];
 
     const chatModel = await this.langchain.getChat({
@@ -81,7 +88,7 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
         inputVariables: ['input', 'agent_scratchpad'],
       },
       returnIntermediateSteps: true,
-      verbose: true,
+      callbackManager,
     });
 
     let result = await executor.call({ input: userQuery });
@@ -92,7 +99,7 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
     return {
       data_points: searchResults,
       answer,
-      thoughts: `Though process:\n${JSON.stringify(result.intermediateSteps, null, 2)}`, // TODO: format to HTML
+      thoughts: htmlTracer.getAndResetLog(),
     };
   }
 }
@@ -106,8 +113,11 @@ class EmployeeInfoTool extends CsvLookupTool {
   description =
     'useful to look up details given an input key as opposite to searching data with an unstructured question';
 
-  constructor(private employeeName: string) {
-    super(path.join(__dirname, '../../../data/employee-info.csv'), 'name');
+  constructor(
+    private employeeName: string,
+    options?: ToolParams,
+  ) {
+    super(path.join(__dirname, '../../../data/employee-info.csv'), 'name', options);
   }
 
   async _call(input: string): Promise<string> {

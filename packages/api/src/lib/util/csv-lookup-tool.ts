@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { Tool } from 'langchain/tools';
+import { Tool, ToolParams } from 'langchain/tools';
 
 const CSV_SEPARATOR = ',';
 
@@ -21,8 +21,9 @@ export class CsvLookupTool extends Tool {
   constructor(
     private filename: string,
     private keyField: string,
+    options?: ToolParams,
   ) {
-    super();
+    super(options);
   }
 
   async _call(input: string): Promise<string> {
