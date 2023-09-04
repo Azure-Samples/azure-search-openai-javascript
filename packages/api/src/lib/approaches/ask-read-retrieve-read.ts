@@ -5,9 +5,9 @@ import { DynamicTool } from 'langchain/tools';
 import { initializeAgentExecutorWithOptions } from 'langchain/agents';
 import { OpenAiService } from '../../plugins/openai.js';
 import { LangchainService } from '../../plugins/langchain.js';
+import { CsvLookupTool } from '../util/index.js';
 import { AskApproach } from './approach.js';
 import { ApproachBase } from './approach-base.js';
-import { CsvLookupTool } from '../util/csv-lookup-tool.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
