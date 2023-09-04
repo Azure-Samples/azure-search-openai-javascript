@@ -1,4 +1,4 @@
-import { getTokenCountFromMessages } from './model-helpers.js';
+import { getTokenCountFromMessages } from './tokens.js';
 import { Message, MessageRole } from './message.js';
 
 export class MessageBuilder {

@@ -6,7 +6,7 @@ import { initializeAgentExecutorWithOptions } from 'langchain/agents';
 import { CallbackManager, ConsoleCallbackHandler } from 'langchain/callbacks';
 import { OpenAiService } from '../../plugins/openai.js';
 import { LangchainService } from '../../plugins/langchain.js';
-import { CsvLookupTool, HtmlCallbackHandler } from '../util/index.js';
+import { CsvLookupTool, HtmlCallbackHandler } from '../langchain/index.js';
 import { AskApproach } from './approach.js';
 import { ApproachBase } from './approach-base.js';
 
