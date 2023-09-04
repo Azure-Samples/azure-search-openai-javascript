@@ -4,7 +4,7 @@ import { ChatApproach, ApproachResponse } from './approach.js';
 import { ApproachBase } from './approach-base.js';
 import { HistoryMessage, Message, messagesToString } from '../message.js';
 import { MessageBuilder } from '../message-builder.js';
-import { getTokenLimit } from '../model-helpers.js';
+import { getTokenLimit } from '../tokens.js';
 
 const SYSTEM_MESSAGE_CHAT_CONVERSATION = `Assistant helps the company employees with their healthcare plan questions, and questions about the employee handbook. Be brief in your answers.
 Answer ONLY with the facts listed in the list of sources below. If there isn't enough information below, say you don't know. Do not generate answers that don't use the sources below. If asking a clarifying question to the user would help, ask the question.
