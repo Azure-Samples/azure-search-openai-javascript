@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "concurrently npm:start:* --kill-others",
+    "start": "concurrently \"npm:start:*\" --kill-others",
     "start:webapp": "npm run dev --workspace=webapp",
     "start:api": "npm run dev --workspace=api",
     "test": "npm run test -ws --if-present",
