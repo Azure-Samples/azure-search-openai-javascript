@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { SearchClient } from '@azure/search-documents';
 import { DynamicTool, ToolParams } from 'langchain/tools';
 import { initializeAgentExecutorWithOptions } from 'langchain/agents';
-import { CallbackManager, ConsoleCallbackHandler } from 'langchain/callbacks';
+import { CallbackManager } from 'langchain/callbacks';
 import { OpenAiService } from '../../plugins/openai.js';
 import { LangchainService } from '../../plugins/langchain.js';
 import { CsvLookupTool, HtmlCallbackHandler } from '../langchain/index.js';
@@ -56,7 +56,6 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
 
     const htmlTracer = new HtmlCallbackHandler();
     const callbackManager = new CallbackManager();
-    callbackManager.addHandler(new ConsoleCallbackHandler());
     callbackManager.addHandler(htmlTracer);
 
     const searchAndStore = async (query: string): Promise<string> => {
@@ -89,6 +88,7 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
       },
       returnIntermediateSteps: true,
       callbackManager,
+      verbose: true,
     });
 
     let result = await executor.call({ input: userQuery });
