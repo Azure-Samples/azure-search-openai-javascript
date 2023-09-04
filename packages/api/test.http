@@ -24,13 +24,30 @@ Content-Type: application/json
 
 ###
 
-# Ask a question
+# Ask a question using the rtr approach
 POST {{api_host}}/ask
 Content-Type: application/json
 
 {
   "question": "What does a Product Manager do?",
   "approach":"rtr",
+  "overrides": {
+    "retrieval_mode": "hybrid",
+    "semantic_ranker": true,
+    "semantic_captions": false,
+    "top": 3
+  }
+}
+
+###
+
+# Ask a question using the rrr approach
+POST {{api_host}}/ask
+Content-Type: application/json
+
+{
+  "question": "What is the title of Employee2?",
+  "approach":"rrr",
   "overrides": {
     "retrieval_mode": "hybrid",
     "semantic_ranker": true,

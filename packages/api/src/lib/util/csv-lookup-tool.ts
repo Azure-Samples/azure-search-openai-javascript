@@ -26,14 +26,13 @@ export class CsvLookupTool extends Tool {
   }
 
   async _call(input: string): Promise<string> {
-    if (!this.loaded) {
-      await this.loadFile();
-      this.loaded = true;
-    }
+    await this.loadFile();
     return this.lookupAsString(input?.trim());
   }
 
-  private async loadFile() {
+  protected async loadFile() {
+    if (this.loaded) return;
+
     try {
       const csvContent = await fs.readFile(path.resolve(this.filename), 'utf8');
       const [headerRow, ...dataRows] = csvContent.split('\n');
