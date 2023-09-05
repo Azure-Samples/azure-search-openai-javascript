@@ -1,6 +1,7 @@
 import fp from 'fastify-plugin';
 import {
   AskApproach,
+  AskReadDecomposeAsk,
   AskReadRetrieveRead,
   AskRetrieveThenRead,
   ChatApproach,
@@ -38,6 +39,14 @@ export default fp(
           config.kbFieldsContent,
         ),
         rrr: new AskReadRetrieveRead(
+          fastify.langchain,
+          fastify.azure.search,
+          fastify.openai,
+          config.azureOpenAiChatGptModel,
+          config.kbFieldsSourcePage,
+          config.kbFieldsContent,
+        ),
+        rda: new AskReadDecomposeAsk(
           fastify.langchain,
           fastify.azure.search,
           fastify.openai,
