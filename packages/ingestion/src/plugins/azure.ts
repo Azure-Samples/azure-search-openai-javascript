@@ -1,11 +1,11 @@
 import fp from 'fastify-plugin';
 import { DefaultAzureCredential } from '@azure/identity';
-import { SearchClient } from '@azure/search-documents';
+import { SearchIndexClient } from '@azure/search-documents';
 import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 
 export type AzureClients = {
   credential: DefaultAzureCredential;
-  search: SearchClient<any>;
+  searchIndex: SearchIndexClient;
   blobContainer: ContainerClient;
 };
 
@@ -19,9 +19,8 @@ export default fp(
     const credential = new DefaultAzureCredential();
 
     // Set up Azure clients
-    const searchClient = new SearchClient<any>(
+    const searchIndexClient = new SearchIndexClient(
       `https://${config.azureSearchService}.search.windows.net`,
-      config.azureSearchIndex,
       credential,
     );
     const blobServiceClient = new BlobServiceClient(
@@ -32,7 +31,7 @@ export default fp(
 
     fastify.decorate('azure', {
       credential,
-      search: searchClient,
+      searchIndex: searchIndexClient,
       blobContainer: blobContainerClient,
     });
   },
