@@ -19,8 +19,8 @@ export default fp(
       // TODO: Implement token refresh
     };
 
-    azureOpenAiClient.getChatCompletions();
-    azureOpenAiClient.getEmbeddings();
+    azureOpenAiClient.getCompletions(config.azureOpenAiEmbDeployment, []);
+    azureOpenAiClient.getEmbeddings(config.azureOpenAiEmbDeployment, []);
 
     fastify.decorate('azureOpenAi', {
       config: {
