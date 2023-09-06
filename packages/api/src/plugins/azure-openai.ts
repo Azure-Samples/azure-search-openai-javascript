@@ -7,13 +7,13 @@ const AZURE_COGNITIVE_SERVICES_AD_SCOPE = 'https://cognitiveservices.azure.com/.
 export default fp(
   async (fastify, opts) => {
     const config = fastify.config;
-    const azureOpenAiEndpoint = `https://${config.azureOpenAiService}.openai.azure.com`;
+    const azureOpenAiUrl = `https://${config.azureOpenAiService}.openai.azure.com`;
 
-    fastify.log.info(`Using Azure OpenAI at ${azureOpenAiEndpoint}`);
+    fastify.log.info(`Using Azure OpenAI at ${azureOpenAiUrl}`);
 
     const azureApiKey = '<include-azure-open-ai-key>';
 
-    const azureOpenAiClient = new OpenAIClient(azureOpenAiEndpoint, new AzureKeyCredential(azureApiKey));
+    const azureOpenAiClient = new OpenAIClient(azureOpenAiUrl, new AzureKeyCredential(azureApiKey));
 
     const refreshOpenAiToken = async () => {
       // TODO: Implement token refresh
@@ -25,7 +25,7 @@ export default fp(
     fastify.decorate('azureOpenAi', {
       config: {
         apiVersion: AZURE_OPENAI_API_VERSION,
-        apiUrl: azureOpenAiEndpoint,
+        apiUrl: azureOpenAiUrl,
       },
     });
   },
