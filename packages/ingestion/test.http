@@ -1,0 +1,21 @@
+##################################################################
+# VS Code with REST Client extension is needed to use this file.
+# Download at: https://aka.ms/vscode/rest-client
+##################################################################
+
+@api_host = http://localhost:3001
+
+
+# Ingest a file as a document
+POST {{api_host}}/ingest
+Content-Type: application/json
+
+{
+  "filename": "sample.pdf",
+  "metadata": {
+    "title": "Sample PDF",
+    "description": "This is a sample PDF file.",
+    "authors": "John Doe",
+    "date": "2020-01-01T00:00:00Z"
+  }
+}
