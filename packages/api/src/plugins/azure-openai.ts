@@ -19,8 +19,6 @@ export default fp(
       // TODO: Implement token refresh
     };
 
-    //azureOpenAiClient.getChatCompletions(config.azureOpenAiChatGptDeployment, []);
-
     azureOpenAiClient.getChatCompletions(`${azureOpenAiUrl}/${config.azureOpenAiChatGptModel}`, []);
 
     azureOpenAiClient.getEmbeddings(`${azureOpenAiUrl}/${config.azureOpenAiEmbDeployment}`, []);
