@@ -17,8 +17,8 @@
     "dev:start": "fastify start --ignore-watch=.ts$ -w -l debug -P dist/app.js | pino-pretty",
     "lint": "xo",
     "lint:fix": "xo --fix",
-    "docker:build": "docker build --tag search --file ./Dockerfile ../..",
-    "docker:run": "docker run --rm --publish 3000:3000 --env-file ../../.env search",
+    "docker:build": "docker build --tag api --file ./Dockerfile ../..",
+    "docker:run": "docker run --rm --publish 3000:3000 --env-file ../../.env api",
     "clean": "rm -rf dist *.tgz"
   },
   "dependencies": {
