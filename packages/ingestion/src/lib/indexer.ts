@@ -12,14 +12,22 @@ export class Indexer {
     private azure: AzureClients,
     private openai: OpenAiService,
     private name: string,
+    private embeddingModelName: string = 'text-embedding-ada-002',
     private options: IndexerOptions = {},
   ) {}
 
-  async createEmbedding(text: string) {
+  async createEmbedding(text: string): Promise<number[]> {
     const embeddingsClient = await this.openai.getEmbeddings();
     // TODO: make model configurable in env vars
-    const result = await embeddingsClient.create({ input: text, model: 'text-embedding-ada-002' });
+    const result = await embeddingsClient.create({ input: text, model: this.embeddingModelName });
     return result.data[0].embedding;
+  }
+
+  async batchCreateEmbeddings(texts: string[]): Promise<Array<number[]>> {
+    const embeddingsClient = await this.openai.getEmbeddings();
+    // TODO: make model configurable in env vars
+    const result = await embeddingsClient.create({ input: texts, model: this.embeddingModelName });
+    return result.data.map((d) => d.embedding);
   }
 
   async createSearchIndex() {
@@ -118,26 +126,18 @@ export class Indexer {
     }
     const searchClient = this.azure.searchIndex.getSearchClient(this.name);
 
-    let i = 0;
+    const batchSize = 1000;
     let batch: any[] = [];
-    for (const s of sections) {
-      batch.push(s);
-      i += 1;
-      if (i % 1000 === 0) {
+
+    for (let i = 0; i < sections.length; i++) {
+      batch.push(sections[i]);
+
+      if (batch.length === batchSize || i === sections.length - 1) {
         const { results } = await searchClient.uploadDocuments(batch);
         const succeeded = results.filter((r) => r.succeeded).length;
-        if (this.options.verbose) {
-          console.log(`Indexed ${results.length} sections, ${succeeded} succeeded`);
-        }
+        const indexed = batch.length;
+        console.log(`Indexed ${indexed} sections, ${succeeded} succeeded`);
         batch = [];
-      }
-    }
-
-    if (batch.length > 0) {
-      const { results } = await searchClient.uploadDocuments(batch);
-      const succeeded = results.filter((r) => r.succeeded).length;
-      if (this.options.verbose) {
-        console.log(`Indexed ${results.length} sections, ${succeeded} succeeded`);
       }
     }
   }
