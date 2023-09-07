@@ -1,14 +1,32 @@
+import { BaseLogger } from 'pino';
 import { SearchIndex } from '@azure/search-documents';
+import { encoding_for_model, TiktokenModel } from '@dqbd/tiktoken';
 import { AzureClients } from '../plugins/azure';
 import { OpenAiService } from '../plugins/openai';
 import { wait } from './util/index.js';
+import { DocumentProcessor, Section } from './document-processor.js';
 
 export interface IndexerOptions {
-  verbose?: boolean;
+  useVectors?: boolean;
 }
+
+export interface ModelLimit {
+  tokenLimit: number;
+  maxBatchSize: number;
+}
+
+export const MODELS_SUPPORTED_BATCH_SIZE: Record<string, ModelLimit> = {
+  'text-embedding-ada-002': {
+    tokenLimit: 8100,
+    maxBatchSize: 16,
+  },
+};
+
+const INDEXING_BATCH_SIZE = 1000;
 
 export class Indexer {
   constructor(
+    private logger: BaseLogger,
     private azure: AzureClients,
     private openai: OpenAiService,
     private name: string,
@@ -17,23 +35,49 @@ export class Indexer {
   ) {}
 
   async createEmbedding(text: string): Promise<number[]> {
+    // TODO: add retry
     const embeddingsClient = await this.openai.getEmbeddings();
     // TODO: make model configurable in env vars
     const result = await embeddingsClient.create({ input: text, model: this.embeddingModelName });
     return result.data[0].embedding;
   }
 
-  async batchCreateEmbeddings(texts: string[]): Promise<Array<number[]>> {
+  async createEmbeddingsInBatch(texts: string[]): Promise<Array<number[]>> {
+    // TODO: add retry
     const embeddingsClient = await this.openai.getEmbeddings();
     // TODO: make model configurable in env vars
     const result = await embeddingsClient.create({ input: texts, model: this.embeddingModelName });
     return result.data.map((d) => d.embedding);
   }
 
-  async createSearchIndex() {
-    if (this.options.verbose) {
-      console.log(`Ensuring search index "${this.name}" exists`);
+  async updateEmbeddingsInBatch(sections: Section[]): Promise<Section[]> {
+    const batchSize = MODELS_SUPPORTED_BATCH_SIZE[this.embeddingModelName];
+    const batchQueue: Section[] = [];
+    let tokenCount = 0;
+
+    for (const [i, section] of sections.entries()) {
+      tokenCount += getTokenCount(section.content, this.embeddingModelName);
+      batchQueue.push(section);
+
+      if (
+        tokenCount > batchSize.tokenLimit ||
+        batchQueue.length >= batchSize.maxBatchSize ||
+        i === sections.length - 1
+      ) {
+        const embeddings = await this.createEmbeddingsInBatch(batchQueue.map((section) => section.content));
+        batchQueue.forEach((section, i) => (section.embedding = embeddings[i]));
+        this.logger.debug(`Batch Completed. Batch size ${batchQueue.length} Token count ${tokenCount}`);
+
+        batchQueue.length = 0;
+        tokenCount = 0;
+      }
     }
+
+    return sections;
+  }
+
+  async createSearchIndex() {
+    this.logger.debug(`Ensuring search index "${this.name}" exists`);
 
     const searchIndexClient = this.azure.searchIndex;
 
@@ -109,25 +153,27 @@ export class Indexer {
           ],
         },
       };
-      if (this.options.verbose) {
-        console.log(`Creating "${this.name}" search index...`);
-      }
+      this.logger.debug(`Creating "${this.name}" search index...`);
       await searchIndexClient.createIndex(index);
     } else {
-      if (this.options.verbose) {
-        console.log(`Search index "${this.name}" already exists`);
-      }
+      this.logger.debug(`Search index "${this.name}" already exists`);
     }
   }
 
-  async indexSections(filename: string, sections: any[]) {
-    if (this.options.verbose) {
-      console.log(`Indexing sections from "${filename}" into search index "${this.name}..."`);
+  async indexFile(filename: string, data: Buffer, type: string, category: string) {
+    this.logger.debug(`Indexing file "${filename}" into search index "${this.name}..."`);
+
+    const documentProcessor = new DocumentProcessor(this.logger);
+    const document = await documentProcessor.createDocumentFromFile(filename, data, type, category);
+    const sections = document.sections;
+    if (this.options.useVectors) {
+      await this.updateEmbeddingsInBatch(sections);
     }
+
     const searchClient = this.azure.searchIndex.getSearchClient(this.name);
 
-    const batchSize = 1000;
-    let batch: any[] = [];
+    const batchSize = INDEXING_BATCH_SIZE;
+    let batch: Section[] = [];
 
     for (let i = 0; i < sections.length; i++) {
       batch.push(sections[i]);
@@ -136,16 +182,14 @@ export class Indexer {
         const { results } = await searchClient.uploadDocuments(batch);
         const succeeded = results.filter((r) => r.succeeded).length;
         const indexed = batch.length;
-        console.log(`Indexed ${indexed} sections, ${succeeded} succeeded`);
+        this.logger.debug(`Indexed ${indexed} sections, ${succeeded} succeeded`);
         batch = [];
       }
     }
   }
 
   async removeFromIndex(filename?: string) {
-    if (this.options.verbose) {
-      console.log(`Removing sections from "${filename ?? '<all>'}" from search index "${this.name}"`);
-    }
+    this.logger.debug(`Removing sections from "${filename ?? '<all>'}" from search index "${this.name}"`);
     const searchClient = this.azure.searchIndex.getSearchClient(this.name);
 
     while (true) {
@@ -160,12 +204,17 @@ export class Indexer {
       }
 
       const { results } = await searchClient.deleteDocuments(documents);
-      if (this.options.verbose) {
-        console.log(`\tRemoved ${results.length} sections from index`);
-      }
+      this.logger.debug(`Removed ${results.length} sections from index`);
 
       // It can take a few seconds for search results to reflect changes, so wait a bit
       await wait(2000);
     }
   }
+}
+
+export function getTokenCount(input: string, model: string): number {
+  const encoder = encoding_for_model(model as TiktokenModel);
+  const tokens = encoder.encode(input).length;
+  encoder.free();
+  return tokens;
 }
