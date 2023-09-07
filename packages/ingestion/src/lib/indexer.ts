@@ -6,8 +6,15 @@ import { OpenAiService } from '../plugins/openai';
 import { wait } from './util/index.js';
 import { DocumentProcessor, Section } from './document-processor.js';
 
-export interface IndexerOptions {
+export interface IndexFileOptions {
   useVectors?: boolean;
+}
+
+export interface FileInfos {
+  filename: string;
+  data: Buffer;
+  type: string;
+  category: string;
 }
 
 export interface ModelLimit {
@@ -29,55 +36,11 @@ export class Indexer {
     private logger: BaseLogger,
     private azure: AzureClients,
     private openai: OpenAiService,
-    private name: string,
     private embeddingModelName: string = 'text-embedding-ada-002',
-    private options: IndexerOptions = {},
   ) {}
 
-  async createEmbedding(text: string): Promise<number[]> {
-    // TODO: add retry
-    const embeddingsClient = await this.openai.getEmbeddings();
-    // TODO: make model configurable in env vars
-    const result = await embeddingsClient.create({ input: text, model: this.embeddingModelName });
-    return result.data[0].embedding;
-  }
-
-  async createEmbeddingsInBatch(texts: string[]): Promise<Array<number[]>> {
-    // TODO: add retry
-    const embeddingsClient = await this.openai.getEmbeddings();
-    // TODO: make model configurable in env vars
-    const result = await embeddingsClient.create({ input: texts, model: this.embeddingModelName });
-    return result.data.map((d) => d.embedding);
-  }
-
-  async updateEmbeddingsInBatch(sections: Section[]): Promise<Section[]> {
-    const batchSize = MODELS_SUPPORTED_BATCH_SIZE[this.embeddingModelName];
-    const batchQueue: Section[] = [];
-    let tokenCount = 0;
-
-    for (const [i, section] of sections.entries()) {
-      tokenCount += getTokenCount(section.content, this.embeddingModelName);
-      batchQueue.push(section);
-
-      if (
-        tokenCount > batchSize.tokenLimit ||
-        batchQueue.length >= batchSize.maxBatchSize ||
-        i === sections.length - 1
-      ) {
-        const embeddings = await this.createEmbeddingsInBatch(batchQueue.map((section) => section.content));
-        batchQueue.forEach((section, i) => (section.embedding = embeddings[i]));
-        this.logger.debug(`Batch Completed. Batch size ${batchQueue.length} Token count ${tokenCount}`);
-
-        batchQueue.length = 0;
-        tokenCount = 0;
-      }
-    }
-
-    return sections;
-  }
-
-  async createSearchIndex() {
-    this.logger.debug(`Ensuring search index "${this.name}" exists`);
+  async createSearchIndex(indexName: string) {
+    this.logger.debug(`Ensuring search index "${indexName}" exists`);
 
     const searchIndexClient = this.azure.searchIndex;
 
@@ -86,9 +49,9 @@ export class Indexer {
     for await (const index of indexNames) {
       names.push(index.name);
     }
-    if (!names.includes(this.name)) {
+    if (!names.includes(indexName)) {
       const index: SearchIndex = {
-        name: this.name,
+        name: indexName,
         fields: [
           {
             name: 'id',
@@ -153,24 +116,31 @@ export class Indexer {
           ],
         },
       };
-      this.logger.debug(`Creating "${this.name}" search index...`);
+      this.logger.debug(`Creating "${indexName}" search index...`);
       await searchIndexClient.createIndex(index);
     } else {
-      this.logger.debug(`Search index "${this.name}" already exists`);
+      this.logger.debug(`Search index "${indexName}" already exists`);
     }
   }
 
-  async indexFile(filename: string, data: Buffer, type: string, category: string) {
-    this.logger.debug(`Indexing file "${filename}" into search index "${this.name}..."`);
+  async deleteSearchIndex(indexName: string) {
+    this.logger.debug(`Deleting search index "${indexName}"`);
+    const searchIndexClient = this.azure.searchIndex;
+    await searchIndexClient.deleteIndex(indexName);
+  }
+
+  async indexFile(indexName: string, fileInfos: FileInfos, options: IndexFileOptions = {}) {
+    const { filename, data, type, category } = fileInfos;
+    this.logger.debug(`Indexing file "${filename}" into search index "${indexName}..."`);
 
     const documentProcessor = new DocumentProcessor(this.logger);
     const document = await documentProcessor.createDocumentFromFile(filename, data, type, category);
     const sections = document.sections;
-    if (this.options.useVectors) {
+    if (options.useVectors) {
       await this.updateEmbeddingsInBatch(sections);
     }
 
-    const searchClient = this.azure.searchIndex.getSearchClient(this.name);
+    const searchClient = this.azure.searchIndex.getSearchClient(indexName);
 
     const batchSize = INDEXING_BATCH_SIZE;
     let batch: Section[] = [];
@@ -188,9 +158,9 @@ export class Indexer {
     }
   }
 
-  async removeFromIndex(filename?: string) {
-    this.logger.debug(`Removing sections from "${filename ?? '<all>'}" from search index "${this.name}"`);
-    const searchClient = this.azure.searchIndex.getSearchClient(this.name);
+  async removeFromIndex(indexName: string, filename?: string) {
+    this.logger.debug(`Removing sections from "${filename ?? '<all>'}" from search index "${indexName}"`);
+    const searchClient = this.azure.searchIndex.getSearchClient(indexName);
 
     while (true) {
       const filter = filename ? `sourcefile eq '${filename}'` : undefined;
@@ -209,6 +179,48 @@ export class Indexer {
       // It can take a few seconds for search results to reflect changes, so wait a bit
       await wait(2000);
     }
+  }
+
+  async createEmbedding(text: string): Promise<number[]> {
+    // TODO: add retry
+    const embeddingsClient = await this.openai.getEmbeddings();
+    // TODO: make model configurable in env vars
+    const result = await embeddingsClient.create({ input: text, model: this.embeddingModelName });
+    return result.data[0].embedding;
+  }
+
+  async createEmbeddingsInBatch(texts: string[]): Promise<Array<number[]>> {
+    // TODO: add retry
+    const embeddingsClient = await this.openai.getEmbeddings();
+    // TODO: make model configurable in env vars
+    const result = await embeddingsClient.create({ input: texts, model: this.embeddingModelName });
+    return result.data.map((d) => d.embedding);
+  }
+
+  async updateEmbeddingsInBatch(sections: Section[]): Promise<Section[]> {
+    const batchSize = MODELS_SUPPORTED_BATCH_SIZE[this.embeddingModelName];
+    const batchQueue: Section[] = [];
+    let tokenCount = 0;
+
+    for (const [i, section] of sections.entries()) {
+      tokenCount += getTokenCount(section.content, this.embeddingModelName);
+      batchQueue.push(section);
+
+      if (
+        tokenCount > batchSize.tokenLimit ||
+        batchQueue.length >= batchSize.maxBatchSize ||
+        i === sections.length - 1
+      ) {
+        const embeddings = await this.createEmbeddingsInBatch(batchQueue.map((section) => section.content));
+        batchQueue.forEach((section, i) => (section.embedding = embeddings[i]));
+        this.logger.debug(`Batch Completed. Batch size ${batchQueue.length} Token count ${tokenCount}`);
+
+        batchQueue.length = 0;
+        tokenCount = 0;
+      }
+    }
+
+    return sections;
   }
 }
 
