@@ -1,34 +1,6 @@
-import { FastifyPluginAsync, FastifyRequest } from 'fastify';
+import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 
-export type CreateIndexRequest = FastifyRequest<{
-  Body: {
-    name: string;
-  };
-}>;
-
-export type DeleteIndexRequest = FastifyRequest<{
-  Params: {
-    name: string;
-  };
-}>;
-
-export type IndexFileRequest = FastifyRequest<{
-  Params: {
-    name: string;
-  };
-  Body: {
-    options: Record<string, any>;
-  };
-}>;
-
-export type DeleteFileRequest = FastifyRequest<{
-  Params: {
-    name: string;
-    filename: string;
-  };
-}>;
-
-const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
+const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, opts): Promise<void> => {
   fastify.post('/', {
     schema: {
       body: {
@@ -48,8 +20,8 @@ const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         400: { $ref: 'httpError' },
         500: { $ref: 'httpError' },
       },
-    },
-    handler: async function (request: CreateIndexRequest, reply) {
+    } as const,
+    handler: async function (request, reply) {
       const { name } = request.body;
       try {
         await fastify.indexer.createSearchIndex(name);
@@ -80,8 +52,8 @@ const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         },
         500: { $ref: 'httpError' },
       },
-    },
-    handler: async function (request: DeleteIndexRequest, reply) {
+    } as const,
+    handler: async function (request, reply) {
       const { name } = request.params;
       try {
         await fastify.indexer.deleteSearchIndex(name);
@@ -109,9 +81,9 @@ const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       body: {
         type: 'object',
         properties: {
-          category: { $ref: '#fieldSchema' },
-          wait: { $ref: '#fieldSchema' },
-          file: { $ref: '#fieldSchema' },
+          category: { $ref: '#multipartField' },
+          wait: { $ref: '#multipartField' },
+          file: { $ref: '#multipartField' },
         },
         required: ['file'],
       },
@@ -127,10 +99,11 @@ const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         400: { $ref: 'httpError' },
         500: { $ref: 'httpError' },
       },
-    },
-    handler: async function (request: IndexFileRequest, reply) {
-      const { file, category, wait } = request.body as any;
-
+    } as const,
+    handler: async function (request, reply) {
+      // TOFIX: issue in types generation
+      // https://github.com/fastify/fastify-type-provider-json-schema-to-ts/issues/57
+      const { file, category, wait } = (request as any).body;
       if (file.type !== 'file') {
         return reply.badRequest('field "file" must be a file');
       }
@@ -140,14 +113,12 @@ const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       if (wait && wait.type !== 'field') {
         return reply.badRequest('field "wait" must be a value');
       }
-
       const filesInfos = {
         filename: file.filename,
         data: await file.toBuffer(),
         type: file.mimetype,
         category: category?.value,
       };
-
       try {
         if (Boolean(wait?.value)) {
           fastify.log.info(`Indexing file "${filesInfos.filename}" synchronously`);
@@ -187,8 +158,8 @@ const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         },
         500: { $ref: 'httpError' },
       },
-    },
-    handler: async function (request: DeleteFileRequest, reply) {
+    } as const,
+    handler: async function (request, reply) {
       const { name, filename } = request.params;
       try {
         await fastify.indexer.deleteFromIndex(name, filename);
