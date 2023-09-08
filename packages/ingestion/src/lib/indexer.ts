@@ -6,6 +6,7 @@ import { OpenAiService } from '../plugins/openai';
 import { wait } from './util/index.js';
 import { DocumentProcessor, Section } from './document-processor.js';
 import { MODELS_SUPPORTED_BATCH_SIZE } from './model-limits.js';
+import { BlobStorage } from './blob-storage.js';
 
 export interface IndexFileOptions {
   useVectors?: boolean;
@@ -22,12 +23,16 @@ export interface FileInfos {
 const INDEXING_BATCH_SIZE = 1000;
 
 export class Indexer {
+  private blobStorage: BlobStorage;
+
   constructor(
     private logger: BaseLogger,
     private azure: AzureClients,
     private openai: OpenAiService,
     private embeddingModelName: string = 'text-embedding-ada-002',
-  ) {}
+  ) {
+    this.blobStorage = new BlobStorage(logger, azure);
+  }
 
   async createSearchIndex(indexName: string) {
     this.logger.debug(`Ensuring search index "${indexName}" exists`);
@@ -124,7 +129,8 @@ export class Indexer {
     this.logger.debug(`Indexing file "${filename}" into search index "${indexName}..."`);
 
     if (options.uploadToStorage) {
-      // TODO: upload to blob storage
+      // TODO: use separate containers for each index?
+      await this.blobStorage.upload(filename, data, type);
     }
 
     const documentProcessor = new DocumentProcessor(this.logger);
@@ -170,7 +176,11 @@ export class Indexer {
       const { results } = await searchClient.deleteDocuments(documents);
       this.logger.debug(`Removed ${results.length} sections from index`);
 
-      // TODO: delete from blob storage
+      if (filename) {
+        await this.blobStorage.delete(filename);
+      } else {
+        await this.blobStorage.deleteAll();
+      }
 
       // It can take a few seconds for search results to reflect changes, so wait a bit
       await wait(2000);

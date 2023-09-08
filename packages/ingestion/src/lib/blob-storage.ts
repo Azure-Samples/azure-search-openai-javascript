@@ -4,8 +4,8 @@ import { AzureClients } from '../plugins/azure';
 
 export class BlobStorage {
   constructor(
-    private azure: AzureClients,
     private logger: BaseLogger,
+    private azure: AzureClients,
   ) {}
 
   async upload(filename: string, data: Buffer, type: string) {
