@@ -67,7 +67,6 @@ export class DocumentProcessor {
         category: category,
         sourcepage: getBlobNameFromFile(filename),
         sourcefile: filename,
-        // TODO: add hash
       };
 
       sections.push(section);
