@@ -1,49 +1,19 @@
-import { FastifyPluginAsync, FastifyRequest } from 'fastify';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { FastifyPluginAsync } from 'fastify';
 
-export type ChatRequest = FastifyRequest<{
-  Body: {
-    approach: string;
-    overrides: Record<string, any>;
-  };
-}>;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   fastify.get('/', async function (request, reply) {
-    return { root: true };
+    const pkg = JSON.parse(await fs.readFile(path.join(__dirname, '../../package.json'), 'utf-8'));
+    return {
+      service: pkg.name,
+      description: pkg.description,
+      version: pkg.version,
+    };
   });
-
-  // fastify.post('/chat', {
-  //   schema: {
-  //     body: {
-  //       type: 'object',
-  //       properties: {
-  //         approach: {
-  //           type: 'string',
-  //         },
-  //       },
-  //     },
-  //   },
-  //   handler: async function (request: ChatRequest, reply) {
-  //     const { approach } = request.body;
-  //     const chatApproach = fastify.approaches.chat[approach];
-  //     if (!chatApproach) {
-  //       reply.code(400);
-  //       return {
-  //         error: `Chat approach "${approach}" is unknown or not implemented.`,
-  //       };
-  //     }
-
-  //     const { history, overrides } = request.body;
-  //     try {
-  //       return await chatApproach.run(history, overrides);
-  //     } catch (_error: unknown) {
-  //       const error = _error as Error;
-  //       fastify.log.error(error);
-  //       reply.code(500);
-  //       return { error: `Unknown server error: ${error.message}` };
-  //     }
-  //   },
-  // });
 };
 
 export default root;

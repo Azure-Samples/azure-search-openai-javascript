@@ -8,6 +8,7 @@ import { DocumentProcessor, Section } from './document-processor.js';
 
 export interface IndexFileOptions {
   useVectors?: boolean;
+  uploadToStorage?: boolean;
 }
 
 export interface FileInfos {
@@ -66,7 +67,7 @@ export class Indexer {
           },
           {
             name: 'embedding',
-            type: 'Collection(Edm.Double)',
+            type: 'Collection(Edm.Single)',
             hidden: false,
             searchable: true,
             filterable: false,
@@ -133,6 +134,10 @@ export class Indexer {
     const { filename, data, type, category } = fileInfos;
     this.logger.debug(`Indexing file "${filename}" into search index "${indexName}..."`);
 
+    if (options.uploadToStorage) {
+      // TODO: upload to blob storage
+    }
+
     const documentProcessor = new DocumentProcessor(this.logger);
     const document = await documentProcessor.createDocumentFromFile(filename, data, type, category);
     const sections = document.sections;
@@ -158,7 +163,7 @@ export class Indexer {
     }
   }
 
-  async removeFromIndex(indexName: string, filename?: string) {
+  async deleteFromIndex(indexName: string, filename?: string) {
     this.logger.debug(`Removing sections from "${filename ?? '<all>'}" from search index "${indexName}"`);
     const searchClient = this.azure.searchIndex.getSearchClient(indexName);
 
@@ -175,6 +180,8 @@ export class Indexer {
 
       const { results } = await searchClient.deleteDocuments(documents);
       this.logger.debug(`Removed ${results.length} sections from index`);
+
+      // TODO: delete from blob storage
 
       // It can take a few seconds for search results to reflect changes, so wait a bit
       await wait(2000);

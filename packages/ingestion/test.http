@@ -5,17 +5,42 @@
 
 @api_host = http://localhost:3001
 
-
-# Ingest a file as a document
-POST {{api_host}}/ingest
+# Create an index
+POST {{api_host}}/indexes
 Content-Type: application/json
 
 {
-  "filename": "sample.pdf",
-  "metadata": {
-    "title": "Sample PDF",
-    "description": "This is a sample PDF file.",
-    "authors": "John Doe",
-    "date": "2020-01-01T00:00:00Z"
-  }
+  "name": "test"
 }
+
+###
+
+# Delete an index
+DELETE {{api_host}}/indexes/test
+
+###
+
+# Index a file
+POST {{api_host}}/indexes/test/files
+Accept: */*
+Content-Type: multipart/form-data; boundary=Boundary
+
+--Boundary
+Content-Disposition: form-data; name="fiele"; filename="test.txt"
+Content-Type: text/plain
+
+< ../../README.md
+--Boundary
+Content-Disposition: form-data; name="category"
+
+test
+--Boundary
+Content-Disposition: form-data; name="wait"
+
+true
+--Boundary--
+
+###
+
+# Delete a file
+DELETE {{api_host}}/indexes/test/files/sample.txt
