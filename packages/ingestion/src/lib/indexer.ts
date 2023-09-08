@@ -5,6 +5,7 @@ import { AzureClients } from '../plugins/azure';
 import { OpenAiService } from '../plugins/openai';
 import { wait } from './util/index.js';
 import { DocumentProcessor, Section } from './document-processor.js';
+import { MODELS_SUPPORTED_BATCH_SIZE } from './model-limits.js';
 
 export interface IndexFileOptions {
   useVectors?: boolean;
@@ -17,18 +18,6 @@ export interface FileInfos {
   type: string;
   category: string;
 }
-
-export interface ModelLimit {
-  tokenLimit: number;
-  maxBatchSize: number;
-}
-
-export const MODELS_SUPPORTED_BATCH_SIZE: Record<string, ModelLimit> = {
-  'text-embedding-ada-002': {
-    tokenLimit: 8100,
-    maxBatchSize: 16,
-  },
-};
 
 const INDEXING_BATCH_SIZE = 1000;
 
