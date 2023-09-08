@@ -1,7 +1,7 @@
 {
-  "name": "ingestion",
+  "name": "indexer",
   "version": "1.0.0",
-  "description": "Document ingestion service",
+  "description": "Document indexer service",
   "private": true,
   "type": "module",
   "exports": "./src/app.ts",
@@ -17,8 +17,8 @@
     "dev:start": "fastify start --ignore-watch=.ts$ -w -l debug -P dist/app.js -p 3001 | pino-pretty",
     "lint": "xo",
     "lint:fix": "xo --fix",
-    "docker:build": "docker build --tag ingestion --file ./Dockerfile ../..",
-    "docker:run": "docker run --rm --publish 3001:3001 --env-file ../../.env ingestion",
+    "docker:build": "docker build --tag indexer --file ./Dockerfile ../..",
+    "docker:run": "docker run --rm --publish 3001:3001 --env-file ../../.env indexer",
     "clean": "rm -rf dist *.tgz"
   },
   "dependencies": {
