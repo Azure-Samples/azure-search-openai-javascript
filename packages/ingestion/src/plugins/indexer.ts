@@ -3,16 +3,11 @@ import { Indexer } from '../lib/index.js';
 
 export default fp(
   async (fastify, opts) => {
-    // const config = fastify.config;
+    const config = fastify.config;
 
     fastify.decorate(
       'indexer',
-      new Indexer(
-        fastify.log,
-        fastify.azure,
-        fastify.openai,
-        // config.azureOpenAiEmbeddingModel,
-      ),
+      new Indexer(fastify.log, fastify.azure, fastify.openai, config.azureOpenAiEmbeddingModel),
     );
   },
   {

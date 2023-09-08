@@ -10,6 +10,7 @@ export interface AppConfig {
   azureSearchIndex: string;
   azureOpenAiService: string;
   azureOpenAiEmbDeployment: string;
+  azureOpenAiEmbeddingModel: string;
   kbFieldsContent: string;
   kbFieldsSourcePage: string;
 }
@@ -30,6 +31,7 @@ export default fp(
       azureSearchIndex: process.env.AZURE_SEARCH_INDEX || '',
       azureOpenAiService: process.env.AZURE_OPENAI_SERVICE || '',
       azureOpenAiEmbDeployment: process.env.AZURE_OPENAI_EMB_DEPLOYMENT || '',
+      azureOpenAiEmbeddingModel: process.env.AZURE_OPENAI_EMBEDDING_MODEL || 'text-embedding-ada-002',
       kbFieldsContent: process.env.KB_FIELDS_CONTENT || 'content',
       kbFieldsSourcePage: process.env.KB_FIELDS_SOURCEPAGE || 'sourcepage',
     };
