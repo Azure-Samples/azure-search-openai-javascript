@@ -31,13 +31,14 @@ Content-Type: text/plain
 
 < ../../README.md
 --Boundary
-Content-Disposition: form-data; name="category"
+Content-Disposition: form-data; name="options"
 
-test
---Boundary
-Content-Disposition: form-data; name="wait"
-
-true
+{
+  "category": "test-category",
+  "wait": true,
+  "uploadToStorage": true,
+  "useVectors": true
+}
 --Boundary--
 
 ###

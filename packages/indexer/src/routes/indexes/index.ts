@@ -1,5 +1,12 @@
 import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 
+export interface IndexFileOptionsField {
+  category?: string;
+  wait?: boolean;
+  useVectors?: boolean;
+  uploadToStorage?: boolean;
+}
+
 const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, opts): Promise<void> => {
   fastify.post('/', {
     schema: {
@@ -81,8 +88,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, opts): Promise<vo
       body: {
         type: 'object',
         properties: {
-          category: { $ref: '#multipartField' },
-          wait: { $ref: '#multipartField' },
+          options: { $ref: '#multipartField' },
           file: { $ref: '#multipartField' },
         },
         required: ['file'],
@@ -103,26 +109,30 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, opts): Promise<vo
     handler: async function (request, reply) {
       // TOFIX: issue in types generation
       // https://github.com/fastify/fastify-type-provider-json-schema-to-ts/issues/57
-      const { file, category, wait } = (request as any).body;
+      const { file, options } = (request as any).body;
       if (file.type !== 'file') {
         return reply.badRequest('field "file" must be a file');
       }
-      if (category && category.type !== 'field') {
-        return reply.badRequest('field "category" must be a value');
+      if (options && options.type !== 'field') {
+        return reply.badRequest('field "options" must be a value');
       }
-      if (wait && wait.type !== 'field') {
-        return reply.badRequest('field "wait" must be a value');
-      }
-      const filesInfos = {
-        filename: file.filename,
-        data: await file.toBuffer(),
-        type: file.mimetype,
-        category: category?.value,
-      };
       try {
-        if (Boolean(wait?.value)) {
+        const fileOptions = JSON.parse(options?.value ?? '{}') as IndexFileOptionsField;
+        fastify.log.info(`Received indexing options: ${JSON.stringify(fileOptions)}`);
+
+        const wait = Boolean(fileOptions?.wait);
+        const filesInfos = {
+          filename: file.filename,
+          data: await file.toBuffer(),
+          type: file.mimetype,
+          category: fileOptions?.category ?? 'default',
+        };
+        if (wait) {
           fastify.log.info(`Indexing file "${filesInfos.filename}" synchronously`);
-          await fastify.indexer.indexFile(request.params.name, filesInfos);
+          await fastify.indexer.indexFile(request.params.name, filesInfos, {
+            useVectors: fileOptions?.useVectors ?? true,
+            uploadToStorage: fileOptions?.uploadToStorage ?? true,
+          });
           reply.code(204);
         } else {
           // Do not await this, we want to return 202 immediately
