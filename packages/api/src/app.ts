@@ -1,8 +1,8 @@
-import path, { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { FastifyPluginAsync } from "fastify";
-import AutoLoad, { AutoloadPluginOptions } from "@fastify/autoload";
-import cors from "@fastify/cors";
+import path, { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { FastifyPluginAsync } from 'fastify';
+import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload';
+import cors from '@fastify/cors';
 
 export type AppOptions = {
   // Place your custom options for app below here.
@@ -25,14 +25,14 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
   // those should be support plugins that are reused
   // through your application
   fastify.register(AutoLoad, {
-    dir: join(__dirname, "plugins"),
+    dir: join(__dirname, 'plugins'),
     options: opts,
   });
 
   // This loads all plugins defined in routes
   // define your routes in one of these
   fastify.register(AutoLoad, {
-    dir: join(__dirname, "routes"),
+    dir: join(__dirname, 'routes'),
     options: opts,
   });
 };
