@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { BaseLogger } from 'pino';
-import { AzureClients } from '../plugins/azure';
+import { type BaseLogger } from 'pino';
+import { type AzureClients } from '../plugins/azure';
 
 export class BlobStorage {
   constructor(
@@ -23,9 +23,7 @@ export class BlobStorage {
   async delete(filename: string) {
     const blobContainer = this.azure.blobContainer;
     if (await blobContainer.exists()) {
-      if (!filename) {
-        throw new Error('Filename is required');
-      } else {
+      if (filename) {
         const name = getBlobNameFromFile(filename);
         const re = new RegExp(`${name}`, 'i');
 
@@ -36,6 +34,8 @@ export class BlobStorage {
             await blobContainer.deleteBlob(blob.name);
           }
         }
+      } else {
+        throw new Error('Filename is required');
       }
     }
   }

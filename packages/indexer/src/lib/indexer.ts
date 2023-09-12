@@ -1,10 +1,10 @@
-import { BaseLogger } from 'pino';
-import { SearchIndex } from '@azure/search-documents';
-import { encoding_for_model, TiktokenModel } from '@dqbd/tiktoken';
-import { AzureClients } from '../plugins/azure';
-import { OpenAiService } from '../plugins/openai';
+import { type BaseLogger } from 'pino';
+import { type SearchIndex } from '@azure/search-documents';
+import { encoding_for_model, type TiktokenModel } from '@dqbd/tiktoken';
+import { type AzureClients } from '../plugins/azure';
+import { type OpenAiService } from '../plugins/openai';
 import { wait } from './util/index.js';
-import { DocumentProcessor, Section } from './document-processor.js';
+import { DocumentProcessor, type Section } from './document-processor.js';
 import { MODELS_SUPPORTED_BATCH_SIZE } from './model-limits.js';
 import { BlobStorage } from './blob-storage.js';
 
@@ -44,7 +44,9 @@ export class Indexer {
     for await (const index of indexNames) {
       names.push(index.name);
     }
-    if (!names.includes(indexName)) {
+    if (names.includes(indexName)) {
+      this.logger.debug(`Search index "${indexName}" already exists`);
+    } else {
       const index: SearchIndex = {
         name: indexName,
         fields: [
@@ -113,8 +115,6 @@ export class Indexer {
       };
       this.logger.debug(`Creating "${indexName}" search index...`);
       await searchIndexClient.createIndex(index);
-    } else {
-      this.logger.debug(`Search index "${indexName}" already exists`);
     }
   }
 
@@ -145,10 +145,10 @@ export class Indexer {
     const batchSize = INDEXING_BATCH_SIZE;
     let batch: Section[] = [];
 
-    for (let i = 0; i < sections.length; i++) {
-      batch.push(sections[i]);
+    for (let index = 0; index < sections.length; index++) {
+      batch.push(sections[index]);
 
-      if (batch.length === batchSize || i === sections.length - 1) {
+      if (batch.length === batchSize || index === sections.length - 1) {
         const { results } = await searchClient.uploadDocuments(batch);
         const succeeded = results.filter((r) => r.succeeded).length;
         const indexed = batch.length;
@@ -162,6 +162,7 @@ export class Indexer {
     this.logger.debug(`Removing sections from "${filename ?? '<all>'}" from search index "${indexName}"`);
     const searchClient = this.azure.searchIndex.getSearchClient(indexName);
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const filter = filename ? `sourcefile eq '${filename}'` : undefined;
       const r = await searchClient.search('', { filter: filter, top: 1000, includeTotalCount: true });
@@ -176,11 +177,7 @@ export class Indexer {
       const { results } = await searchClient.deleteDocuments(documents);
       this.logger.debug(`Removed ${results.length} sections from index`);
 
-      if (filename) {
-        await this.blobStorage.delete(filename);
-      } else {
-        await this.blobStorage.deleteAll();
-      }
+      await (filename ? this.blobStorage.delete(filename) : this.blobStorage.deleteAll());
 
       // It can take a few seconds for search results to reflect changes, so wait a bit
       await wait(2000);
@@ -206,17 +203,17 @@ export class Indexer {
     const batchQueue: Section[] = [];
     let tokenCount = 0;
 
-    for (const [i, section] of sections.entries()) {
+    for (const [index, section] of sections.entries()) {
       tokenCount += getTokenCount(section.content, this.embeddingModelName);
       batchQueue.push(section);
 
       if (
         tokenCount > batchSize.tokenLimit ||
         batchQueue.length >= batchSize.maxBatchSize ||
-        i === sections.length - 1
+        index === sections.length - 1
       ) {
         const embeddings = await this.createEmbeddingsInBatch(batchQueue.map((section) => section.content));
-        batchQueue.forEach((section, i) => (section.embedding = embeddings[i]));
+        for (const [index_, section] of batchQueue.entries()) section.embedding = embeddings[index_];
         this.logger.debug(`Batch Completed. Batch size ${batchQueue.length} Token count ${tokenCount}`);
 
         batchQueue.length = 0;

@@ -2,7 +2,7 @@ import process from 'node:process';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { join, dirname, extname } from 'node:path';
-import { OptionValues, program } from 'commander';
+import { type OptionValues, program } from 'commander';
 import * as dotenv from 'dotenv';
 import mime from 'mime/lite.js';
 
@@ -17,11 +17,11 @@ export interface IndexFilesOptions {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export async function run(args: string[] = process.argv) {
+export async function run(arguments_: string[] = process.argv) {
   dotenv.config();
 
   const file = await fs.readFile(join(__dirname, '../../package.json'), 'utf8');
-  const pkg = JSON.parse(file) as Record<string, string>;
+  const package_ = JSON.parse(file) as Record<string, string>;
 
   program
     .name('index-files')
@@ -33,7 +33,7 @@ export async function run(args: string[] = process.argv) {
     .option('-w, --wait', 'Wait for the indexer to finish processing the files', false)
     .option('--no-upload', 'Disable uploading files to a blob storage container')
     .option('--no-vectors', 'Disable vectors generation for the files')
-    .version(pkg.version, '-v, --version', 'Show the current version')
+    .version(package_.version, '-v, --version', 'Show the current version')
     .showHelpAfterError()
     .action(async (files: string[], options: OptionValues) => {
       const { indexerUrl, indexName, upload, vectors, wait } = options;
@@ -45,7 +45,7 @@ export async function run(args: string[] = process.argv) {
         wait,
       });
     });
-  program.parse(args);
+  program.parse(arguments_);
 }
 
 export async function indexFiles(files: string[], options: IndexFilesOptions) {

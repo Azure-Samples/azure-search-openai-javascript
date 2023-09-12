@@ -18,8 +18,8 @@
     "watch": "tsc -w",
     "dev": "npm run build && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch\" \"npm:dev:start\"",
     "dev:start": "fastify start --ignore-watch=.ts$ -w -l debug -P dist/app.js -p 3001 | pino-pretty",
-    "lint": "xo",
-    "lint:fix": "xo --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "docker:build": "docker build --tag indexer --file ./Dockerfile ../..",
     "docker:run": "docker run --rm --publish 3001:3001 --env-file ../../.env indexer",
     "clean": "rm -rf dist *.tgz"
@@ -48,10 +48,15 @@
     "@types/node": "^18.0.0",
     "@types/tap": "^15.0.5",
     "concurrently": "^8.2.0",
+    "eslint": "^8.49.0",
+    "eslint-config-shared": "^1.0.0",
     "fastify-tsconfig": "^1.0.1",
     "pino-pretty": "^10.2.0",
     "tap": "^16.1.0",
     "ts-node": "^10.4.0",
     "typescript": "^5.1.6"
+  },
+  "eslintConfig": {
+    "extends": "shared"
   }
 }

@@ -1,9 +1,9 @@
 // This file contains code that we reuse between our tests.
 import * as helper from 'fastify-cli/helper.js';
-import * as path from 'path';
-import * as tap from 'tap';
-import process from 'process';
-import { fileURLToPath } from 'url';
+import * as path from 'node:path';
+import type * as tap from 'tap';
+import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

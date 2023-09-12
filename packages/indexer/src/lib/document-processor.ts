@@ -1,4 +1,4 @@
-import { BaseLogger } from 'pino';
+import { type BaseLogger } from 'pino';
 import { getBlobNameFromFile } from './blob-storage.js';
 
 export interface Document {
@@ -45,7 +45,7 @@ export class DocumentProcessor {
   private async extractText(data: Buffer, type: string): Promise<ContentPage[]> {
     const pages: ContentPage[] = [];
     if (type === 'text/plain') {
-      const text = data.toString('utf-8');
+      const text = data.toString('utf8');
       pages.push({ content: text, offset: 0, page: 0 });
     } else {
       // TODO: support other file types (PDF...)
@@ -59,10 +59,9 @@ export class DocumentProcessor {
     const fileId = filenameToId(filename);
     const sections: Section[] = [];
 
-    for (let i = 0; i < contentSections.length; i++) {
-      const { content } = contentSections[i];
+    for (const [index, { content }] of contentSections.entries()) {
       const section: Section = {
-        id: `${fileId}-section-${i}`,
+        id: `${fileId}-section-${index}`,
         content,
         category: category,
         sourcepage: getBlobNameFromFile(filename),
@@ -76,14 +75,14 @@ export class DocumentProcessor {
 
   // TODO: use langchain splitters: https://js.langchain.com/docs/modules/data_connection/document_transformers/text_splitters/code_splitter
   private splitText(filename: string, pages: ContentPage[]) {
-    const SENTENCE_ENDINGS = ['.', '!', '?'];
-    const WORDS_BREAKS = [',', ';', ':', ' ', '(', ')', '[', ']', '{', '}', '\t', '\n'];
+    const SENTENCE_ENDINGS = new Set(['.', '!', '?']);
+    const WORDS_BREAKS = new Set([',', ';', ':', ' ', '(', ')', '[', ']', '{', '}', '\t', '\n']);
 
     this.logger.debug(`Splitting '${filename}' into sections`);
 
     const findPage = (pages: ContentPage[], offset: number) =>
-      pages.findIndex((page, i, array) => {
-        const nextPage = array[i + 1];
+      pages.findIndex((page, index, array) => {
+        const nextPage = array[index + 1];
         return !nextPage || (offset >= page.offset && offset < nextPage.offset);
       });
 
@@ -103,14 +102,14 @@ export class DocumentProcessor {
         while (
           end < length &&
           end - start - MAX_SECTION_LENGTH < SENTENCE_SEARCH_LIMIT &&
-          !SENTENCE_ENDINGS.includes(allText[end])
+          !SENTENCE_ENDINGS.has(allText[end])
         ) {
-          if (WORDS_BREAKS.includes(allText[end])) {
+          if (WORDS_BREAKS.has(allText[end])) {
             lastWord = end;
           }
           end += 1;
         }
-        if (end < length && !SENTENCE_ENDINGS.includes(allText[end]) && lastWord > 0) {
+        if (end < length && !SENTENCE_ENDINGS.has(allText[end]) && lastWord > 0) {
           end = lastWord; // Fall back to at least keeping a whole word
         }
       }
@@ -123,21 +122,21 @@ export class DocumentProcessor {
       while (
         start > 0 &&
         start > end - MAX_SECTION_LENGTH - 2 * SENTENCE_SEARCH_LIMIT &&
-        !SENTENCE_ENDINGS.includes(allText[start])
+        !SENTENCE_ENDINGS.has(allText[start])
       ) {
-        if (WORDS_BREAKS.includes(allText[start])) {
+        if (WORDS_BREAKS.has(allText[start])) {
           lastWord = start;
         }
         start -= 1;
       }
-      if (!SENTENCE_ENDINGS.includes(allText[start]) && lastWord > 0) {
+      if (!SENTENCE_ENDINGS.has(allText[start]) && lastWord > 0) {
         start = lastWord;
       }
       if (start > 0) {
         start += 1;
       }
 
-      const sectionText = allText.substring(start, end);
+      const sectionText = allText.slice(start, end);
       contentSections.push({ content: sectionText, page: findPage(pages, start) });
 
       const lastTableStart = sectionText.lastIndexOf('<table');
@@ -156,7 +155,7 @@ export class DocumentProcessor {
     }
 
     if (start + SECTION_OVERLAP < end) {
-      contentSections.push({ content: allText.substring(start, end), page: findPage(pages, start) });
+      contentSections.push({ content: allText.slice(start, end), page: findPage(pages, start) });
     }
 
     return contentSections;
@@ -164,7 +163,7 @@ export class DocumentProcessor {
 }
 
 function filenameToId(filename: string) {
-  const filenameAscii = filename.replace(/[^0-9a-zA-Z_-]/g, '_');
-  const filenameHash = Buffer.from(filename, 'utf-8').toString('hex');
+  const filenameAscii = filename.replaceAll(/[^\w-]/g, '_');
+  const filenameHash = Buffer.from(filename, 'utf8').toString('hex');
   return `file-${filenameAscii}-${filenameHash}`;
 }

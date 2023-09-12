@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
-import { AccessToken } from '@azure/core-http';
+import { type AccessToken } from '@azure/core-http';
 import { OpenAI } from 'openai';
-import { Embeddings } from 'openai/resources/index';
+import { type Embeddings } from 'openai/resources/index';
 
 export type OpenAiService = {
   getEmbeddings(): Promise<Embeddings>;
@@ -16,7 +16,7 @@ const AZURE_OPENAI_API_VERSION = '2023-05-15';
 const AZURE_COGNITIVE_SERVICES_AD_SCOPE = 'https://cognitiveservices.azure.com/.default';
 
 export default fp(
-  async (fastify, opts) => {
+  async (fastify, _options) => {
     const config = fastify.config;
     const openAiUrl = `https://${config.azureOpenAiService}.openai.azure.com`;
 
