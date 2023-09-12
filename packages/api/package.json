@@ -40,16 +40,16 @@
   "devDependencies": {
     "@types/node": "^18.0.0",
     "@types/tap": "^15.0.5",
-    "@typescript-eslint/eslint-plugin": "^6.7.0",
-    "@typescript-eslint/parser": "^6.7.0",
     "concurrently": "^8.2.0",
     "eslint": "^8.49.0",
-    "eslint-plugin-n": "^16.1.0",
-    "eslint-plugin-unicorn": "^48.0.1",
+    "eslint-config-shared": "^1.0.0",
     "fastify-tsconfig": "^1.0.1",
     "pino-pretty": "^10.2.0",
     "tap": "^16.1.0",
     "ts-node": "^10.4.0",
     "typescript": "^5.1.6"
+  },
+  "eslintConfig": {
+    "extends": "shared"
   }
 }
