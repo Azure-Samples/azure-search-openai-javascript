@@ -16,7 +16,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "npm run lint -ws --if-present",
-    "lint:fix": "npm run lint:fix -ws --if-present"
+    "lint:fix": "npm run lint:fix -ws --if-present",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "Microsoft",
@@ -25,7 +26,9 @@
     "packages/*"
   ],
   "devDependencies": {
-    "concurrently": "^8.2.1"
+    "concurrently": "^8.2.1",
+    "husky": "^8.0.3",
+    "prettier": "^3.0.3"
   },
   "engines": {
     "node": ">=18",
