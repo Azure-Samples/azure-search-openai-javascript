@@ -1,10 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
-import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Dropdown, IDropdownOption } from '@fluentui/react';
+import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Dropdown, type IDropdownOption } from '@fluentui/react';
 import { SparkleFilled } from '@fluentui/react-icons';
 
 import styles from './Chat.module.css';
 
-import { chatApi, RetrievalMode, Approaches, AskResponse, ChatRequest, ChatTurn } from '../../api';
+import { chatApi, RetrievalMode, Approaches, type AskResponse, type ChatRequest, type ChatTurn } from '../../api';
 import { Answer, AnswerError, AnswerLoading } from '../../components/Answer';
 import { QuestionInput } from '../../components/QuestionInput';
 import { ExampleList } from '../../components/Example';
@@ -23,7 +23,7 @@ const Chat = () => {
   const [excludeCategory, setExcludeCategory] = useState<string>('');
   const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(false);
 
-  const lastQuestionRef = useRef<string>('');
+  const lastQuestionReference = useRef<string>('');
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -36,7 +36,7 @@ const Chat = () => {
   const [answers, setAnswers] = useState<[user: string, response: AskResponse][]>([]);
 
   const makeApiRequest = async (question: string) => {
-    lastQuestionRef.current = question;
+    lastQuestionReference.current = question;
 
     error && setError(undefined);
     setIsLoading(true);
@@ -60,15 +60,15 @@ const Chat = () => {
       };
       const result = await chatApi(request);
       setAnswers([...answers, [question, result]]);
-    } catch (e) {
-      setError(e);
+    } catch (error_) {
+      setError(error_);
     } finally {
       setIsLoading(false);
     }
   };
 
   const clearChat = () => {
-    lastQuestionRef.current = '';
+    lastQuestionReference.current = '';
     error && setError(undefined);
     setActiveCitation(undefined);
     setActiveAnalysisPanelTab(undefined);
@@ -77,36 +77,39 @@ const Chat = () => {
 
   useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' }), [isLoading]);
 
-  const onPromptTemplateChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+  const onPromptTemplateChange = (
+    _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    newValue?: string,
+  ) => {
     setPromptTemplate(newValue || '');
   };
 
-  const onRetrieveCountChange = (_ev?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
-    setRetrieveCount(parseInt(newValue || '3'));
+  const onRetrieveCountChange = (_event?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
+    setRetrieveCount(Number.parseInt(newValue || '3'));
   };
 
   const onRetrievalModeChange = (
-    _ev: React.FormEvent<HTMLDivElement>,
+    _event: React.FormEvent<HTMLDivElement>,
     option?: IDropdownOption<RetrievalMode> | undefined,
-    index?: number | undefined,
+    _index?: number | undefined,
   ) => {
     setRetrievalMode(option?.data || RetrievalMode.Hybrid);
   };
 
-  const onUseSemanticRankerChange = (_ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  const onUseSemanticRankerChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     setUseSemanticRanker(!!checked);
   };
 
-  const onUseSemanticCaptionsChange = (_ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  const onUseSemanticCaptionsChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     setUseSemanticCaptions(!!checked);
   };
 
-  const onExcludeCategoryChanged = (_ev?: React.FormEvent, newValue?: string) => {
+  const onExcludeCategoryChanged = (_event?: React.FormEvent, newValue?: string) => {
     setExcludeCategory(newValue || '');
   };
 
   const onUseSuggestFollowupQuestionsChange = (
-    _ev?: React.FormEvent<HTMLElement | HTMLInputElement>,
+    _event?: React.FormEvent<HTMLElement | HTMLInputElement>,
     checked?: boolean,
   ) => {
     setUseSuggestFollowupQuestions(!!checked);
@@ -147,25 +150,13 @@ const Chat = () => {
         <ClearChatButton
           className={styles.commandButton}
           onClick={clearChat}
-          disabled={!lastQuestionRef.current || isLoading}
+          disabled={!lastQuestionReference.current || isLoading}
         />
         <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
       </div>
       <div className={styles.chatRoot}>
         <div className={styles.chatContainer}>
-          {!lastQuestionRef.current ? (
-            <div className={styles.chatEmptyState}>
-              <SparkleFilled
-                fontSize={'120px'}
-                primaryFill={'rgba(115, 118, 225, 1)'}
-                aria-hidden="true"
-                aria-label="Chat logo"
-              />
-              <h1 className={styles.chatEmptyStateTitle}>Chat with your data</h1>
-              <h2 className={styles.chatEmptyStateSubtitle}>Ask anything or try an example</h2>
-              <ExampleList onExampleClicked={onExampleClicked} />
-            </div>
-          ) : (
+          {lastQuestionReference.current ? (
             <div className={styles.chatMessageStream}>
               {answers.map((answer, index) => (
                 <div key={index}>
@@ -186,7 +177,7 @@ const Chat = () => {
               ))}
               {isLoading && (
                 <>
-                  <UserChatMessage message={lastQuestionRef.current} />
+                  <UserChatMessage message={lastQuestionReference.current} />
                   <div className={styles.chatMessageGptMinWidth}>
                     <AnswerLoading />
                   </div>
@@ -194,13 +185,28 @@ const Chat = () => {
               )}
               {error ? (
                 <>
-                  <UserChatMessage message={lastQuestionRef.current} />
+                  <UserChatMessage message={lastQuestionReference.current} />
                   <div className={styles.chatMessageGptMinWidth}>
-                    <AnswerError error={error.toString()} onRetry={() => makeApiRequest(lastQuestionRef.current)} />
+                    <AnswerError
+                      error={error.toString()}
+                      onRetry={() => makeApiRequest(lastQuestionReference.current)}
+                    />
                   </div>
                 </>
-              ) : null}
+              ) : undefined}
               <div ref={chatMessageStreamEnd} />
+            </div>
+          ) : (
+            <div className={styles.chatEmptyState}>
+              <SparkleFilled
+                fontSize={'120px'}
+                primaryFill={'rgba(115, 118, 225, 1)'}
+                aria-hidden="true"
+                aria-label="Chat logo"
+              />
+              <h1 className={styles.chatEmptyStateTitle}>Chat with your data</h1>
+              <h2 className={styles.chatEmptyStateSubtitle}>Ask anything or try an example</h2>
+              <ExampleList onExampleClicked={onExampleClicked} />
             </div>
           )}
 

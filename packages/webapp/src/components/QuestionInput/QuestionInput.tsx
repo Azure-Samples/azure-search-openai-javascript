@@ -26,14 +26,14 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend }: Pr
     }
   };
 
-  const onEnterPress = (ev: React.KeyboardEvent<Element>) => {
-    if (ev.key === 'Enter' && !ev.shiftKey) {
-      ev.preventDefault();
+  const onEnterPress = (event: React.KeyboardEvent<Element>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
       sendQuestion();
     }
   };
 
-  const onQuestionChange = (_ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+  const onQuestionChange = (_event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
     if (!newValue) {
       setQuestion('');
     } else if (newValue.length <= 1000) {

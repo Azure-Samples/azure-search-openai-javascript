@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 import styles from './AnalysisPanel.module.css';
 
 import { SupportingContent } from '../SupportingContent';
-import { AskResponse } from '../../api';
+import { type AskResponse } from '../../api';
 import { AnalysisPanelTabs } from './AnalysisPanelTabs';
 
 interface Props {
@@ -27,7 +27,7 @@ export const AnalysisPanel = ({
   onActiveTabChanged,
 }: Props) => {
   const isDisabledThoughtProcessTab: boolean = !answer.thoughts;
-  const isDisabledSupportingContentTab: boolean = !answer.data_points.length;
+  const isDisabledSupportingContentTab: boolean = answer.data_points.length === 0;
   const isDisabledCitationTab: boolean = !activeCitation;
 
   const sanitizedThoughts = DOMPurify.sanitize(answer.thoughts!);

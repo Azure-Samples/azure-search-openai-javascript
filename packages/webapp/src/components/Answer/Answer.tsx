@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 
 import styles from './Answer.module.css';
 
-import { AskResponse, getCitationFilePath } from '../../api';
+import { type AskResponse, getCitationFilePath } from '../../api';
 import { parseAnswerToHtml } from './AnswerParser';
 import { AnswerIcon } from './AnswerIcon';
 
@@ -51,7 +51,7 @@ export const Answer = ({
               title="Show supporting content"
               ariaLabel="Show supporting content"
               onClick={() => onSupportingContentClicked()}
-              disabled={!answer.data_points.length}
+              disabled={answer.data_points.length === 0}
             />
           </div>
         </Stack>
@@ -61,7 +61,7 @@ export const Answer = ({
         <div className={styles.answerText} dangerouslySetInnerHTML={{ __html: sanitizedAnswerHtml }}></div>
       </Stack.Item>
 
-      {!!parsedAnswer.citations.length && (
+      {parsedAnswer.citations.length > 0 && (
         <Stack.Item>
           <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
             <span className={styles.citationLearnMore}>Citations:</span>
@@ -77,12 +77,12 @@ export const Answer = ({
         </Stack.Item>
       )}
 
-      {!!parsedAnswer.followupQuestions.length && showFollowupQuestions && onFollowupQuestionClicked && (
+      {parsedAnswer.followupQuestions.length > 0 && showFollowupQuestions && onFollowupQuestionClicked && (
         <Stack.Item>
           <Stack
             horizontal
             wrap
-            className={`${!!parsedAnswer.citations.length ? styles.followupQuestionsList : ''}`}
+            className={`${parsedAnswer.citations.length > 0 ? styles.followupQuestionsList : ''}`}
             tokens={{ childrenGap: 6 }}
           >
             <span className={styles.followupQuestionLearnMore}>Follow-up questions:</span>

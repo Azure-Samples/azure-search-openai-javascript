@@ -15,7 +15,7 @@ export function parseAnswerToHtml(
   const followupQuestions: string[] = [];
 
   // Extract any follow-up questions that might be in the answer
-  let parsedAnswer = answer.replace(/<<([^>>]+)>>/g, (match, content) => {
+  let parsedAnswer = answer.replaceAll(/<<([^>]+)>>/g, (match, content) => {
     followupQuestions.push(content);
     return '';
   });
@@ -23,14 +23,14 @@ export function parseAnswerToHtml(
   // trim any whitespace from the end of the answer after removing follow-up questions
   parsedAnswer = parsedAnswer.trim();
 
-  const parts = parsedAnswer.split(/\[([^\]]+)\]/g);
+  const parts = parsedAnswer.split(/\[([^\]]+)]/g);
 
   const fragments: string[] = parts.map((part, index) => {
     if (index % 2 === 0) {
       return part;
     } else {
       let citationIndex: number;
-      if (citations.indexOf(part) !== -1) {
+      if (citations.includes(part)) {
         citationIndex = citations.indexOf(part) + 1;
       } else {
         citations.push(part);
