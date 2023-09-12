@@ -1,12 +1,15 @@
 {
   "name": "Node.js",
-  "image": "mcr.microsoft.com/devcontainers/python:3.10",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:0-18",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "18"
     },
-    "ghcr.io/devcontainers/features/powershell:1.1.0": {},
-    "ghcr.io/devcontainers/features/azure-cli:1.2.1": {},
+    "ghcr.io/devcontainers/features/powershell:1": {},
+    "ghcr.io/devcontainers/features/azure-cli:1": {
+      "version": "latest",
+      "installBicep": true
+    },
     "ghcr.io/azure/azure-dev/azd:latest": {}
   },
   "customizations": {
@@ -16,12 +19,11 @@
         "ms-azuretools.vscode-bicep",
         "ms-azuretools.vscode-docker",
         "esbenp.prettier-vscode",
-        "humao.rest-client",
-        "ms-python.python"
+        "humao.rest-client"
       ]
     }
   },
-  "forwardPorts": [3000, 50505],
+  "forwardPorts": [3000, 3001, 5173],
   "postCreateCommand": "npm install",
   "remoteUser": "vscode",
   "hostRequirements": {
