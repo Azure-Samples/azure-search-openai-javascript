@@ -1,4 +1,4 @@
-import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
+import { type FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 
 export interface IndexFileOptionsField {
   category?: string;
@@ -7,7 +7,7 @@ export interface IndexFileOptionsField {
   uploadToStorage?: boolean;
 }
 
-const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, opts): Promise<void> => {
+const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promise<void> => {
   fastify.post('/', {
     schema: {
       body: {

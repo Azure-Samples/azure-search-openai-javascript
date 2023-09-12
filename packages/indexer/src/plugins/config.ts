@@ -15,14 +15,14 @@ export interface AppConfig {
   kbFieldsSourcePage: string;
 }
 
-const camelCaseToUpperSnakeCase = (str: string) => str.replaceAll(/[A-Z]/g, (l) => `_${l}`).toUpperCase();
+const camelCaseToUpperSnakeCase = (string_: string) => string_.replaceAll(/[A-Z]/g, (l) => `_${l}`).toUpperCase();
 
 export default fp(
-  async (fastify, opts) => {
-    const envPath = path.resolve(process.cwd(), '../../.env');
+  async (fastify, _options) => {
+    const environmentPath = path.resolve(process.cwd(), '../../.env');
 
-    console.log(`Loading .env config from ${envPath}...`);
-    dotenv.config({ path: envPath });
+    console.log(`Loading .env config from ${environmentPath}...`);
+    dotenv.config({ path: environmentPath });
 
     const config: AppConfig = {
       azureStorageAccount: process.env.AZURE_STORAGE_ACCOUNT || '',

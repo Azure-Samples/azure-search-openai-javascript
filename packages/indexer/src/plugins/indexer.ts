@@ -2,7 +2,7 @@ import fp from 'fastify-plugin';
 import { Indexer } from '../lib/index.js';
 
 export default fp(
-  async (fastify, opts) => {
+  async (fastify, _options) => {
     const config = fastify.config;
 
     fastify.decorate(
