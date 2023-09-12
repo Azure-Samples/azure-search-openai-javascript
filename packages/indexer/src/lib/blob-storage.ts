@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { type BaseLogger } from 'pino';
-import { type AzureClients } from '../plugins/azure';
+import { type AzureClients } from '../plugins/azure.js';
 
 export class BlobStorage {
   constructor(
