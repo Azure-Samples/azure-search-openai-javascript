@@ -1,0 +1,27 @@
+{
+  "name": "eslint-config-shared",
+  "version": "1.0.0",
+  "description": "ESLint shareable config",
+  "private": true,
+  "main": "./index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "peerDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
+    "eslint": "^8.49.0",
+    "eslint-plugin-n": "^16.1.0",
+    "eslint-plugin-unicorn": "^48.0.1",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "@typescript-eslint/parser": "^6.7.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.49.0",
+    "eslint-plugin-n": "^16.1.0",
+    "eslint-plugin-unicorn": "^48.0.1",
+    "typescript": "^5.2.2"
+  }
+}

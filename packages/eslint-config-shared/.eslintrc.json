@@ -1,0 +1,11 @@
+{
+  "overrides": [
+    {
+      "extends": "./index.js",
+      "files": ["*.js", "*.ts"],
+      "rules": {
+        "unicorn/prefer-module": "off"
+      }
+    }
+  ]
+}
