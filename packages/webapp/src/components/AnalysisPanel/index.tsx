@@ -1,2 +1,2 @@
-export * from "./AnalysisPanel";
-export * from "./AnalysisPanelTabs";
+export * from './AnalysisPanel';
+export * from './AnalysisPanelTabs';

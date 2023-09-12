@@ -1,1 +1,1 @@
-export * from "./ClearChatButton";
+export * from './ClearChatButton';
