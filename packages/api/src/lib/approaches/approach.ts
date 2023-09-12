@@ -1,4 +1,4 @@
-import { HistoryMessage } from '../message';
+import { HistoryMessage } from '../message.js';
 
 export interface ApproachResponse {
   data_points: string[];
