@@ -14,12 +14,12 @@ import {
 
 import styles from './OneShot.module.css';
 
-import { askApi, Approaches, type AskResponse, type AskRequest, RetrievalMode } from '../../api';
-import { Answer, AnswerError } from '../../components/Answer';
-import { QuestionInput } from '../../components/QuestionInput';
-import { ExampleList } from '../../components/Example';
-import { AnalysisPanel, AnalysisPanelTabs } from '../../components/AnalysisPanel';
-import { SettingsButton } from '../../components/SettingsButton/SettingsButton';
+import { askApi, Approaches, type AskResponse, type AskRequest, RetrievalMode } from '../../api/index.js';
+import { Answer, AnswerError } from '../../components/Answer/index.js';
+import { QuestionInput } from '../../components/QuestionInput/index.js';
+import { ExampleList } from '../../components/Example/index.js';
+import { AnalysisPanel, AnalysisPanelTabs } from '../../components/AnalysisPanel/index.js';
+import { SettingsButton } from '../../components/SettingsButton/SettingsButton.jsx';
 
 export function Component(): JSX.Element {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);

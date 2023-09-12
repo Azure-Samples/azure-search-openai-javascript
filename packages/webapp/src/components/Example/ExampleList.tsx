@@ -1,4 +1,4 @@
-import { Example } from './Example';
+import { Example } from './Example.jsx';
 
 import styles from './Example.module.css';
 

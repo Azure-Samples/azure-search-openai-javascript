@@ -1,4 +1,4 @@
-import { type AskRequest, type AskResponse, type ChatRequest } from './models';
+import { type AskRequest, type AskResponse, type ChatRequest } from './models.js';
 
 export async function askApi(options: AskRequest): Promise<AskResponse> {
   const response = await fetch('/ask', {
