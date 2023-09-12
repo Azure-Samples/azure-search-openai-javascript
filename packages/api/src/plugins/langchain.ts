@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { OpenAIChatInput } from 'langchain/dist/types/openai-types';
+import { type OpenAIChatInput } from 'langchain/dist/types/openai-types';
 
 export type LangchainService = {
   getChat(options?: Partial<OpenAIChatInput>): Promise<ChatOpenAI>;
@@ -9,7 +9,7 @@ export type LangchainService = {
 };
 
 export default fp(
-  async (fastify, opts) => {
+  async (fastify, _options) => {
     const config = fastify.config;
     const getAzureOpenAiOptions = (apiToken: string) => ({
       openAIApiKey: apiToken,

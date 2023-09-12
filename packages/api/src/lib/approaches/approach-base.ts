@@ -1,5 +1,5 @@
-import { SearchClient } from '@azure/search-documents';
-import { OpenAiService } from '../../plugins/openai.js';
+import { type SearchClient } from '@azure/search-documents';
+import { type OpenAiService } from '../../plugins/openai.js';
 import { removeNewlines } from '../util/index.js';
 
 export interface SearchDocumentsResult {
@@ -28,7 +28,7 @@ export class ApproachBase {
     // If retrieval mode includes vectors, compute an embedding for the query
     let queryVector;
     if (hasVectors) {
-      let openAiEmbeddings = await this.openai.getEmbeddings();
+      const openAiEmbeddings = await this.openai.getEmbeddings();
       const result = await openAiEmbeddings.create({
         model: 'text-embedding-ada-002',
         input: query!,
@@ -40,52 +40,49 @@ export class ApproachBase {
     const queryText = hasText ? query : '';
 
     // Use semantic L2 reranker if requested and if retrieval mode is text or hybrid (vectors + text)
-    let searchResults;
-    if (overrides?.semantic_ranker && hasText) {
-      searchResults = await this.search.search(queryText, {
-        filter,
-        queryType: 'semantic',
-        queryLanguage: 'en-us',
-        speller: 'lexicon',
-        semanticConfiguration: 'default',
-        top,
-        captions: useSemanticCaption ? 'extractive|highlight-false' : undefined,
-        vectors: [
-          {
-            value: queryVector,
-            kNearestNeighborsCount: queryVector ? 50 : undefined,
-            fields: queryVector ? ['embedding'] : undefined,
-          },
-        ],
-      });
-    } else {
-      searchResults = await this.search.search(queryText, {
-        filter,
-        top,
-        vectors: [
-          {
-            value: queryVector,
-            kNearestNeighborsCount: queryVector ? 50 : undefined,
-            fields: queryVector ? ['embedding'] : undefined,
-          },
-        ],
-      });
-    }
+    const searchResults = await (overrides?.semantic_ranker && hasText
+      ? this.search.search(queryText, {
+          filter,
+          queryType: 'semantic',
+          queryLanguage: 'en-us',
+          speller: 'lexicon',
+          semanticConfiguration: 'default',
+          top,
+          captions: useSemanticCaption ? 'extractive|highlight-false' : undefined,
+          vectors: [
+            {
+              value: queryVector,
+              kNearestNeighborsCount: queryVector ? 50 : undefined,
+              fields: queryVector ? ['embedding'] : undefined,
+            },
+          ],
+        })
+      : this.search.search(queryText, {
+          filter,
+          top,
+          vectors: [
+            {
+              value: queryVector,
+              kNearestNeighborsCount: queryVector ? 50 : undefined,
+              fields: queryVector ? ['embedding'] : undefined,
+            },
+          ],
+        }));
 
-    let results: string[] = [];
+    const results: string[] = [];
     if (useSemanticCaption) {
       for await (const result of searchResults.results) {
         // TODO: ensure typings
-        const doc = result as any;
-        const captions = doc['@search.captions'];
+        const document = result as any;
+        const captions = document['@search.captions'];
         const captionsText = captions.map((c: any) => c.text).join(' . ');
-        results.push(`${doc[this.sourcePageField]}: ${removeNewlines(captionsText)}`);
+        results.push(`${document[this.sourcePageField]}: ${removeNewlines(captionsText)}`);
       }
     } else {
       for await (const result of searchResults.results) {
         // TODO: ensure typings
-        const doc = result.document as any;
-        results.push(`${doc[this.sourcePageField]}: ${removeNewlines(doc[this.contentField])}`);
+        const document = result.document as any;
+        results.push(`${document[this.sourcePageField]}: ${removeNewlines(document[this.contentField])}`);
       }
     }
     const content = results.join('\n');
@@ -116,8 +113,8 @@ export class ApproachBase {
       const results = [];
       for await (const result of searchResults.results) {
         // TODO: ensure typings
-        const doc = result.document as any;
-        results.push(doc[this.contentField]);
+        const document = result.document as any;
+        results.push(document[this.contentField]);
       }
       return results.join('\n');
     }

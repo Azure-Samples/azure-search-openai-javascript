@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 import { DefaultAzureCredential } from '@azure/identity';
 import { SearchClient } from '@azure/search-documents';
-import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
+import { BlobServiceClient, type ContainerClient } from '@azure/storage-blob';
 
 export type AzureClients = {
   credential: DefaultAzureCredential;
@@ -10,7 +10,7 @@ export type AzureClients = {
 };
 
 export default fp(
-  async (fastify, opts) => {
+  async (fastify, _options) => {
     const config = fastify.config;
 
     // Use the current user identity to authenticate with Azure OpenAI, Cognitive Search and Blob Storage

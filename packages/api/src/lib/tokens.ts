@@ -1,13 +1,13 @@
-import { encoding_for_model, TiktokenModel } from '@dqbd/tiktoken';
-import { Message } from './message.js';
+import { encoding_for_model, type TiktokenModel } from '@dqbd/tiktoken';
+import { type Message } from './message.js';
 
 const MODEL_TOKEN_LIMITS: Record<string, number> = {
   'gpt-35-turbo': 4000,
   'gpt-3.5-turbo': 4000,
-  'gpt-35-turbo-16k': 16000,
-  'gpt-3.5-turbo-16k': 16000,
+  'gpt-35-turbo-16k': 16_000,
+  'gpt-3.5-turbo-16k': 16_000,
   'gpt-4': 8100,
-  'gpt-4-32k': 32000,
+  'gpt-4-32k': 32_000,
 };
 
 const AZURE_OPENAI_TO_TIKTOKEN_MODELS: Record<string, string> = {

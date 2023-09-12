@@ -1,5 +1,5 @@
-import { FastifyPluginAsync, FastifyRequest } from 'fastify';
-import { HistoryMessage } from '../lib/index.js';
+import { type FastifyPluginAsync, type FastifyRequest } from 'fastify';
+import { type HistoryMessage } from '../lib/index.js';
 
 export type ChatRequest = FastifyRequest<{
   Body: {
@@ -17,8 +17,8 @@ export type AskRequest = FastifyRequest<{
   };
 }>;
 
-const root: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
-  fastify.get('/', async function (request, reply) {
+const root: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
+  fastify.get('/', async function (_request, _reply) {
     return { root: true };
   });
 

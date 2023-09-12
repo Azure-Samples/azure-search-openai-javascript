@@ -1,8 +1,8 @@
-import { SearchClient } from '@azure/search-documents';
-import { OpenAiService } from '../../plugins/openai.js';
+import { type SearchClient } from '@azure/search-documents';
+import { type OpenAiService } from '../../plugins/openai.js';
 import { messagesToString } from '../message.js';
 import { MessageBuilder } from '../message-builder.js';
-import { AskApproach } from './approach.js';
+import { type AskApproach } from './approach.js';
 import { ApproachBase } from './approach-base.js';
 
 const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant helping Contoso Inc employees with their healthcare plan questions and employee handbook questions.

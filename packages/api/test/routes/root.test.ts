@@ -4,8 +4,8 @@ import { build } from '../helper.js';
 test('default root route', async (t) => {
   const app = await build(t);
 
-  const res = await app.inject({
+  const response = await app.inject({
     url: '/',
   });
-  t.same(JSON.parse(res.payload), { root: true });
+  t.same(JSON.parse(response.payload), { root: true });
 });

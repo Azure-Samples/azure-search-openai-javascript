@@ -1,7 +1,7 @@
 import path, { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FastifyPluginAsync } from 'fastify';
-import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload';
+import { type FastifyPluginAsync } from 'fastify';
+import AutoLoad, { type AutoloadPluginOptions } from '@fastify/autoload';
 import cors from '@fastify/cors';
 
 export type AppOptions = {
@@ -14,7 +14,7 @@ const options: AppOptions = {};
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void> => {
+const app: FastifyPluginAsync<AppOptions> = async (fastify, options_): Promise<void> => {
   // Place here your custom code!
 
   fastify.register(cors, {});
@@ -26,14 +26,14 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
   // through your application
   fastify.register(AutoLoad, {
     dir: join(__dirname, 'plugins'),
-    options: opts,
+    options: options_,
   });
 
   // This loads all plugins defined in routes
   // define your routes in one of these
   fastify.register(AutoLoad, {
     dir: join(__dirname, 'routes'),
-    options: opts,
+    options: options_,
   });
 };
 

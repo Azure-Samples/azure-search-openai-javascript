@@ -1,5 +1,5 @@
 import { getTokenCountFromMessages } from './tokens.js';
-import { Message, MessageRole } from './message.js';
+import { type Message, type MessageRole } from './message.js';
 
 export class MessageBuilder {
   messages: Message[];
