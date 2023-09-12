@@ -17,15 +17,20 @@ module.exports = {
     'plugin:n/recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
   ],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
   ignorePatterns: ['dist'],
   settings: {
     'import/resolver': {
-      typescript: {
-        alwaysTryTypes: true,
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
+    },
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
     react: {
       version: 'detect',
@@ -62,6 +67,17 @@ module.exports = {
         },
       },
     ],
+    'import/default': 'off',
+    'import/no-unresolved': 'off',
+    'import/extensions': [
+      'error',
+      'always',
+      {
+        ignorePackages: true,
+      },
+    ],
+    'import/namespace': 'off',
+    'import/named': 'off',
   },
   overrides: [
     {

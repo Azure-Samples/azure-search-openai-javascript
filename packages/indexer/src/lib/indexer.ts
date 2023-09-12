@@ -1,8 +1,8 @@
 import { type BaseLogger } from 'pino';
 import { type SearchIndex } from '@azure/search-documents';
 import { encoding_for_model, type TiktokenModel } from '@dqbd/tiktoken';
-import { type AzureClients } from '../plugins/azure';
-import { type OpenAiService } from '../plugins/openai';
+import { type AzureClients } from '../plugins/azure.js';
+import { type OpenAiService } from '../plugins/openai.js';
 import { wait } from './util/index.js';
 import { DocumentProcessor, type Section } from './document-processor.js';
 import { MODELS_SUPPORTED_BATCH_SIZE } from './model-limits.js';
