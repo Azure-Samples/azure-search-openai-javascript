@@ -2,7 +2,7 @@ import { Stack } from '@fluentui/react';
 import { animated, useSpring } from '@react-spring/web';
 
 import styles from './Answer.module.css';
-import { AnswerIcon } from './AnswerIcon';
+import { AnswerIcon } from './AnswerIcon.jsx';
 
 export const AnswerLoading = () => {
   const animatedStyles = useSpring({

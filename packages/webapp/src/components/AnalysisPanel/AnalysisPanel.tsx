@@ -3,9 +3,9 @@ import DOMPurify from 'dompurify';
 
 import styles from './AnalysisPanel.module.css';
 
-import { SupportingContent } from '../SupportingContent';
-import { type AskResponse } from '../../api';
-import { AnalysisPanelTabs } from './AnalysisPanelTabs';
+import { SupportingContent } from '../SupportingContent/index.js';
+import { type AskResponse } from '../../api/index.js';
+import { AnalysisPanelTabs } from './AnalysisPanelTabs.jsx';
 
 interface Props {
   className: string;

@@ -4,9 +4,9 @@ import DOMPurify from 'dompurify';
 
 import styles from './Answer.module.css';
 
-import { type AskResponse, getCitationFilePath } from '../../api';
-import { parseAnswerToHtml } from './AnswerParser';
-import { AnswerIcon } from './AnswerIcon';
+import { type AskResponse, getCitationFilePath } from '../../api/index.js';
+import { parseAnswerToHtml } from './AnswerParser.jsx';
+import { AnswerIcon } from './AnswerIcon.jsx';
 
 interface Props {
   answer: AskResponse;

@@ -4,14 +4,21 @@ import { SparkleFilled } from '@fluentui/react-icons';
 
 import styles from './Chat.module.css';
 
-import { chatApi, RetrievalMode, Approaches, type AskResponse, type ChatRequest, type ChatTurn } from '../../api';
-import { Answer, AnswerError, AnswerLoading } from '../../components/Answer';
-import { QuestionInput } from '../../components/QuestionInput';
-import { ExampleList } from '../../components/Example';
-import { UserChatMessage } from '../../components/UserChatMessage';
-import { AnalysisPanel, AnalysisPanelTabs } from '../../components/AnalysisPanel';
-import { SettingsButton } from '../../components/SettingsButton';
-import { ClearChatButton } from '../../components/ClearChatButton';
+import {
+  chatApi,
+  RetrievalMode,
+  Approaches,
+  type AskResponse,
+  type ChatRequest,
+  type ChatTurn,
+} from '../../api/index.js';
+import { Answer, AnswerError, AnswerLoading } from '../../components/Answer/index.js';
+import { QuestionInput } from '../../components/QuestionInput/index.js';
+import { ExampleList } from '../../components/Example/index.js';
+import { UserChatMessage } from '../../components/UserChatMessage/index.js';
+import { AnalysisPanel, AnalysisPanelTabs } from '../../components/AnalysisPanel/index.js';
+import { SettingsButton } from '../../components/SettingsButton/index.js';
+import { ClearChatButton } from '../../components/ClearChatButton/index.js';
 
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);

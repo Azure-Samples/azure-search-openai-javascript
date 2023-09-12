@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { getCitationFilePath } from '../../api';
+import { getCitationFilePath } from '../../api/index.js';
 
 type HtmlParsedAnswer = {
   answerHtml: string;
