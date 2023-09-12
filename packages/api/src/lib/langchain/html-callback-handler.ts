@@ -1,5 +1,5 @@
-import { BaseTracer, Run } from 'langchain/callbacks';
-import { AgentRun } from 'langchain/dist/callbacks/handlers/tracer';
+import { BaseTracer, type Run } from 'langchain/callbacks';
+import { type AgentRun } from 'langchain/dist/callbacks/handlers/tracer';
 
 type Style = { open: string; close: string };
 
@@ -26,10 +26,10 @@ export class HtmlCallbackHandler extends BaseTracer {
   }
 
   onLLMStart(run: Run): void {
-    this.html += `LLM prompts:<br>${run.inputs.prompts.map(toHtml).join('<br>')}<br><br>`;
+    this.html += `LLM prompts:<br>${run.inputs.prompts.map((p: string) => toHtml(p)).join('<br>')}<br><br>`;
   }
 
-  onLLMEnd(run: Run): void {
+  onLLMEnd(_run: Run): void {
     // Do nothing
   }
 
@@ -42,7 +42,7 @@ export class HtmlCallbackHandler extends BaseTracer {
     this.html += `[chain/start] [${crumbs}] Entering chain<br><br>`;
   }
 
-  onChainEnd(run: Run): void {
+  onChainEnd(_run: Run): void {
     this.html += '[chain/end] Finished chain<br>';
   }
 
@@ -53,7 +53,7 @@ export class HtmlCallbackHandler extends BaseTracer {
     )}<br><br>`;
   }
 
-  onToolStart(run: Run): void {
+  onToolStart(_run: Run): void {
     // Do nothing
   }
 
@@ -105,9 +105,9 @@ export class HtmlCallbackHandler extends BaseTracer {
   private getBreadcrumbs(run: Run) {
     const parents = this.getParents(run).reverse();
     return [...parents, run]
-      .map((parent, i, arr) => {
+      .map((parent, index, array) => {
         const name = `${parent.execution_order}:${parent.run_type}:${parent.name}`;
-        return i === arr.length - 1 ? wrap(STYLES.Bold, name) : name;
+        return index === array.length - 1 ? wrap(STYLES.Bold, name) : name;
       })
       .join(' > ');
   }
@@ -117,15 +117,15 @@ function wrap(style: Style, text: string) {
   return `${style.open}${text}${style.close}`;
 }
 
-function tryJsonStringify(obj: unknown, fallback: string) {
+function tryJsonStringify(object: unknown, fallback: string) {
   try {
-    return JSON.stringify(obj, null, 2);
-  } catch (err) {
+    return JSON.stringify(object, undefined, 2);
+  } catch {
     return fallback;
   }
 }
 
 function toHtml(text: string | unknown): string {
   const s = typeof text === 'string' ? text : String(text);
-  return s.replace('<', '&lt;').replace('>', '&gt;').replace(/\r?\n/g, '<br>');
+  return s.replace('<', '&lt;').replace('>', '&gt;').replaceAll(/\r?\n/g, '<br>');
 }

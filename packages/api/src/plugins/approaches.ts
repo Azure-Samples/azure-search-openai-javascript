@@ -1,9 +1,9 @@
 import fp from 'fastify-plugin';
 import {
-  AskApproach,
+  type AskApproach,
   AskReadRetrieveRead,
   AskRetrieveThenRead,
-  ChatApproach,
+  type ChatApproach,
   ChatReadRetrieveRead,
 } from '../lib/index.js';
 
@@ -13,7 +13,7 @@ export type Approaches = {
 };
 
 export default fp(
-  async (fastify, opts) => {
+  async (fastify, _options) => {
     const config = fastify.config;
 
     // Various approaches to integrate GPT and external knowledge.

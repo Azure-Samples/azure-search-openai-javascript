@@ -1,6 +1,6 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { Tool, ToolParams } from 'langchain/tools';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { Tool, type ToolParams } from 'langchain/tools';
 
 const CSV_SEPARATOR = ',';
 
@@ -43,10 +43,11 @@ export class CsvLookupTool extends Tool {
       for (const row of dataRows) {
         const fields = row.split(CSV_SEPARATOR);
         // Transform the row into a key-value object
-        this.data[fields[keyFieldIndex]] = fields.reduce((acc, field, index) => {
-          acc[headerRowFields[index]] = field;
-          return acc;
-        }, {} as CsvData);
+        const rowData: CsvData = {};
+        for (const [index, field] of fields.entries()) {
+          rowData[headerRowFields[index]] = field;
+        }
+        this.data[fields[keyFieldIndex]] = rowData;
       }
     } catch (_error: unknown) {
       const error = _error as Error;

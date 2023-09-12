@@ -1,8 +1,8 @@
-import { SearchClient } from '@azure/search-documents';
-import { OpenAiService } from '../../plugins/openai.js';
-import { ChatApproach, ApproachResponse } from './approach.js';
+import { type SearchClient } from '@azure/search-documents';
+import { type OpenAiService } from '../../plugins/openai.js';
+import { type ChatApproach, type ApproachResponse } from './approach.js';
 import { ApproachBase } from './approach-base.js';
-import { HistoryMessage, Message, messagesToString } from '../message.js';
+import { type HistoryMessage, type Message, messagesToString } from '../message.js';
 import { MessageBuilder } from '../message-builder.js';
 import { getTokenLimit } from '../tokens.js';
 

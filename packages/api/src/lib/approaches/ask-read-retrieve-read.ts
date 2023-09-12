@@ -1,13 +1,13 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SearchClient } from '@azure/search-documents';
-import { DynamicTool, ToolParams } from 'langchain/tools';
+import { type SearchClient } from '@azure/search-documents';
+import { DynamicTool, type ToolParams } from 'langchain/tools';
 import { initializeAgentExecutorWithOptions } from 'langchain/agents';
 import { CallbackManager } from 'langchain/callbacks';
-import { OpenAiService } from '../../plugins/openai.js';
-import { LangchainService } from '../../plugins/langchain.js';
+import { type OpenAiService } from '../../plugins/openai.js';
+import { type LangchainService } from '../../plugins/langchain.js';
 import { CsvLookupTool, HtmlCallbackHandler } from '../langchain/index.js';
-import { AskApproach } from './approach.js';
+import { type AskApproach } from './approach.js';
 import { ApproachBase } from './approach-base.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -91,7 +91,7 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
       verbose: true,
     });
 
-    let result = await executor.call({ input: userQuery });
+    const result = await executor.call({ input: userQuery });
 
     // Remove references to tool names that might be confused with a citation
     const answer = result.output.replace('[CognitiveSearch]', '').replace('[Employee]', '');
@@ -126,10 +126,8 @@ class EmployeeInfoTool extends CsvLookupTool {
 
     // Only managers can access other employees' information
     const isManager = this.lookup(this.employeeName).title?.toLowerCase().includes('manager');
-    if (isManager || input?.toLowerCase() === this.employeeName.toLowerCase()) {
-      return this.lookupAsString(input);
-    } else {
-      return 'I am not allowed to share that information with you.';
-    }
+    return isManager || input?.toLowerCase() === this.employeeName.toLowerCase()
+      ? this.lookupAsString(input)
+      : 'I am not allowed to share that information with you.';
   }
 }
