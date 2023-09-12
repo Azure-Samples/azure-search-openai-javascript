@@ -1,1 +1,1 @@
-export * from "./SupportingContent";
+export * from './SupportingContent';

@@ -1,13 +1,13 @@
-import styles from "./UserChatMessage.module.css";
+import styles from './UserChatMessage.module.css';
 
 interface Props {
-    message: string;
+  message: string;
 }
 
 export const UserChatMessage = ({ message }: Props) => {
-    return (
-        <div className={styles.container}>
-            <div className={styles.message}>{message}</div>
-        </div>
-    );
+  return (
+    <div className={styles.container}>
+      <div className={styles.message}>{message}</div>
+    </div>
+  );
 };
