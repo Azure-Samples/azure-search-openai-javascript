@@ -1,4 +1,4 @@
-import { parseSupportingContentItem } from './SupportingContentParser';
+import { parseSupportingContentItem } from './supporting-content-parser.js';
 
 import styles from './SupportingContent.module.css';
 
@@ -13,7 +13,7 @@ export const SupportingContent = ({ supportingContent }: Props) => {
         const parsed = parseSupportingContentItem(x);
 
         return (
-          <li className={styles.supportingContentItem}>
+          <li className={styles.supportingContentItem} key={i}>
             <h4 className={styles.supportingContentItemHeader}>{parsed.title}</h4>
             <p className={styles.supportingContentItemText}>{parsed.content}</p>
           </li>

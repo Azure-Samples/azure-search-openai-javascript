@@ -2,19 +2,19 @@ import { useRef, useState } from 'react';
 import {
   Checkbox,
   ChoiceGroup,
-  IChoiceGroupOption,
+  type IChoiceGroupOption,
   Panel,
   DefaultButton,
   Spinner,
   TextField,
   SpinButton,
-  IDropdownOption,
+  type IDropdownOption,
   Dropdown,
 } from '@fluentui/react';
 
 import styles from './OneShot.module.css';
 
-import { askApi, Approaches, AskResponse, AskRequest, RetrievalMode } from '../../api';
+import { askApi, Approaches, type AskResponse, type AskRequest, RetrievalMode } from '../../api';
 import { Answer, AnswerError } from '../../components/Answer';
 import { QuestionInput } from '../../components/QuestionInput';
 import { ExampleList } from '../../components/Example';
@@ -33,7 +33,7 @@ export function Component(): JSX.Element {
   const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(false);
   const [excludeCategory, setExcludeCategory] = useState<string>('');
 
-  const lastQuestionRef = useRef<string>('');
+  const lastQuestionReference = useRef<string>('');
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<unknown>();
@@ -43,7 +43,7 @@ export function Component(): JSX.Element {
   const [activeAnalysisPanelTab, setActiveAnalysisPanelTab] = useState<AnalysisPanelTabs | undefined>(undefined);
 
   const makeApiRequest = async (question: string) => {
-    lastQuestionRef.current = question;
+    lastQuestionReference.current = question;
 
     error && setError(undefined);
     setIsLoading(true);
@@ -67,56 +67,59 @@ export function Component(): JSX.Element {
       };
       const result = await askApi(request);
       setAnswer(result);
-    } catch (e) {
-      setError(e);
+    } catch (error_) {
+      setError(error_);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const onPromptTemplateChange = (_ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+  const onPromptTemplateChange = (
+    _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    newValue?: string,
+  ) => {
     setPromptTemplate(newValue || '');
   };
 
   const onPromptTemplatePrefixChange = (
-    _ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string,
   ) => {
     setPromptTemplatePrefix(newValue || '');
   };
 
   const onPromptTemplateSuffixChange = (
-    _ev?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string,
   ) => {
     setPromptTemplateSuffix(newValue || '');
   };
 
-  const onRetrieveCountChange = (_ev?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
-    setRetrieveCount(parseInt(newValue || '3'));
+  const onRetrieveCountChange = (_event?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
+    setRetrieveCount(Number.parseInt(newValue || '3'));
   };
 
   const onRetrievalModeChange = (
-    _ev: React.FormEvent<HTMLDivElement>,
+    _event: React.FormEvent<HTMLDivElement>,
     option?: IDropdownOption<RetrievalMode> | undefined,
-    index?: number | undefined,
+    _index?: number | undefined,
   ) => {
     setRetrievalMode(option?.data || RetrievalMode.Hybrid);
   };
 
-  const onApproachChange = (_ev?: React.FormEvent<HTMLElement | HTMLInputElement>, option?: IChoiceGroupOption) => {
+  const onApproachChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, option?: IChoiceGroupOption) => {
     setApproach((option?.key as Approaches) || Approaches.RetrieveThenRead);
   };
 
-  const onUseSemanticRankerChange = (_ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  const onUseSemanticRankerChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     setUseSemanticRanker(!!checked);
   };
 
-  const onUseSemanticCaptionsChange = (_ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+  const onUseSemanticCaptionsChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     setUseSemanticCaptions(!!checked);
   };
 
-  const onExcludeCategoryChanged = (_ev?: React.FormEvent, newValue?: string) => {
+  const onExcludeCategoryChanged = (_event?: React.FormEvent, newValue?: string) => {
     setExcludeCategory(newValue || '');
   };
 
@@ -171,7 +174,7 @@ export function Component(): JSX.Element {
       </div>
       <div className={styles.oneshotBottomSection}>
         {isLoading && <Spinner label="Generating answer" />}
-        {!lastQuestionRef.current && <ExampleList onExampleClicked={onExampleClicked} />}
+        {!lastQuestionReference.current && <ExampleList onExampleClicked={onExampleClicked} />}
         {!isLoading && answer && !error && (
           <div className={styles.oneshotAnswerContainer}>
             <Answer
@@ -184,9 +187,9 @@ export function Component(): JSX.Element {
         )}
         {error ? (
           <div className={styles.oneshotAnswerContainer}>
-            <AnswerError error={error.toString()} onRetry={() => makeApiRequest(lastQuestionRef.current)} />
+            <AnswerError error={error.toString()} onRetry={() => makeApiRequest(lastQuestionReference.current)} />
           </div>
-        ) : null}
+        ) : undefined}
         {activeAnalysisPanelTab && answer && (
           <AnalysisPanel
             className={styles.oneshotAnalysisPanel}

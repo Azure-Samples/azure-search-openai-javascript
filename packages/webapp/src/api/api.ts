@@ -1,4 +1,4 @@
-import { AskRequest, AskResponse, ChatRequest } from './models';
+import { type AskRequest, type AskResponse, type ChatRequest } from './models';
 
 export async function askApi(options: AskRequest): Promise<AskResponse> {
   const response = await fetch('/ask', {
@@ -25,7 +25,7 @@ export async function askApi(options: AskRequest): Promise<AskResponse> {
 
   const parsedResponse: AskResponse = await response.json();
   if (response.status > 299 || !response.ok) {
-    throw Error(parsedResponse.error || 'Unknown error');
+    throw new Error(parsedResponse.error || 'Unknown error');
   }
 
   return parsedResponse;
@@ -57,7 +57,7 @@ export async function chatApi(options: ChatRequest): Promise<AskResponse> {
 
   const parsedResponse: AskResponse = await response.json();
   if (response.status > 299 || !response.ok) {
-    throw Error(parsedResponse.error || 'Unknown error');
+    throw new Error(parsedResponse.error || 'Unknown error');
   }
 
   return parsedResponse;
