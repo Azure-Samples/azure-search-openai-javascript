@@ -1,7 +1,7 @@
 {
   "name": "eslint-config-shared",
   "version": "1.0.0",
-  "description": "ESLint shareable config",
+  "description": "ESLint shared config for this project",
   "private": true,
   "main": "./index.js",
   "peerDependencies": {
