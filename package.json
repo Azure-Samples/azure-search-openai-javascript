@@ -44,6 +44,6 @@
     "bracketSpacing": true
   },
   "eslintConfig": {
-    "extends": "shared"
+    "extends": "eslint-config-shared"
   }
 }
