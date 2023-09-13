@@ -2,7 +2,8 @@
 
 name: azure-search-openai-javascript
 metadata:
-  template: azure-search-openai-javascript@0.0.1
+  template: azure-search-openai-javascript@1.0.0
+
 services:
   webapp:
     project: ./packages/webapp
@@ -25,7 +26,7 @@ services:
       context: ../..
 
 hooks:
-  postprovision:
+  postup:
     windows:
       shell: pwsh
       run: ./scripts/index-data.ps1
