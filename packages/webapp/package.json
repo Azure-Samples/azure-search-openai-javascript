@@ -6,9 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "watch": "tsc && vite build --watch",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "watch": "tsc && vite build --watch"
   },
   "dependencies": {
     "@fluentui/react": "^8.110.7",
@@ -27,8 +25,5 @@
     "prettier": "^3.0.0",
     "typescript": "^5.1.6",
     "vite": "^4.4.2"
-  },
-  "eslintConfig": {
-    "extends": "shared"
   }
 }
