@@ -56,7 +56,7 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend }: Pr
         onKeyDown={onEnterPress}
       />
       <div className={styles.questionInputButtonsContainer}>
-        <div
+        <button
           className={`${styles.questionInputSendButton} ${
             sendQuestionDisabled ? styles.questionInputSendButtonDisabled : ''
           }`}
@@ -64,7 +64,7 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend }: Pr
           onClick={sendQuestion}
         >
           <Send28Filled primaryFill="rgba(115, 118, 225, 1)" />
-        </div>
+        </button>
       </div>
     </Stack>
   );
