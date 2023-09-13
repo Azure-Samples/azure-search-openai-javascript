@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 output=$(azd env get-values)
 
 while IFS= read -r line; do
