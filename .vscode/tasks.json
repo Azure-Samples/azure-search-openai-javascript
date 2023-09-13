@@ -2,23 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start App",
-      "type": "dotenv",
-      "targetTasks": ["Start App (Script)"],
-      "file": "${input:dotEnvFilePath}"
-    },
-    {
-      "label": "Start App (Script)",
+      "label": "Start app",
       "type": "shell",
-      "command": "${workspaceFolder}/app/start.sh",
-      "windows": {
-        "command": "pwsh ${workspaceFolder}/app/start.ps1"
-      },
+      "command": "npm",
+      "args": ["start"],
       "presentation": {
-        "reveal": "silent"
+        "reveal": "always"
       },
       "options": {
-        "cwd": "${workspaceFolder}/app"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
     }
