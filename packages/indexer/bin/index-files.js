@@ -7,11 +7,15 @@ if ((process.env.NODE_OPTIONS ?? '').includes('--no-warnings')) {
   run(process.argv);
 } else {
   // Silence experimental warnings
-  execSync(process.argv.join(' '), {
-    stdio: 'inherit',
-    env: {
-      ...process.env,
-      NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --no-warnings`,
-    },
-  });
+  try {
+    execSync(process.argv.join(' '), {
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --no-warnings`,
+      },
+    });
+  } catch {
+    // Do nothing
+  }
 }
