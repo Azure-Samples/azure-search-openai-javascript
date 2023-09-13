@@ -132,6 +132,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
           await fastify.indexer.indexFile(request.params.name, filesInfos, {
             useVectors: fileOptions?.useVectors ?? true,
             uploadToStorage: fileOptions?.uploadToStorage ?? true,
+            throwErrors: true,
           });
           reply.code(204);
         } else {
