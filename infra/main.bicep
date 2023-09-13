@@ -12,10 +12,10 @@ param location string
 param resourceGroupName string = ''
 param containerAppsEnvironmentName string = ''
 param containerRegistryName string = ''
-param webAppName string = ''
-param searchApiName string = ''
+param webAppName string = 'webapp'
+param searchApiName string = 'search'
 param searchApiImageName string = ''
-param indexerApiName string = ''
+param indexerApiName string = 'indexer'
 param indexerApiImageName string = ''
 
 param logAnalyticsName string = ''
@@ -94,14 +94,14 @@ resource storageResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' ex
 }
 
 // Monitor application with Azure Monitor
-module monitoring './core/monitor/monitoring.bicep' = if (useApplicationInsights) {
+module monitoring './core/monitor/monitoring.bicep' = {
   name: 'monitoring'
   scope: resourceGroup
   params: {
     location: location
     tags: tags
     logAnalyticsName: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
-    applicationInsightsName: !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
+    applicationInsightsName: useApplicationInsights ? (!empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}') : ''
   }
 }
 
@@ -126,7 +126,7 @@ module webApp './core/host/staticwebapp.bicep' = {
   params: {
     name: !empty(webAppName) ? webAppName : '${abbrs.webStaticSites}web-${resourceToken}'
     location: location
-    tags: tags
+    tags: union(tags, { 'azd-service-name': webAppName })
     sku: {
       name: 'Standard'
       tier: 'Standard'
@@ -141,22 +141,19 @@ module searchApi './core/host/container-app.bicep' = {
   params: {
     name: !empty(searchApiName) ? searchApiName : '${abbrs.appContainerApps}search-${resourceToken}'
     location: location
-    tags: tags
+    tags: union(tags, { 'azd-service-name': searchApiName })
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
+    managedIdentity: true
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
-    secrets: [
+    secrets: useApplicationInsights ? [
       {
         name: 'appinsights-cs'
         value: monitoring.outputs.applicationInsightsConnectionString
       }
-    ]
-    env: [
-      {
-        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-        secretRef: 'appinsights-cs'
-      }
+    ] : []
+    env: concat([
       {
         name: 'AZURE_OPENAI_CHATGPT_DEPLOYMENT'
         value: chatGptDeploymentName
@@ -174,6 +171,10 @@ module searchApi './core/host/container-app.bicep' = {
         value: embeddingModelName
       }
       {
+        name: 'AZURE_OPENAI_SERVICE'
+        value: openAi.outputs.name
+      }
+      {
         name: 'AZURE_SEARCH_INDEX'
         value: searchIndexName
       }
@@ -189,7 +190,10 @@ module searchApi './core/host/container-app.bicep' = {
         name: 'AZURE_STORAGE_CONTAINER'
         value: storageContainerName
       }
-    ]
+    ], useApplicationInsights ? [{
+      name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+      secretRef: 'appinsights-cs'
+    }] : [])
     imageName: !empty(searchApiImageName) ? searchApiImageName : 'nginx:latest'
     targetPort: 3000
   }
@@ -202,22 +206,19 @@ module indexerApi './core/host/container-app.bicep' = {
   params: {
     name: !empty(indexerApiName) ? indexerApiName : '${abbrs.appContainerApps}indexer-${resourceToken}'
     location: location
-    tags: tags
+    tags: union(tags, { 'azd-service-name': indexerApiName })
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
+    managedIdentity: true
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
-    secrets: [
+    secrets: useApplicationInsights ? [
       {
         name: 'appinsights-cs'
         value: monitoring.outputs.applicationInsightsConnectionString
       }
-    ]
-    env: [
-      {
-        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-        secretRef: 'appinsights-cs'
-      }
+    ] : []
+    env: concat([
       {
         name: 'AZURE_OPENAI_CHATGPT_DEPLOYMENT'
         value: chatGptDeploymentName
@@ -235,6 +236,10 @@ module indexerApi './core/host/container-app.bicep' = {
         value: embeddingModelName
       }
       {
+        name: 'AZURE_OPENAI_SERVICE'
+        value: openAi.outputs.name
+      }
+      {
         name: 'AZURE_SEARCH_INDEX'
         value: searchIndexName
       }
@@ -250,7 +255,10 @@ module indexerApi './core/host/container-app.bicep' = {
         name: 'AZURE_STORAGE_CONTAINER'
         value: storageContainerName
       }
-    ]
+    ], useApplicationInsights ? [{
+      name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+      secretRef: 'appinsights-cs'
+    }] : [])
     imageName: !empty(indexerApiImageName) ? indexerApiImageName : 'nginx:latest'
     targetPort: 3001
   }
@@ -484,6 +492,9 @@ module searchRoleIndexerApi 'core/security/role.bicep' = {
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
 output AZURE_RESOURCE_GROUP string = resourceGroup.name
+
+output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
+output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.registryName
 
 output AZURE_OPENAI_SERVICE string = openAi.outputs.name
 output AZURE_OPENAI_RESOURCE_GROUP string = openAiResourceGroup.name
