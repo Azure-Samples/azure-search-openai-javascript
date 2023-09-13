@@ -11,6 +11,7 @@ import { BlobStorage } from './blob-storage.js';
 export interface IndexFileOptions {
   useVectors?: boolean;
   uploadToStorage?: boolean;
+  throwErrors?: boolean;
 }
 
 export interface FileInfos {
@@ -128,32 +129,41 @@ export class Indexer {
     const { filename, data, type, category } = fileInfos;
     this.logger.debug(`Indexing file "${filename}" into search index "${indexName}..."`);
 
-    if (options.uploadToStorage) {
-      // TODO: use separate containers for each index?
-      await this.blobStorage.upload(filename, data, type);
-    }
+    try {
+      if (options.uploadToStorage) {
+        // TODO: use separate containers for each index?
+        await this.blobStorage.upload(filename, data, type);
+      }
 
-    const documentProcessor = new DocumentProcessor(this.logger);
-    const document = await documentProcessor.createDocumentFromFile(filename, data, type, category);
-    const sections = document.sections;
-    if (options.useVectors) {
-      await this.updateEmbeddingsInBatch(sections);
-    }
+      const documentProcessor = new DocumentProcessor(this.logger);
+      const document = await documentProcessor.createDocumentFromFile(filename, data, type, category);
+      const sections = document.sections;
+      if (options.useVectors) {
+        await this.updateEmbeddingsInBatch(sections);
+      }
 
-    const searchClient = this.azure.searchIndex.getSearchClient(indexName);
+      const searchClient = this.azure.searchIndex.getSearchClient(indexName);
 
-    const batchSize = INDEXING_BATCH_SIZE;
-    let batch: Section[] = [];
+      const batchSize = INDEXING_BATCH_SIZE;
+      let batch: Section[] = [];
 
-    for (let index = 0; index < sections.length; index++) {
-      batch.push(sections[index]);
+      for (let index = 0; index < sections.length; index++) {
+        batch.push(sections[index]);
 
-      if (batch.length === batchSize || index === sections.length - 1) {
-        const { results } = await searchClient.uploadDocuments(batch);
-        const succeeded = results.filter((r) => r.succeeded).length;
-        const indexed = batch.length;
-        this.logger.debug(`Indexed ${indexed} sections, ${succeeded} succeeded`);
-        batch = [];
+        if (batch.length === batchSize || index === sections.length - 1) {
+          const { results } = await searchClient.uploadDocuments(batch);
+          const succeeded = results.filter((r) => r.succeeded).length;
+          const indexed = batch.length;
+          this.logger.debug(`Indexed ${indexed} sections, ${succeeded} succeeded`);
+          batch = [];
+        }
+      }
+    } catch (_error: unknown) {
+      const error = _error as Error;
+      if (options.throwErrors) {
+        throw error;
+      } else {
+        this.logger.error(`Error indexing file "${filename}": ${error.message}`);
       }
     }
   }
