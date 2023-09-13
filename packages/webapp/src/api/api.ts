@@ -1,7 +1,9 @@
 import { type AskRequest, type AskResponse, type ChatRequest } from './models.js';
 
+const baseUrl = import.meta.env.VITE_SEARCH_API_URI ?? '';
+
 export async function askApi(options: AskRequest): Promise<AskResponse> {
-  const response = await fetch('/ask', {
+  const response = await fetch(`${baseUrl}/ask`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -32,7 +34,7 @@ export async function askApi(options: AskRequest): Promise<AskResponse> {
 }
 
 export async function chatApi(options: ChatRequest): Promise<AskResponse> {
-  const response = await fetch('/chat', {
+  const response = await fetch(`${baseUrl}/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
