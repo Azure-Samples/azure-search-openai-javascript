@@ -146,7 +146,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     systemPrompt: string,
     model: string,
     history: HistoryMessage[],
-    userConv: string,
+    userContent: string,
     fewShots: Message[] = [],
     maxTokens = 4096,
   ): Message[] {
@@ -154,29 +154,26 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
 
     // Add examples to show the chat what responses we want.
     // It will try to mimic any responses and make sure they match the rules laid out in the system message.
-    for (const shot of fewShots) {
+    for (const shot of fewShots.reverse()) {
       messageBuilder.appendMessage(shot.role, shot.content);
     }
 
-    const userContent = userConv;
     const appendIndex = fewShots.length + 1;
-
     messageBuilder.appendMessage('user', userContent, appendIndex);
 
-    for (let i = history.length - 2; i >= 0; i--) {
-      const h = history[i];
-      if (h.bot) {
-        messageBuilder.appendMessage('assistant', h.bot, appendIndex);
+    for (const historyMessage of history.slice(0, -1).reverse()) {
+      if (historyMessage.bot) {
+        messageBuilder.appendMessage('assistant', historyMessage.bot, appendIndex);
       }
-      if (h.user) {
-        messageBuilder.appendMessage('user', h.user, appendIndex);
+      if (historyMessage.user) {
+        messageBuilder.appendMessage('user', historyMessage.user, appendIndex);
       }
       if (messageBuilder.tokens > maxTokens) {
         break;
       }
     }
 
-    const messages = messageBuilder.messages.slice(1);
+    const messages = messageBuilder.messages;
     return messages.map((m) => ({ role: m.role, content: m.content }));
   }
 }
