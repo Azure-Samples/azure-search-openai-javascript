@@ -9,7 +9,7 @@
   "scripts": {
     "start": "concurrently \"npm:start:*\" --kill-others",
     "start:webapp": "npm run dev --workspace=webapp",
-    "start:api": "npm run dev --workspace=api",
+    "start:search": "npm run dev --workspace=search",
     "test": "npm run test -ws --if-present",
     "build": "npm run build -ws --if-present",
     "build:webapp": "npm run build --workspace=webapp",
