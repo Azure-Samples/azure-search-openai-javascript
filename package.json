@@ -15,8 +15,8 @@
     "build:webapp": "npm run build --workspace=webapp",
     "format": "prettier --list-different --write .",
     "format:check": "prettier --check .",
-    "lint": "npm run lint -ws --if-present",
-    "lint:fix": "npm run lint:fix -ws --if-present",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "prepare": "husky install"
   },
   "keywords": [],
@@ -27,6 +27,7 @@
   ],
   "devDependencies": {
     "concurrently": "^8.2.1",
+    "eslint-config-shared": "^1.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^14.0.1",
     "prettier": "^3.0.3"
@@ -41,5 +42,8 @@
     "singleQuote": true,
     "printWidth": 120,
     "bracketSpacing": true
+  },
+  "eslintConfig": {
+    "extends": "shared"
   }
 }
