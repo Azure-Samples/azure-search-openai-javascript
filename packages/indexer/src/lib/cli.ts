@@ -56,6 +56,7 @@ export async function indexFiles(files: string[], options: IndexFilesOptions) {
     console.log(`Indexing ${files.length} file(s)...`);
     const promises = files.map(async (file) => indexFile(file, options));
     await Promise.all(promises);
+    console.log('Completed.');
   } catch (_error: unknown) {
     const error = _error as Error;
     console.error(`Error indexing files: ${error.message}`);
