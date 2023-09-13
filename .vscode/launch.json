@@ -5,37 +5,30 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Quart",
-      "type": "python",
-      "request": "launch",
-      "module": "quart",
-      "cwd": "${workspaceFolder}/app/backend",
-      "env": {
-        "QUART_APP": "main:app",
-        "QUART_ENV": "development",
-        "QUART_DEBUG": "0"
-      },
-      "args": ["run", "--no-reload", "-p 50505"],
-      "console": "integratedTerminal",
-      "justMyCode": false,
-      "envFile": "${input:dotEnvFilePath}"
-    },
-    {
-      "name": "Frontend: watch",
+      "name": "search: dev",
       "type": "node",
       "request": "launch",
-      "cwd": "${workspaceFolder}/app/frontend",
+      "cwd": "${workspaceFolder}/packages/search",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run-script", "watch"],
+      "runtimeArgs": ["run-script", "dev"],
       "console": "integratedTerminal"
     },
     {
-      "name": "Frontend: build",
+      "name": "indexer: dev",
       "type": "node",
       "request": "launch",
-      "cwd": "${workspaceFolder}/app/frontend",
+      "cwd": "${workspaceFolder}/packages/indexer",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run-script", "build"],
+      "runtimeArgs": ["run-script", "dev"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "webapp: dev",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/packages/webapp",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "dev"],
       "console": "integratedTerminal"
     }
   ],
