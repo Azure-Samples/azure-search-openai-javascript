@@ -19,5 +19,5 @@ COPY ./package*.json ./
 COPY ./packages/indexer/package.json ./packages/indexer/
 RUN npm ci --omit=dev --workspace=indexer --cache /tmp/empty-cache
 COPY --from=build app/packages/indexer/dist packages/indexer/dist
-EXPOSE 3000
+EXPOSE 3001
 CMD [ "npm", "start", "--workspace=indexer" ]

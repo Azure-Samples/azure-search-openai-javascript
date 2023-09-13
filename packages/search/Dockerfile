@@ -5,9 +5,9 @@
 FROM node:18-alpine as build
 WORKDIR /app
 COPY ./package*.json ./
-COPY ./packages/api ./packages/api
+COPY ./packages/search ./packages/search
 RUN npm ci --cache /tmp/empty-cache
-RUN npm run build --workspace=api
+RUN npm run build --workspace=search
 
 # Run Node.js app
 # ------------------------------------
@@ -16,8 +16,8 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 COPY ./package*.json ./
-COPY ./packages/api/package.json ./packages/api/
-RUN npm ci --omit=dev --workspace=api --cache /tmp/empty-cache
-COPY --from=build app/packages/api/dist packages/api/dist
+COPY ./packages/search/package.json ./packages/search/
+RUN npm ci --omit=dev --workspace=search --cache /tmp/empty-cache
+COPY --from=build app/packages/search/dist packages/search/dist
 EXPOSE 3000
-CMD [ "npm", "start", "--workspace=api" ]
+CMD [ "npm", "start", "--workspace=search" ]
