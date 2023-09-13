@@ -9,10 +9,16 @@ param environmentName string
 @description('Primary location for all resources')
 param location string
 
-param appServicePlanName string = ''
-param backendServiceName string = ''
 param resourceGroupName string = ''
+param containerAppsEnvironmentName string = ''
+param containerRegistryName string = ''
+param webAppName string = ''
+param searchApiName string = ''
+param searchApiImageName string = ''
+param indexerApiName string = ''
+param indexerApiImageName string = ''
 
+param logAnalyticsName string = ''
 param applicationInsightsName string = ''
 
 param searchServiceName string = ''
@@ -94,51 +100,159 @@ module monitoring './core/monitor/monitoring.bicep' = if (useApplicationInsights
   params: {
     location: location
     tags: tags
+    logAnalyticsName: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
     applicationInsightsName: !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
   }
 }
 
-// Create an App Service Plan to group applications under the same payment plan and SKU
-module appServicePlan 'core/host/appserviceplan.bicep' = {
-  name: 'appserviceplan'
+// Container apps host (including container registry)
+module containerApps './core/host/container-apps.bicep' = {
+  name: 'container-apps'
   scope: resourceGroup
   params: {
-    name: !empty(appServicePlanName) ? appServicePlanName : '${abbrs.webServerFarms}${resourceToken}'
+    name: 'containerapps'
+    containerAppsEnvironmentName: !empty(containerAppsEnvironmentName) ? containerAppsEnvironmentName : '${abbrs.appManagedEnvironments}${resourceToken}'
+    containerRegistryName: !empty(containerRegistryName) ? containerRegistryName : '${abbrs.containerRegistryRegistries}${resourceToken}'
     location: location
     tags: tags
-    sku: {
-      name: 'B1'
-      capacity: 1
-    }
-    kind: 'linux'
+    logAnalyticsWorkspaceName: monitoring.outputs.logAnalyticsWorkspaceName
   }
 }
 
 // The application frontend
-module backend 'core/host/appservice.bicep' = {
-  name: 'web'
+module webApp './core/host/staticwebapp.bicep' = {
+  name: 'webapp'
   scope: resourceGroup
   params: {
-    name: !empty(backendServiceName) ? backendServiceName : '${abbrs.webSitesAppService}backend-${resourceToken}'
+    name: !empty(webAppName) ? webAppName : '${abbrs.webStaticSites}web-${resourceToken}'
     location: location
-    tags: union(tags, { 'azd-service-name': 'backend' })
-    appServicePlanId: appServicePlan.outputs.id
-    runtimeName: 'python'
-    runtimeVersion: '3.10'
-    appCommandLine: 'python3 -m gunicorn main:app'
-    scmDoBuildDuringDeployment: true
-    managedIdentity: true
-    appSettings: {
-      AZURE_STORAGE_ACCOUNT: storage.outputs.name
-      AZURE_STORAGE_CONTAINER: storageContainerName
-      AZURE_OPENAI_SERVICE: openAi.outputs.name
-      AZURE_SEARCH_INDEX: searchIndexName
-      AZURE_SEARCH_SERVICE: searchService.outputs.name
-      AZURE_OPENAI_CHATGPT_DEPLOYMENT: chatGptDeploymentName
-      AZURE_OPENAI_CHATGPT_MODEL: chatGptModelName
-      AZURE_OPENAI_EMB_DEPLOYMENT: embeddingDeploymentName
-      APPLICATIONINSIGHTS_CONNECTION_STRING: useApplicationInsights ? monitoring.outputs.applicationInsightsConnectionString : ''
+    tags: tags
+    sku: {
+      name: 'Standard'
+      tier: 'Standard'
     }
+  }
+}
+
+// The search API
+module searchApi './core/host/container-app.bicep' = {
+  name: 'search-api'
+  scope: resourceGroup
+  params: {
+    name: !empty(searchApiName) ? searchApiName : '${abbrs.appContainerApps}search-${resourceToken}'
+    location: location
+    tags: tags
+    containerAppsEnvironmentName: containerApps.outputs.environmentName
+    containerRegistryName: containerApps.outputs.registryName
+    containerCpuCoreCount: '1.0'
+    containerMemory: '2.0Gi'
+    secrets: [
+      {
+        name: 'appinsights-cs'
+        value: monitoring.outputs.applicationInsightsConnectionString
+      }
+    ]
+    env: [
+      {
+        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        secretRef: 'appinsights-cs'
+      }
+      {
+        name: 'AZURE_OPENAI_CHATGPT_DEPLOYMENT'
+        value: chatGptDeploymentName
+      }
+      {
+        name: 'AZURE_OPENAI_CHATGPT_MODEL'
+        value: chatGptModelName
+      }
+      {
+        name: 'AZURE_OPENAI_EMB_DEPLOYMENT'
+        value: embeddingDeploymentName
+      }
+      {
+        name: 'AZURE_OPENAI_EMBEDDING_MODEL'
+        value: embeddingModelName
+      }
+      {
+        name: 'AZURE_SEARCH_INDEX'
+        value: searchIndexName
+      }
+      {
+        name: 'AZURE_SEARCH_SERVICE'
+        value: searchService.outputs.name
+      }
+      {
+        name: 'AZURE_STORAGE_ACCOUNT'
+        value: storage.outputs.name
+      }
+      {
+        name: 'AZURE_STORAGE_CONTAINER'
+        value: storageContainerName
+      }
+    ]
+    imageName: !empty(searchApiImageName) ? searchApiImageName : 'nginx:latest'
+    targetPort: 3000
+  }
+}
+
+// The indexer API
+module indexerApi './core/host/container-app.bicep' = {
+  name: 'indexer-api'
+  scope: resourceGroup
+  params: {
+    name: !empty(indexerApiName) ? indexerApiName : '${abbrs.appContainerApps}indexer-${resourceToken}'
+    location: location
+    tags: tags
+    containerAppsEnvironmentName: containerApps.outputs.environmentName
+    containerRegistryName: containerApps.outputs.registryName
+    containerCpuCoreCount: '1.0'
+    containerMemory: '2.0Gi'
+    secrets: [
+      {
+        name: 'appinsights-cs'
+        value: monitoring.outputs.applicationInsightsConnectionString
+      }
+    ]
+    env: [
+      {
+        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        secretRef: 'appinsights-cs'
+      }
+      {
+        name: 'AZURE_OPENAI_CHATGPT_DEPLOYMENT'
+        value: chatGptDeploymentName
+      }
+      {
+        name: 'AZURE_OPENAI_CHATGPT_MODEL'
+        value: chatGptModelName
+      }
+      {
+        name: 'AZURE_OPENAI_EMB_DEPLOYMENT'
+        value: embeddingDeploymentName
+      }
+      {
+        name: 'AZURE_OPENAI_EMBEDDING_MODEL'
+        value: embeddingModelName
+      }
+      {
+        name: 'AZURE_SEARCH_INDEX'
+        value: searchIndexName
+      }
+      {
+        name: 'AZURE_SEARCH_SERVICE'
+        value: searchService.outputs.name
+      }
+      {
+        name: 'AZURE_STORAGE_ACCOUNT'
+        value: storage.outputs.name
+      }
+      {
+        name: 'AZURE_STORAGE_CONTAINER'
+        value: storageContainerName
+      }
+    ]
+    imageName: !empty(indexerApiImageName) ? indexerApiImageName : 'nginx:latest'
+    targetPort: 3001
   }
 }
 
@@ -307,31 +421,61 @@ module searchSvcContribRoleUser 'core/security/role.bicep' = {
 }
 
 // SYSTEM IDENTITIES
-module openAiRoleBackend 'core/security/role.bicep' = {
+module openAiRoleSearchApi 'core/security/role.bicep' = {
   scope: openAiResourceGroup
-  name: 'openai-role-backend'
+  name: 'openai-role-searchapi'
   params: {
-    principalId: backend.outputs.identityPrincipalId
+    principalId: searchApi.outputs.identityPrincipalId
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
     principalType: 'ServicePrincipal'
   }
 }
 
-module storageRoleBackend 'core/security/role.bicep' = {
+module storageRoleSearchApi 'core/security/role.bicep' = {
   scope: storageResourceGroup
-  name: 'storage-role-backend'
+  name: 'storage-role-searchapi'
   params: {
-    principalId: backend.outputs.identityPrincipalId
+    principalId: searchApi.outputs.identityPrincipalId
     roleDefinitionId: '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
     principalType: 'ServicePrincipal'
   }
 }
 
-module searchRoleBackend 'core/security/role.bicep' = {
+module searchRoleSearchApi 'core/security/role.bicep' = {
   scope: searchServiceResourceGroup
-  name: 'search-role-backend'
+  name: 'search-role-searchapi'
   params: {
-    principalId: backend.outputs.identityPrincipalId
+    principalId: searchApi.outputs.identityPrincipalId
+    roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module openAiRoleIndexerApi 'core/security/role.bicep' = {
+  scope: openAiResourceGroup
+  name: 'openai-role-indexer'
+  params: {
+    principalId: indexerApi.outputs.identityPrincipalId
+    roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module storageRoleIndexerApi 'core/security/role.bicep' = {
+  scope: storageResourceGroup
+  name: 'storage-role-indexer'
+  params: {
+    principalId: indexerApi.outputs.identityPrincipalId
+    roleDefinitionId: '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module searchRoleIndexerApi 'core/security/role.bicep' = {
+  scope: searchServiceResourceGroup
+  name: 'search-role-indexer'
+  params: {
+    principalId: indexerApi.outputs.identityPrincipalId
     roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
     principalType: 'ServicePrincipal'
   }
@@ -346,6 +490,7 @@ output AZURE_OPENAI_RESOURCE_GROUP string = openAiResourceGroup.name
 output AZURE_OPENAI_CHATGPT_DEPLOYMENT string = chatGptDeploymentName
 output AZURE_OPENAI_CHATGPT_MODEL string = chatGptModelName
 output AZURE_OPENAI_EMB_DEPLOYMENT string = embeddingDeploymentName
+output AZURE_OPENAI_EMBEDDING_MODEL string = embeddingModelName
 
 output AZURE_FORMRECOGNIZER_SERVICE string = formRecognizer.outputs.name
 output AZURE_FORMRECOGNIZER_RESOURCE_GROUP string = formRecognizerResourceGroup.name
@@ -358,4 +503,6 @@ output AZURE_STORAGE_ACCOUNT string = storage.outputs.name
 output AZURE_STORAGE_CONTAINER string = storageContainerName
 output AZURE_STORAGE_RESOURCE_GROUP string = storageResourceGroup.name
 
-output BACKEND_URI string = backend.outputs.uri
+output WEBAPP_URI string = webApp.outputs.uri
+output SEARCH_API_URI string = searchApi.outputs.uri
+output INDEXER_API_URI string = indexerApi.outputs.uri
