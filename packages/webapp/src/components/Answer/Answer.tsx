@@ -68,9 +68,9 @@ export const Answer = ({
             {parsedAnswer.citations.map((x, i) => {
               const path = getCitationFilePath(x);
               return (
-                <a key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(path)}>
+                <button key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(path)}>
                   {`${++i}. ${x}`}
-                </a>
+                </button>
               );
             })}
           </Stack>
@@ -88,9 +88,14 @@ export const Answer = ({
             <span className={styles.followupQuestionLearnMore}>Follow-up questions:</span>
             {parsedAnswer.followupQuestions.map((x, i) => {
               return (
-                <a key={i} className={styles.followupQuestion} title={x} onClick={() => onFollowupQuestionClicked(x)}>
+                <button
+                  key={i}
+                  className={styles.followupQuestion}
+                  title={x}
+                  onClick={() => onFollowupQuestionClicked(x)}
+                >
                   {`${x}`}
-                </a>
+                </button>
               );
             })}
           </Stack>

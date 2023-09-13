@@ -17,6 +17,7 @@ module.exports = {
     'plugin:n/recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
+    'plugin:jsx-a11y/recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
   ],

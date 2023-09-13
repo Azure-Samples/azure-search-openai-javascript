@@ -40,9 +40,9 @@ export function parseAnswerToHtml(
       const path = getCitationFilePath(part);
 
       return renderToStaticMarkup(
-        <a className="supContainer" title={part} onClick={() => onCitationClicked(path)}>
+        <button className="supContainer" title={part} onClick={() => onCitationClicked(path)}>
           <sup>{citationIndex}</sup>
-        </a>,
+        </button>,
       );
     }
   });

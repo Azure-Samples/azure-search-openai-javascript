@@ -28,6 +28,14 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+button {
+  all: unset;
+}
+
+button:focus {
+  outline: revert;
+}
+
 #root {
   height: 100%;
 }
