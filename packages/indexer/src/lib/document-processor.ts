@@ -44,7 +44,7 @@ export class DocumentProcessor {
 
   private async extractText(data: Buffer, type: string): Promise<ContentPage[]> {
     const pages: ContentPage[] = [];
-    if (type === 'text/plain') {
+    if (type === 'text/plain' || type === 'text/markdown') {
       const text = data.toString('utf8');
       pages.push({ content: text, offset: 0, page: 0 });
     } else {
