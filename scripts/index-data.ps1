@@ -1,5 +1,5 @@
 $scriptPath = $MyInvocation.MyCommand.Path
-cd $scriptPath/../..
+cd $scriptPath/..
 
 Write-Host "Loading azd .env file from current environment"
 
