@@ -363,6 +363,7 @@ module openAiRoleUser 'core/security/role.bicep' = {
   name: 'openai-role-user'
   params: {
     principalId: principalId
+    // Cognitive Services OpenAI User
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
     principalType: 'User'
   }
@@ -373,17 +374,8 @@ module formRecognizerRoleUser 'core/security/role.bicep' = {
   name: 'formrecognizer-role-user'
   params: {
     principalId: principalId
+    // Cognitive Services User
     roleDefinitionId: 'a97b65f3-24c7-4388-baec-2e87135dc908'
-    principalType: 'User'
-  }
-}
-
-module storageRoleUser 'core/security/role.bicep' = {
-  scope: storageResourceGroup
-  name: 'storage-role-user'
-  params: {
-    principalId: principalId
-    roleDefinitionId: '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
     principalType: 'User'
   }
 }
@@ -393,17 +385,8 @@ module storageContribRoleUser 'core/security/role.bicep' = {
   name: 'storage-contribrole-user'
   params: {
     principalId: principalId
+    // Storage Blob Data Contributor
     roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
-    principalType: 'User'
-  }
-}
-
-module searchRoleUser 'core/security/role.bicep' = {
-  scope: searchServiceResourceGroup
-  name: 'search-role-user'
-  params: {
-    principalId: principalId
-    roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
     principalType: 'User'
   }
 }
@@ -413,6 +396,7 @@ module searchContribRoleUser 'core/security/role.bicep' = {
   name: 'search-contrib-role-user'
   params: {
     principalId: principalId
+    // Search Index Data Contributor
     roleDefinitionId: '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
     principalType: 'User'
   }
@@ -423,6 +407,7 @@ module searchSvcContribRoleUser 'core/security/role.bicep' = {
   name: 'search-svccontrib-role-user'
   params: {
     principalId: principalId
+    // Search Service Contributor
     roleDefinitionId: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
     principalType: 'User'
   }
@@ -434,6 +419,7 @@ module openAiRoleSearchApi 'core/security/role.bicep' = {
   name: 'openai-role-searchapi'
   params: {
     principalId: searchApi.outputs.identityPrincipalId
+    // Cognitive Services OpenAI User
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
     principalType: 'ServicePrincipal'
   }
@@ -444,6 +430,7 @@ module storageRoleSearchApi 'core/security/role.bicep' = {
   name: 'storage-role-searchapi'
   params: {
     principalId: searchApi.outputs.identityPrincipalId
+    // Storage Blob Data Reader
     roleDefinitionId: '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
     principalType: 'ServicePrincipal'
   }
@@ -454,6 +441,7 @@ module searchRoleSearchApi 'core/security/role.bicep' = {
   name: 'search-role-searchapi'
   params: {
     principalId: searchApi.outputs.identityPrincipalId
+    // Search Index Data Reader
     roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
     principalType: 'ServicePrincipal'
   }
@@ -464,27 +452,41 @@ module openAiRoleIndexerApi 'core/security/role.bicep' = {
   name: 'openai-role-indexer'
   params: {
     principalId: indexerApi.outputs.identityPrincipalId
+    // Cognitive Services OpenAI User
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
     principalType: 'ServicePrincipal'
   }
 }
 
-module storageRoleIndexerApi 'core/security/role.bicep' = {
+module storageContribRoleIndexerApi 'core/security/role.bicep' = {
   scope: storageResourceGroup
-  name: 'storage-role-indexer'
+  name: 'storage-contribrole-indexer'
   params: {
     principalId: indexerApi.outputs.identityPrincipalId
-    roleDefinitionId: '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
+    // Storage Blob Data Contributor
+    roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
     principalType: 'ServicePrincipal'
   }
 }
 
-module searchRoleIndexerApi 'core/security/role.bicep' = {
+module searchContribRoleIndexerApi 'core/security/role.bicep' = {
   scope: searchServiceResourceGroup
-  name: 'search-role-indexer'
+  name: 'search-contrib-role-indexer'
   params: {
     principalId: indexerApi.outputs.identityPrincipalId
-    roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
+    // Search Index Data Contributor
+    roleDefinitionId: '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module searchSvcContribRoleIndexerApi 'core/security/role.bicep' = {
+  scope: searchServiceResourceGroup
+  name: 'search-svccontrib-role-indexer'
+  params: {
+    principalId: indexerApi.outputs.identityPrincipalId
+    // Search Service Contributor
+    roleDefinitionId: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
     principalType: 'ServicePrincipal'
   }
 }
