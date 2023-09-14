@@ -10,6 +10,7 @@
     "start": "concurrently \"npm:start:*\" --kill-others",
     "start:webapp": "npm run dev --workspace=webapp",
     "start:search": "npm run dev --workspace=search",
+    "start:indexer": "npm run dev --workspace=indexer",
     "test": "npm run test -ws --if-present",
     "build": "npm run build -ws --if-present",
     "build:webapp": "npm run build --workspace=webapp",
