@@ -10,13 +10,16 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
       params: {
         type: 'object',
         properties: {
-          path: {
-            type: 'string',
-          },
+          path: { type: 'string' },
         },
         required: ['path'],
-      } as const,
-    },
+      },
+      response: {
+        200: {},
+        404: { $ref: 'httpError' },
+        500: { $ref: 'httpError' },
+      },
+    } as const,
     handler: async function (request, reply) {
       const { path } = request.params;
       try {
@@ -30,11 +33,11 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
           return reply.notFound();
         }
         const buffer = await blobClient.downloadToBuffer();
-        reply.type(properties.contentType).send(buffer);
+        return reply.type(properties.contentType).send(buffer);
       } catch (_error: unknown) {
         const error = _error as Error;
         fastify.log.error(error);
-        return { error: `Unknown server error: ${error.message}` };
+        return reply.internalServerError(`Unknown server error: ${error.message}`);
       }
     },
   });
@@ -44,41 +47,47 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
       body: {
         type: 'object',
         properties: {
-          approach: {
-            type: 'string',
-          },
+          approach: { type: 'string' },
           history: {
             type: 'array',
             items: {
               type: 'object',
               properties: {
-                bot: {
-                  type: 'string',
-                },
-                user: {
-                  type: 'string',
-                },
+                bot: { type: 'string' },
+                user: { type: 'string' },
               },
             },
           },
           overrides: {
             type: 'object',
-            additionalProperties: {
-              type: 'integer',
-            },
+            additionalProperties: { type: 'string' },
           },
         },
         required: ['approach', 'history'],
-      } as const,
-    },
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            data_points: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            answer: { type: 'string' },
+            thoughts: { type: 'string' },
+          },
+          required: ['data_points', 'answer', 'thoughts'],
+          additionalProperties: false,
+        },
+        400: { $ref: 'httpError' },
+        500: { $ref: 'httpError' },
+      },
+    } as const,
     handler: async function (request, reply) {
       const { approach } = request.body;
       const chatApproach = fastify.approaches.chat[approach];
       if (!chatApproach) {
-        reply.code(400);
-        return {
-          error: `Chat approach "${approach}" is unknown or not implemented.`,
-        };
+        return reply.badRequest(`Chat approach "${approach}" is unknown or not implemented.`);
       }
 
       const { history, overrides } = request.body;
@@ -87,8 +96,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
       } catch (_error: unknown) {
         const error = _error as Error;
         fastify.log.error(error);
-        reply.code(500);
-        return { error: `Unknown server error: ${error.message}` };
+        return reply.internalServerError(`Unknown server error: ${error.message}`);
       }
     },
   });
@@ -98,30 +106,38 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
       body: {
         type: 'object',
         properties: {
-          approach: {
-            type: 'string',
-          },
-          question: {
-            type: 'string',
-          },
+          approach: { type: 'string' },
+          question: { type: 'string' },
           overrides: {
             type: 'object',
-            additionalProperties: {
-              type: 'integer',
-            },
+            additionalProperties: { type: 'integer' },
           },
         },
         required: ['approach', 'question'],
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            data_points: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            answer: { type: 'string' },
+            thoughts: { type: 'string' },
+          },
+          required: ['data_points', 'answer', 'thoughts'],
+          additionalProperties: false,
+        },
+        400: { $ref: 'httpError' },
+        500: { $ref: 'httpError' },
       },
     } as const,
     handler: async function (request, reply) {
       const { approach } = request.body;
       const askApproach = fastify.approaches.ask[approach];
       if (!askApproach) {
-        reply.code(400);
-        return {
-          error: `Ask approach "${approach}" is unknown or not implemented.`,
-        };
+        return reply.badRequest(`Ask approach "${approach}" is unknown or not implemented.`);
       }
 
       const { overrides, question } = request.body;
@@ -130,8 +146,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
       } catch (_error: unknown) {
         const error = _error as Error;
         fastify.log.error(error);
-        reply.code(500);
-        return { error: `Unknown server error: ${error.message}` };
+        return reply.internalServerError(`Unknown server error: ${error.message}`);
       }
     },
   });
