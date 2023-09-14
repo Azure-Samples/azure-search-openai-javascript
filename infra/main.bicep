@@ -127,10 +127,6 @@ module webApp './core/host/staticwebapp.bicep' = {
     name: !empty(webAppName) ? webAppName : '${abbrs.webStaticSites}web-${resourceToken}'
     location: location
     tags: union(tags, { 'azd-service-name': webAppName })
-    sku: {
-      name: 'Standard'
-      tier: 'Standard'
-    }
   }
 }
 
