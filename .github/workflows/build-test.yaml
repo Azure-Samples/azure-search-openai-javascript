@@ -28,7 +28,7 @@ jobs:
       - name: Build packages
         run: npm run build
       - name: Build Docker images
-        run: npm run docker:build --if-present
+        run: npm run docker:build
       - name: Lint packages
         run: npm run lint
       - name: Test packages

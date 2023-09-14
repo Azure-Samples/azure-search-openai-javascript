@@ -13,7 +13,7 @@
     "start:indexer": "npm run dev --workspace=indexer",
     "test": "npm run test -ws --if-present",
     "build": "npm run build -ws --if-present",
-    "build:webapp": "npm run build --workspace=webapp",
+    "docker:build": "npm run docker:build -ws --if-present",
     "format": "prettier --list-different --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
