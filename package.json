@@ -18,7 +18,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "prepare": "simple-git-hooks"
+    "prepare": "simple-git-hooks || echo 'simple-git-hooks install skipped'"
   },
   "keywords": [],
   "author": "Microsoft",
