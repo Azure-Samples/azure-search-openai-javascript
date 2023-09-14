@@ -48,6 +48,10 @@ const template = html<ChatComponent>`
           html<ChatMessage>`${(message) => html`
             <li class="chat__listItem ${message ? 'chat__listItem--userMessage' : ''}">
               <p class="chat__text">"${message.text}"</p>
+              <p>
+                <span class="chat__time">${(x) => x.getFormattedDate()}</span>
+                <span class="chat__owner">${message.isUserMessage ? globalConfig.CHAT_MESSAGE_USER_OWNER : globalConfig.CHAT_MESSAGE_SUPPORT_OWNER}</span>
+              </p>
             </li>
           `}`,
         )}
@@ -157,6 +161,8 @@ export class ChatComponent extends FASTElement {
         isUserMessage,
       },
     ];
+    // need to check the height and then execute the scroll
+    this.scrollToBottom();
   }
 
   // handle the click on a default prompt
@@ -189,5 +195,13 @@ export class ChatComponent extends FASTElement {
   scrollToBottom() {
     const chatWindow = this.shadowRoot!.getElementById('chatWindow');
     chatWindow!.scrollTop = chatWindow!.scrollHeight;
+  }
+
+  // Get the current time of the message
+  getFormattedDate() {
+    const date = new Date();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    return `${hours}:${minutes}`;
   }
 }

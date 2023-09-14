@@ -8,6 +8,9 @@ export const globalConfig = {
   CHAT_BUTTON_LABEL_TEXT: 'Ask Support',
   CHAT_INPUT_LABEL_TEXT: 'Ask a question now',
   CHAT_INPUT_PLACEHOLDER: 'Enter your question here',
+  // Message owners
+  CHAT_MESSAGE_SUPPORT_OWNER: 'Support',
+  CHAT_MESSAGE_USER_OWNER: 'You',
   RESET_BUTTON_LABEL_TEXT: 'Reset',
   // API URL for development purposes
   API_URL_LOCAL: '/api/responses',
