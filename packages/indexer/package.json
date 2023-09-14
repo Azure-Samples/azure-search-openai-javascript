@@ -46,7 +46,6 @@
     "@types/node": "^18.0.0",
     "@types/tap": "^15.0.5",
     "concurrently": "^8.2.0",
-    "eslint": "^8.49.0",
     "fastify-tsconfig": "^1.0.1",
     "pino-pretty": "^10.2.0",
     "tap": "^16.1.0",
