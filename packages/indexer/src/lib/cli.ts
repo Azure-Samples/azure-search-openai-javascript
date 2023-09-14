@@ -54,13 +54,34 @@ export async function indexFiles(files: string[], options: IndexFilesOptions) {
       throw new Error('Index name is required');
     }
     console.log(`Indexing ${files.length} file(s)...`);
-    const promises = files.map(async (file) => indexFile(file, options));
-    await Promise.all(promises);
+    await ensureSearchIndex(options);
+
+    for (const file of files) {
+      await indexFile(file, options);
+    }
+
     console.log('Completed.');
   } catch (_error: unknown) {
     const error = _error as Error;
     console.error(`Error indexing files: ${error.message}`);
     process.exitCode = 1;
+  }
+}
+
+async function ensureSearchIndex(options: IndexFilesOptions) {
+  const { indexerUrl, indexName } = options;
+  const response = await fetch(`${indexerUrl}/indexes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: indexName?.trim(),
+    }),
+  });
+  if (!response.ok) {
+    const errorDetails = await response.json();
+    throw new Error(`Index creating "${indexName}": ${errorDetails.message}`);
   }
 }
 
