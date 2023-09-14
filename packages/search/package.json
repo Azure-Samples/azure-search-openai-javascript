@@ -28,6 +28,7 @@
     "@fastify/autoload": "^5.0.0",
     "@fastify/cors": "^8.3.0",
     "@fastify/sensible": "^5.0.0",
+    "@fastify/type-provider-json-schema-to-ts": "^2.2.2",
     "dotenv": "^16.3.1",
     "fastify": "^4.0.0",
     "fastify-cli": "^5.7.0",
