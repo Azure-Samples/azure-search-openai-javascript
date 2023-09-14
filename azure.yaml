@@ -10,6 +10,18 @@ services:
     dist: dist
     language: ts
     host: staticwebapp
+    hooks:
+      predeploy:
+        windows:
+          shell: pwsh
+          run: npm run build
+          interactive: true
+          continueOnError: false
+        posix:
+          shell: sh
+          run: export SEARCH_API_URI && npm run build
+          interactive: true
+          continueOnError: false
 
   search:
     project: ./packages/search
