@@ -1,23 +1,6 @@
-import { type FastifyPluginAsync, type FastifyRequest } from 'fastify';
-import { type HistoryMessage } from '../lib/index.js';
+import { type FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 
-export type ChatRequest = FastifyRequest<{
-  Body: {
-    approach: string;
-    history: HistoryMessage[];
-    overrides: Record<string, any>;
-  };
-}>;
-
-export type AskRequest = FastifyRequest<{
-  Body: {
-    approach: string;
-    question: string;
-    overrides: Record<string, any>;
-  };
-}>;
-
-const root: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
+const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promise<void> => {
   fastify.get('/', async function (_request, _reply) {
     return { root: true };
   });
@@ -30,10 +13,31 @@ const root: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
           approach: {
             type: 'string',
           },
+          history: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                bot: {
+                  type: 'string',
+                },
+                user: {
+                  type: 'string',
+                },
+              },
+            },
+          },
+          overrides: {
+            type: 'object',
+            additionalProperties: {
+              type: 'integer',
+            },
+          },
         },
-      },
+        required: ['approach', 'history'],
+      } as const,
     },
-    handler: async function (request: ChatRequest, reply) {
+    handler: async function (request, reply) {
       const { approach } = request.body;
       const chatApproach = fastify.approaches.chat[approach];
       if (!chatApproach) {
@@ -45,7 +49,7 @@ const root: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       const { history, overrides } = request.body;
       try {
-        return await chatApproach.run(history, overrides);
+        return await chatApproach.run(history, overrides ?? {});
       } catch (_error: unknown) {
         const error = _error as Error;
         fastify.log.error(error);
@@ -63,10 +67,20 @@ const root: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
           approach: {
             type: 'string',
           },
+          question: {
+            type: 'string',
+          },
+          overrides: {
+            type: 'object',
+            additionalProperties: {
+              type: 'integer',
+            },
+          },
         },
+        required: ['approach', 'question'],
       },
-    },
-    handler: async function (request: AskRequest, reply) {
+    } as const,
+    handler: async function (request, reply) {
       const { approach } = request.body;
       const askApproach = fastify.approaches.ask[approach];
       if (!askApproach) {
@@ -78,7 +92,7 @@ const root: FastifyPluginAsync = async (fastify, _options): Promise<void> => {
 
       const { overrides, question } = request.body;
       try {
-        return await askApproach.run(question, overrides);
+        return await askApproach.run(question, overrides ?? {});
       } catch (_error: unknown) {
         const error = _error as Error;
         fastify.log.error(error);
