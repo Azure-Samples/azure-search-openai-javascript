@@ -5,6 +5,10 @@
 
 @api_host = http://localhost:3000
 
+# Get file content
+GET {{api_host}}/content/role-library.md
+
+###
 
 # Chat with the bot
 POST {{api_host}}/chat
