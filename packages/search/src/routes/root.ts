@@ -5,6 +5,40 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
     return { root: true };
   });
 
+  fastify.get('/content/:path', {
+    schema: {
+      params: {
+        type: 'object',
+        properties: {
+          path: {
+            type: 'string',
+          },
+        },
+        required: ['path'],
+      } as const,
+    },
+    handler: async function (request, reply) {
+      const { path } = request.params;
+      try {
+        const blobClient = await fastify.azure.blobContainer.getBlobClient(path);
+        const exists = await blobClient.exists();
+        if (!exists) {
+          return reply.notFound();
+        }
+        const properties = await blobClient.getProperties();
+        if (!properties?.contentType) {
+          return reply.notFound();
+        }
+        const buffer = await blobClient.downloadToBuffer();
+        reply.type(properties.contentType).send(buffer);
+      } catch (_error: unknown) {
+        const error = _error as Error;
+        fastify.log.error(error);
+        return { error: `Unknown server error: ${error.message}` };
+      }
+    },
+  });
+
   fastify.post('/chat', {
     schema: {
       body: {
