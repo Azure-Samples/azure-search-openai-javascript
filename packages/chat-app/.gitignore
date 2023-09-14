@@ -1,0 +1,14 @@
+# node_modules
+node_modules/
+
+# build files
+dist/
+dist/*
+/build/
+
+# env
+*.env*
+
+# macOS files
+.DS_Store
+.DS_Store?
