@@ -17,7 +17,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "prepare": "husky install"
+    "prepare": "simple-git-hooks"
   },
   "keywords": [],
   "author": "Microsoft",
@@ -28,13 +28,16 @@
   "devDependencies": {
     "concurrently": "^8.2.1",
     "eslint-config-shared": "^1.0.0",
-    "husky": "^8.0.3",
     "lint-staged": "^14.0.1",
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "simple-git-hooks": "^2.9.0"
   },
   "engines": {
     "node": ">=18",
     "npm": ">=8"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
   },
   "prettier": {
     "tabWidth": 2,
