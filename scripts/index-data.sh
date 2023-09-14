@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 echo "Loading azd .env file from current environment"
-source <(azd env get-values)
+export $(azd env get-values | xargs)
 
 echo 'Installing dependencies'
 npm ci
