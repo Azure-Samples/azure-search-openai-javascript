@@ -3,7 +3,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 // Expose environment variables to the client
-process.env.VITE_SEARCH_API_URI = process.env.SEARCH_API_URI;
+process.env.VITE_SEARCH_API_URI = process.env.SEARCH_API_URI ?? '';
+console.log(`Using search API base URL: "${process.env.VITE_SEARCH_API_URI}"`);
 
 // https://vitejs.dev/config/
 export default defineConfig({
