@@ -27,7 +27,8 @@ jobs:
         run: npm ci
       - name: Build packages
         run: npm run build
-      - name: Build Docker images
+      - if: matrix.platform == 'ubuntu-latest'
+        name: Build Docker images
         run: npm run docker:build
       - name: Lint packages
         run: npm run lint
