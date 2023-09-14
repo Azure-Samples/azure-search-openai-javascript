@@ -1,57 +1,81 @@
-import {
-  provideFASTDesignSystem,
-  fastDivider,
-  fastButton,
-} from '@microsoft/fast-components';
 import { FASTElement, customElement, attr, html, observable, when, repeat } from '@microsoft/fast-element';
 import { globalConfig } from './config/globalConfig';
 
-provideFASTDesignSystem()
-  .withPrefix('chat')
-  .register(
-    fastDivider(),
-    fastButton()
-  );
-
 const template = html<ChatComponent>`
-
+  <style>
+    :host {
+      display: block;
+      margin: 0 auto;
+      max-width: 500px;
+    }
+  </style>
   <h2>Ask Support</h2>
   <section class="chat__wrapper">
-    ${when(x => x.showDefaultPrompts, html<ChatComponent>`
-    <section class="chat__listWrapper"> 
-        <h3 class="chat__subHl">${x => x.defaultPromptsHeading}</h3>
-        <ul class="chat__list flex-container-row">
-        ${repeat(x => x.defaultPrompts, html<ChatComponent>`
-          <li class="chat__listItem--prompt">
-            <button type="submit" @click="${(x, c) => { 
-              console.log((c.event.currentTarget as HTMLButtonElement).innerText, '#### This the event target ####');
-              x.handleDefaultQuestionClick((c.event.currentTarget as HTMLButtonElement).innerText);
-            }}">
-            ${x => x}
-            </button>
-          </li>
-        `)}
+    ${when(
+      (x) => x.showDefaultPrompts,
+      html<ChatComponent>`
+        <section part="chat__listWrapper" class="chat__listWrapper">
+          <h3 class="chat__subHl">${(x) => x.defaultPromptsHeading}</h3>
+          <ul part="chat__listWrapper--defaults" class="chat__list flex-container-row">
+            ${repeat(
+              (x) => x.defaultPrompts,
+              html<ChatComponent>`
+                <li part="chat__listItem" class="chat__listItem--prompt">
+                  <button
+                    type="submit"
+                    @click="${(x, c) => {
+                      console.log(
+                        (c.event.currentTarget as HTMLButtonElement).innerText,
+                        '#### This the event target ####',
+                      );
+                      x.handleDefaultQuestionClick((c.event.currentTarget as HTMLButtonElement).innerText);
+                    }}"
+                  >
+                    ${(x) => x}
+                  </button>
+                </li>
+              `,
+            )}
+          </ul>
+        </section>
+      `,
+    )}
+    <section part="chat__listWrapper" class="chat__listWrapper" id="chatWindow">
+      <ul part="chat__list--chat" class="chat__list">
+        <!-- Render chatMessages as list items -->
+        ${repeat(
+          (x) => x.chatMessages,
+          html<ChatMessage>`${(message) => html`
+            <li class="chat__listItem ${message ? 'chat__listItem--userMessage' : ''}">
+              <p class="chat__text">"${message.text}"</p>
+            </li>
+          `}`,
+        )}
       </ul>
     </section>
-    `)}
-    <section class="chat__listWrapper"> 
-    <ul class="chat__list">
-      <!-- Render chatMessages as list items -->
-      ${repeat(
-        x => x.chatMessages,
-        html<ChatMessage>`${(message) => html`
-          <li class="chat__listItem ${message ? 'chat__listItem--userMessage' : ''}">
-            <p class="chat__text">"${message.text}"</p>
-          </li>
-        `
-      }`)}
-    </ul>
-  </section>
-    <form @submit="${x => x.submitQuestion()}">
+    <form @submit="${(x) => x.submitQuestion()}">
       <label id="chatboxLabel" for="chatbox">${globalConfig.CHAT_INPUT_LABEL_TEXT}</label>
-      <input placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}" aria-labelledby="chatboxLabel" id="chatbox" name="chatbox" ?disabled="${x => x.isDisabled}" type="text" :value="${x => x.questionInput}" @input="${(x, c) => x.handleUserQuestionSubmit(c.event)}">
-      <button ?disabled="${x => x.isDisabled}" type="submit" title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}">${globalConfig.CHAT_BUTTON_LABEL_TEXT}</button>
-      <button ?disabled="${x => x.isDisabled}" type="reset" @click="${x => x.resetInputField()}" title="${globalConfig.RESET_BUTTON_LABEL_TEXT}">${globalConfig.RESET_BUTTON_LABEL_TEXT}</button>
+      <input
+        placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}"
+        aria-labelledby="chatboxLabel"
+        id="chatbox"
+        name="chatbox"
+        ?disabled="${(x) => x.isDisabled}"
+        type="text"
+        :value="${(x) => x.questionInput}"
+        @input="${(x, c) => x.handleUserQuestionSubmit(c.event)}"
+      />
+      <button ?disabled="${(x) => x.isDisabled}" type="submit" title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}">
+        ${globalConfig.CHAT_BUTTON_LABEL_TEXT}
+      </button>
+      <button
+        ?disabled="${(x) => x.isDisabled}"
+        type="reset"
+        @click="${(x) => x.resetInputField()}"
+        title="${globalConfig.RESET_BUTTON_LABEL_TEXT}"
+      >
+        ${globalConfig.RESET_BUTTON_LABEL_TEXT}
+      </button>
     </form>
   </section>
 `;
@@ -100,20 +124,22 @@ export class ChatComponent extends FASTElement {
         headers: {
           'Content-Type': 'application/json',
         },
-      }).then((response) => {
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        return response.text();
-      }).then((text) => {
-        console.log(text);
-        // add the response to the chat
-        this.questionInput = text;
-        isUserMessage = false;
-        this.addMessage(isUserMessage);
-        this.resetInputField();
-        this.isDisabled = false;
-      });
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(response.statusText);
+          }
+          return response.text();
+        })
+        .then((text) => {
+          console.log(text);
+          // add the response to the chat
+          this.questionInput = text;
+          isUserMessage = false;
+          this.addMessage(isUserMessage);
+          this.resetInputField();
+          this.isDisabled = false;
+        });
     } catch (error) {
       console.error('Error:', error);
     }
@@ -126,10 +152,10 @@ export class ChatComponent extends FASTElement {
     }
     this.chatMessages = [
       ...this.chatMessages,
-      { 
-        text: this.questionInput, 
-        isUserMessage 
-      }
+      {
+        text: this.questionInput,
+        isUserMessage,
+      },
     ];
   }
 
@@ -157,5 +183,11 @@ export class ChatComponent extends FASTElement {
   // Reset the input field and the current question
   resetInputField() {
     this.questionInput = '';
+  }
+
+  // Scroll to the bottom of the chat window
+  scrollToBottom() {
+    const chatWindow = this.shadowRoot!.getElementById('chatWindow');
+    chatWindow!.scrollTop = chatWindow!.scrollHeight;
   }
 }
