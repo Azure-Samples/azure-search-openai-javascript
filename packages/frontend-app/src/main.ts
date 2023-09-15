@@ -39,8 +39,18 @@ export class ChatComponent extends LitElement {
     :host {
       display: block;
       padding: 16px;
-      --bubble-color: #f0f0f0;
-      --user-bubble-color: #d7c6f878;
+      --background-color: #D9D9D9;
+      --text-color: #123F58;
+      --bubble-color: rgba(51, 40, 56, 0.6);
+      --bubble-text-color: #fff;
+      --user-bubble-color: #4BBFAA;
+    }
+
+    html,
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
     }
 
     #chat-container {
@@ -50,23 +60,47 @@ export class ChatComponent extends LitElement {
     }
 
     .chat-container__messages {
+      color: var(--text-color);
       display: flex;
       flex-direction: column;
+      padding: 0;
     }
 
     .message-bubble {
-      background-color: var(--bubble-color);
-      border-radius: 10px;
-      margin-top: 8px;
-      padding: 8px 12px;
       max-width: 80%;
-      word-wrap: break-word;
-      display: flex; 
+      min-width: 70%;
+      display: flex;
+      flex-direction: column; 
     }
 
-    .user-message {
-      align-self: flex-end;
+    .message-bubble-txt {
+      background-color: var(--bubble-color);
+      color: var(--bubble-text-color);
+      border-radius: 10px;
+      margin-top: 8px;
+      padding: 20px;
+      word-wrap: break-word;
+      margin-block-end: 0;
+    }
+
+    .message-bubble-txt.user-message {
       background-color: var(--user-bubble-color);
+      color: var(--text-color);
+    }
+
+    .message-bubble.user-message {
+      align-self: flex-end;
+    }
+
+    .message-info {
+      font-size: smaller;
+      font-style: italic;
+      margin: 0;
+      margin-top: 1px;
+    }
+
+    .user-message .message-info {
+      text-align: right;
     }
 
     .defaultPrompts-container {
@@ -131,7 +165,8 @@ export class ChatComponent extends LitElement {
   }
 
   // Handle the click on the chat button and send the question to the API
-  handleUserQuestionSubmit() {
+  handleUserQuestionSubmit(e: Event) {
+    e.preventDefault();
     console.log('User question: ', this.questionInput.value);
     const userQuestion = this.questionInput.value;
     if (userQuestion) {
@@ -163,9 +198,10 @@ export class ChatComponent extends LitElement {
           ${this.chatMessages.map(
             (message) => html`
               <li class="message-bubble ${message.isUserMessage ? 'user-message' : ''}">
-                <p>${message.text}<p>
-                <p><span class="timestamp">${message.timestamp}</span>, 
-                  <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span></p>
+                <p class="message-bubble-txt ${message.isUserMessage ? 'user-message' : ''}">${message.text}</p>
+                <p class="message-info"><span class="timestamp">${message.timestamp}</span>, 
+                  <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
+                </p>
               </li>
             `
           )}
