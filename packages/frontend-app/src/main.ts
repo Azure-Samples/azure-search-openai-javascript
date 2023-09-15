@@ -26,7 +26,7 @@ export class ChatComponent extends LitElement {
   @property({ type: Boolean }) isInputDisabled = false;
   @property({ type: Boolean }) isSubmitButtonDisabled = false;
   @property({ type: Boolean }) isChatStarted = false;
-  @property({ type: Boolean! }) isResetInput = false;
+  @property({ type: Boolean }) isResetInput = false;
   showDefaultPrompts: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
@@ -214,6 +214,7 @@ export class ChatComponent extends LitElement {
     this.addMessage(question, true);
     // remove default prompts
     this.isChatStarted = true;
+    this.showDefaultPrompts = false;
     // disable the input field and submit button while waiting for the API response
     this.isInputDisabled = true;
     this.isSubmitButtonDisabled = true;
