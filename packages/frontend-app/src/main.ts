@@ -41,18 +41,17 @@ export class ChatComponent extends LitElement {
     :host {
       display: block;
       padding: 16px;
-      --background-color: #d9d9d9;
+      --secondary-color: #d9d9d9;
       --text-color: #123f58;
-      --bubble-color: rgba(51, 40, 56, 0.6);
-      --bubble-text-color: #fff;
-      --user-bubble-color: #4bbfaa;
-      --accent-color: #65b5e3;
+      --primary-color: rgba(51, 40, 56, 0.6);
+      --white: #fff;
+      --accent-high: #4bbfaa;
     }
 
     html,
     body {
       font-family: 'Roboto', sans-serif;
-      background-color: var(--background-color);
+      background-color: var(--secondary-color);
       color: var(--text-color);
     }
 
@@ -92,6 +91,7 @@ export class ChatComponent extends LitElement {
       display: flex;
       flex-direction: column;
       gap: 8px;
+      min-width: 100%;
     }
 
     #chat-container form {
@@ -106,9 +106,9 @@ export class ChatComponent extends LitElement {
     }
 
     .chatboxAction button {
-      background: var(--accent-color);
+      background: var(--accent-high);
       border: none;
-      color: white;
+      color: var(--text-color);
       font-weight: bold;
       cursor: pointer;
       border-radius: 4px;
@@ -125,7 +125,7 @@ export class ChatComponent extends LitElement {
     }
 
     .chatboxAction input {
-      border: 1px solid var(--accent-color);
+      border: 1px solid var(--accent-high);
       border-radius: 4px;
       padding: 8px;
       flex: 1 1 auto;
@@ -154,8 +154,8 @@ export class ChatComponent extends LitElement {
 
     .message-bubble-txt {
       animation: chatmessageanimation 0.5s ease-in-out;
-      background-color: var(--bubble-color);
-      color: var(--bubble-text-color);
+      background-color: var(--primary-color);
+      color: var(--white);
       border-radius: 10px;
       margin-top: 8px;
       padding: 20px;
@@ -166,7 +166,7 @@ export class ChatComponent extends LitElement {
     }
 
     .message-bubble-txt.user-message {
-      background-color: var(--user-bubble-color);
+      background-color: var(--accent-high);
       color: var(--text-color);
     }
 
@@ -194,6 +194,12 @@ export class ChatComponent extends LitElement {
       list-style-type: none;
       padding: 0;
       display: flex;
+      flex-direction: column;
+      text-align: center;
+
+      @media (min-width: 768px) {
+        flex-direction: row;
+      }
     }
 
     .defaultPrompts-container ul li {
@@ -228,7 +234,7 @@ export class ChatComponent extends LitElement {
       width: 10px;
       height: 10px;
       margin: 0 5px;
-      background-color: var(--bubble-color);
+      background-color: var(--primary-color);
       border-radius: 50%;
       animation: chatloadinganimation 1.5s infinite;
     }
@@ -390,9 +396,9 @@ export class ChatComponent extends LitElement {
           ${
             this.showDefaultPrompts
               ? html`
-                  <div class="defaultPrompts-container">
-                    <ul>
-                      ${this.defaultPrompts.map(
+                <div class="defaultPrompts-container">
+                  <ul>
+                    ${this.defaultPrompts.map(
                         (prompt) => html`
                           <li>
                             <p>${prompt}</p>
@@ -400,9 +406,9 @@ export class ChatComponent extends LitElement {
                           </li>
                         `,
                       )}
-                    </ul>
-                  </div>
-                `
+                  </ul>
+                </div>
+              `
               : ''
           }
         </div>
