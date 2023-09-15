@@ -35,10 +35,11 @@ export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
     search: SearchClient<any>,
     openai: OpenAiService,
     chatGptModel: string,
+    embeddingModel: string,
     sourcePageField: string,
     contentField: string,
   ) {
-    super(search, openai, chatGptModel, sourcePageField, contentField);
+    super(search, openai, chatGptModel, embeddingModel, sourcePageField, contentField);
   }
 
   async run(userQuery: string, overrides: Record<string, any>): Promise<any> {
