@@ -23,13 +23,14 @@ export class ChatComponent extends LitElement {
   @property({ type: String }) currentQuestion = '';
   @query('#questionInput') questionInput!: HTMLInputElement;
   // Default prompts to display in the chat
-  @property({ type: Boolean }) isInputDisabled = false;
-  @property({ type: Boolean }) isSubmitButtonDisabled = false;
+  @property({ type: Boolean }) isDisabled = false;
   @property({ type: Boolean }) isChatStarted = false;
   @property({ type: Boolean }) isResetInput = false;
   showDefaultPrompts: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
+  // Awaiting response from API
+  @property({ type: Boolean }) isAwaitingResponse = false;
   // This are the chat bubbles that will be displayed in the chat
   chatMessages: ChatMessage[] = [];
   // This are the labels for the chat button and input
@@ -55,6 +56,11 @@ export class ChatComponent extends LitElement {
       color: var(--text-color);
     }
 
+    .chat__main {
+      width: 500px;
+      margin: 0 auto;
+    }
+
     @keyframes chatmessageanimation {
       0% {
         opacity: 0.5;
@@ -63,6 +69,18 @@ export class ChatComponent extends LitElement {
       100% {
         opacity: 1;
         top: 0px;
+      }
+    }
+
+    @keyframes chatloadinganimation {
+      0% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0.5;
       }
     }
 
@@ -124,8 +142,6 @@ export class ChatComponent extends LitElement {
       display: flex;
       flex-direction: column;
       padding: 0;
-      max-height: 500px;
-      overflow-y: auto;
     }
 
     .message-bubble {
@@ -203,6 +219,27 @@ export class ChatComponent extends LitElement {
       font-weight: bold;
       cursor: pointer;
     }
+
+    .loading-skeleton {
+      display: flex;
+    }
+
+    .circle {
+      width: 10px;
+      height: 10px;
+      margin: 0 5px;
+      background-color: var(--bubble-color);
+      border-radius: 50%;
+      animation: chatloadinganimation 1.5s infinite;
+    }
+
+    .circle:nth-child(2) {
+      animation-delay: 0.5s;
+    }
+
+    .circle:nth-child(3) {
+      animation-delay: 1s;
+    }
   `;
 
   // Send the question to the Open AI API and render the answer in the chat
@@ -217,8 +254,9 @@ export class ChatComponent extends LitElement {
     this.isChatStarted = true;
     this.showDefaultPrompts = false;
     // disable the input field and submit button while waiting for the API response
-    this.isInputDisabled = true;
-    this.isSubmitButtonDisabled = true;
+    this.isDisabled = true;
+    // show loading indicator
+    this.isAwaitingResponse = true;
     try {
       await fetch(`${globalConfig.API_CHAT_URL}`, {
         method: 'POST',
@@ -253,8 +291,8 @@ export class ChatComponent extends LitElement {
           this.addMessage(data.answer, false);
         });
       // enable the input field and submit button again
-      this.isInputDisabled = false;
-      this.isSubmitButtonDisabled = false;
+      this.isDisabled = false;
+      this.isAwaitingResponse = false;
     } catch (error) {
       console.error('Error:', error);
     }
@@ -317,7 +355,7 @@ export class ChatComponent extends LitElement {
   override render() {
     return html`
       <div id="chat-container">
-        <ul class="chat-container__messages">
+        <ul class="chat-container__messages" aria-live="assertive">
           ${this.chatMessages.map(
             (message) => html`
               <li class="message-bubble ${message.isUserMessage ? 'user-message' : ''}">
@@ -330,6 +368,21 @@ export class ChatComponent extends LitElement {
             `,
           )}
         </ul>
+        ${
+          this.isAwaitingResponse
+            ? html`
+              <div
+                id="loading-indicator"
+                class="loading-skeleton"
+                aria-label="Please wait. We are searching for an answer..."
+              >
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+              </div>
+            `
+            : ''
+        }
         <!-- Default prompts: use the variables above to edit the heading -->
         <div class="chat-container__questions">
           <h3 class="chat-container__subHl">${this.defaultPromptsHeading}</h3>
