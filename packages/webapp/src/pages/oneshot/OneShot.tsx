@@ -153,10 +153,10 @@ export function Component(): JSX.Element {
       key: Approaches.ReadRetrieveRead,
       text: 'Read-Retrieve-Read',
     },
-    {
-      key: Approaches.ReadDecomposeAsk,
-      text: 'Read-Decompose-Ask',
-    },
+    // {
+    //   key: Approaches.ReadDecomposeAsk,
+    //   text: 'Read-Decompose-Ask',
+    // },
   ];
 
   return (
@@ -166,7 +166,7 @@ export function Component(): JSX.Element {
         <h1 className={styles.oneshotTitle}>Ask your data</h1>
         <div className={styles.oneshotQuestionInput}>
           <QuestionInput
-            placeholder="Example: Does my plan cover annual eye exams?"
+            placeholder="Example: What is the redund policy?"
             disabled={isLoading}
             onSend={(question) => makeApiRequest(question)}
           />
