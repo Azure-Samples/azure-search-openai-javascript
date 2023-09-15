@@ -31,6 +31,7 @@ export default defineConfig({
     proxy: {
       '/ask': 'http://localhost:3000',
       '/chat': 'http://localhost:3000',
+      '/content': 'http://localhost:3000',
     },
   },
 });
