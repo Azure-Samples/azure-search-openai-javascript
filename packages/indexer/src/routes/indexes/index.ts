@@ -10,6 +10,8 @@ export interface IndexFileOptionsField {
 const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promise<void> => {
   fastify.post('/', {
     schema: {
+      description: 'Create a new search index',
+      tags: ['indexes'],
       body: {
         type: 'object',
         properties: {
@@ -43,6 +45,8 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
 
   fastify.delete('/:name', {
     schema: {
+      description: 'Delete a search index',
+      tags: ['indexes'],
       params: {
         type: 'object',
         properties: {
@@ -75,7 +79,9 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
 
   fastify.post('/:name/files', {
     schema: {
-      // consumes: ['multipart/form-data'],
+      description: 'Upload a file for indexing',
+      tags: ['indexes'],
+      consumes: ['multipart/form-data'],
       params: {
         type: 'object',
         properties: {
@@ -88,8 +94,9 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
       body: {
         type: 'object',
         properties: {
-          options: { $ref: '#multipartField' },
-          file: { $ref: '#multipartField' },
+          options: { $ref: 'multipartField' },
+          // TODO: missing proper file type from ajv plugin
+          file: { $ref: 'multipartField' },
         },
         required: ['file'],
       },
@@ -150,6 +157,8 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
 
   fastify.delete('/:name/files/:filename', {
     schema: {
+      description: 'Delete a file from the index',
+      tags: ['indexes'],
       params: {
         type: 'object',
         properties: {
