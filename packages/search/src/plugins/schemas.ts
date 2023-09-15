@@ -17,6 +17,7 @@ export const chatRequestSchema = {
     },
     overrides: {
       type: 'object',
+      // TODO: need to type this better
       additionalProperties: { type: 'string' },
     },
   },
@@ -31,6 +32,7 @@ export const askRequestSchema = {
     question: { type: 'string' },
     overrides: {
       type: 'object',
+      // TODO: need to type this better
       additionalProperties: { type: 'string' },
     },
   },

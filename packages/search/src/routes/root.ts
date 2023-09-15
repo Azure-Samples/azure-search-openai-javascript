@@ -68,7 +68,7 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       tags: ['chat'],
       body: { $ref: 'chatRequest' },
       response: {
-        200: { $ref: 'approachResponse' },
+        // 200: { $ref: 'approachResponse' },
         400: { $ref: 'httpError' },
         500: { $ref: 'httpError' },
       },
@@ -97,7 +97,7 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       tags: ['ask'],
       body: { $ref: 'askRequest' },
       response: {
-        200: { $ref: 'approachResponse' },
+        // 200: { $ref: 'approachResponse' },
         400: { $ref: 'httpError' },
         500: { $ref: 'httpError' },
       },
