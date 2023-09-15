@@ -21,7 +21,7 @@ export async function run(arguments_: string[] = process.argv) {
   dotenv.config();
 
   const file = await fs.readFile(join(__dirname, '../../package.json'), 'utf8');
-  const package_ = JSON.parse(file) as Record<string, string>;
+  const packageJson = JSON.parse(file) as Record<string, string>;
 
   program
     .name('index-files')
@@ -33,7 +33,7 @@ export async function run(arguments_: string[] = process.argv) {
     .option('-w, --wait', 'Wait for the indexer to finish processing the files', false)
     .option('--no-upload', 'Disable uploading files to a blob storage container')
     .option('--no-vectors', 'Disable vectors generation for the files')
-    .version(package_.version, '-v, --version', 'Show the current version')
+    .version(packageJson.version, '-v, --version', 'Show the current version')
     .showHelpAfterError()
     .action(async (files: string[], options: OptionValues) => {
       const { indexerUrl, indexName, upload, vectors, wait } = options;
