@@ -123,6 +123,8 @@ export class ChatComponent extends LitElement {
       display: flex;
       flex-direction: column;
       padding: 0;
+      max-height: 500px;
+      overflow-y: auto;
     }
 
     .message-bubble {
@@ -130,7 +132,7 @@ export class ChatComponent extends LitElement {
       min-width: 70%;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      height: auto;
     }
 
     .message-bubble-txt {
@@ -333,9 +335,9 @@ export class ChatComponent extends LitElement {
           ${
             this.showDefaultPrompts
               ? html`
-                <div class="defaultPrompts-container">
-                  <ul>
-                    ${this.defaultPrompts.map(
+                  <div class="defaultPrompts-container">
+                    <ul>
+                      ${this.defaultPrompts.map(
                         (prompt) => html`
                           <li>
                             <p>${prompt}</p>
@@ -343,9 +345,9 @@ export class ChatComponent extends LitElement {
                           </li>
                         `,
                       )}
-                  </ul>
-                </div>
-              `
+                    </ul>
+                  </div>
+                `
               : ''
           }
         </div>
