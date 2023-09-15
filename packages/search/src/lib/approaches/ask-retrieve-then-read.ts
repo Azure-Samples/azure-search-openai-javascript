@@ -5,7 +5,7 @@ import { MessageBuilder } from '../message-builder.js';
 import { type ApproachOverrides, type AskApproach } from './approach.js';
 import { ApproachBase } from './approach-base.js';
 
-const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant helping Contoso Inc employees with their healthcare plan questions and employee handbook questions.
+const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant helping Consto Real Estate company customers with support questions regarding terms of service, privacy policy, and questions about support requests.
 Use 'you' to refer to the individual asking the questions even if they ask with 'I'.
 Answer the following question using only the data provided in the sources below.
 For tabular information return it as an html table. Do not return markdown format.
@@ -14,16 +14,15 @@ If you cannot answer using the sources below, say you don't know. Use below exam
 
 // shots/sample conversation
 const QUESTION = `
-'What is the deductible for the employee plan for a visit to Overlake in Bellevue?'
+'What happens if a guest breaks something?'
 
 Sources:
-info1.txt: deductibles depend on whether you are in-network or out-of-network. In-network deductibles are $500 for employee and $1000 for family. Out-of-network deductibles are $1000 for employee and $2000 for family.
-info2.pdf: Overlake is in-network for the employee plan.
-info3.pdf: Overlake is the name of the area that includes a park and ride near Bellevue.
-info4.pdf: In-network institutions include Overlake, Swedish and others in the region
+info1.txt: Compensation for Damage Accidents can happen during a stay, and we have procedures in place to handle compensation for damage. If you, as a guest, notice damage during your stay or if you're a host and your property has been damaged, report it immediately through the platform
+info2.pdf: Guests must not engage in any prohibited activities, including but not limited to: - Unauthorized parties or events - Smoking in non-smoking properties - Violating community rules - Damaging property or belongings
+info3.pdf: Once you've provided the necessary information, submit the report. Our financial support team will investigate the matter and work to resolve it promptly.
 `;
 
-const ANSWER = `In-network deductibles are $500 for employee and $1000 for family [info1.txt] and Overlake is in-network for the employee plan [info2.pdf][info4.pdf].`;
+const ANSWER = `If a guest breaks something, report the damage immediately through the platform [info1.txt]. Once you've provided the necessary information, submit the report. Our financial support team will investigate the matter and work to resolve it promptly [info3.pdf].`;
 
 /**
  * Simple retrieve-then-read implementation, using the Cognitive Search and OpenAI APIs directly.
@@ -60,7 +59,7 @@ export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
     const chatCompletion = await openAiChat.completions.create({
       model: this.chatGptModel,
       messages,
-      temperature: overrides?.temperature ?? 0.3,
+      temperature: Number(overrides?.temperature) ?? 0.3,
       max_tokens: 1024,
       n: 1,
     });

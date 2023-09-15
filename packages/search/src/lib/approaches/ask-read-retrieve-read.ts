@@ -12,7 +12,7 @@ import { ApproachBase } from './approach-base.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const TEMPLATE_PREFIX = `You are an intelligent assistant helping Contoso Inc employees with their healthcare plan questions and employee handbook questions. 
+const TEMPLATE_PREFIX = `You are an intelligent assistant helping Consto Real Estate company customers with support questions regarding terms of service, privacy policy, and questions about support requests.
 Answer the question using only the data provided in the information sources below.
 For tabular information return it as an html table. Do not return markdown format.
 Each source has a name followed by colon and the actual data, quote the source name for each piece of data you use in the response.
@@ -70,14 +70,14 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
         name: 'CognitiveSearch',
         func: searchAndStore,
         description:
-          'useful for searching employee handbook informations, such as healthcare plans, retirement plans, etc',
+          'useful for searching company related documents such as terms of service, privacy policy, and questions about support requests',
         callbacks: callbackManager,
       }),
       new EmployeeInfoTool('Employee1', { callbacks: callbackManager }),
     ];
 
     const chatModel = await this.langchain.getChat({
-      temperature: overrides?.temperature || 0.3,
+      temperature: Number(overrides?.temperature) || 0.3,
     });
 
     const executor = await initializeAgentExecutorWithOptions(tools, chatModel, {
