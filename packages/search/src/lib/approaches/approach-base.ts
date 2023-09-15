@@ -1,6 +1,7 @@
 import { type SearchClient } from '@azure/search-documents';
 import { type OpenAiService } from '../../plugins/openai.js';
 import { removeNewlines } from '../util/index.js';
+import { type ApproachOverrides } from './approach.js';
 
 export interface SearchDocumentsResult {
   query: string;
@@ -18,10 +19,10 @@ export class ApproachBase {
     protected contentField: string,
   ) {}
 
-  protected async searchDocuments(query?: string, overrides: Record<string, any> = {}): Promise<SearchDocumentsResult> {
+  protected async searchDocuments(query?: string, overrides: ApproachOverrides = {}): Promise<SearchDocumentsResult> {
     const hasText = ['text', 'hybrid', undefined].includes(overrides?.retrieval_mode);
     const hasVectors = ['vectors', 'hybrid', undefined].includes(overrides?.retrieval_mode);
-    const useSemanticCaption = Boolean(overrides?.use_semantic_caption) && hasText;
+    const useSemanticCaption = Boolean(overrides?.semantic_captions) && hasText;
     const top = overrides?.top ? Number(overrides?.top) : 3;
     const excludeCategory: string | undefined = overrides?.exclude_category;
     const filter = excludeCategory ? `category ne '${excludeCategory.replace("'", "''")}'` : undefined;

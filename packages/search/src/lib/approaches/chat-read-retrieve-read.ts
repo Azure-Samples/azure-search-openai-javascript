@@ -1,6 +1,6 @@
 import { type SearchClient } from '@azure/search-documents';
 import { type OpenAiService } from '../../plugins/openai.js';
-import { type ChatApproach, type ApproachResponse } from './approach.js';
+import { type ChatApproach, type ApproachResponse, type ChatApproachOverrides } from './approach.js';
 import { ApproachBase } from './approach-base.js';
 import { type HistoryMessage, type Message, messagesToString } from '../message.js';
 import { MessageBuilder } from '../message-builder.js';
@@ -55,7 +55,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     this.chatGptTokenLimit = getTokenLimit(chatGptModel);
   }
 
-  async run(history: HistoryMessage[], overrides: Record<string, any>): Promise<ApproachResponse> {
+  async run(history: HistoryMessage[], overrides: ChatApproachOverrides): Promise<ApproachResponse> {
     const userQuery = 'Generate search query for: ' + history[history.length - 1].user;
 
     // STEP 1: Generate an optimized keyword search query based on the chat history and the last question
@@ -95,7 +95,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     // -----------------------------------------------------------------------
 
     // Allow client to replace the entire prompt, or to inject into the exiting prompt using >>>
-    const promptOverride = overrides?.prompt_override;
+    const promptOverride = overrides?.prompt_template;
     let systemMessage: string;
     if (promptOverride?.startsWith('>>>')) {
       systemMessage = SYSTEM_MESSAGE_CHAT_CONVERSATION.replace(

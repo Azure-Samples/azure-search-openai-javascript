@@ -7,7 +7,7 @@ import { CallbackManager } from 'langchain/callbacks';
 import { type OpenAiService } from '../../plugins/openai.js';
 import { type LangchainService } from '../../plugins/langchain.js';
 import { CsvLookupTool, HtmlCallbackHandler } from '../langchain/index.js';
-import { type AskApproach } from './approach.js';
+import { type ApproachOverrides, type AskApproach } from './approach.js';
 import { ApproachBase } from './approach-base.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -52,7 +52,7 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
     super(search, openai, chatGptModel, embeddingModel, sourcePageField, contentField);
   }
 
-  async run(userQuery: string, overrides: Record<string, any>): Promise<any> {
+  async run(userQuery: string, overrides: ApproachOverrides): Promise<any> {
     let searchResults: string[] = [];
 
     const htmlTracer = new HtmlCallbackHandler();
@@ -83,8 +83,8 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
     const executor = await initializeAgentExecutorWithOptions(tools, chatModel, {
       agentType: 'chat-zero-shot-react-description',
       agentArgs: {
-        prefix: overrides?.promptTemplatePrefix ?? TEMPLATE_PREFIX,
-        suffix: overrides?.promptTemplateSuffix ?? TEMPLATE_SUFFIX,
+        prefix: overrides?.prompt_template_prefix ?? TEMPLATE_PREFIX,
+        suffix: overrides?.prompt_template_suffix ?? TEMPLATE_SUFFIX,
         inputVariables: ['input', 'agent_scratchpad'],
       },
       returnIntermediateSteps: true,
