@@ -1,11 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { globalConfig } from './config/globalConfig';
-import { TextField } from '@material/mwc-textfield';
-import '@material/mwc-textfield';
-import '@material/mwc-button';
-import '@material/mwc-checkbox';
-import '@material/mwc-formfield';
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -21,7 +16,7 @@ import '@material/mwc-formfield';
 @customElement('chat-component')
 export class ChatComponent extends LitElement {
   @property({ type: String }) currentQuestion = '';
-  @query('#questionInput') questionInput!: TextField;
+  @query('#questionInput') questionInput!: HTMLInputElement;
   // Default prompts to display in the chat
   @property({ type: Boolean }) isInputDisabled = false;
   @property({ type: Boolean }) isSubmitButtonDisabled = false;
@@ -127,6 +122,7 @@ export class ChatComponent extends LitElement {
 
   // Handle the click on the chat button and send the question to the API
   handleUserQuestionSubmit() {
+    console.log('User question: ', this.questionInput.value);
     const userQuestion = this.questionInput.value;
     if (userQuestion) {
       this.currentQuestion = userQuestion;
@@ -161,39 +157,27 @@ export class ChatComponent extends LitElement {
           ${this.showDefaultPrompts
             ? html`
                 <div class="defaultPrompts-container">
+                  <ul>
                   ${this.defaultPrompts.map(
                     (prompt) => html`
-                      <mwc-button
-                        @click=${() => this.handleDefaultQuestionClick(prompt)}
-                        label=${prompt}
-                      ></mwc-button>
+                    <li>
+                    <button  type="reset" @click="" title="${prompt}">${prompt}</button>
+                    </li>
                     `
                   )}
+                </ul>
                 </div>
               `
             : ''}
         </div>
-        <mwc-textfield
-          id="questionInput"
-          label="${this.chatInputLabelText}"
-          outlined
-          ?disabled="${this.isInputDisabled}"
-          @input=${(e: Event) => (this.currentQuestion = (e.target as TextField).value)}
-        ></mwc-textfield>
-        <!-- This is the send button -->
-        <mwc-button 
-          @click=${this.handleUserQuestionSubmit}
-          raised
-          ?disabled="${this.isSubmitButtonDisabled}"
-          label="${this.chatButtonLabelText}"
-        ></mwc-button>
-        <!-- This is the reset button -->
-        <mwc-button
-          @click=${this.resetInputField}
-          outlined
-          ?disabled="${this.isSubmitButtonDisabled}"
-          label="${globalConfig.RESET_BUTTON_LABEL_TEXT}"
-        ></mwc-button>
+        </section>
+        <form @submit="">
+          <label id="chatboxLabel" for="chatbox">${globalConfig.CHAT_INPUT_LABEL_TEXT}</label>
+          <input id="questionInput" placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}" aria-labelledby="chatboxLabel" id="chatbox" name="chatbox"  type="text" :value="">
+          <button @click="${this.handleUserQuestionSubmit}" title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}">${globalConfig.CHAT_BUTTON_LABEL_TEXT}</button>
+          <button @click="${this.resetInputField}" title="${globalConfig.RESET_BUTTON_LABEL_TEXT}">${globalConfig.RESET_BUTTON_LABEL_TEXT}</button>
+        </form>
+      </section>
       </div>
       </div>
     `;

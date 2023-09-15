@@ -9,6 +9,7 @@ export const globalConfig = {
   // This are the labels for the chat button and input
   CHAT_BUTTON_LABEL_TEXT: 'Ask Support',
   CHAT_INPUT_LABEL_TEXT: 'Ask a question now',
+  CHAT_INPUT_PLACEHOLDER: 'Type your question here',
   RESET_BUTTON_LABEL_TEXT: 'Reset',
   // API URL for development purposes
   API_URL_LOCAL: '/api/responses',
