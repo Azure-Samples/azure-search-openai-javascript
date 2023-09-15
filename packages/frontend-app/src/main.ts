@@ -26,6 +26,7 @@ export class ChatComponent extends LitElement {
   @property({ type: Boolean }) isInputDisabled = false;
   @property({ type: Boolean }) isSubmitButtonDisabled = false;
   @property({ type: Boolean }) isChatStarted = false;
+  @property({ type: Boolean! }) isResetInput = false;
   showDefaultPrompts: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
@@ -64,10 +65,57 @@ export class ChatComponent extends LitElement {
       }
     }
 
+    .display-none {
+      display: none;
+    }
+
     #chat-container {
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
+
+    #chat-container form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chatboxAction {
+      display: flex;
+      flex-direction: row;
+      position: relative;
+    }
+
+    .chatboxAction button {
+      background: #65b5e3;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+
+    .chatboxAction [type='reset'] {
+      position: absolute;
+      right: 100px;
+      top: 10px;
+      background: transparent;
+      border: none;
+      color: gray;
+    }
+
+    .chatboxAction input {
+      border: 1px solid #65b5e3;
+      border-radius: 4px;
+      padding: 8px;
+      flex: 1 1 auto;
+      font-size: 1rem;
+    }
+
+    .chat-container__subHl {
+      color: #666;
+      font-size: 1.2rem;
     }
 
     .chat-container__messages {
@@ -95,6 +143,7 @@ export class ChatComponent extends LitElement {
       word-wrap: break-word;
       margin-block-end: 0;
       position: relative;
+      display: flex;
     }
 
     .message-bubble-txt.user-message {
@@ -120,6 +169,36 @@ export class ChatComponent extends LitElement {
     .defaultPrompts-container {
       display: flex;
       flex-direction: column;
+    }
+
+    .defaultPrompts-container ul {
+      list-style-type: none;
+      padding: 0;
+      display: flex;
+    }
+
+    .defaultPrompts-container ul li {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      background: #eee;
+      margin: 4px;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      min-height: 100px;
+    }
+
+    .defaultPrompts-container ul li p {
+      height: 100%;
+    }
+
+    .defaultPrompts-container ul li button {
+      border: none;
+      background: transparent;
+      color: #222;
+      font-weight: bold;
+      cursor: pointer;
     }
   `;
 
@@ -206,6 +285,7 @@ export class ChatComponent extends LitElement {
       this.currentQuestion = userQuestion;
       this.sendQuestionToAPI(userQuestion);
       this.questionInput.value = '';
+      this.isResetInput = false;
     }
   }
 
@@ -222,6 +302,11 @@ export class ChatComponent extends LitElement {
     event.preventDefault();
     this.questionInput.value = '';
     this.currentQuestion = '';
+    this.isResetInput = false;
+  }
+
+  handleOnInputChange() {
+    this.isResetInput = !!this.questionInput.value;
   }
 
   // Web Component render function
@@ -253,7 +338,8 @@ export class ChatComponent extends LitElement {
                     ${this.defaultPrompts.map(
                         (prompt) => html`
                           <li>
-                            <button type="reset" @click="" title="${prompt}">${prompt}</button>
+                            <p>${prompt}</p>
+                            <button @click="">Ask Now</button>
                           </li>
                         `,
                       )}
@@ -264,17 +350,22 @@ export class ChatComponent extends LitElement {
           }
         </div>
         </section>
-        <form @submit="">
-          <label id="chatboxLabel" for="chatbox">${globalConfig.CHAT_INPUT_LABEL_TEXT}</label>
-          <input id="questionInput" placeholder="${
-            globalConfig.CHAT_INPUT_PLACEHOLDER
-          }" aria-labelledby="chatboxLabel" id="chatbox" name="chatbox"  type="text" :value="">
-          <button @click="${this.handleUserQuestionSubmit}" title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}">${
-            globalConfig.CHAT_BUTTON_LABEL_TEXT
-          }</button>
-          <button @click="${this.resetInputField}" title="${globalConfig.RESET_BUTTON_LABEL_TEXT}">${
-            globalConfig.RESET_BUTTON_LABEL_TEXT
-          }</button>
+        <form>
+          <label id="chatboxLabel" for="questionInput">${globalConfig.CHAT_INPUT_LABEL_TEXT}</label>
+
+          <div class="chatboxAction">
+            <input id="questionInput" placeholder="${
+              globalConfig.CHAT_INPUT_PLACEHOLDER
+            }" aria-labelledby="chatboxLabel" id="chatbox" name="chatbox" type="text" :value="" autocomplete="off" @keyup="${
+              this.handleOnInputChange
+            }">
+            <button @click="${this.handleUserQuestionSubmit}" title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}">${
+              globalConfig.CHAT_BUTTON_LABEL_TEXT
+            }</button>
+            <button .hidden="${!this.isResetInput}" type="reset" id="resetBtn" title="Clear input" @click="${
+              this.resetInputField
+            }" title="${globalConfig.RESET_BUTTON_LABEL_TEXT}">${globalConfig.RESET_BUTTON_LABEL_TEXT}</button>
+          </div>
         </form>
       </section>
       </div>
