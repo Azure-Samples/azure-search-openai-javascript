@@ -6,7 +6,7 @@
 @api_host = http://localhost:3000
 
 # Get file content
-GET {{api_host}}/content/role-library.md
+GET {{api_host}}/content/terms-of-service.md
 
 ###
 
@@ -15,7 +15,7 @@ POST {{api_host}}/chat
 Content-Type: application/json
 
 {
-  "history": [{ "user": "What happens in a performance review?" }],
+  "history": [{ "user": "What happens is a rental doesn't fit the description?" }],
   "approach":"rrr",
   "overrides": {
     "retrieval_mode": "hybrid",
@@ -33,7 +33,7 @@ POST {{api_host}}/ask
 Content-Type: application/json
 
 {
-  "question": "What does a Product Manager do?",
+  "question": "What is the refund policy?",
   "approach":"rtr",
   "overrides": {
     "retrieval_mode": "hybrid",
@@ -50,7 +50,7 @@ POST {{api_host}}/ask
 Content-Type: application/json
 
 {
-  "question": "What is the title of Employee2?",
+  "question": "How to contact a representative?",
   "approach":"rrr",
   "overrides": {
     "retrieval_mode": "hybrid",
