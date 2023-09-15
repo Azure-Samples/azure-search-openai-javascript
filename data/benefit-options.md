@@ -1,7 +1,5 @@
 # Contoso Electronics Plan and Benefit Packages
 
-
-
 > This document contains information generated using a language model (Azure OpenAI). The information
 > contained in this document is only for demonstration purposes and does not reflect the opinions or
 > beliefs of Microsoft. Microsoft makes no representations or warranties of any kind, express or implied,

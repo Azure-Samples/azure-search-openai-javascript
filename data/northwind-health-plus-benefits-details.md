@@ -4937,5 +4937,3 @@ Tips
 
 - Take advantage of preventive care services as they are covered at 100% with no out-of-
   pocket costs.
-
-

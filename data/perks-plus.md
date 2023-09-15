@@ -55,5 +55,3 @@ In addition to the wide range of activities covered by PerksPlus, there is also 
 - Medical treatments and procedures
 - Travel expenses (unless related to a fitness program)
   - Food and supplements
-
-
