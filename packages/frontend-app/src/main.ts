@@ -386,9 +386,11 @@ export class ChatComponent extends LitElement {
   }
 
   displayDefaultPrompts() {
-    if (this.isChatStarted && this.chatMessages.length > 0 && !this.showDefaultPrompts) {
-        this.showDefaultPrompts = true;
-      }
+    if (!this.showDefaultPrompts) {
+      this.isChatStarted = false;
+      this.chatMessages = [];
+      this.showDefaultPrompts = true;
+    }
   }
 
   handleOnInputChange() {
