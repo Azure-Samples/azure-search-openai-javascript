@@ -11,7 +11,7 @@ declare interface ChatMessage {
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
  * The component is built with LitElement and Material Web Components.
- * 
+ *
  * Labels and other aspects are configurable via properties that get their values from the global config file.
  * @element chat-component
  * @fires chat-component#questionSubmitted - Fired when the user submits a question
@@ -39,11 +39,11 @@ export class ChatComponent extends LitElement {
     :host {
       display: block;
       padding: 16px;
-      --background-color: #D9D9D9;
-      --text-color: #123F58;
+      --background-color: #d9d9d9;
+      --text-color: #123f58;
       --bubble-color: rgba(51, 40, 56, 0.6);
       --bubble-text-color: #fff;
-      --user-bubble-color: #4BBFAA;
+      --user-bubble-color: #4bbfaa;
     }
 
     html,
@@ -51,6 +51,17 @@ export class ChatComponent extends LitElement {
       font-family: 'Roboto', sans-serif;
       background-color: var(--background-color);
       color: var(--text-color);
+    }
+
+    @keyframes chatmessageanimation {
+      0% {
+        opacity: 0.5;
+        top: 150px;
+      }
+      100% {
+        opacity: 1;
+        top: 0px;
+      }
     }
 
     #chat-container {
@@ -70,10 +81,12 @@ export class ChatComponent extends LitElement {
       max-width: 80%;
       min-width: 70%;
       display: flex;
-      flex-direction: column; 
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .message-bubble-txt {
+      animation: chatmessageanimation 0.5s ease-in-out;
       background-color: var(--bubble-color);
       color: var(--bubble-text-color);
       border-radius: 10px;
@@ -81,6 +94,7 @@ export class ChatComponent extends LitElement {
       padding: 20px;
       word-wrap: break-word;
       margin-block-end: 0;
+      position: relative;
     }
 
     .message-bubble-txt.user-message {
@@ -108,14 +122,14 @@ export class ChatComponent extends LitElement {
       flex-direction: column;
     }
   `;
-  
+
   // Send the question to the Open AI API and render the answer in the chat
   async sendQuestionToAPI(question: string) {
     // Simulate an API call (replace with actual API endpoint)
     if (this.currentQuestion.trim() === '') {
       return;
     }
-    
+
     this.addMessage(question, true);
     // remove default prompts
     this.isChatStarted = true;
@@ -129,16 +143,18 @@ export class ChatComponent extends LitElement {
         headers: {
           'Content-Type': 'application/json',
         },
-      }).then((response) => {
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        return response.text();
-      }).then((text) => {
-        console.log(text);
-        // add the response to the chat
-        this.addMessage(text, false);
-      });
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(response.statusText);
+          }
+          return response.text();
+        })
+        .then((text) => {
+          console.log(text);
+          // add the response to the chat
+          this.addMessage(text, false);
+        });
       // enable the input field and submit button again
       this.isInputDisabled = false;
       this.isSubmitButtonDisabled = false;
@@ -150,11 +166,14 @@ export class ChatComponent extends LitElement {
   // add a message to the chat, when the user or the API sends a message
   addMessage(message: string, isUserMessage: boolean) {
     const timestamp = this.getTimestamp();
-    this.chatMessages = [...this.chatMessages, { 
-      text: message,
-      timestamp: timestamp,
-      isUserMessage 
-    }];
+    this.chatMessages = [
+      ...this.chatMessages,
+      {
+        text: message,
+        timestamp: timestamp,
+        isUserMessage,
+      },
+    ];
     this.requestUpdate();
   }
 
@@ -199,39 +218,48 @@ export class ChatComponent extends LitElement {
             (message) => html`
               <li class="message-bubble ${message.isUserMessage ? 'user-message' : ''}">
                 <p class="message-bubble-txt ${message.isUserMessage ? 'user-message' : ''}">${message.text}</p>
-                <p class="message-info"><span class="timestamp">${message.timestamp}</span>, 
+                <p class="message-info">
+                  <span class="timestamp">${message.timestamp}</span>,
                   <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
                 </p>
               </li>
-            `
+            `,
           )}
         </ul>
         <!-- Default prompts: use the variables above to edit the heading -->
         <div class="chat-container__questions">
           <h3 class="chat-container__subHl">${this.defaultPromptsHeading}</h3>
           <!-- Conditionally render default prompts based on showDefaultPrompts -->
-          ${this.showDefaultPrompts
-            ? html`
-                <div class="defaultPrompts-container">
-                  <ul>
-                  ${this.defaultPrompts.map(
-                    (prompt) => html`
-                    <li>
-                    <button  type="reset" @click="" title="${prompt}">${prompt}</button>
-                    </li>
-                    `
-                  )}
-                </ul>
-                </div>
-              `
-            : ''}
+          ${
+            this.showDefaultPrompts
+              ? html`
+                  <div class="defaultPrompts-container">
+                    <ul>
+                      ${this.defaultPrompts.map(
+                        (prompt) => html`
+                          <li>
+                            <button type="reset" @click="" title="${prompt}">${prompt}</button>
+                          </li>
+                        `,
+                      )}
+                    </ul>
+                  </div>
+                `
+              : ''
+          }
         </div>
         </section>
         <form @submit="">
           <label id="chatboxLabel" for="chatbox">${globalConfig.CHAT_INPUT_LABEL_TEXT}</label>
-          <input id="questionInput" placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}" aria-labelledby="chatboxLabel" id="chatbox" name="chatbox"  type="text" :value="">
-          <button @click="${this.handleUserQuestionSubmit}" title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}">${globalConfig.CHAT_BUTTON_LABEL_TEXT}</button>
-          <button @click="${this.resetInputField}" title="${globalConfig.RESET_BUTTON_LABEL_TEXT}">${globalConfig.RESET_BUTTON_LABEL_TEXT}</button>
+          <input id="questionInput" placeholder="${
+            globalConfig.CHAT_INPUT_PLACEHOLDER
+          }" aria-labelledby="chatboxLabel" id="chatbox" name="chatbox"  type="text" :value="">
+          <button @click="${this.handleUserQuestionSubmit}" title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}">${
+            globalConfig.CHAT_BUTTON_LABEL_TEXT
+          }</button>
+          <button @click="${this.resetInputField}" title="${globalConfig.RESET_BUTTON_LABEL_TEXT}">${
+            globalConfig.RESET_BUTTON_LABEL_TEXT
+          }</button>
         </form>
       </section>
       </div>
