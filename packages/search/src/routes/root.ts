@@ -1,12 +1,28 @@
-import { type FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { type FastifyPluginAsync } from 'fastify';
+import { type JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
+import { type SchemaTypes } from '../plugins/schemas.js';
 
-const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promise<void> => {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
+  const fastify = _fastify.withTypeProvider<JsonSchemaToTsProvider<{ references: SchemaTypes }>>();
+
   fastify.get('/', async function (_request, _reply) {
-    return { root: true };
+    const packageJson = JSON.parse(await fs.readFile(path.join(__dirname, '../../package.json'), 'utf8'));
+    return {
+      service: packageJson.name,
+      description: packageJson.description,
+      version: packageJson.version,
+    };
   });
 
   fastify.get('/content/:path', {
     schema: {
+      description: 'Get content file',
+      tags: ['content'],
+      produces: ['*/*'],
       params: {
         type: 'object',
         properties: {
@@ -15,7 +31,11 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
         required: ['path'],
       },
       response: {
-        200: {},
+        200: {
+          type: 'object',
+          format: 'binary',
+          additionalProperties: false,
+        },
         404: { $ref: 'httpError' },
         500: { $ref: 'httpError' },
       },
@@ -44,41 +64,11 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
 
   fastify.post('/chat', {
     schema: {
-      body: {
-        type: 'object',
-        properties: {
-          approach: { type: 'string' },
-          history: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                bot: { type: 'string' },
-                user: { type: 'string' },
-              },
-            },
-          },
-          overrides: {
-            type: 'object',
-            additionalProperties: { type: 'string' },
-          },
-        },
-        required: ['approach', 'history'],
-      },
+      description: 'Chat with the bot',
+      tags: ['chat'],
+      body: { $ref: 'chatRequest' },
       response: {
-        200: {
-          type: 'object',
-          properties: {
-            data_points: {
-              type: 'array',
-              items: { type: 'string' },
-            },
-            answer: { type: 'string' },
-            thoughts: { type: 'string' },
-          },
-          required: ['data_points', 'answer', 'thoughts'],
-          additionalProperties: false,
-        },
+        200: { $ref: 'approachResponse' },
         400: { $ref: 'httpError' },
         500: { $ref: 'httpError' },
       },
@@ -103,32 +93,11 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
 
   fastify.post('/ask', {
     schema: {
-      body: {
-        type: 'object',
-        properties: {
-          approach: { type: 'string' },
-          question: { type: 'string' },
-          overrides: {
-            type: 'object',
-            additionalProperties: { type: 'integer' },
-          },
-        },
-        required: ['approach', 'question'],
-      },
+      description: 'Ask the bot a question',
+      tags: ['ask'],
+      body: { $ref: 'askRequest' },
       response: {
-        200: {
-          type: 'object',
-          properties: {
-            data_points: {
-              type: 'array',
-              items: { type: 'string' },
-            },
-            answer: { type: 'string' },
-            thoughts: { type: 'string' },
-          },
-          required: ['data_points', 'answer', 'thoughts'],
-          additionalProperties: false,
-        },
+        200: { $ref: 'approachResponse' },
         400: { $ref: 'httpError' },
         500: { $ref: 'httpError' },
       },
