@@ -159,7 +159,7 @@ module searchApi './core/host/container-app.bicep' = {
         value: chatGptModelName
       }
       {
-        name: 'AZURE_OPENAI_EMB_DEPLOYMENT'
+        name: 'AZURE_OPENAI_EMBEDDING_DEPLOYMENT'
         value: embeddingDeploymentName
       }
       {
@@ -224,7 +224,7 @@ module indexerApi './core/host/container-app.bicep' = {
         value: chatGptModelName
       }
       {
-        name: 'AZURE_OPENAI_EMB_DEPLOYMENT'
+        name: 'AZURE_OPENAI_EMBEDDING_DEPLOYMENT'
         value: embeddingDeploymentName
       }
       {
@@ -498,7 +498,7 @@ output AZURE_OPENAI_SERVICE string = openAi.outputs.name
 output AZURE_OPENAI_RESOURCE_GROUP string = openAiResourceGroup.name
 output AZURE_OPENAI_CHATGPT_DEPLOYMENT string = chatGptDeploymentName
 output AZURE_OPENAI_CHATGPT_MODEL string = chatGptModelName
-output AZURE_OPENAI_EMB_DEPLOYMENT string = embeddingDeploymentName
+output AZURE_OPENAI_EMBEDDING_DEPLOYMENT string = embeddingDeploymentName
 output AZURE_OPENAI_EMBEDDING_MODEL string = embeddingModelName
 
 output AZURE_FORMRECOGNIZER_SERVICE string = formRecognizer.outputs.name

@@ -43,7 +43,7 @@ async def client(monkeypatch):
     monkeypatch.setenv("AZURE_OPENAI_SERVICE", "test-openai-service")
     monkeypatch.setenv("AZURE_OPENAI_CHATGPT_DEPLOYMENT", "test-chatgpt")
     monkeypatch.setenv("AZURE_OPENAI_CHATGPT_MODEL", "gpt-35-turbo")
-    monkeypatch.setenv("AZURE_OPENAI_EMB_DEPLOYMENT", "test-ada")
+    monkeypatch.setenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "test-ada")
 
     with mock.patch("app.DefaultAzureCredential") as mock_default_azure_credential:
         mock_default_azure_credential.return_value = MockAzureCredential()
