@@ -1,6 +1,6 @@
 import { type SearchClient } from '@azure/search-documents';
 import { type OpenAiService } from '../../plugins/openai.js';
-import { removeNewlines } from '../util/index.js';
+import { parseBoolean, removeNewlines } from '../util/index.js';
 import { type ApproachOverrides } from './approach.js';
 
 export interface SearchDocumentsResult {
@@ -22,7 +22,7 @@ export class ApproachBase {
   protected async searchDocuments(query?: string, overrides: ApproachOverrides = {}): Promise<SearchDocumentsResult> {
     const hasText = ['text', 'hybrid', undefined].includes(overrides?.retrieval_mode);
     const hasVectors = ['vectors', 'hybrid', undefined].includes(overrides?.retrieval_mode);
-    const useSemanticCaption = Boolean(overrides?.semantic_captions) && hasText;
+    const useSemanticCaption = parseBoolean(overrides?.semantic_captions) && hasText;
     const top = overrides?.top ? Number(overrides?.top) : 3;
     const excludeCategory: string | undefined = overrides?.exclude_category;
     const filter = excludeCategory ? `category ne '${excludeCategory.replace("'", "''")}'` : undefined;
@@ -77,7 +77,7 @@ export class ApproachBase {
         // TODO: ensure typings
         const document = result as any;
         const captions = document['@search.captions'];
-        const captionsText = captions.map((c: any) => c.text).join(' . ');
+        const captionsText = captions?.map((c: any) => c.text).join(' . ');
         results.push(`${document[this.sourcePageField]}: ${removeNewlines(captionsText)}`);
       }
     } else {

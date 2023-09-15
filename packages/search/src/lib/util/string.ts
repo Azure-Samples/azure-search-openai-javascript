@@ -9,3 +9,23 @@
 export function removeNewlines(s: string = ''): string {
   return s.replaceAll('\n', ' ').replaceAll('\r', ' ');
 }
+
+/**
+ * Parse a boolean value from a string.
+ * @param {string | boolean | undefined} value The value to parse.
+ * @returns {boolean} The parsed boolean value.
+ * @example
+ * parseBoolean('true');
+ * // output: true
+ * parseBoolean('false');
+ * // output: false
+ */
+export function parseBoolean(value: string | boolean | undefined): boolean {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (value === undefined) {
+    return false;
+  }
+  return value === 'true';
+}
