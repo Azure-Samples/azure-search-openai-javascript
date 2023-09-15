@@ -37,7 +37,7 @@ export default fp(
 
         embeddingsClient = new OpenAI({
           ...commonOptions,
-          baseURL: `${openAiUrl}/openai/deployments/${config.azureOpenAiEmbDeployment}`,
+          baseURL: `${openAiUrl}/openai/deployments/${config.azureOpenAiEmbeddingDeployment}`,
         });
       }
     };
