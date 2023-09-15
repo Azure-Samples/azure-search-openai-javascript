@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
-import { globalConfig } from './config/globalConfig';
+import { globalConfig } from './config/global-config.js';
 
 declare interface ChatMessage {
   text: string;
@@ -137,9 +137,23 @@ export class ChatComponent extends LitElement {
     this.isInputDisabled = true;
     this.isSubmitButtonDisabled = true;
     try {
-      await fetch(`${globalConfig.API_URL_LOCAL}`, {
+      await fetch(`${globalConfig.API_CHAT_URL}`, {
         method: 'POST',
-        body: JSON.stringify({ question: this.currentQuestion }),
+        body: JSON.stringify({
+          history: [
+            {
+              user: this.currentQuestion,
+            },
+          ],
+          approach: 'rrr',
+          overrides: {
+            retrieval_mode: 'hybrid',
+            semantic_ranker: true,
+            semantic_captions: false,
+            top: 3,
+            suggest_followup_questions: false,
+          },
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -148,12 +162,12 @@ export class ChatComponent extends LitElement {
           if (!response.ok) {
             throw new Error(response.statusText);
           }
-          return response.text();
+          const data = response.json();
+          return data;
         })
-        .then((text) => {
-          console.log(text);
+        .then((data) => {
           // add the response to the chat
-          this.addMessage(text, false);
+          this.addMessage(data.answer, false);
         });
       // enable the input field and submit button again
       this.isInputDisabled = false;
@@ -184,9 +198,9 @@ export class ChatComponent extends LitElement {
   }
 
   // Handle the click on the chat button and send the question to the API
-  handleUserQuestionSubmit(e: Event) {
-    e.preventDefault();
-    console.log('User question: ', this.questionInput.value);
+  handleUserQuestionSubmit(event: Event) {
+    event.preventDefault();
+    console.log('User question:', this.questionInput.value);
     const userQuestion = this.questionInput.value;
     if (userQuestion) {
       this.currentQuestion = userQuestion;
@@ -204,7 +218,8 @@ export class ChatComponent extends LitElement {
   }
 
   // Reset the input field and the current question
-  resetInputField() {
+  resetInputField(event: Event) {
+    event.preventDefault();
     this.questionInput.value = '';
     this.currentQuestion = '';
   }
@@ -233,18 +248,18 @@ export class ChatComponent extends LitElement {
           ${
             this.showDefaultPrompts
               ? html`
-                  <div class="defaultPrompts-container">
-                    <ul>
-                      ${this.defaultPrompts.map(
+                <div class="defaultPrompts-container">
+                  <ul>
+                    ${this.defaultPrompts.map(
                         (prompt) => html`
                           <li>
                             <button type="reset" @click="" title="${prompt}">${prompt}</button>
                           </li>
                         `,
                       )}
-                    </ul>
-                  </div>
-                `
+                  </ul>
+                </div>
+              `
               : ''
           }
         </div>
