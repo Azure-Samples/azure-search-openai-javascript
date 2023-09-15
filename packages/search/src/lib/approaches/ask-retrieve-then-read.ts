@@ -2,7 +2,7 @@ import { type SearchClient } from '@azure/search-documents';
 import { type OpenAiService } from '../../plugins/openai.js';
 import { messagesToString } from '../message.js';
 import { MessageBuilder } from '../message-builder.js';
-import { type AskApproach } from './approach.js';
+import { type ApproachOverrides, type AskApproach } from './approach.js';
 import { ApproachBase } from './approach-base.js';
 
 const SYSTEM_CHAT_TEMPLATE = `You are an intelligent assistant helping Contoso Inc employees with their healthcare plan questions and employee handbook questions.
@@ -42,7 +42,7 @@ export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
     super(search, openai, chatGptModel, embeddingModel, sourcePageField, contentField);
   }
 
-  async run(userQuery: string, overrides: Record<string, any>): Promise<any> {
+  async run(userQuery: string, overrides: ApproachOverrides): Promise<any> {
     const { query, results, content } = await this.searchDocuments(userQuery, overrides);
     const messageBuilder = new MessageBuilder(overrides?.prompt_template || SYSTEM_CHAT_TEMPLATE, this.chatGptModel);
 
