@@ -2,6 +2,11 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { globalConfig } from './config/globalConfig';
 
+declare interface ChatMessage {
+  text: string;
+  isUserMessage: boolean;
+  timestamp: string;
+}
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
@@ -25,7 +30,7 @@ export class ChatComponent extends LitElement {
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   // This are the chat bubbles that will be displayed in the chat
-  chatMessages: { text: string; isUserMessage: boolean }[] = [];
+  chatMessages: ChatMessage[] = [];
   // This are the labels for the chat button and input
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   chatInputLabelText: string = globalConfig.CHAT_INPUT_LABEL_TEXT;
@@ -110,7 +115,12 @@ export class ChatComponent extends LitElement {
 
   // add a message to the chat, when the user or the API sends a message
   addMessage(message: string, isUserMessage: boolean) {
-    this.chatMessages = [...this.chatMessages, { text: message, isUserMessage }];
+    const timestamp = this.getTimestamp();
+    this.chatMessages = [...this.chatMessages, { 
+      text: message,
+      timestamp: timestamp,
+      isUserMessage 
+    }];
     this.requestUpdate();
   }
 
@@ -131,6 +141,14 @@ export class ChatComponent extends LitElement {
     }
   }
 
+  getTimestamp() {
+    return new Date().toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
+  }
+
   // Reset the input field and the current question
   resetInputField() {
     this.questionInput.value = '';
@@ -141,15 +159,17 @@ export class ChatComponent extends LitElement {
   override render() {
     return html`
       <div id="chat-container">
-        <div class="chat-container__messages">
+        <ul class="chat-container__messages">
           ${this.chatMessages.map(
             (message) => html`
-              <div class="message-bubble ${message.isUserMessage ? 'user-message' : ''}">
-                ${message.text}
-              </div>
+              <li class="message-bubble ${message.isUserMessage ? 'user-message' : ''}">
+                <p>${message.text}<p>
+                <p><span class="timestamp">${message.timestamp}</span>, 
+                  <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span></p>
+              </li>
             `
           )}
-        </div>
+        </ul>
         <!-- Default prompts: use the variables above to edit the heading -->
         <div class="chat-container__questions">
           <h3 class="chat-container__subHl">${this.defaultPromptsHeading}</h3>

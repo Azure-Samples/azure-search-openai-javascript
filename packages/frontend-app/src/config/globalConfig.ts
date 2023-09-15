@@ -11,6 +11,7 @@ export const globalConfig = {
   CHAT_INPUT_LABEL_TEXT: 'Ask a question now',
   CHAT_INPUT_PLACEHOLDER: 'Type your question here',
   RESET_BUTTON_LABEL_TEXT: 'Reset',
+  USER_IS_BOT: 'Support Bot',
   // API URL for development purposes
   API_URL_LOCAL: '/api/responses',
 };
