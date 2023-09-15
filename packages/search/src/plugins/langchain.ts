@@ -32,7 +32,7 @@ export default fp(
         return new OpenAIEmbeddings({
           ...options,
           ...getAzureOpenAiOptions(apiToken),
-          azureOpenAIApiDeploymentName: config.azureOpenAiEmbDeployment,
+          azureOpenAIApiDeploymentName: config.azureOpenAiEmbeddingDeployment,
         });
       },
     });
