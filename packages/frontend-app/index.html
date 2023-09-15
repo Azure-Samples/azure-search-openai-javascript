@@ -1,16 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta viewport="width=device-width, initial-scale=1" />
-    <title>Open AI Chat Web Component</title>
-    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-    <script src="../node_modules/lit/polyfill-support.js"></script>
-    <script type="module" src="../dist/chat-component.js"></script>
+<!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+      <title>OpenAI Chat App JavaScript</title>
   </head>
   <body>
-    <chat-component>
-      <p>Loading the chat web component...</p>
-    </chat-component>
+    <main class="chat__main">
+      <h1>Welcome to this Open AI JavaScript Chat Sample</h1>
+      <!-- When using this sample chat app as part of an existing app, you only need the section below -->
+      <section class="chat__container">
+        <h2 class="chat__container--hl">
+          Start a conversation
+        </h2>
+        <chat-component></chat-component>
+      </section>
+    </main>
+    <style>
+      .chat__main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        padding: 10px 20px;   
+      }
+      @media screen and (min-width: 768px) {
+        .chat__main {
+          width: 50%;
+          padding: 50px;
+        }
+      }
+    </style>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
