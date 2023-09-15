@@ -13,6 +13,7 @@ export class ApproachBase {
     protected search: SearchClient<any>,
     protected openai: OpenAiService,
     protected chatGptModel: string,
+    protected embeddingModel: string,
     protected sourcePageField: string,
     protected contentField: string,
   ) {}
@@ -30,7 +31,7 @@ export class ApproachBase {
     if (hasVectors) {
       const openAiEmbeddings = await this.openai.getEmbeddings();
       const result = await openAiEmbeddings.create({
-        model: 'text-embedding-ada-002',
+        model: this.embeddingModel,
         input: query!,
       });
       queryVector = result.data[0].embedding;

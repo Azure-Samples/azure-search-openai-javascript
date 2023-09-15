@@ -12,6 +12,7 @@ export interface AppConfig {
   azureOpenAiChatGptDeployment: string;
   azureOpenAiChatGptModel: string;
   azureOpenAiEmbDeployment: string;
+  azureOpenAiEmbeddingModel: string;
   kbFieldsContent: string;
   kbFieldsSourcePage: string;
 }
@@ -34,6 +35,7 @@ export default fp(
       azureOpenAiChatGptDeployment: process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT || '',
       azureOpenAiChatGptModel: process.env.AZURE_OPENAI_CHATGPT_MODEL || 'gpt-35-turbo',
       azureOpenAiEmbDeployment: process.env.AZURE_OPENAI_EMB_DEPLOYMENT || '',
+      azureOpenAiEmbeddingModel: process.env.AZURE_OPENAI_EMBEDDING_MODEL || 'text-embedding-ada-002',
       kbFieldsContent: process.env.KB_FIELDS_CONTENT || 'content',
       kbFieldsSourcePage: process.env.KB_FIELDS_SOURCEPAGE || 'sourcepage',
     };

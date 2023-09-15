@@ -47,10 +47,11 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     search: SearchClient<any>,
     openai: OpenAiService,
     chatGptModel: string,
+    embeddingModel: string,
     sourcePageField: string,
     contentField: string,
   ) {
-    super(search, openai, chatGptModel, sourcePageField, contentField);
+    super(search, openai, chatGptModel, embeddingModel, sourcePageField, contentField);
     this.chatGptTokenLimit = getTokenLimit(chatGptModel);
   }
 
