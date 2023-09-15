@@ -45,6 +45,7 @@ export class ChatComponent extends LitElement {
       --bubble-color: rgba(51, 40, 56, 0.6);
       --bubble-text-color: #fff;
       --user-bubble-color: #4bbfaa;
+      --accent-color: #65b5e3;
     }
 
     html,
@@ -87,7 +88,7 @@ export class ChatComponent extends LitElement {
     }
 
     .chatboxAction button {
-      background: #65b5e3;
+      background: var(--accent-color);
       border: none;
       color: white;
       font-weight: bold;
@@ -106,7 +107,7 @@ export class ChatComponent extends LitElement {
     }
 
     .chatboxAction input {
-      border: 1px solid #65b5e3;
+      border: 1px solid var(--accent-color);
       border-radius: 4px;
       padding: 8px;
       flex: 1 1 auto;
@@ -114,7 +115,7 @@ export class ChatComponent extends LitElement {
     }
 
     .chat-container__subHl {
-      color: #666;
+      color: var(--text-color);
       font-size: 1.2rem;
     }
 
@@ -185,7 +186,7 @@ export class ChatComponent extends LitElement {
       border: 1px solid #ddd;
       background: #eee;
       margin: 4px;
-      color: #222;
+      color: var(--text-color);
       display: flex;
       flex-direction: column;
       min-height: 100px;
@@ -198,7 +199,7 @@ export class ChatComponent extends LitElement {
     .defaultPrompts-container ul li button {
       border: none;
       background: transparent;
-      color: #222;
+      color: var(--text-color);
       font-weight: bold;
       cursor: pointer;
     }
