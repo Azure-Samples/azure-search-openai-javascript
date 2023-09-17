@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/template-indent */
 import { LitElement, html, css } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { globalConfig } from './config/global-config.js';
@@ -21,7 +22,7 @@ declare interface ChatMessage {
 @customElement('chat-component')
 export class ChatComponent extends LitElement {
   @property({ type: String }) currentQuestion = '';
-  @query('#questionInput') questionInput!: HTMLInputElement;
+  @query('#question-input') questionInput!: HTMLInputElement;
   // Default prompts to display in the chat
   @property({ type: Boolean }) isDisabled = false;
   @property({ type: Boolean }) isChatStarted = false;
@@ -50,6 +51,7 @@ export class ChatComponent extends LitElement {
       --accent-high: #8cdef2;
       --accent-dark: #002b23;
       --accent-light: #e6fbf7;
+      --error-color: #8a0000;
     }
 
     .button {
@@ -85,28 +87,65 @@ export class ChatComponent extends LitElement {
 
     .display-none {
       display: none;
+      visibility: hidden;
     }
 
-    #chat-container {
+    .display-flex {
+      display: flex;
+    }
+
+    .container-col {
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
+
+    .container-row {
+      flex-direction: row;
+    }
+
+    .headline {
+      color: var(--text-color);
+      font-size: 1.5rem;
+      padding: 0;
+      margin: 0;
+    }
+
+    .subheadline {
+      color: var(--text-color);
+      font-size: 1.2rem;
+      padding: 0;
+      margin: 0;
+    }
+
+    .chat__container {
       min-width: 100%;
     }
 
-    #chat-container form {
+    /* #chat__container--
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    } */
+
+    /* #chat__container--orm {
       display: flex;
       flex-direction: column;
     }
+    */
+    .chatbox__container {
+      position: relative;
+      height: 50px;
+    }
 
-    .chatboxAction {
+    /* .chatboxAction {
       display: flex;
       flex-direction: row;
       position: relative;
       height: 50px;
     }
-
-    .chatboxAction button {
+    */
+    .chatbox__button {
       background: var(--accent-high);
       border: none;
       color: var(--text-color);
@@ -116,16 +155,33 @@ export class ChatComponent extends LitElement {
       margin-left: 8px;
     }
 
-    .chatboxAction [type='reset'] {
+    /* .chatboxAction button {
+      background: var(--accent-high);
+      border: none;
+      color: var(--text-color);
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-left: 8px;
+    } */
+
+    .chatbox__button--reset {
       position: absolute;
-      right: 100px;
-      top: 10px;
+      right: 115px;
+      top: 15px;
       background: transparent;
       border: none;
       color: gray;
+      background: var(--accent-dark);
+      border-radius: 50%;
+      color: var(--white);
+      font-weight: bold;
+      height: 20px;
+      width: 20px;
+      cursor: pointer;
     }
 
-    .chatboxAction input {
+    .chatbox__input {
       border: 1px solid var(--accent-high);
       border-radius: 4px;
       padding: 8px;
@@ -133,14 +189,7 @@ export class ChatComponent extends LitElement {
       font-size: 1rem;
     }
 
-    .chat-container__subHl {
-      color: var(--text-color);
-      font-size: 1.2rem;
-      padding: 0;
-      margin: 0;
-    }
-
-    .chat-container__messages {
+    .chat__list {
       color: var(--text-color);
       display: flex;
       flex-direction: column;
@@ -148,7 +197,7 @@ export class ChatComponent extends LitElement {
       margin-bottom: 50px;
     }
 
-    .message-bubble {
+    .chat__listItem {
       max-width: 80%;
       min-width: 70%;
       display: flex;
@@ -156,7 +205,7 @@ export class ChatComponent extends LitElement {
       height: auto;
     }
 
-    .message-bubble-txt {
+    .chat__txt {
       animation: chatmessageanimation 0.5s ease-in-out;
       background-color: var(--primary-color);
       color: var(--white);
@@ -169,59 +218,56 @@ export class ChatComponent extends LitElement {
       display: flex;
     }
 
-    .message-bubble-txt.user-message {
+    .chat__txt.error {
+      background-color: var(--error-color);
+      color: var(--white);
+    }
+
+    .chat__txt.user-message {
       background-color: var(--accent-high);
       color: var(--text-color);
     }
 
-    .message-bubble.user-message {
+    .chat__listItem.user-message {
       align-self: flex-end;
     }
 
-    .message-info {
+    .chat__txt--info {
       font-size: smaller;
       font-style: italic;
       margin: 0;
       margin-top: 1px;
     }
 
-    .user-message .message-info {
+    .user-message .chat__txt--info {
       text-align: right;
     }
 
-    .defaultPrompts-container {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .defaultPrompts-button {
+    .defaults__button {
       text-decoration: none;
       color: var(--text-color);
       display: block;
     }
 
-    .defaultPrompts-container ul {
+    .defaults__list {
       list-style-type: none;
       padding: 0;
+      text-align: center;
       display: flex;
       flex-direction: column;
-      text-align: center;
 
       @media (min-width: 1200px) {
         flex-direction: row;
       }
     }
 
-    .defaultPrompts-container ul li {
+    .defaults__listItem {
       padding: 10px;
       border-radius: 10px;
       border: 1px solid var(--accent-high);
       background: var(--secondary-color);
       margin: 4px;
       color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      display: flex;
       justify-content: space-evenly;
 
       @media (min-width: 768px) {
@@ -229,30 +275,18 @@ export class ChatComponent extends LitElement {
       }
     }
 
-    .defaultPrompts-container ul li:hover,
-    .defaultPrompts-container ul li:focus {
+    .defaults__listItem:hover,
+    .defaults__listItem:focus {
       color: var(--accent-dark);
       background: var(--accent-light);
       transition: all 0.3s ease-in-out;
     }
 
-    .defaultPrompts-cta {
+    .defaults__span {
       font-weight: bold;
       display: block;
       margin-top: 20px;
       text-decoration: underline;
-    }
-
-    .defaultPrompts-container ul li button {
-      border: none;
-      background: transparent;
-      color: var(--text-color);
-    }
-
-    .defaultPrompts-cta {
-      font-weight: bold;
-      display: block;
-      margin-top: 20px;
     }
 
     .loading-skeleton {
@@ -260,7 +294,7 @@ export class ChatComponent extends LitElement {
       margin-bottom: 50px;
     }
 
-    .circle {
+    .dot {
       width: 10px;
       height: 10px;
       margin: 0 5px;
@@ -269,11 +303,11 @@ export class ChatComponent extends LitElement {
       animation: chatloadinganimation 1.5s infinite;
     }
 
-    .circle:nth-child(2) {
+    .dot:nth-child(2) {
       animation-delay: 0.5s;
     }
 
-    .circle:nth-child(3) {
+    .dot:nth-child(3) {
       animation-delay: 1s;
     }
   `;
@@ -411,64 +445,59 @@ export class ChatComponent extends LitElement {
   // Web Component render function
   override render() {
     return html`
-      <div id="chat-container">
-        <ul class="chat-container__messages" aria-live="assertive">
-          ${this.chatMessages.map(
-            (message) => html`
-              <li class="message-bubble ${message.isUserMessage ? 'user-message' : ''}">
-                <p class="message-bubble-txt ${message.isUserMessage ? 'user-message' : ''}">${message.text}</p>
-                <p class="message-info">
-                  <span class="timestamp">${message.timestamp}</span>,
-                  <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
-                </p>
-              </li>
-            `,
-          )}
-          ${
-            this.hasAPIError
-              ? html`
-                <li class="message-bubble user-message">
-                  <p class="message-bubble-txt user-message">${globalConfig.API_ERROR_MESSAGE}</p>
-                </li>
-              `
-              : ''
-          }
-        </ul>
-        ${
-          this.isAwaitingResponse
-            ? html`
-              <div
-                id="loading-indicator"
-                class="loading-skeleton"
-                aria-label="${globalConfig.LOADING_INDICATOR_TEXT}"
-              >
-                <div class="circle"></div>
-                <div class="circle"></div>
-                <div class="circle"></div>
+      <section class="chat__container" id="chat-container">
+        ${this.isChatStarted
+          ? html`
+              <ul class="chat__list" aria-live="assertive">
+                ${this.chatMessages.map(
+                  (message) => html`
+                    <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
+                      <p class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">${message.text}</p>
+                      <p class="chat__txt--info">
+                        <span class="timestamp">${message.timestamp}</span>,
+                        <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
+                      </p>
+                    </li>
+                  `,
+                )}
+                ${this.hasAPIError
+                  ? html`
+                      <li class="chat__listItem">
+                        <p class="chat__txt error">${globalConfig.API_ERROR_MESSAGE}</p>
+                      </li>
+                    `
+                  : ''}
+              </ul>
+            `
+          : ''}
+        ${this.isAwaitingResponse && !this.hasAPIError
+          ? html`
+              <div id="loading-indicator" class="loading-skeleton" aria-label="${globalConfig.LOADING_INDICATOR_TEXT}">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
               </div>
             `
-            : ''
-        }
+          : ''}
         <!-- Default prompts: use the variables above to edit the heading -->
-        <div class="chat-container__questions">
+        <div class="chat__container">
           <!-- Conditionally render default prompts based on showDefaultPrompts -->
-          ${
-            this.showDefaultPrompts
-              ? html`
-                <div class="defaultPrompts-container">
-                  <h2 class="chat-container__subHl">${this.defaultPromptsHeading}</h3>
-                  <ul>
+          ${this.showDefaultPrompts
+            ? html`
+                <div class="defaults__container">
+                  <h2 class="subheadline">${this.defaultPromptsHeading}</h2>
+                  <ul class="defaults__list">
                     ${this.defaultPrompts.map(
                       (prompt) => html`
-                        <li>
+                        <li class="defaults__listItem">
                           <a
                             role="button"
                             href="#"
-                            class="defaultPrompts-button"
+                            class="defaults__button"
                             @click="${(event: Event) => this.handleDefaultQuestionClick(prompt, event)}"
                           >
                             ${prompt}
-                            <span class="defaultPrompts-cta">Ask now</span>
+                            <span class="defaults__span">Ask now</span>
                           </a>
                         </li>
                       `,
@@ -476,41 +505,54 @@ export class ChatComponent extends LitElement {
                   </ul>
                 </div>
               `
-              : ''
-          }
+            : ''}
         </div>
-        </section>
-        <form>
-          <label id="chatboxLabel" for="questionInput">${globalConfig.CHAT_INPUT_LABEL_TEXT}</label>
+        <form id="chat-form" class="form__container">
+          <label id="chatbox-label" for="question-input">${globalConfig.CHAT_INPUT_LABEL_TEXT}</label>
 
-          <div class="chatboxAction">
-            <input id="questionInput" placeholder="${
-              globalConfig.CHAT_INPUT_PLACEHOLDER
-            }" aria-labelledby="chatboxLabel" id="chatbox" name="chatbox" type="text" :value="" autocomplete="off" @keyup="${
-              this.handleOnInputChange
-            }">
-            <button @click="${this.handleUserQuestionSubmit}" title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}">${
-              globalConfig.CHAT_BUTTON_LABEL_TEXT
-            }</button>
-            <button .hidden="${!this.isResetInput}" type="reset" id="resetBtn" title="Clear input" @click="${
-              this.resetInputField
-            }" title="${globalConfig.RESET_BUTTON_LABEL_TEXT}">${globalConfig.RESET_BUTTON_LABEL_TEXT}</button>
+          <div class="chatbox__container container-col container-row">
+            <input
+              class="chatbox__input"
+              id="question-input"
+              placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}"
+              aria-labelledby="chatbox-label"
+              id="chatbox"
+              name="chatbox"
+              type="text"
+              :value=""
+              autocomplete="off"
+              @keyup="${this.handleOnInputChange}"
+            />
+            <button
+              class="chatbox__button"
+              @click="${this.handleUserQuestionSubmit}"
+              title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
+            >
+              ${globalConfig.CHAT_BUTTON_LABEL_TEXT}
+            </button>
+            <button
+              title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
+              class="chatbox__button--reset"
+              .hidden="${!this.isResetInput}"
+              type="reset"
+              id="resetBtn"
+              title="Clear input"
+              @click="${this.resetInputField}"
+            >
+              ${globalConfig.RESET_BUTTON_LABEL_TEXT}
+            </button>
           </div>
         </form>
-        <div class="chat-container__footer">
-        ${
-          this.showDefaultPrompts
+        <div class="chat__container--footer">
+          ${this.showDefaultPrompts
             ? ''
             : html`
-              <button class="button" type="button" @click="${this.displayDefaultPrompts}" class="defaultPrompts-cta">
-                ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
-              </button>
-            `
-        }
+                <button type="button" @click="${this.displayDefaultPrompts}" class="deaults__span button">
+                  ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
+                </button>
+              `}
         </div>
       </section>
-      </div>
-      </div>
     `;
   }
 }
