@@ -36,6 +36,8 @@ export class ChatComponent extends LitElement {
   // This are the labels for the chat button and input
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   chatInputLabelText: string = globalConfig.CHAT_INPUT_LABEL_TEXT;
+  // Show error message if API call fails
+  @property({ type: Boolean }) hasAPIError = false;
 
   static override styles = css`
     :host {
@@ -45,7 +47,7 @@ export class ChatComponent extends LitElement {
       --text-color: #123f58;
       --primary-color: rgba(51, 40, 56, 0.6);
       --white: #fff;
-      --accent-high: #4bbfaa;
+      --accent-high: #8cdef2;
       --accent-dark: #002b23;
       --accent-light: #e6fbf7;
     }
@@ -246,7 +248,7 @@ export class ChatComponent extends LitElement {
       background: transparent;
       color: var(--text-color);
     }
-    
+
     .defaultPrompts-cta {
       font-weight: bold;
       display: block;
@@ -303,6 +305,8 @@ export class ChatComponent extends LitElement {
               user: this.currentQuestion,
             },
           ],
+          // TODO: move this to global config when it's actually implemented
+          // as configurable
           approach: 'rrr',
           overrides: {
             retrieval_mode: 'hybrid',
@@ -318,6 +322,7 @@ export class ChatComponent extends LitElement {
       })
         .then((response) => {
           if (!response.ok) {
+            this.handleAPIError();
             throw new Error(response.statusText);
           }
           const data = response.json();
@@ -331,7 +336,8 @@ export class ChatComponent extends LitElement {
       this.isDisabled = false;
       this.isAwaitingResponse = false;
     } catch (error) {
-      console.error('Error:', error);
+      this.handleAPIError();
+      console.error('API Response Exception. Error:', error);
     }
   }
 
@@ -397,6 +403,11 @@ export class ChatComponent extends LitElement {
     this.isResetInput = !!this.questionInput.value;
   }
 
+  handleAPIError() {
+    console.log('API Error');
+    this.hasAPIError = true;
+  }
+
   // Web Component render function
   override render() {
     return html`
@@ -413,6 +424,15 @@ export class ChatComponent extends LitElement {
               </li>
             `,
           )}
+          ${
+            this.hasAPIError
+              ? html`
+                <li class="message-bubble user-message">
+                  <p class="message-bubble-txt user-message">${globalConfig.API_ERROR_MESSAGE}</p>
+                </li>
+              `
+              : ''
+          }
         </ul>
         ${
           this.isAwaitingResponse
@@ -436,23 +456,23 @@ export class ChatComponent extends LitElement {
             this.showDefaultPrompts
               ? html`
                 <div class="defaultPrompts-container">
-                  <h3 class="chat-container__subHl">${this.defaultPromptsHeading}</h3>
+                  <h2 class="chat-container__subHl">${this.defaultPromptsHeading}</h3>
                   <ul>
                     ${this.defaultPrompts.map(
-                        (prompt) => html`
-                          <li>
-                            <a
-                              role="button"
-                              href="#"
-                              class="defaultPrompts-button"
-                              @click="${(event: Event) => this.handleDefaultQuestionClick(prompt, event)}"
-                            >
-                              ${prompt}
-                              <span class="defaultPrompts-cta">Ask now</span>
-                            </a>
-                          </li>
-                        `,
-                      )}
+                      (prompt) => html`
+                        <li>
+                          <a
+                            role="button"
+                            href="#"
+                            class="defaultPrompts-button"
+                            @click="${(event: Event) => this.handleDefaultQuestionClick(prompt, event)}"
+                          >
+                            ${prompt}
+                            <span class="defaultPrompts-cta">Ask now</span>
+                          </a>
+                        </li>
+                      `,
+                    )}
                   </ul>
                 </div>
               `
