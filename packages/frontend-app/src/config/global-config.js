@@ -19,6 +19,7 @@ export const globalConfig = {
   RESET_BUTTON_LABEL_TEXT: 'X',
   LOADING_INDICATOR_TEXT: 'Please wait. We are searching for an answer...',
   // API URL for development purposes
-  API_URL_LOCAL: '/api/responses',
   API_CHAT_URL: 'http://localhost:3000/chat',
+  // API ERROR HANDLING IN UI
+  API_ERROR_MESSAGE: 'Sorry, we are having some problems. Please try again later.',
 };
