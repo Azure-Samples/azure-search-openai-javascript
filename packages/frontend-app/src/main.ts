@@ -3,6 +3,9 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 import { globalConfig } from './config/global-config.js';
 
+// For simplicity, we declare a simple interface for the chat messages
+// in the same file. You may want to move this to a separate file, or
+// together with existing interfaces in your app.
 declare interface ChatMessage {
   text: string;
   isUserMessage: boolean;
@@ -11,7 +14,7 @@ declare interface ChatMessage {
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
- * The component is built with LitElement and Material Web Components.
+ * The component is built as a custom element that extends LitElement.
  *
  * Labels and other aspects are configurable via properties that get their values from the global config file.
  * @element chat-component
@@ -27,18 +30,17 @@ export class ChatComponent extends LitElement {
   @property({ type: Boolean }) isDisabled = false;
   @property({ type: Boolean }) isChatStarted = false;
   @property({ type: Boolean }) isResetInput = false;
-  showDefaultPrompts: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
+  // The program is awaiting response from API
+  @property({ type: Boolean }) isAwaitingResponse = false;
+  // Show error message to the end-user, if API call fails
+  @property({ type: Boolean }) hasAPIError = false;
+  // These are the chat bubbles that will be displayed in the chat
+  chatMessages: ChatMessage[] = [];
+  hasDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
-  // Awaiting response from API
-  @property({ type: Boolean }) isAwaitingResponse = false;
-  // This are the chat bubbles that will be displayed in the chat
-  chatMessages: ChatMessage[] = [];
-  // This are the labels for the chat button and input
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   chatInputLabelText: string = globalConfig.CHAT_INPUT_LABEL_TEXT;
-  // Show error message if API call fails
-  @property({ type: Boolean }) hasAPIError = false;
 
   static override styles = css`
     :host {
@@ -53,7 +55,6 @@ export class ChatComponent extends LitElement {
       --accent-light: #e6fbf7;
       --error-color: #8a0000;
     }
-
     .button {
       color: var(--text-color);
       border: 0;
@@ -61,7 +62,6 @@ export class ChatComponent extends LitElement {
       cursor: pointer;
       text-decoration: underline;
     }
-
     @keyframes chatmessageanimation {
       0% {
         opacity: 0.5;
@@ -72,7 +72,6 @@ export class ChatComponent extends LitElement {
         top: 0px;
       }
     }
-
     @keyframes chatloadinganimation {
       0% {
         opacity: 0.5;
@@ -84,67 +83,40 @@ export class ChatComponent extends LitElement {
         opacity: 0.5;
       }
     }
-
     .display-none {
       display: none;
       visibility: hidden;
     }
-
     .display-flex {
       display: flex;
     }
-
     .container-col {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-
     .container-row {
       flex-direction: row;
     }
-
     .headline {
       color: var(--text-color);
       font-size: 1.5rem;
       padding: 0;
       margin: 0;
     }
-
     .subheadline {
       color: var(--text-color);
       font-size: 1.2rem;
       padding: 0;
       margin: 0;
     }
-
     .chat__container {
       min-width: 100%;
     }
-
-    /* #chat__container--
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    } */
-
-    /* #chat__container--orm {
-      display: flex;
-      flex-direction: column;
-    }
-    */
     .chatbox__container {
       position: relative;
       height: 50px;
     }
-
-    /* .chatboxAction {
-      display: flex;
-      flex-direction: row;
-      position: relative;
-      height: 50px;
-    }
-    */
     .chatbox__button {
       background: var(--accent-high);
       border: none;
@@ -154,17 +126,6 @@ export class ChatComponent extends LitElement {
       border-radius: 4px;
       margin-left: 8px;
     }
-
-    /* .chatboxAction button {
-      background: var(--accent-high);
-      border: none;
-      color: var(--text-color);
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 4px;
-      margin-left: 8px;
-    } */
-
     .chatbox__button--reset {
       position: absolute;
       right: 115px;
@@ -180,7 +141,6 @@ export class ChatComponent extends LitElement {
       width: 20px;
       cursor: pointer;
     }
-
     .chatbox__input {
       border: 1px solid var(--accent-high);
       border-radius: 4px;
@@ -188,7 +148,6 @@ export class ChatComponent extends LitElement {
       flex: 1 1 auto;
       font-size: 1rem;
     }
-
     .chat__list {
       color: var(--text-color);
       display: flex;
@@ -196,7 +155,6 @@ export class ChatComponent extends LitElement {
       padding: 0;
       margin-bottom: 50px;
     }
-
     .chat__listItem {
       max-width: 80%;
       min-width: 70%;
@@ -204,7 +162,6 @@ export class ChatComponent extends LitElement {
       flex-direction: column;
       height: auto;
     }
-
     .chat__txt {
       animation: chatmessageanimation 0.5s ease-in-out;
       background-color: var(--primary-color);
@@ -217,38 +174,31 @@ export class ChatComponent extends LitElement {
       position: relative;
       display: flex;
     }
-
     .chat__txt.error {
       background-color: var(--error-color);
       color: var(--white);
     }
-
     .chat__txt.user-message {
       background-color: var(--accent-high);
       color: var(--text-color);
     }
-
     .chat__listItem.user-message {
       align-self: flex-end;
     }
-
     .chat__txt--info {
       font-size: smaller;
       font-style: italic;
       margin: 0;
       margin-top: 1px;
     }
-
     .user-message .chat__txt--info {
       text-align: right;
     }
-
     .defaults__button {
       text-decoration: none;
       color: var(--text-color);
       display: block;
     }
-
     .defaults__list {
       list-style-type: none;
       padding: 0;
@@ -260,7 +210,6 @@ export class ChatComponent extends LitElement {
         flex-direction: row;
       }
     }
-
     .defaults__listItem {
       padding: 10px;
       border-radius: 10px;
@@ -274,26 +223,22 @@ export class ChatComponent extends LitElement {
         min-height: 100px;
       }
     }
-
     .defaults__listItem:hover,
     .defaults__listItem:focus {
       color: var(--accent-dark);
       background: var(--accent-light);
       transition: all 0.3s ease-in-out;
     }
-
     .defaults__span {
       font-weight: bold;
       display: block;
       margin-top: 20px;
       text-decoration: underline;
     }
-
     .loading-skeleton {
       display: flex;
       margin-bottom: 50px;
     }
-
     .dot {
       width: 10px;
       height: 10px;
@@ -302,11 +247,9 @@ export class ChatComponent extends LitElement {
       border-radius: 50%;
       animation: chatloadinganimation 1.5s infinite;
     }
-
     .dot:nth-child(2) {
       animation-delay: 0.5s;
     }
-
     .dot:nth-child(3) {
       animation-delay: 1s;
     }
@@ -319,16 +262,18 @@ export class ChatComponent extends LitElement {
       return;
     }
 
-    // empty the current messages
+    // Empty the current messages to start a new chat
+    // TODO: add a button to start a new chat
+    // TODO: add chat history (first locally with local storage, then with a backend database)
     this.chatMessages = [];
-    // add the question to the chat
+    // Add the question to the chat
     this.addMessage(question, true);
-    // remove default prompts
+    // Remove default prompts
     this.isChatStarted = true;
-    this.showDefaultPrompts = false;
-    // disable the input field and submit button while waiting for the API response
+    this.hasDefaultPromptsEnabled = false;
+    // Disable the input field and submit button while waiting for the API response
     this.isDisabled = true;
-    // show loading indicator
+    // Show loading indicator while waiting for the API response
     this.isAwaitingResponse = true;
     try {
       await fetch(`${globalConfig.API_CHAT_URL}`, {
@@ -363,19 +308,18 @@ export class ChatComponent extends LitElement {
           return data;
         })
         .then((data) => {
-          // add the response to the chat
+          // Add the response to the chat messages
           this.addMessage(data.answer, false);
         });
-      // enable the input field and submit button again
+      // Enable the input field and submit button again
       this.isDisabled = false;
       this.isAwaitingResponse = false;
     } catch (error) {
-      this.handleAPIError();
       console.error('API Response Exception. Error:', error);
     }
   }
 
-  // add a message to the chat, when the user or the API sends a message
+  // Add a message to the chat, when the user or the API sends a message
   addMessage(message: string, isUserMessage: boolean) {
     const timestamp = this.getTimestamp();
     this.chatMessages = [
@@ -389,7 +333,7 @@ export class ChatComponent extends LitElement {
     this.requestUpdate();
   }
 
-  // handle the click on a default prompt
+  // Handle the click on a default prompt
   handleDefaultQuestionClick(question: string, event?: Event) {
     event?.preventDefault();
     this.questionInput.value = question;
@@ -399,7 +343,6 @@ export class ChatComponent extends LitElement {
   // Handle the click on the chat button and send the question to the API
   handleUserQuestionSubmit(event: Event) {
     event.preventDefault();
-    console.log('User question:', this.questionInput.value);
     const userQuestion = this.questionInput.value;
     if (userQuestion) {
       this.currentQuestion = userQuestion;
@@ -409,6 +352,7 @@ export class ChatComponent extends LitElement {
     }
   }
 
+  // Get the current timestamp to display with the chat message
   getTimestamp() {
     return new Date().toLocaleTimeString('en-US', {
       hour: 'numeric',
@@ -425,24 +369,26 @@ export class ChatComponent extends LitElement {
     this.isResetInput = false;
   }
 
-  displayDefaultPrompts() {
-    if (!this.showDefaultPrompts) {
+  // Show the default prompts when enabled
+  showDefaultPrompts() {
+    if (!this.hasDefaultPromptsEnabled) {
       this.isChatStarted = false;
       this.chatMessages = [];
-      this.showDefaultPrompts = true;
+      this.hasDefaultPromptsEnabled = true;
     }
   }
 
+  // Handle the change event on the input field
   handleOnInputChange() {
     this.isResetInput = !!this.questionInput.value;
   }
 
+  // Handle API error
   handleAPIError() {
-    console.log('API Error');
     this.hasAPIError = true;
   }
 
-  // Web Component render function
+  // Render the chat component as a web component
   override render() {
     return html`
       <section class="chat__container" id="chat-container">
@@ -481,8 +427,8 @@ export class ChatComponent extends LitElement {
           : ''}
         <!-- Default prompts: use the variables above to edit the heading -->
         <div class="chat__container">
-          <!-- Conditionally render default prompts based on showDefaultPrompts -->
-          ${this.showDefaultPrompts
+          <!-- Conditionally render default prompts based on hasDefaultPromptsEnabled -->
+          ${this.hasDefaultPromptsEnabled
             ? html`
                 <div class="defaults__container">
                   <h2 class="subheadline">${this.defaultPromptsHeading}</h2>
@@ -544,10 +490,10 @@ export class ChatComponent extends LitElement {
           </div>
         </form>
         <div class="chat__container--footer">
-          ${this.showDefaultPrompts
+          ${this.hasDefaultPromptsEnabled
             ? ''
             : html`
-                <button type="button" @click="${this.displayDefaultPrompts}" class="deaults__span button">
+                <button type="button" @click="${this.showDefaultPrompts}" class="deaults__span button">
                   ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
                 </button>
               `}
@@ -557,6 +503,7 @@ export class ChatComponent extends LitElement {
   }
 }
 
+// Register the custom element
 declare global {
   interface HTMLElementTagNameMap {
     'chat-component': ChatComponent;
