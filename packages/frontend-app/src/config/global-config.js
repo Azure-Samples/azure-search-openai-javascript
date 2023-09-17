@@ -17,6 +17,7 @@ export const globalConfig = {
   CHAT_INPUT_PLACEHOLDER: 'Type your question here',
   USER_IS_BOT: 'Support Bot',
   RESET_BUTTON_LABEL_TEXT: 'X',
+  RESET_BUTTON_TITLE_TEXT: 'Reset current question',
   LOADING_INDICATOR_TEXT: 'Please wait. We are searching for an answer...',
   // API URL for development purposes
   API_CHAT_URL: 'http://localhost:3000/chat',
