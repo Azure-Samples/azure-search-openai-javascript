@@ -113,6 +113,10 @@ export class ChatComponent extends LitElement {
     .chat__container {
       min-width: 100%;
     }
+    .chat__header {
+      display: flex;
+      justify-content: flex-end;
+    }
     .chatbox__container {
       position: relative;
       height: 50px;
@@ -369,12 +373,17 @@ export class ChatComponent extends LitElement {
     this.isResetInput = false;
   }
 
+  // Reset the chat and show the default prompts
+  resetCurrentChat() {
+    this.isChatStarted = false;
+    this.chatMessages = [];
+    this.hasDefaultPromptsEnabled = true;
+  }
+
   // Show the default prompts when enabled
   showDefaultPrompts() {
     if (!this.hasDefaultPromptsEnabled) {
-      this.isChatStarted = false;
-      this.chatMessages = [];
-      this.hasDefaultPromptsEnabled = true;
+      this.resetCurrentChat();
     }
   }
 
@@ -388,12 +397,27 @@ export class ChatComponent extends LitElement {
     this.hasAPIError = true;
   }
 
+  // Copy response to clipboard
+  copyResponseToClipboard() {
+    const response = this.chatMessages[this.chatMessages.length - 1].text;
+    navigator.clipboard.writeText(response);
+  }
+
   // Render the chat component as a web component
   override render() {
     return html`
       <section class="chat__container" id="chat-container">
         ${this.isChatStarted
           ? html`
+              <div class="chat__header">
+                <button
+                  title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
+                  class="button"
+                  @click="${this.resetCurrentChat}"
+                >
+                  <img src="./public/svg/delete-icon.svg" alt="Restart Chat" width="20" height="30" />
+                </button>
+              </div>
               <ul class="chat__list" aria-live="assertive">
                 ${this.chatMessages.map(
                   (message) => html`
