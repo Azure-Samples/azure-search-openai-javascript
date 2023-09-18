@@ -34,6 +34,8 @@ export class ChatComponent extends LitElement {
   @property({ type: Boolean }) isAwaitingResponse = false;
   // Show error message to the end-user, if API call fails
   @property({ type: Boolean }) hasAPIError = false;
+  // Has the response been copied to the clipboard
+  @property({ type: Boolean }) isResponseCopied = false;
   // These are the chat bubbles that will be displayed in the chat
   chatMessages: ChatMessage[] = [];
   hasDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
@@ -127,6 +129,8 @@ export class ChatComponent extends LitElement {
       align-items: center;
       margin-left: 5px;
       opacity: 1;
+      padding: 5px;
+      transition: all 0.3s ease-in-out;
     }
     .chat__header--button:disabled,
     .chatbox__button:disabled,
@@ -400,6 +404,7 @@ export class ChatComponent extends LitElement {
     this.chatMessages = [];
     this.isDisabled = false;
     this.hasDefaultPromptsEnabled = true;
+    this.isResponseCopied = false;
   }
 
   // Show the default prompts when enabled
@@ -424,6 +429,7 @@ export class ChatComponent extends LitElement {
   copyResponseToClipboard() {
     const response = this.chatMessages[this.chatMessages.length - 1].text;
     navigator.clipboard.writeText(response);
+    this.isResponseCopied = true;
   }
 
   // Render the chat component as a web component
@@ -439,12 +445,16 @@ export class ChatComponent extends LitElement {
                   @click="${this.copyResponseToClipboard}"
                   ?disabled="${this.isDisabled}"
                 >
-                  <span class="chat__header--span">${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span>
+                  <span class="chat__header--span"
+                    >${this.isResponseCopied
+                      ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
+                      : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
+                  >
                   <img
-                    src="./public/svg/copy-icon.svg"
+                    src="${this.isResponseCopied ? './public/svg/doublecheck-icon.svg' : './public/svg/copy-icon.svg'}"
                     alt="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-                    width="15"
-                    height="15"
+                    width="12"
+                    height="12"
                   />
                 </button>
                 <button
@@ -456,8 +466,8 @@ export class ChatComponent extends LitElement {
                   <img
                     src="./public/svg/delete-icon.svg"
                     alt="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
-                    width="15"
-                    height="15"
+                    width="12"
+                    height="12"
                   />
                 </button>
               </div>
