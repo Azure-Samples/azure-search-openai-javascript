@@ -29,9 +29,17 @@
 
 This sample demonstrates a few approaches for creating ChatGPT-like experiences over your own data using the Retrieval Augmented Generation pattern. It uses Azure OpenAI Service to access the ChatGPT model (gpt-35-turbo), and Azure Cognitive Search for data indexing and retrieval.
 
+![Retrieval Augmented Generation Architecture](docs/rag-architecture.png)
+
 The repo includes sample data so it's ready to try end to end. In this sample application we use a fictitious company called Contoso Real Estate, and the experience allows its customers to ask support questions about the usage of its products. The sample data includes a set of documents that describe its terms of service, privacy policy and a support guide.
 
-![Retrieval Augmented Generation Architecture](docs/architecture.png)
+The application is made from multiple components, including:
+
+- **Search service**: the backend service that provides the search and retrieval capabilities.
+- **Indexer service**: the service that indexes the data and creates the search indexes.
+- **Web app**: the frontend web application that provides the user interface and orchestrates the interaction between the user and the backend services.
+
+![App Architecture](docs/app-architecture.drawio.png)
 
 ## Features
 
@@ -41,7 +49,7 @@ The repo includes sample data so it's ready to try end to end. In this sample ap
 - Settings directly in the UX to tweak the behavior and experiment with options
 - Optional performance tracing and monitoring with Application Insights
 
-![Chat screen](docs/chat-screening.png)
+![Chat screen](docs/chat-screenshot.png)
 
 ## Getting started
 
