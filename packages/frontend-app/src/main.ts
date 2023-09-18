@@ -149,6 +149,7 @@ export class ChatComponent extends LitElement {
       cursor: pointer;
       border-radius: 4px;
       margin-left: 8px;
+      width: 80px;
     }
     .chatbox__button--reset {
       position: absolute;
@@ -542,7 +543,12 @@ export class ChatComponent extends LitElement {
               title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
               ?disabled="${this.isDisabled}"
             >
-              ${globalConfig.CHAT_BUTTON_LABEL_TEXT}
+              <img
+                src="./public/svg/send-icon.svg"
+                alt="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
+                width="25"
+                height="25"
+              />
             </button>
             <button
               title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
