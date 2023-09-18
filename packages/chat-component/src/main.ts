@@ -10,6 +10,8 @@ declare interface ChatMessage {
   text: string;
   isUserMessage: boolean;
   timestamp: string;
+  citations: string[];
+  followupQuestions: string[];
 }
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -50,9 +52,10 @@ export class ChatComponent extends LitElement {
       padding: 16px;
       --secondary-color: #f8fffd;
       --text-color: #123f58;
-      --primary-color: rgba(51, 40, 56, 0.6);
+      --primary-color: rgba(241, 255, 165, 0.6);
       --white: #fff;
       --light-gray: #e3e3e3;
+      --dark-gray: #4e5288;
       --accent-high: #8cdef2;
       --accent-dark: #002b23;
       --accent-light: #e6fbf7;
@@ -112,6 +115,10 @@ export class ChatComponent extends LitElement {
       font-size: 1.2rem;
       padding: 0;
       margin: 0;
+    }
+    .subheadline--small {
+      font-size: small;
+      font-style: italic;
     }
     .chat__container {
       min-width: 100%;
@@ -194,14 +201,13 @@ export class ChatComponent extends LitElement {
     .chat__txt {
       animation: chatmessageanimation 0.5s ease-in-out;
       background-color: var(--primary-color);
-      color: var(--white);
+      color: var(--text-color);
       border-radius: 10px;
       margin-top: 8px;
       padding: 20px;
       word-wrap: break-word;
       margin-block-end: 0;
       position: relative;
-      display: flex;
     }
     .chat__txt.error {
       background-color: var(--error-color);
@@ -209,7 +215,6 @@ export class ChatComponent extends LitElement {
     }
     .chat__txt.user-message {
       background-color: var(--accent-high);
-      color: var(--text-color);
     }
     .chat__listItem.user-message {
       align-self: flex-end;
@@ -222,6 +227,43 @@ export class ChatComponent extends LitElement {
     }
     .user-message .chat__txt--info {
       text-align: right;
+    }
+    .items__list {
+      display: flex;
+      padding-inline-start: 0;
+      list-style: none;
+      padding: 20px 0;
+    }
+    .items__list.followup {
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid var(--accent-dark);
+      padding: 20px;
+    }
+    .items__listItem--followup {
+      cursor: pointer;
+      color: var(--dark-gray);
+    }
+    .items__listItem--citation {
+      display: inline-block;
+      background-color: var(--light-gray);
+      border-radius: 5px;
+      text-decoration: none;
+      padding: 5px;
+    }
+    .items__listItem--citation:not(first-child) {
+      margin-left: 5px;
+    }
+    .items__link {
+      text-decoration: none;
+      color: var(--text-color);
+    }
+    .followup .items__link {
+      color: var(--dark-gray);
+      font-weight: bold;
+      display: block;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--light-gray);
     }
     .defaults__button {
       text-decoration: none;
@@ -272,7 +314,7 @@ export class ChatComponent extends LitElement {
       width: 10px;
       height: 10px;
       margin: 0 5px;
-      background-color: var(--primary-color);
+      background-color: var(--accent-high);
       border-radius: 50%;
       animation: chatloadinganimation 1.5s infinite;
     }
@@ -350,13 +392,31 @@ export class ChatComponent extends LitElement {
 
   // Add a message to the chat, when the user or the API sends a message
   addMessage(message: string, isUserMessage: boolean) {
+    // Extract citations
+    const citations: string[] = [];
+    // eslint-disable-next-line unicorn/prefer-string-replace-all
+    const messageWithoutCitations = message.replace(/\[(.*?)]/g, (match, citation) => {
+      citations.push(citation);
+      return ''; // Remove the citation from the message
+    });
+
+    // Extract follow-up questions
+    const followupQuestions: string[] = [];
+    // eslint-disable-next-line unicorn/prefer-string-replace-all
+    const messageWithoutFollowup = messageWithoutCitations.replace(/<<([^>]+)>>/g, (match, followup) => {
+      followupQuestions.push(followup);
+      return ''; // Remove the follow-up question from the message
+    });
+
     const timestamp = this.getTimestamp();
     this.chatMessages = [
       ...this.chatMessages,
       {
-        text: message,
+        text: messageWithoutFollowup,
         timestamp: timestamp,
         isUserMessage,
+        citations,
+        followupQuestions,
       },
     ];
     this.requestUpdate();
@@ -475,7 +535,49 @@ export class ChatComponent extends LitElement {
                 ${this.chatMessages.map(
                   (message) => html`
                     <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
-                      <p class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">${message.text}</p>
+                      <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
+                        <p>${message.text}</p>
+                        ${message.citations.length > 0
+                          ? html`
+                              <h3 class="subheadline--small">Citations</h3>
+                              <ul class="items__list">
+                                ${message.citations.map(
+                                  (citation) => html`
+                                    <li class="items__listItem--citation">
+                                      <a
+                                        class="items__link"
+                                        href="${citation}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        >${citation}</a
+                                      >
+                                    </li>
+                                  `,
+                                )}
+                              </ul>
+                            `
+                          : ''}
+                        ${message.followupQuestions.length > 0
+                          ? html`
+                              <h3 class="subheadline--small">You may also want to ask...</h3>
+                              <ul class="items__list followup">
+                                ${message.followupQuestions.map(
+                                  (followupQuestion) => html`
+                                    <li class="items__listItem--followup">
+                                      <a
+                                        class="items__link"
+                                        href="#"
+                                        @click="${(event: Event) =>
+                                          this.handleDefaultQuestionClick(followupQuestion, event)}"
+                                        >${followupQuestion}</a
+                                      >
+                                    </li>
+                                  `,
+                                )}
+                              </ul>
+                            `
+                          : ''}
+                      </div>
                       <p class="chat__txt--info">
                         <span class="timestamp">${message.timestamp}</span>,
                         <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
