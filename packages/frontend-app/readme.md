@@ -46,4 +46,4 @@ The development server will proxy all requests to the local API, so you can use 
 
 You can deploy to [Azure Static Web Apps](https://docs.microsoft.com/azure/static-web-apps/overview) by using the [Azure Static Web Apps CLI](https://learn.microsoft.com/azure/static-web-apps/static-web-apps-cli-deploy) or the whole infrastructure with [Bicep](https://bicep.dev/) using the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview).
 
-We will soon support the [Terraform deployment provider](https://learn.microsoft.com/azure/developer/azure-developer-cli/use-terraform-for-azd).
+We will soon support [Terraform deployment](https://learn.microsoft.com/azure/developer/azure-developer-cli/use-terraform-for-azd).
