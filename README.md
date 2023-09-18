@@ -140,7 +140,7 @@ If you've changed the infrastructure files (`infra` folder or `azure.yaml`), the
 To give someone else access to a completely deployed and existing environment,
 either you or they can follow these steps:
 
-1. Install the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)
+1. Install the [Azure Developer CLI](https://aka.ms/azure-dev/install)
 1. Run `azd init -t azure-search-openai-javascript` or clone this repository.
 1. Run `azd env refresh -e {environment name}`
    They will need the azd environment name, subscription ID, and location to run this command. You can find those values in your `.azure/{env name}/.env` file. This will populate their azd environment's `.env` file with all the settings needed to run the app locally.
