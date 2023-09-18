@@ -2,7 +2,7 @@
 
 This folder contains a web component with LitElement that can be used to interact with the Azure Open AI API.
 
-It is a standard chat UI that can be used to send messages to the API and receive responses.
+It is a classic chat UI that can be used to send messages to the API and receive responses.
 
 ## Technical stack
 
