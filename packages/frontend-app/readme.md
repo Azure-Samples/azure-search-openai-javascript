@@ -1,6 +1,6 @@
 ## Azure Open AI JavaScript Sample - Frontend
 
-This folder contains a web component with LitElement that can be used to interact with the Azure Open AI API.
+This folder contains a single web component built with LitElement that can be used to interact with the Azure OpenAI API.
 
 It is a classic chat UI that can be used to send messages to the API and receive responses.
 
