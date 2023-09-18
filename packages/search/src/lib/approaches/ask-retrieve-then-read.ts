@@ -59,7 +59,7 @@ export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
     const chatCompletion = await openAiChat.completions.create({
       model: this.chatGptModel,
       messages,
-      temperature: Number(overrides?.temperature) ?? 0.3,
+      temperature: Number(overrides?.temperature ?? 0.3),
       max_tokens: 1024,
       n: 1,
     });
