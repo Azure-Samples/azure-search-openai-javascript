@@ -128,7 +128,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     const finalChatCompletion = await openAiChat.completions.create({
       model: this.chatGptModel,
       messages: finalMessages,
-      temperature: Number(overrides?.temperature) ?? 0.7,
+      temperature: Number(overrides?.temperature ?? 0.7),
       max_tokens: 1024,
       n: 1,
     });
