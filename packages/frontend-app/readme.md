@@ -1,4 +1,4 @@
-## Azure Open AI JavaScript Sample - Frontend
+## Azure OpenAI JavaScript Sample - Frontend
 
 This folder contains a single web component built with LitElement that can be used to interact with the Azure OpenAI API.
 
