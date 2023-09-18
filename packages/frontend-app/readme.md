@@ -30,7 +30,7 @@ Then you can proceed by following these steps:
 - To install all npm dependencies, please run `npm install`. This is a npm workspace, so all dependencies will be installed in the root folder.
 - To start the local development server, open a new terminal and run `npm run start`. This will start the local development server on port 8000.
 - To run the unit tests, open a new terminal and run `npm run test`. This will run all unit tests and generate a coverage report. (TBD - not yet implemented-)
-- To build the application, open a new terminal and run `npm run build:vite`. This will generate a production build in the `dist` folder.
+- To build the application, open a new terminal and run `npm run build`. This will generate a production build in the `dist` folder.
 
 ## Testing
 
