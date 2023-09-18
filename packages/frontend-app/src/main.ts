@@ -50,6 +50,7 @@ export class ChatComponent extends LitElement {
       --text-color: #123f58;
       --primary-color: rgba(51, 40, 56, 0.6);
       --white: #fff;
+      --light-gray: #e3e3e3;
       --accent-high: #8cdef2;
       --accent-dark: #002b23;
       --accent-light: #e6fbf7;
@@ -116,6 +117,25 @@ export class ChatComponent extends LitElement {
     .chat__header {
       display: flex;
       justify-content: flex-end;
+    }
+    .chat__header--button {
+      border: 1px solid var(--accent-dark);
+      text-decoration: none;
+      border-radius: 5px;
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      margin-left: 5px;
+      opacity: 1;
+    }
+    .chat__header--button:disabled,
+    .chatbox__button:disabled,
+    .chatbox__input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .chat__header--span {
+      margin-right: 5px;
     }
     .chatbox__container {
       position: relative;
@@ -314,10 +334,10 @@ export class ChatComponent extends LitElement {
         .then((data) => {
           // Add the response to the chat messages
           this.addMessage(data.answer, false);
+          this.isDisabled = false;
+          this.isAwaitingResponse = false;
         });
       // Enable the input field and submit button again
-      this.isDisabled = false;
-      this.isAwaitingResponse = false;
     } catch (error) {
       console.error('API Response Exception. Error:', error);
     }
@@ -377,6 +397,7 @@ export class ChatComponent extends LitElement {
   resetCurrentChat() {
     this.isChatStarted = false;
     this.chatMessages = [];
+    this.isDisabled = false;
     this.hasDefaultPromptsEnabled = true;
   }
 
@@ -395,6 +416,7 @@ export class ChatComponent extends LitElement {
   // Handle API error
   handleAPIError() {
     this.hasAPIError = true;
+    this.isDisabled = false;
   }
 
   // Copy response to clipboard
@@ -411,11 +433,31 @@ export class ChatComponent extends LitElement {
           ? html`
               <div class="chat__header">
                 <button
-                  title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
-                  class="button"
+                  title="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
+                  class="button chat__header--button"
+                  @click="${this.copyResponseToClipboard}"
+                  ?disabled="${this.isDisabled}"
+                >
+                  <span class="chat__header--span">${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span>
+                  <img
+                    src="./public/svg/copy-icon.svg"
+                    alt="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+                    width="15"
+                    height="15"
+                  />
+                </button>
+                <button
+                  title="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
+                  class="button chat__header--button"
                   @click="${this.resetCurrentChat}"
                 >
-                  <img src="./public/svg/delete-icon.svg" alt="Restart Chat" width="20" height="30" />
+                  <span class="chat__header--span">${globalConfig.RESET_CHAT_BUTTON_TITLE}</span>
+                  <img
+                    src="./public/svg/delete-icon.svg"
+                    alt="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
+                    width="15"
+                    height="15"
+                  />
                 </button>
               </div>
               <ul class="chat__list" aria-live="assertive">
@@ -490,6 +532,7 @@ export class ChatComponent extends LitElement {
               name="chatbox"
               type="text"
               :value=""
+              ?disabled="${this.isDisabled}"
               autocomplete="off"
               @keyup="${this.handleOnInputChange}"
             />
@@ -497,6 +540,7 @@ export class ChatComponent extends LitElement {
               class="chatbox__button"
               @click="${this.handleUserQuestionSubmit}"
               title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
+              ?disabled="${this.isDisabled}"
             >
               ${globalConfig.CHAT_BUTTON_LABEL_TEXT}
             </button>

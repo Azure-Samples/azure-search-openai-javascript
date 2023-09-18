@@ -19,6 +19,8 @@ export const globalConfig = {
   RESET_BUTTON_LABEL_TEXT: 'X',
   RESET_BUTTON_TITLE_TEXT: 'Reset current question',
   RESET_CHAT_BUTTON_TITLE: 'Reset chat',
+  // Copy response to clipboard
+  COPY_RESPONSE_BUTTON_LABEL_TEXT: 'Copy Response',
   LOADING_INDICATOR_TEXT: 'Please wait. We are searching for an answer...',
   // API URL for development purposes
   API_CHAT_URL: 'http://localhost:3000/chat',
