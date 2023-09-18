@@ -19,7 +19,7 @@ The following technologies are part of the frontend application:
 
 The frontend application is configured using a global configuration file. You can enable or disable the default prompts, and configure the default prompt texts, the API endpoint and other settings.
 
-All texts and labels are configurable to match your use-case. To reconfigure the texts, please edit the [global config](./src/config/globalConfig.js) file.
+All texts and labels are configurable to match your use case. To customize the texts, please edit the [global config](./src/config/globalConfig.js) file.
 
 ## Running the application
 
