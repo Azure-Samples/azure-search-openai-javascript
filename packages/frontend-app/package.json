@@ -9,7 +9,7 @@
     "clean": "cd dist && rimraf chat-component.{d.ts,d.ts.map,js,js.map} ",
     "lint": "eslint \"**/*.{js,ts}\"",
     "start": "vite --port 8000 --host 0.0.0.0",
-    "build:vite": "vite build",
+    "build": "vite build",
     "build:rollup": "rollup -c",
     "preview": "vite preview"
   },
