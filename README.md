@@ -112,7 +112,7 @@ Then bring down the project code:
 
 1. Create a new folder and switch to it in the terminal
 1. Run `azd auth login`
-1. Run `azd init -t azure-search-openai-demo`
+1. Run `azd init -t azure-search-openai-javascript`
    - note that this command will initialize a git repository and you do not need to clone this repository
 
 ### Deploying from scratch
