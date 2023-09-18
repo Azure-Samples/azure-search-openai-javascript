@@ -10,3 +10,7 @@ All icons in this sample are free and open source
 - [Copy Icon](https://fontawesome.com/icons/copy?f=classic&s=solid)
 - [Double Check Icon](https://fontawesome.com/icons/check-double?f=classic&s=solid)
 - [Email Icon](https://fontawesome.com/icons/envelope-open-text?f=classic&s=solid)
+
+## FontAwesome License
+
+For the full information and license, please visit [Font Awesome License](https://github.com/FortAwesome/Font-Awesome/blob/6.x/LICENSE.txt)
