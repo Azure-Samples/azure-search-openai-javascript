@@ -94,7 +94,7 @@ module.exports = {
       },
     },
     {
-      files: 'vite-env.d.ts',
+      files: ['vite-env.d.ts', 'web-dev-server.config.js'],
       rules: {
         'unicorn/prevent-abbreviations': 'off',
       },
