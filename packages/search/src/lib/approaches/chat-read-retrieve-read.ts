@@ -1,6 +1,11 @@
 import { type SearchClient } from '@azure/search-documents';
 import { type OpenAiService } from '../../plugins/openai.js';
-import { type ChatApproach, type ApproachResponse, type ChatApproachOverrides } from './approach.js';
+import {
+  type ChatApproach,
+  type ApproachResponse,
+  type ChatApproachOverrides,
+  type ApproachResponseChunk,
+} from './approach.js';
 import { ApproachBase } from './approach-base.js';
 import { type HistoryMessage, type Message, messagesToString } from '../message.js';
 import { MessageBuilder } from '../message-builder.js';
@@ -55,7 +60,44 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     this.chatGptTokenLimit = getTokenLimit(chatGptModel);
   }
 
-  async run(history: HistoryMessage[], overrides: ChatApproachOverrides): Promise<ApproachResponse> {
+  async run(history: HistoryMessage[], overrides?: ChatApproachOverrides): Promise<ApproachResponse> {
+    const { completionRequest, dataPoints, thoughts } = await this.baseRun(history, overrides);
+    const openAiChat = await this.openai.getChat();
+    const chatCompletion = await openAiChat.completions.create(completionRequest);
+    const chatContent = chatCompletion.choices[0].message.content ?? '';
+
+    return {
+      data_points: dataPoints,
+      answer: chatContent,
+      thoughts: thoughts,
+    };
+  }
+
+  async *runWithStreaming(
+    history: HistoryMessage[],
+    overrides?: ChatApproachOverrides,
+  ): AsyncGenerator<ApproachResponseChunk, void> {
+    const { completionRequest, dataPoints, thoughts } = await this.baseRun(history, overrides);
+    const openAiChat = await this.openai.getChat();
+    const chatCompletion = await openAiChat.completions.create({
+      ...completionRequest,
+      stream: true,
+    });
+    let id = 0;
+    for await (const chunk of chatCompletion) {
+      const responseChunk = {
+        data_points: id === 0 ? dataPoints : undefined,
+        thoughts: id === 0 ? thoughts : undefined,
+        answer: chunk.choices[0].delta.content ?? '',
+      };
+      yield {
+        id: String(id++),
+        data: JSON.stringify(responseChunk),
+      };
+    }
+  }
+
+  private async baseRun(history: HistoryMessage[], overrides?: ChatApproachOverrides) {
     const userQuery = 'Generate search query for: ' + history[history.length - 1].user;
 
     // STEP 1: Generate an optimized keyword search query based on the chat history and the last question
@@ -125,20 +167,17 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
       this.chatGptTokenLimit,
     );
 
-    const finalChatCompletion = await openAiChat.completions.create({
-      model: this.chatGptModel,
-      messages: finalMessages,
-      temperature: Number(overrides?.temperature ?? 0.7),
-      max_tokens: 1024,
-      n: 1,
-    });
-
-    const chatContent = finalChatCompletion.choices[0].message.content ?? '';
     const messageToDisplay = messagesToString(messages);
 
     return {
-      data_points: results,
-      answer: chatContent,
+      completionRequest: {
+        model: this.chatGptModel,
+        messages: finalMessages,
+        temperature: Number(overrides?.temperature ?? 0.7),
+        max_tokens: 1024,
+        n: 1,
+      },
+      dataPoints: results,
       thoughts: `Searched for:<br>${query}<br><br>Conversations:<br>${messageToDisplay.replace('\n', '<br>')}`,
     };
   }

@@ -6,6 +6,12 @@ export interface ApproachResponse {
   thoughts: string;
 }
 
+export type ApproachResponseChunk = {
+  id: string;
+  // JSON stringified Partial<ApproachResponse>
+  data: string;
+};
+
 export type ApproachOverrides = {
   retrieval_mode?: 'hybrid' | 'text' | 'vectors';
   semantic_ranker?: boolean;
@@ -23,9 +29,17 @@ export type ChatApproachOverrides = ApproachOverrides & {
 };
 
 export interface ChatApproach {
-  run(history: HistoryMessage[], overrides: ChatApproachOverrides): Promise<ApproachResponse>;
+  run(history: HistoryMessage[], overrides?: ChatApproachOverrides): Promise<ApproachResponse>;
+  runWithStreaming(
+    history: HistoryMessage[],
+    overrides?: ChatApproachOverrides,
+  ): AsyncGenerator<ApproachResponseChunk, void>;
 }
 
 export interface AskApproach {
-  run(query: string, overrides: ApproachOverrides): Promise<ApproachResponse>;
+  run(query: string, overrides?: ApproachOverrides): Promise<ApproachResponse>;
+  // runWithStreaming(
+  //   query: HistoryMessage[],
+  //   overrides?: ChatApproachOverrides,
+  // ): AsyncGenerator<ApproachResponseChunk, void>;
 }

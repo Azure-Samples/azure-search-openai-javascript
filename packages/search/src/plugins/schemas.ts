@@ -15,6 +15,7 @@ export const chatRequestSchema = {
         },
       },
     },
+    stream: { type: 'boolean' },
     overrides: {
       type: 'object',
       // TODO: need to type this better
@@ -30,6 +31,7 @@ export const askRequestSchema = {
   properties: {
     approach: { type: 'string' },
     question: { type: 'string' },
+    stream: { type: 'boolean' },
     overrides: {
       type: 'object',
       // TODO: need to type this better
