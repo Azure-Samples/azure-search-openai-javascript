@@ -123,11 +123,19 @@ It will look like the following:
 
 ### Deploying with existing resources
 
+If you already have existing Azure resources, you can re-use those by setting `azd` environment values.
+
+#### Existing resource group
+
+1. Run `azd env set AZURE_RESOURCE_GROUP {Name of existing resource group}`
+1. Run `azd env set AZURE_LOCATION {Location of existing resource group}`
+
+#### Existing OpenAI resource
+
 1. Run `azd env set AZURE_OPENAI_SERVICE {Name of existing OpenAI service}`
 1. Run `azd env set AZURE_OPENAI_RESOURCE_GROUP {Name of existing resource group that OpenAI service is provisioned to}`
 1. Run `azd env set AZURE_OPENAI_CHATGPT_DEPLOYMENT {Name of existing ChatGPT deployment}`. Only needed if your ChatGPT deployment is not the default 'chat'.
-1. Run `azd env set AZURE_OPENAI_EMBEDDING_DEPLOYMENT {Name of existing GPT embedding deployment}`. Only needed if your embeddings deployment is not the default 'embedding'.
-1. Run `azd up` - This will provision the rest of the Azure resources and deploy this sample to those resources, including building the search index based on the files found in the `./data` folder.
+1. Run `azd env set AZURE_OPENAI_EMB_DEPLOYMENT {Name of existing GPT embedding deployment}`. Only needed if your embeddings deployment is not the default 'embedding'.
 
 #### Existing Azure Cognitive Search resource
 
@@ -135,7 +143,7 @@ It will look like the following:
 1. Run `azd env set AZURE_SEARCH_SERVICE_RESOURCE_GROUP {Name of existing resource group with ACS service}`
 1. If that resource group is in a different location than the one you'll pick for the `azd up` step,
    then run `azd env set AZURE_SEARCH_SERVICE_LOCATION {Location of existing service}`
-1. If the search service's SKU is not standard, then run `azd env set AZURE_SEARCH_SERVICE_SKU {Name of SKU}`. ([See possible values](https://learn.microsoft.com/en-us/azure/templates/microsoft.search/searchservices?pivots=deployment-language-bicep#sku))
+1. If the search service's SKU is not standard, then run `azd env set AZURE_SEARCH_SERVICE_SKU {Name of SKU}`. The free tier won't work as it doesn't support managed identity. ([See other possible values](https://learn.microsoft.com/azure/templates/microsoft.search/searchservices?pivots=deployment-language-bicep#sku))
 
 #### Other existing Azure resources
 
