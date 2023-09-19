@@ -38,8 +38,5 @@ export interface ChatApproach {
 
 export interface AskApproach {
   run(query: string, overrides?: ApproachOverrides): Promise<ApproachResponse>;
-  // runWithStreaming(
-  //   query: HistoryMessage[],
-  //   overrides?: ChatApproachOverrides,
-  // ): AsyncGenerator<ApproachResponseChunk, void>;
+  runWithStreaming(query: string, overrides?: ApproachOverrides): AsyncGenerator<ApproachResponseChunk, void>;
 }

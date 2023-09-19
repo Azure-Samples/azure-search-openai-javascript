@@ -16,7 +16,6 @@ Content-Type: application/json
 
 {
   "history": [{ "user": "What happens is a rental doesn't fit the description?" }],
-  "stream": false,
   "approach":"rrr",
   "overrides": {
     "retrieval_mode": "hybrid",
