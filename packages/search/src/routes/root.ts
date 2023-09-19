@@ -83,15 +83,18 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       const { history, overrides, stream } = request.body;
       try {
         if (stream) {
-          const generator = await chatApproach.runWithStreaming(history, overrides ?? {});
-          reply.sse(generator);
+          const chunks = await chatApproach.runWithStreaming(history, overrides ?? {});
+          for await (const chunk of chunks) {
+            reply.sse(chunk);
+          }
+          reply.sseContext.source.end();
         } else {
           return await chatApproach.run(history, overrides ?? {});
         }
       } catch (_error: unknown) {
         const error = _error as Error;
         fastify.log.error(error);
-        return reply.internalServerError(`Unknown server error: ${error.message}`);
+        return reply.internalServerError(error.message);
       }
     },
   });
@@ -114,13 +117,21 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
         return reply.badRequest(`Ask approach "${approach}" is unknown or not implemented.`);
       }
 
-      const { overrides, question } = request.body;
+      const { question, overrides, stream } = request.body;
       try {
-        return await askApproach.run(question, overrides ?? {});
+        if (stream) {
+          const chunks = await askApproach.runWithStreaming(question, overrides ?? {});
+          for await (const chunk of chunks) {
+            reply.sse(chunk);
+          }
+          reply.sseContext.source.end();
+        } else {
+          return await askApproach.run(question, overrides ?? {});
+        }
       } catch (_error: unknown) {
         const error = _error as Error;
         fastify.log.error(error);
-        return reply.internalServerError(`Unknown server error: ${error.message}`);
+        return reply.internalServerError(error.message);
       }
     },
   });

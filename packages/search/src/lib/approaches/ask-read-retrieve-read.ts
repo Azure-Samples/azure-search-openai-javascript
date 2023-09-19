@@ -7,7 +7,12 @@ import { CallbackManager } from 'langchain/callbacks';
 import { type OpenAiService } from '../../plugins/openai.js';
 import { type LangchainService } from '../../plugins/langchain.js';
 import { CsvLookupTool, HtmlCallbackHandler } from '../langchain/index.js';
-import { type ApproachOverrides, type AskApproach } from './approach.js';
+import {
+  type ApproachResponseChunk,
+  type ApproachOverrides,
+  type AskApproach,
+  type ApproachResponse,
+} from './approach.js';
 import { ApproachBase } from './approach-base.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -52,7 +57,7 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
     super(search, openai, chatGptModel, embeddingModel, sourcePageField, contentField);
   }
 
-  async run(userQuery: string, overrides: ApproachOverrides): Promise<any> {
+  async run(userQuery: string, overrides?: ApproachOverrides): Promise<ApproachResponse> {
     let searchResults: string[] = [];
 
     const htmlTracer = new HtmlCallbackHandler();
@@ -102,6 +107,11 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
       answer,
       thoughts: htmlTracer.getAndResetLog(),
     };
+  }
+
+  // eslint-disable-next-line require-yield
+  async *runWithStreaming(_query: string, _overrides?: ApproachOverrides): AsyncGenerator<ApproachResponseChunk, void> {
+    throw new Error('Streaming not supported for this approach.');
   }
 }
 
