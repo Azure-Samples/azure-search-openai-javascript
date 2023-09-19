@@ -32,6 +32,7 @@ param storageAccountName string = ''
 param storageResourceGroupName string = ''
 param storageResourceGroupLocation string = location
 param storageContainerName string = 'content'
+param storageSkuName string
 
 param openAiServiceName string = ''
 param openAiResourceGroupName string = ''
@@ -338,7 +339,7 @@ module storage 'core/storage/storage-account.bicep' = {
     tags: tags
     publicNetworkAccess: 'Enabled'
     sku: {
-      name: 'Standard_ZRS'
+      name: storageSkuName
     }
     deleteRetentionPolicy: {
       enabled: true
