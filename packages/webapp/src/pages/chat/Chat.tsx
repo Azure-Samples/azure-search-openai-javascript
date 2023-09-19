@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { flushSync } from 'react-dom';
 import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Dropdown, type IDropdownOption } from '@fluentui/react';
 import { SparkleFilled } from '@fluentui/react-icons';
 
@@ -11,6 +12,7 @@ import {
   type AskResponse,
   type ChatRequest,
   type ChatTurn,
+  getChunksFromResponse,
 } from '../../api/index.js';
 import { Answer, AnswerError, AnswerLoading } from '../../components/Answer/index.js';
 import { QuestionInput } from '../../components/QuestionInput/index.js';
@@ -26,6 +28,7 @@ const Chat = () => {
   const [retrieveCount, setRetrieveCount] = useState<number>(3);
   const [retrievalMode, setRetrievalMode] = useState<RetrievalMode>(RetrievalMode.Hybrid);
   const [useSemanticRanker, setUseSemanticRanker] = useState<boolean>(true);
+  const [useStream, setUseStream] = useState<boolean>(true);
   const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(false);
   const [excludeCategory, setExcludeCategory] = useState<string>('');
   const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(false);
@@ -55,6 +58,7 @@ const Chat = () => {
       const request: ChatRequest = {
         history: [...history, { user: question, bot: undefined }],
         approach: Approaches.ReadRetrieveRead,
+        stream: useStream,
         overrides: {
           promptTemplate: promptTemplate.length === 0 ? undefined : promptTemplate,
           excludeCategory: excludeCategory.length === 0 ? undefined : excludeCategory,
@@ -65,8 +69,34 @@ const Chat = () => {
           suggestFollowupQuestions: useSuggestFollowupQuestions,
         },
       };
-      const result = await chatApi(request);
-      setAnswers([...answers, [question, result]]);
+
+      const chatResponse = await chatApi(request);
+      if (useStream) {
+        const response = chatResponse as Response;
+        const askResponse: AskResponse = {
+          answer: '',
+          data_points: [],
+          thoughts: '',
+        };
+
+        const chunks = await getChunksFromResponse<Partial<AskResponse> & { id: string }>(response);
+        for await (const chunk of chunks) {
+          if (chunk.data_points) {
+            askResponse.data_points = chunk.data_points;
+            askResponse.thoughts = chunk.thoughts ?? '';
+          } else if (chunk.answer) {
+            askResponse.answer += chunk.answer;
+            setIsLoading(false);
+            // Disable batching
+            flushSync(() => {
+              setAnswers([...answers, [question, { ...askResponse }]]);
+            });
+          }
+        }
+      } else {
+        const result = chatResponse as AskResponse;
+        setAnswers([...answers, [question, result]]);
+      }
     } catch (error_) {
       setError(error_);
     } finally {
@@ -109,6 +139,10 @@ const Chat = () => {
 
   const onUseSemanticCaptionsChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
     setUseSemanticCaptions(!!checked);
+  };
+
+  const onUseStreamChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+    setUseStream(!!checked);
   };
 
   const onExcludeCategoryChanged = (_event?: React.FormEvent, newValue?: string) => {
@@ -308,6 +342,12 @@ const Chat = () => {
             ]}
             required
             onChange={onRetrievalModeChange}
+          />
+          <Checkbox
+            className={styles.chatSettingsSeparator}
+            checked={useStream}
+            label="Stream chat completion responses"
+            onChange={onUseStreamChange}
           />
         </Panel>
       </div>
