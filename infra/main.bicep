@@ -24,6 +24,8 @@ param applicationInsightsName string = ''
 param searchServiceName string = ''
 param searchServiceResourceGroupName string = ''
 param searchServiceLocation string = ''
+// The free tier does not support managed identity (required) or semantic search (optional)
+@allowed(['basic', 'standard', 'standard2', 'standard3', 'storage_optimized_l1', 'storage_optimized_l2'])
 param searchServiceSkuName string
 param searchIndexName string
 

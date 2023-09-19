@@ -78,8 +78,6 @@ However, you can try the [Azure pricing calculator](https://azure.com/e/8ffbe5b1
 - Azure Blob Storage: Standard tier with ZRS (Zone-redundant storage). Pricing per storage and read operations. [Pricing](https://azure.microsoft.com/pricing/details/storage/blobs/)
 - Azure Monitor: Pay-as-you-go tier. Costs based on data ingested. [Pricing](https://azure.microsoft.com/pricing/details/monitor/)
 
-To reduce costs, you can switch to free SKUs for Azure Cognitive Search by changing the parameters file under the `infra` folder. There are some limits to consider; for example, you can have up to 1 free Cognitive Search resource per subscription.
-
 ⚠️ To avoid unnecessary costs, remember to take down your app if it's no longer in use,
 either by deleting the resource group in the Portal or running `azd down`.
 
