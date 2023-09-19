@@ -286,6 +286,24 @@ The primary differences:
 - This repository includes multiple RAG (retrieval-augmented generation) approaches that chain the results of multiple API calls (to Azure OpenAI and ACS) together in different ways. The other repository uses only the built-in data sources option for the ChatCompletions API, which uses a RAG approach on the specified ACS index. That should work for most uses, but if you needed more flexibility, this sample may be a better option.
 - This repository is also a bit more experimental in other ways, since it's not tied to the Azure OpenAI Studio like the other repository.
 
+Feature comparison:
+
+| Feature                 | azure-search-openai-demo | sample-app-aoai-chatGPT                  |
+| ----------------------- | ------------------------ | ---------------------------------------- |
+| RAG approach            | Multiple approaches      | Only via ChatCompletion API data_sources |
+| Vector support          | ✅ Yes                   | ✅ Yes                                   |
+| Data ingestion          | ✅ Yes (MD)              | ✅ Yes (PDF, TXT, MD, HTML)              |
+| Persistent chat history | ❌ No (browser tab only) | ✅ Yes, in CosmosDB                      |
+
+Technology comparison:
+
+| Tech       | azure-search-openai-demo  | sample-app-aoai-chatGPT |
+| ---------- | ------------------------- | ----------------------- |
+| Frontend   | React/Lit                 | React                   |
+| Backend    | Node.js (Fastify)         | Python (Flask)          |
+| Vector DB  | Azure Cognitive Search    | Azure Cognitive Search  |
+| Deployment | Azure Developer CLI (azd) | Azure Portal, az, azd   |
+
 </details>
 
 <details><a id="switch-gpt4"></a>
