@@ -80,9 +80,14 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
         return reply.badRequest(`Chat approach "${approach}" is unknown or not implemented.`);
       }
 
-      const { history, overrides } = request.body;
+      const { history, overrides, stream } = request.body;
       try {
-        return await chatApproach.run(history, overrides ?? {});
+        if (stream) {
+          const generator = await chatApproach.runWithStreaming(history, overrides ?? {});
+          reply.sse(generator);
+        } else {
+          return await chatApproach.run(history, overrides ?? {});
+        }
       } catch (_error: unknown) {
         const error = _error as Error;
         fastify.log.error(error);

@@ -16,6 +16,26 @@ Content-Type: application/json
 
 {
   "history": [{ "user": "What happens is a rental doesn't fit the description?" }],
+  "stream": false,
+  "approach":"rrr",
+  "overrides": {
+    "retrieval_mode": "hybrid",
+    "semantic_ranker": true,
+    "semantic_captions": false,
+    "top": 3,
+    "suggest_followup_questions": false
+  }
+}
+
+###
+
+# Chat with the bot using streaming
+POST {{api_host}}/chat
+Content-Type: application/json
+
+{
+  "history": [{ "user": "What happens is a rental doesn't fit the description?" }],
+  "stream": true,
   "approach":"rrr",
   "overrides": {
     "retrieval_mode": "hybrid",
