@@ -229,21 +229,21 @@ Once in the web app:
 
 ### FAQ
 
-<details>
+<details><a id="ingestion-why-chunk"></a>
 <summary>Why do we need to break up the documents into chunks when Azure Cognitive Search supports searching large documents?</summary>
 
 Chunking allows us to limit the amount of information we send to OpenAI due to token limits. By breaking up the content, it allows us to easily find potential chunks of text that we can inject into OpenAI. The method of chunking we use leverages a sliding window of text such that sentences that end one chunk will start the next. This allows us to reduce the chance of losing the context of the text.
 
 </details>
 
-<details>
+<details><a id="ingestion-more-pdfs"></a>
 <summary>How can we upload additional documents without redeploying everything?</summary>
 
 To upload more documents, put them in the data/ folder and run `./scripts/index-data.sh` or `./scripts/index-data.ps1`.
 
 </details>
 
-<details>
+<details><a id="compare-samples"></a>
 <summary>How does this sample compare to other Chat with Your Data samples?</summary>
 
 Another popular repository for this use case is here:
@@ -258,10 +258,27 @@ The primary differences:
 
 </details>
 
-<details>
+<details><a id="switch-gpt4"></a>
 <summary>How do you use GPT-4 with this sample?</summary>
 
 In `infra/main.bicep`, change `chatGptModelName` to 'gpt-4' instead of 'gpt-35-turbo'. You may also need to adjust the capacity above that line depending on how much TPM your account is allowed.
+
+</details>
+<details><a id="chat-ask-diff"></a>
+<summary>What is the difference between the Chat and Ask tabs?</summary>
+
+The chat tab uses the approach programmed in [chat-read-retrieve-read.ts](https://github.com/Azure-Samples/azure-search-openai-javascript/blob/main/packages/search/src/lib/approaches/chat-read-retrieve-read.ts).
+The ask tab uses the approach programmed in [ask-retrieve-then-read.ts](https://github.com/Azure-Samples/azure-search-openai-javascript/blob/main/packages/search/src/lib/approaches/ask-retrieve-then-read.ts).
+There is also another one /ask approach available, [using an agent](https://github.com/Azure-Samples/azure-search-openai-javascript/blob/main/packages/search/src/lib/approaches/ask-read-retrieve-read.ts.
+
+</details>
+
+<details><a id="azd-up-explanation"></a>
+<summary>What does the `azd up` command do?</summary>
+
+The `azd up` command comes from the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview), and takes care of both provisioning the Azure resources and deploying code to the selected Azure hosts.
+Finally, it looks at `azure.yaml` to determine the Azure host (appservice, in th
+Related commands are `azd provision` for just provisioning (if infra files change) and `azd deploy` for just deploying updated app code.
 
 </details>
 
