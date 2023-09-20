@@ -14,7 +14,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "dev": "npm run build && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch\" \"npm:dev:start\"",
-    "dev:start": "fastify start --ignore-watch=.ts$ -w -l debug -P dist/app.js | pino-pretty",
+    "dev:start": "fastify start --pretty-logs --ignore-watch=.ts$ -w -l debug dist/app.js",
     "docker:build": "docker build --tag api --file ./Dockerfile ../..",
     "docker:run": "docker run --rm --publish 3000:3000 --env-file ../../.env api",
     "clean": "rimraf dist *.tgz"
@@ -44,7 +44,6 @@
     "@types/tap": "^15.0.5",
     "concurrently": "^8.2.0",
     "fastify-tsconfig": "^2.0.0",
-    "pino-pretty": "^10.2.0",
     "rimraf": "^5.0.1",
     "tap": "^16.3.8",
     "ts-node": "^10.4.0",
