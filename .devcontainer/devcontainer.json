@@ -12,6 +12,7 @@
       "version": "18"
     },
     "ghcr.io/devcontainers/features/docker-in-docker:1": {
+      "version": 20,
       "moby": "false"
     },
     "ghcr.io/devcontainers/features/powershell:1": {},
