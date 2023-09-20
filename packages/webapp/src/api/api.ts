@@ -1,4 +1,4 @@
-import { createParser, type EventSourceParser, type ParsedEvent } from 'eventsource-parser';
+import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { type AskRequest, type AskResponse, type ChatRequest } from './models.js';
 
 const baseUrl = import.meta.env.VITE_SEARCH_API_URI ?? '';
@@ -73,24 +73,6 @@ export async function chatApi(options: ChatRequest): Promise<AskResponse | Respo
 
 export function getCitationFilePath(citation: string): string {
   return `/content/${citation}`;
-}
-
-export class EventSourceParserStream extends TransformStream<string, ParsedEvent> {
-  constructor() {
-    let parser: EventSourceParser;
-    super({
-      start(controller) {
-        parser = createParser((event) => {
-          if (event.type === 'event') {
-            controller.enqueue(event);
-          }
-        });
-      },
-      transform(chunk) {
-        parser.feed(chunk);
-      },
-    });
-  }
 }
 
 export async function* getChunksFromResponse<T>(response: Response): AsyncGenerator<T, void> {
