@@ -23,7 +23,7 @@ module.exports = {
   ],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
-  ignorePatterns: ['dist'],
+  ignorePatterns: ['dist', 'test-dist', 'coverage'],
   settings: {
     'import/resolver': {
       node: {

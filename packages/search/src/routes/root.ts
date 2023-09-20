@@ -7,6 +7,7 @@ import { type JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-
 import { type SchemaTypes } from '../plugins/schemas.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
   const fastify = _fastify.withTypeProvider<JsonSchemaToTsProvider<{ references: SchemaTypes }>>();
 

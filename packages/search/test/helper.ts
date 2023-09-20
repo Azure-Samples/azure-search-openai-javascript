@@ -9,14 +9,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export type Test = (typeof tap)['Test']['prototype'];
 
-const AppPath = path.join(__dirname, '..', 'src', 'app.js');
+const AppPath = path.join(__dirname, '..', 'dist', 'app.js');
 
 // Fill in this config with all the configurations
 // needed for testing the application
 async function config() {
-  process.env.LISTINGS_API_URL = 'https://example.com';
-  process.env.OPENAI_API_URL = 'https://api.com';
-  process.env.OPENAI_API_KEY = '123';
+  process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT = 'chat';
+  process.env.AZURE_OPENAI_CHATGPT_MODEL = 'gpt-3.5-turbo';
+  process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT = 'embeddings';
+  process.env.AZURE_OPENAI_EMBEDDING_MODEL = '';
+  process.env.AZURE_OPENAI_SERVICE = 'https://example.com';
+  process.env.AZURE_SEARCH_INDEX = 'testindex';
+  process.env.AZURE_SEARCH_SERVICE = 'https://example.com';
+  process.env.AZURE_STORAGE_ACCOUNT = 'dummystorage';
+  process.env.AZURE_STORAGE_CONTAINER = 'testfiles';
   return {};
 }
 

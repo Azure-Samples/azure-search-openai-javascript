@@ -7,5 +7,7 @@ test('default root route', async (t) => {
   const response = await app.inject({
     url: '/',
   });
-  t.same(JSON.parse(response.payload), { root: true });
+
+  const result = JSON.parse(response.payload);
+  t.hasProps(result, ['service', 'description', 'version']);
 });
