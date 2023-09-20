@@ -16,17 +16,14 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.1.3",
     "lit": "^2.2.4",
-    "rollup": "^3.29.1",
-    "@rollup/plugin-terser": "^0.4.3"
+    "rollup": "^3.29.1"
   },
   "customElements": "custom-elements.json",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.6.0",
-    "@typescript-eslint/parser": "^6.6.0",
-    "eslint": "^8.48.0",
-    "lit-analyzer": "^0.0.6",
+    "lit-analyzer": "^1.2.1",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
     "vite": "^4.4.5"

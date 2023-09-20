@@ -3,9 +3,10 @@
   "compilerOptions": {
     "outDir": "dist",
     "module": "esnext",
+    "moduleResolution": "node",
     "sourceMap": true,
     "esModuleInterop": true,
-    "lib": ["esnext", "dom"]
+    "lib": ["esnext"]
   },
   "include": ["src/**/*.ts"]
 }
