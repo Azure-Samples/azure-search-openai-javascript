@@ -11,6 +11,9 @@
     "ghcr.io/devcontainers/features/node:1": {
       "version": "18"
     },
+    "ghcr.io/devcontainers/features/docker-in-docker:1": {
+      "moby": "false"
+    },
     "ghcr.io/devcontainers/features/powershell:1": {},
     "ghcr.io/devcontainers/features/azure-cli:1": {
       "version": "latest",
