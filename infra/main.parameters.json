@@ -20,8 +20,14 @@
     "openAiResourceGroupName": {
       "value": "${AZURE_OPENAI_RESOURCE_GROUP}"
     },
+    "openAiResourceGroupLocation": {
+      "value": "${AZURE_OPENAI_RESOURCE_GROUP_LOCATION=eastus2}"
+    },
     "openAiSkuName": {
       "value": "S0"
+    },
+    "webAppLocation": {
+      "value": "${AZURE_WEBAPP_LOCATION=eastus2}"
     },
     "formRecognizerServiceName": {
       "value": "${AZURE_FORMRECOGNIZER_SERVICE}"
@@ -61,6 +67,9 @@
     },
     "useApplicationInsights": {
       "value": "${AZURE_USE_APPLICATION_INSIGHTS=false}"
+    },
+    "aliasTag": {
+      "value": "${AZURE_ALIAS}"
     }
   }
 }
