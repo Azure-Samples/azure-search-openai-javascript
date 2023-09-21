@@ -21,6 +21,7 @@
 - [Using the app](#using-the-app)
 - [Running locally](#running-locally)
 - [Productionizing](#productionizing)
+- [Clean up](#clean-up)
 - [Resources](#resources)
   - [Note](#note)
   - [FAQ](#faq)
@@ -250,6 +251,16 @@ For more details, read [Azure OpenAI Landing Zone reference architecture](https:
 - [Revolutionize your Enterprise Data with ChatGPT: Next-gen Apps w/ Azure OpenAI and Cognitive Search](https://aka.ms/entgptsearchblog)
 - [Azure Cognitive Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search)
 - [Azure OpenAI Service](https://learn.microsoft.com/azure/cognitive-services/openai/overview)
+
+## Clean up
+
+To clean up all the resources created by this sample:
+
+1. Run `azd down`
+2. When asked if you are sure you want to continue, enter `y`
+3. When asked if you want to permanently delete the resources, enter `y`
+
+The resource group and all the resources will be deleted.
 
 ### Note
 
