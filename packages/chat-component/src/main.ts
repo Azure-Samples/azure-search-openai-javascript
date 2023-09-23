@@ -59,7 +59,14 @@ export class ChatComponent extends LitElement {
       --accent-high: #8cdef2;
       --accent-dark: #002b23;
       --accent-light: #e6fbf7;
+      --accent-lighter: rgba(140, 222, 242, 0.4);
       --error-color: #8a0000;
+    }
+
+    // reset all agent styles
+    ul {
+      margin-block-start: 0;
+      margin-block-end: 0;
     }
     .button {
       color: var(--text-color);
@@ -117,8 +124,11 @@ export class ChatComponent extends LitElement {
       margin: 0;
     }
     .subheadline--small {
-      font-size: small;
-      font-style: italic;
+      font-size: 12px;
+      margin: 0;
+      padding: 0;
+      text-transform: uppercase;
+      text-decoration: underline;
     }
     .chat__container {
       min-width: 100%;
@@ -200,7 +210,7 @@ export class ChatComponent extends LitElement {
     }
     .chat__txt {
       animation: chatmessageanimation 0.5s ease-in-out;
-      background-color: var(--primary-color);
+      background-color: var(--secondary-color);
       color: var(--text-color);
       border-radius: 10px;
       margin-top: 8px;
@@ -246,10 +256,11 @@ export class ChatComponent extends LitElement {
     }
     .items__listItem--citation {
       display: inline-block;
-      background-color: var(--light-gray);
+      background-color: var(--accent-lighter);
       border-radius: 5px;
       text-decoration: none;
       padding: 5px;
+      font-size: small;
     }
     .items__listItem--citation:not(first-child) {
       margin-left: 5px;
