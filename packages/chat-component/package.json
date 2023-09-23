@@ -18,10 +18,15 @@
   "dependencies": {
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.1.3",
+<<<<<<< HEAD
     "lit": "^2.2.4",
     "rollup": "^3.29.1"
+=======
+    "lit": "2.8.0",
+    "rollup": "^3.29.1",
+    "@rollup/plugin-terser": "^0.4.3"
+>>>>>>> 0888700 (chore: remove manifest, upgrade lit)
   },
-  "customElements": "custom-elements.json",
   "devDependencies": {
     "lit-analyzer": "^1.2.1",
     "rimraf": "^5.0.1",
