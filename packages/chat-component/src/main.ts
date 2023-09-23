@@ -403,27 +403,42 @@ export class ChatComponent extends LitElement {
 
   // Add a message to the chat, when the user or the API sends a message
   addMessage(message: string, isUserMessage: boolean) {
-    // Extract citations
     const citations: string[] = [];
-    // eslint-disable-next-line unicorn/prefer-string-replace-all
-    const messageWithoutCitations = message.replace(/\[(.*?)]/g, (match, citation) => {
+    const followupQuestions: string[] = [];
+    const findCitations = /\[(.*?)]/g;
+    const findFollowupQuestions = /<<([^>]+)>>/g;
+    const findNextQuestions = /\d+\.\s+\D+/g;
+    const nextQuestionsIndex = message.indexOf('Next Questions');
+    /*  // eslint-disable-next-line unicorn/prefer-string-replace-all
+    const messageWithoutCitations = message.replace(/\[(.*?)]/g, (citation) => {
       citations.push(citation);
       return ''; // Remove the citation from the message
     });
-
-    // Extract follow-up questions
-    const followupQuestions: string[] = [];
+    
     // eslint-disable-next-line unicorn/prefer-string-replace-all
-    const messageWithoutFollowup = messageWithoutCitations.replace(/<<([^>]+)>>/g, (match, followup) => {
+    const messageWithoutFollowup = messageWithoutCitations.replace(/<<([^>]+)>>/g, (followup) => {
       followupQuestions.push(followup);
       return ''; // Remove the follow-up question from the message
     });
+ */
+    let processedText = this.processText(message, citations, findCitations);
+    const hasNextQuestions = nextQuestionsIndex === -1;
+    const nextRegex = hasNextQuestions ? findFollowupQuestions : findNextQuestions;
+    if (hasNextQuestions) {
+      const subText = processedText.slice(0, Math.max(0, nextQuestionsIndex));
+      const questions = subText.match(findNextQuestions);
+      questions?.map((question) => {
+        const cleanedQuestion = question.replace(/\d+\.\s+/, '').trim();
+        return followupQuestions.push(cleanedQuestion);
+      });
+    }
+    processedText = this.processText(processedText, followupQuestions, nextRegex);
 
     const timestamp = this.getTimestamp();
     this.chatMessages = [
       ...this.chatMessages,
       {
-        text: messageWithoutFollowup,
+        text: processedText,
         timestamp: timestamp,
         isUserMessage,
         citations,
@@ -431,6 +446,14 @@ export class ChatComponent extends LitElement {
       },
     ];
     this.requestUpdate();
+  }
+
+  processText(text: string, list: string[], regex: RegExp): string {
+    text.replace(regex, (match) => {
+      list.push(match);
+      return ''; // Return text without either citation or follow-up question
+    });
+    return text;
   }
 
   // Handle the click on a default prompt
