@@ -408,19 +408,9 @@ export class ChatComponent extends LitElement {
     const findCitations = /\[(.*?)]/g;
     const findFollowupQuestions = /<<([^>]+)>>/g;
     const findNextQuestions = /\d+\.\s+\D+/g;
+    // Move separator to global config, since it can change
     const nextQuestionsIndex = message.indexOf('Next Questions');
-    /*  // eslint-disable-next-line unicorn/prefer-string-replace-all
-    const messageWithoutCitations = message.replace(/\[(.*?)]/g, (citation) => {
-      citations.push(citation);
-      return ''; // Remove the citation from the message
-    });
-    
-    // eslint-disable-next-line unicorn/prefer-string-replace-all
-    const messageWithoutFollowup = messageWithoutCitations.replace(/<<([^>]+)>>/g, (followup) => {
-      followupQuestions.push(followup);
-      return ''; // Remove the follow-up question from the message
-    });
- */
+
     let processedText = this.processText(message, citations, findCitations);
     const hasNextQuestions = nextQuestionsIndex === -1;
     const nextRegex = hasNextQuestions ? findFollowupQuestions : findNextQuestions;
