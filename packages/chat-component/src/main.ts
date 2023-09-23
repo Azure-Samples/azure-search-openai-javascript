@@ -253,7 +253,6 @@ export class ChatComponent extends LitElement {
     .items__list.followup {
       display: flex;
       flex-direction: column;
-      border-top: 1px solid var(--accent-dark);
       padding: 20px;
     }
     .items__listItem--followup {
@@ -277,7 +276,6 @@ export class ChatComponent extends LitElement {
     }
     .followup .items__link {
       color: var(--dark-gray);
-      font-weight: bold;
       display: block;
       padding: 5px 0;
       border-bottom: 1px solid var(--light-gray);
