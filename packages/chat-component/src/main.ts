@@ -26,18 +26,26 @@ declare interface ChatMessage {
 
 @customElement('chat-component')
 export class ChatComponent extends LitElement {
-  @property({ type: String }) currentQuestion = '';
-  @query('#question-input') questionInput!: HTMLInputElement;
+  @property({ type: String })
+  currentQuestion = '';
+  @query('#question-input')
+  questionInput!: HTMLInputElement;
   // Default prompts to display in the chat
-  @property({ type: Boolean }) isDisabled = false;
-  @property({ type: Boolean }) isChatStarted = false;
-  @property({ type: Boolean }) isResetInput = false;
+  @property({ type: Boolean })
+  isDisabled = false;
+  @property({ type: Boolean })
+  isChatStarted = false;
+  @property({ type: Boolean })
+  isResetInput = false;
   // The program is awaiting response from API
-  @property({ type: Boolean }) isAwaitingResponse = false;
+  @property({ type: Boolean })
+  isAwaitingResponse = false;
   // Show error message to the end-user, if API call fails
-  @property({ type: Boolean }) hasAPIError = false;
+  @property({ type: Boolean })
+  hasAPIError = false;
   // Has the response been copied to the clipboard
-  @property({ type: Boolean }) isResponseCopied = false;
+  @property({ type: Boolean })
+  isResponseCopied = false;
   // These are the chat bubbles that will be displayed in the chat
   chatMessages: ChatMessage[] = [];
   hasDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
@@ -46,7 +54,7 @@ export class ChatComponent extends LitElement {
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   chatInputLabelText: string = globalConfig.CHAT_INPUT_LABEL_TEXT;
 
-  static override styles = css`
+  static styles = css`
     :host {
       display: block;
       padding: 16px;
@@ -62,8 +70,6 @@ export class ChatComponent extends LitElement {
       --accent-lighter: rgba(140, 222, 242, 0.4);
       --error-color: #8a0000;
     }
-
-    // reset all agent styles
     ul {
       margin-block-start: 0;
       margin-block-end: 0;
@@ -338,7 +344,7 @@ export class ChatComponent extends LitElement {
   `;
 
   // Send the question to the Open AI API and render the answer in the chat
-  async sendQuestionToAPI(question: string) {
+  async sendQuestionToAPI(question: string): Promise<void> {
     // Simulate an API call (replace with actual API endpoint)
     if (this.currentQuestion.trim() === '') {
       return;
@@ -402,7 +408,7 @@ export class ChatComponent extends LitElement {
   }
 
   // Add a message to the chat, when the user or the API sends a message
-  addMessage(message: string, isUserMessage: boolean) {
+  addMessage(message: string, isUserMessage: boolean): void {
     const citations: string[] = [];
     const followupQuestions: string[] = [];
     const findCitations = /\[(.*?)]/g;
@@ -447,14 +453,14 @@ export class ChatComponent extends LitElement {
   }
 
   // Handle the click on a default prompt
-  handleDefaultQuestionClick(question: string, event?: Event) {
+  handleDefaultQuestionClick(question: string, event?: Event): void {
     event?.preventDefault();
     this.questionInput.value = question;
     this.currentQuestion = question;
   }
 
   // Handle the click on the chat button and send the question to the API
-  handleUserQuestionSubmit(event: Event) {
+  handleUserQuestionSubmit(event: Event): void {
     event.preventDefault();
     const userQuestion = this.questionInput.value;
     if (userQuestion) {
@@ -466,7 +472,7 @@ export class ChatComponent extends LitElement {
   }
 
   // Get the current timestamp to display with the chat message
-  getTimestamp() {
+  getTimestamp(): string {
     return new Date().toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: 'numeric',
@@ -475,7 +481,7 @@ export class ChatComponent extends LitElement {
   }
 
   // Reset the input field and the current question
-  resetInputField(event: Event) {
+  resetInputField(event: Event): void {
     event.preventDefault();
     this.questionInput.value = '';
     this.currentQuestion = '';
@@ -483,7 +489,7 @@ export class ChatComponent extends LitElement {
   }
 
   // Reset the chat and show the default prompts
-  resetCurrentChat() {
+  resetCurrentChat(): void {
     this.isChatStarted = false;
     this.chatMessages = [];
     this.isDisabled = false;
@@ -492,25 +498,25 @@ export class ChatComponent extends LitElement {
   }
 
   // Show the default prompts when enabled
-  showDefaultPrompts() {
+  showDefaultPrompts(): void {
     if (!this.hasDefaultPromptsEnabled) {
       this.resetCurrentChat();
     }
   }
 
   // Handle the change event on the input field
-  handleOnInputChange() {
+  handleOnInputChange(): void {
     this.isResetInput = !!this.questionInput.value;
   }
 
   // Handle API error
-  handleAPIError() {
+  handleAPIError(): void {
     this.hasAPIError = true;
     this.isDisabled = false;
   }
 
   // Copy response to clipboard
-  copyResponseToClipboard() {
+  copyResponseToClipboard(): void {
     const response = this.chatMessages[this.chatMessages.length - 1].text;
     navigator.clipboard.writeText(response);
     this.isResponseCopied = true;
