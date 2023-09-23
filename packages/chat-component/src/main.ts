@@ -1,6 +1,7 @@
 /* eslint-disable unicorn/template-indent */
 import { LitElement, html, css, customElement, query, property } from 'lit-element';
 import { globalConfig } from './config/global-config.js';
+import { processText, cleanUpFollowUp } from './utils/index.ts';
 
 // For simplicity, we declare a simple interface for the chat messages
 // in the same file. You may want to move this to a separate file, or
@@ -408,44 +409,40 @@ export class ChatComponent extends LitElement {
   addMessage(message: string, isUserMessage: boolean): void {
     const citations: string[] = [];
     const followupQuestions: string[] = [];
-    const findCitations = /\[(.*?)]/g;
-    const findFollowupQuestions = /<<([^>]+)>>/g;
-    const findNextQuestions = /\d+\.\s+\D+/g;
-    // Move separator to global config, since it can change
-    const nextQuestionsIndex = message.indexOf('Next Questions');
-
-    let processedText = this.processText(message, citations, findCitations);
-    const hasNextQuestions = nextQuestionsIndex === -1;
-    const nextRegex = hasNextQuestions ? findFollowupQuestions : findNextQuestions;
-    if (hasNextQuestions) {
-      const subText = processedText.slice(0, Math.max(0, nextQuestionsIndex));
-      const questions = subText.match(findNextQuestions);
-      questions?.map((question) => {
-        const cleanedQuestion = question.replace(/\d+\.\s+/, '').trim();
-        return followupQuestions.push(cleanedQuestion);
-      });
+    if (!isUserMessage) {
+      const findCitations = /\[(.*?)]/g;
+      const findFollowupQuestions = /<<([^>]+)>>/g;
+      const findNextQuestions = /\d+\.\s+\D+/g;
+      // Move separator to global config, since it can change
+      const nextQuestionsIndex = message.indexOf('Next Questions');
+      // Find citations
+      message = processText(message, citations, findCitations);
+      const hasNextQuestions = nextQuestionsIndex === -1;
+      const nextRegex = hasNextQuestions ? findFollowupQuestions : findNextQuestions;
+      if (hasNextQuestions) {
+        const subText = message.slice(0, Math.max(0, nextQuestionsIndex));
+        const questions = subText.match(findNextQuestions);
+        questions?.map((question) => {
+          const cleanedQuestion = question.replace(/\d+\.\s+/, '').trim();
+          return followupQuestions.push(cleanedQuestion);
+        });
+      }
+      // Clean up from << and >>
+      cleanUpFollowUp(followupQuestions);
+      message = processText(message, followupQuestions, nextRegex);
     }
-    processedText = this.processText(processedText, followupQuestions, nextRegex);
 
     const timestamp = this.getTimestamp();
     this.chatMessages = [
       ...this.chatMessages,
       {
-        text: processedText,
+        text: message,
         timestamp: timestamp,
         isUserMessage,
         citations,
         followupQuestions,
       },
     ];
-  }
-
-  processText(text: string, list: string[], regex: RegExp): string {
-    text.replace(regex, (match) => {
-      list.push(match);
-      return ''; // Return text without either citation or follow-up question
-    });
-    return text;
   }
 
   // Handle the click on a default prompt

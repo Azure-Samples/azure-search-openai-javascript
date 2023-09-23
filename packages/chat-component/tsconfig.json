@@ -21,6 +21,8 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
+    "allowImportingTsExtensions": true,
+    "emitDeclarationOnly": true,
     "plugins": [
       {
         "name": "ts-lit-plugin",
@@ -28,6 +30,6 @@
       }
     ]
   },
-  "include": ["src"],
+  "include": ["**/*.ts"],
   "exclude": []
 }
