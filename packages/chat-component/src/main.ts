@@ -1,6 +1,5 @@
 /* eslint-disable unicorn/template-indent */
-import { LitElement, html, css } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { LitElement, html, css, customElement, query, property } from 'lit-element';
 import { globalConfig } from './config/global-config.js';
 
 // For simplicity, we declare a simple interface for the chat messages
@@ -439,7 +438,6 @@ export class ChatComponent extends LitElement {
         followupQuestions,
       },
     ];
-    this.requestUpdate();
   }
 
   processText(text: string, list: string[], regex: RegExp): string {
