@@ -6,7 +6,7 @@ import type { Citation, ProcessTextReturn } from '../types';
 
 // Let's give the response a type so we can use it in the component
 
-export function processText(inputText: string, arrays: any[][]): ProcessTextReturn {
+export function processText(inputText: string, arrays: string[][] | Citation[][]): ProcessTextReturn {
   // Keeping all the regex at this level so they can be easily changed or removed
   const nextQuestionIndicator = NEXT_QUESTION_INDICATOR;
   const findCitations = /\[(.*?)]/g;
@@ -16,7 +16,7 @@ export function processText(inputText: string, arrays: any[][]): ProcessTextRetu
   const findNumberedItems = /\d+\.\s+/;
 
   // Find and process citations
-  const citation: any = {};
+  const citation: NonNullable<unknown> = {};
   let citations: Citation[] = [];
   let referenceCounter = 1;
   // eslint-disable-next-line unicorn/prefer-string-replace-all
