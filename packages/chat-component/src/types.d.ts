@@ -1,6 +1,5 @@
-// For simplicity, we declare a simple interface for the chat messages
-// in the same file. You may want to move this to a separate file, or
-// together with existing interfaces in your app.
+// We declare a simple interface for the chat messages
+// and the citations
 export declare interface ChatMessage {
   text: string;
   isUserMessage: boolean;
