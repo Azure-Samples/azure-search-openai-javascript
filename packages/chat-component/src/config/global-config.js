@@ -27,4 +27,7 @@ export const globalConfig = {
   API_CHAT_URL: 'http://localhost:3000/chat',
   // API ERROR HANDLING IN UI
   API_ERROR_MESSAGE: 'Sorry, we are having some problems. Please try again later.',
+  // Config pertaining the response format
 };
+
+export const NEXT_QUESTION_INDICATOR = 'Next Questions';

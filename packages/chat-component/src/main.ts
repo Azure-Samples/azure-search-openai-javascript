@@ -1,7 +1,8 @@
 /* eslint-disable unicorn/template-indent */
-import { LitElement, html, css, customElement, query, property } from 'lit-element';
+import { LitElement, html, css } from 'lit';
+import { customElement, query, property } from 'lit/decorators.js';
 import { globalConfig } from './config/global-config.js';
-import { processText, cleanUpFollowUp } from './utils/index.ts';
+import { processText } from './utils/index.ts';
 
 // For simplicity, we declare a simple interface for the chat messages
 // in the same file. You may want to move this to a separate file, or
@@ -11,6 +12,7 @@ declare interface ChatMessage {
   isUserMessage: boolean;
   timestamp: string;
   citations: string[];
+  followingSteps: string[];
   followupQuestions: string[];
 }
 /**
@@ -255,6 +257,9 @@ export class ChatComponent extends LitElement {
       flex-direction: column;
       padding: 20px;
     }
+    .items__list.steps {
+      display: block;
+    }
     .items__listItem--followup {
       cursor: pointer;
       color: var(--dark-gray);
@@ -273,6 +278,11 @@ export class ChatComponent extends LitElement {
     .items__link {
       text-decoration: none;
       color: var(--text-color);
+    }
+    .steps .items__listItem--step {
+      display: block;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--light-gray);
     }
     .followup .items__link {
       color: var(--dark-gray);
@@ -408,39 +418,29 @@ export class ChatComponent extends LitElement {
   // Add a message to the chat, when the user or the API sends a message
   addMessage(message: string, isUserMessage: boolean): void {
     const citations: string[] = [];
+    const followingSteps: string[] = [];
     const followupQuestions: string[] = [];
+    // Check if message is a bot message to process citations and follow-up questions
     if (!isUserMessage) {
-      const findCitations = /\[(.*?)]/g;
-      const findFollowupQuestions = /<<([^>]+)>>/g;
-      const findNextQuestions = /\d+\.\s+\D+/g;
-      // Move separator to global config, since it can change
-      const nextQuestionsIndex = message.indexOf('Next Questions');
-      // Find citations
-      message = processText(message, citations, findCitations);
-      const hasNextQuestions = nextQuestionsIndex === -1;
-      const nextRegex = hasNextQuestions ? findFollowupQuestions : findNextQuestions;
-      if (hasNextQuestions) {
-        const subText = message.slice(0, Math.max(0, nextQuestionsIndex));
-        const questions = subText.match(findNextQuestions);
-        questions?.map((question) => {
-          const cleanedQuestion = question.replace(/\d+\.\s+/, '').trim();
-          return followupQuestions.push(cleanedQuestion);
-        });
-      }
-      // Clean up from << and >>
-      cleanUpFollowUp(followupQuestions);
-      message = processText(message, followupQuestions, nextRegex);
+      const processedText = processText(message, [citations, followingSteps, followupQuestions]);
+      message = processedText.replacedText;
+      // Push all lists coming from processText to the corresponding arrays
+      citations.push(...processedText.arrays[0]);
+      followingSteps.push(...processedText.arrays[1]);
+      followupQuestions.push(...processedText.arrays[2]);
     }
-
+    // Get the timestamp for the message
     const timestamp = this.getTimestamp();
+    // Add the message to the chat messages array
     this.chatMessages = [
       ...this.chatMessages,
       {
         text: message,
         timestamp: timestamp,
         isUserMessage,
-        citations,
+        citations: [...new Set(citations)],
         followupQuestions,
+        followingSteps,
       },
     ];
   }
@@ -560,6 +560,15 @@ export class ChatComponent extends LitElement {
                     <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
                       <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
                         <p>${message.text}</p>
+                        ${message.followingSteps.length > 0
+                          ? html`
+                              <ul class="items__list steps">
+                                ${message.followingSteps.map(
+                                  (followingStep) => html` <li class="items__listItem--step">${followingStep}</li> `,
+                                )}
+                              </ul>
+                            `
+                          : ''}
                         ${message.citations.length > 0
                           ? html`
                               <h3 class="subheadline--small">Citations</h3>
