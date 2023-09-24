@@ -14,7 +14,7 @@ export function processText(inputText: string, arrays: any[][]): ProcessTextRetu
   // Keeping all the regex at this level so they can be easily changed or removed
   const nextQuestionIndicator = NEXT_QUESTION_INDICATOR;
   const findCitations = /\[(.*?)]/g;
-  const findFollowingSteps = /steps:(.*?)Next Questions:/s;
+  const findFollowingSteps = `/steps:(.*?)Next Questions:/s`;
   const findNextQuestions = /Next Questions:(.*?)$/s;
   const findQuestionsbyDoubleArrow = /<<([^<>]+)>>/g;
   const findNumberedItems = /\d+\.\s+/;
@@ -25,7 +25,6 @@ export function processText(inputText: string, arrays: any[][]): ProcessTextRetu
   let referenceCounter = 1;
   // eslint-disable-next-line unicorn/prefer-string-replace-all
   let replacedText = inputText.replace(findCitations, (match, capture) => {
-    console.log(match, capture, 'match, capture');
     const citationText = capture.trim();
     if (!citation[citationText]) {
       citation[citationText] = referenceCounter++;
