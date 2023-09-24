@@ -2,14 +2,15 @@
 // We keep it in this util file because we may not need it once we introduce
 // a new response format with TypeChat or a similar component
 import { NEXT_QUESTION_INDICATOR } from '../config/global-config.js';
+import type { Citation } from '../types';
 
 // Let's give the response a type so we can use it in the component
 declare interface ProcessTextReturn {
   replacedText: string;
-  arrays: string[][];
+  arrays: any[][];
 }
 
-export function processText(inputText: string, arrays: string[][]): ProcessTextReturn {
+export function processText(inputText: string, arrays: any[][]): ProcessTextReturn {
   // Keeping all the regex at this level so they can be easily changed or removed
   const nextQuestionIndicator = NEXT_QUESTION_INDICATOR;
   const findCitations = /\[(.*?)]/g;
@@ -17,14 +18,27 @@ export function processText(inputText: string, arrays: string[][]): ProcessTextR
   const findNextQuestions = /Next Questions:(.*?)$/s;
   const findQuestionsbyDoubleArrow = /<<([^<>]+)>>/g;
   const findNumberedItems = /\d+\.\s+/;
-  // eslint-disable-next-line unicorn/prefer-string-replace-all
-  let replacedText = inputText.replace(findCitations, (_, citation) => {
-    arrays[0].push(citation);
-    const index = arrays[1].length;
-    return `<span class="super">${index}</span>`;
-  });
-  // Find and store 'follow this steps' portion of the response
 
+  // Find and process citations
+  const citation: any = {};
+  let citations: Citation[] = [];
+  let referenceCounter = 1;
+  // eslint-disable-next-line unicorn/prefer-string-replace-all
+  let replacedText = inputText.replace(findCitations, (match, capture) => {
+    console.log(match, capture, 'match, capture');
+    const citationText = capture.trim();
+    if (!citation[citationText]) {
+      citation[citationText] = referenceCounter++;
+    }
+    return `[${citation[citationText]}]`;
+  });
+  citations = Object.keys(citation).map((text, index) => ({
+    ref: index + 1,
+    text,
+  }));
+  arrays[0] = citations;
+
+  // Find and store 'follow this steps' portion of the response
   const followingStepsMatch = replacedText.match(findFollowingSteps);
   const followingStepsText = followingStepsMatch ? followingStepsMatch[1].trim() : '';
   const followingSteps = followingStepsText.split('\n').filter(Boolean);

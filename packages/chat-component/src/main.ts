@@ -3,18 +3,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, query, property } from 'lit/decorators.js';
 import { globalConfig } from './config/global-config.js';
 import { processText } from './utils/index.ts';
-
-// For simplicity, we declare a simple interface for the chat messages
-// in the same file. You may want to move this to a separate file, or
-// together with existing interfaces in your app.
-declare interface ChatMessage {
-  text: string;
-  isUserMessage: boolean;
-  timestamp: string;
-  citations: string[];
-  followingSteps: string[];
-  followupQuestions: string[];
-}
+import type { ChatMessage, Citation } from './types';
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
@@ -417,7 +406,7 @@ export class ChatComponent extends LitElement {
 
   // Add a message to the chat, when the user or the API sends a message
   addMessage(message: string, isUserMessage: boolean): void {
-    const citations: string[] = [];
+    const citations: Citation[] = [];
     const followingSteps: string[] = [];
     const followupQuestions: string[] = [];
     // Check if message is a bot message to process citations and follow-up questions
@@ -578,10 +567,10 @@ export class ChatComponent extends LitElement {
                                     <li class="items__listItem--citation">
                                       <a
                                         class="items__link"
-                                        href="${citation}"
+                                        href="${citation.text}"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        >${citation}</a
+                                        >${citation.ref}. ${citation.text}</a
                                       >
                                     </li>
                                   `,
