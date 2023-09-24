@@ -2,13 +2,9 @@
 // We keep it in this util file because we may not need it once we introduce
 // a new response format with TypeChat or a similar component
 import { NEXT_QUESTION_INDICATOR } from '../config/global-config.js';
-import type { Citation } from '../types';
+import type { Citation, ProcessTextReturn } from '../types';
 
 // Let's give the response a type so we can use it in the component
-declare interface ProcessTextReturn {
-  replacedText: string;
-  arrays: any[][];
-}
 
 export function processText(inputText: string, arrays: any[][]): ProcessTextReturn {
   // Keeping all the regex at this level so they can be easily changed or removed

@@ -13,3 +13,8 @@ export declare interface Citation {
   ref: number;
   text: string;
 }
+
+declare interface ProcessTextReturn {
+  replacedText: string;
+  arrays: any[][];
+}
