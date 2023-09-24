@@ -61,6 +61,21 @@ export class ChatComponent extends LitElement {
       --accent-lighter: rgba(140, 222, 242, 0.4);
       --error-color: #8a0000;
     }
+    :host(.dark) {
+      display: block;
+      padding: 16px;
+      --secondary-color: #1f2e32;
+      --text-color: #ffffff;
+      --primary-color: rgba(241, 255, 165, 0.6);
+      --white: #000000;
+      --light-gray: #e3e3e3;
+      --dark-gray: #4e5288;
+      --accent-high: #005164;
+      --accent-dark: #b4e2ee;
+      --accent-light: #e6fbf7;
+      --accent-lighter: rgba(140, 222, 242, 0.4);
+      --error-color: #8a0000;
+    }
     ul {
       margin-block-start: 0;
       margin-block-end: 0;
@@ -186,6 +201,8 @@ export class ChatComponent extends LitElement {
     }
     .chatbox__input {
       border: 1px solid var(--accent-high);
+      background: var(--white);
+      color: var(--text-color);
       border-radius: 4px;
       padding: 8px;
       flex: 1 1 auto;
