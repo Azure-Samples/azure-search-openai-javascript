@@ -12,7 +12,7 @@
       <h1>Welcome to this Azure OpenAI JavaScript Chat Sample</h1>
       <!-- When using this sample chat app as part of an existing app, you only need the section below -->
       <section class="chat__container">
-        <chat-component class="dark"></chat-component>
+        <chat-component></chat-component>
       </section>
     </main>
     <style>
@@ -20,8 +20,8 @@
       html,
       body {
         font-family: 'Roboto', sans-serif;
-        background-color: black;
-        color: white;
+        background-color: var(--secondary-color);
+        color: var(--text-color);
       }
       .chat__main {
         display: flex;
