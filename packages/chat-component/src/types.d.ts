@@ -4,9 +4,9 @@ export declare interface ChatMessage {
   text: string;
   isUserMessage: boolean;
   timestamp: string;
-  citations: Citation[];
-  followingSteps: string[];
-  followupQuestions: string[];
+  citations?: Citation[];
+  followingSteps?: string[];
+  followupQuestions?: string[];
 }
 
 export declare interface Citation {
@@ -16,5 +16,5 @@ export declare interface Citation {
 
 declare interface ProcessTextReturn {
   replacedText: string;
-  arrays: any[][];
+  arrays: string[] | Citation[];
 }
