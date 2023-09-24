@@ -431,7 +431,6 @@ export class ChatComponent extends LitElement {
       const processedText = processText(message, [citations, followingSteps, followupQuestions]);
       message = processedText.replacedText;
       // Push all lists coming from processText to the corresponding arrays
-      console.log(processedText.arrays, '#####ARRAYS#####');
       citations.push(...processedText.arrays[0]);
       followingSteps.push(...processedText.arrays[1]);
       followupQuestions.push(...processedText.arrays[2]);

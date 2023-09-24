@@ -14,7 +14,7 @@ export function processText(inputText: string, arrays: any[][]): ProcessTextRetu
   // Keeping all the regex at this level so they can be easily changed or removed
   const nextQuestionIndicator = NEXT_QUESTION_INDICATOR;
   const findCitations = /\[(.*?)]/g;
-  const findFollowingSteps = [`/steps:(.*?)Next Questions:/s`, `/steps:(.*?)<</s`];
+  const findFollowingSteps = /steps:(.*?)(?:Next Questions:|<<|$)/s;
   const findNextQuestions = /Next Questions:(.*?)$/s;
   const findQuestionsbyDoubleArrow = /<<([^<>]+)>>/g;
   const findNumberedItems = /\d+\.\s+/;
@@ -41,11 +41,10 @@ export function processText(inputText: string, arrays: any[][]): ProcessTextRetu
   // and sometimes it includes a Next Questions prefix, we need  do some extra work
   const nextQuestionsIndex = replacedText.indexOf(nextQuestionIndicator);
   const hasNextQuestions = nextQuestionsIndex !== -1;
-  const followingStepsPatterns = hasNextQuestions ? findFollowingSteps[0] : findFollowingSteps[1];
   // Find and store 'follow this steps' portion of the response
   // considering the fact that sometimes the 'next questions' indicator is present
   // and sometimes it's not
-  const followingStepsMatch = replacedText.match(followingStepsPatterns);
+  const followingStepsMatch = replacedText.match(findFollowingSteps);
   const followingStepsText = followingStepsMatch ? followingStepsMatch[1].trim() : '';
   const followingSteps = followingStepsText.split('\n').filter(Boolean);
   arrays[1] = followingSteps;
