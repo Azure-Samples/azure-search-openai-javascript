@@ -30,4 +30,4 @@ export const globalConfig = {
   // Config pertaining the response format
 };
 
-export const NEXT_QUESTION_INDICATOR = 'Next Questions';
+export const NEXT_QUESTION_INDICATOR = 'Next Questions:';
