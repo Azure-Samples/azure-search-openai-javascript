@@ -431,9 +431,9 @@ export class ChatComponent extends LitElement {
       const processedText = processText(message, [citations, followingSteps, followupQuestions]);
       message = processedText.replacedText;
       // Push all lists coming from processText to the corresponding arrays
-      citations.push(...processedText.arrays[0]);
-      followingSteps.push(...processedText.arrays[1]);
-      followupQuestions.push(...processedText.arrays[2]);
+      citations.push(...(processedText.arrays[0] as unknown as Citation[]));
+      followingSteps.push(...(processedText.arrays[1] as string[]));
+      followupQuestions.push(...(processedText.arrays[2] as string[]));
     }
     // Get the timestamp for the message
     const timestamp = this.getTimestamp();
@@ -566,7 +566,7 @@ export class ChatComponent extends LitElement {
                     <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
                       <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
                         <p>${message.text}</p>
-                        ${message.followingSteps.length > 0
+                        ${message.followingSteps && message.followingSteps.length > 0
                           ? html`
                               <ul class="items__list steps">
                                 ${message.followingSteps.map(
@@ -575,7 +575,7 @@ export class ChatComponent extends LitElement {
                               </ul>
                             `
                           : ''}
-                        ${message.citations.length > 0
+                        ${message.citations && message.citations.length > 0
                           ? html`
                               <h3 class="subheadline--small">Citations</h3>
                               <ul class="items__list">
@@ -595,7 +595,7 @@ export class ChatComponent extends LitElement {
                               </ul>
                             `
                           : ''}
-                        ${message.followupQuestions.length > 0
+                        ${message.followupQuestions && message.followupQuestions.length > 0
                           ? html`
                               <h3 class="subheadline--small">You may also want to ask...</h3>
                               <ul class="items__list followup">
