@@ -159,7 +159,8 @@ You can also use existing Form Recognizer and Storage Accounts. See `./infra/mai
 
 #### Provision remaining resources
 
-> NOTE: You can also use existing Search and Storage Accounts. See `./infra/main.parameters.json` for list of environment variables to pass to `azd env set` to configure those existing resources.
+Now you can run `azd up`, following the steps in [Deploying from scratch](#deploying-from-scratch) above.
+That will both provision resources and deploy the code.
 
 ### Deploying again
 
