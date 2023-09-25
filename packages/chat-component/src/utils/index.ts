@@ -6,7 +6,10 @@ import type { Citation, ProcessTextReturn } from '../types';
 
 // Let's give the response a type so we can use it in the component
 
-export function processText(inputText: string, arrays: string[][] | Citation[][]): ProcessTextReturn {
+export function processText(
+  inputText: string,
+  arrays: Array<Array<string>> | Array<Array<Citation>>,
+): ProcessTextReturn {
   // Keeping all the regex at this level so they can be easily changed or removed
   const nextQuestionIndicator = NEXT_QUESTION_INDICATOR;
   const findCitations = /\[(.*?)]/g;
