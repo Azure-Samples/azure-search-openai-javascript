@@ -16,5 +16,5 @@ export declare interface Citation {
 
 declare interface ProcessTextReturn {
   replacedText: string;
-  arrays: Array<string> | Array<Citation>;
+  arrays: Array<Array<string> | Array<Citation>>;
 }
