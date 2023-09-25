@@ -45,7 +45,7 @@ export class ChatComponent extends LitElement {
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   chatInputLabelText: string = globalConfig.CHAT_INPUT_LABEL_TEXT;
 
-  static styles = css`
+  static override styles = css`
     :host {
       display: block;
       padding: 16px;
