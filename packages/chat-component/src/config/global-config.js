@@ -1,4 +1,4 @@
-export const globalConfig = {
+const globalConfig = {
   // Is default prompts enabled?
   IS_DEFAULT_PROMPTS_ENABLED: true,
   // Default prompts to display in the chat
@@ -24,10 +24,24 @@ export const globalConfig = {
   COPIED_SUCCESSFULLY_MESSAGE: 'Response copied!',
   LOADING_INDICATOR_TEXT: 'Please wait. We are searching for an answer...',
   // API URL for development purposes
-  API_CHAT_URL: 'http://localhost:3000/chat',
+  API_URL: 'http://localhost:3000/',
   // API ERROR HANDLING IN UI
   API_ERROR_MESSAGE: 'Sorry, we are having some problems. Please try again later.',
   // Config pertaining the response format
 };
 
-export const NEXT_QUESTION_INDICATOR = 'Next Questions:';
+const NEXT_QUESTION_INDICATOR = 'Next Questions:';
+
+const requestOptions = {
+  method: 'POST',
+  approach: ['rrr', 'rrr'],
+  stream: true,
+  overrides: {
+    retrieval_mode: 'hybrid',
+    semantic_ranker: true,
+    semantic_captions: false,
+    suggest_followup_questions: true,
+  },
+};
+
+export { globalConfig, requestOptions, NEXT_QUESTION_INDICATOR };

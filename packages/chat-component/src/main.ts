@@ -1,9 +1,10 @@
 /* eslint-disable unicorn/template-indent */
 import { LitElement, html, css } from 'lit';
 import { customElement, query, property } from 'lit/decorators.js';
-import { globalConfig } from './config/global-config.js';
+import { globalConfig, requestOptions } from './config/global-config.js';
 import { processText } from './utils/index.ts';
-import type { ChatMessage, Citation } from './types';
+import { EventSourceParserStream } from 'eventsource-parser/stream';
+import type { ChatMessage, Citation, RequestOptions } from './types';
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
@@ -17,6 +18,7 @@ import type { ChatMessage, Citation } from './types';
 
 @customElement('chat-component')
 export class ChatComponent extends LitElement {
+  [x: string]: any;
   @property({ type: String })
   currentQuestion = '';
   @query('#question-input')
@@ -44,6 +46,8 @@ export class ChatComponent extends LitElement {
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   chatInputLabelText: string = globalConfig.CHAT_INPUT_LABEL_TEXT;
+
+  requestOptions: RequestOptions = requestOptions;
 
   static override styles = css`
     :host {
@@ -358,14 +362,13 @@ export class ChatComponent extends LitElement {
   `;
 
   // Send the question to the Open AI API and render the answer in the chat
-  async sendQuestionToAPI(question: string): Promise<void> {
+  async sendQuestionToAPI(question: string, options: RequestOptions, type: string): Promise<void> {
     // Simulate an API call (replace with actual API endpoint)
     if (this.currentQuestion.trim() === '') {
       return;
     }
-
+    const isStreaming = type === 'chat' ? (options.stream = true) : (options.stream = undefined);
     // Empty the current messages to start a new chat
-    // TODO: add a button to start a new chat
     // TODO: add chat history (first locally with local storage, then with a backend database)
     this.chatMessages = [];
     // Add the question to the chat
@@ -378,42 +381,63 @@ export class ChatComponent extends LitElement {
     // Show loading indicator while waiting for the API response
     this.isAwaitingResponse = true;
     try {
-      await fetch(`${globalConfig.API_CHAT_URL}`, {
-        method: 'POST',
+      await fetch(`${globalConfig.API_URL}${type}`, {
+        method: options.method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
+          // must enable history persistence
           history: [
             {
               user: this.currentQuestion,
             },
           ],
-          // TODO: move this to global config when it's actually implemented
-          // as configurable
-          approach: 'rrr',
-          overrides: {
-            retrieval_mode: 'hybrid',
-            semantic_ranker: true,
-            semantic_captions: false,
-            top: 3,
-            suggest_followup_questions: false,
-          },
+          approach: options.approach[0],
+          overrides: options.overrides,
+          stream: isStreaming,
         }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
       })
         .then((response) => {
-          if (!response.ok) {
+          if (response.status > 299 || !response.ok) {
             this.handleAPIError();
-            throw new Error(response.statusText);
+            throw new Error(response.statusText) || 'API Response Error';
           }
           const data = response.json();
           return data;
         })
         .then((data) => {
-          // Add the response to the chat messages
-          this.addMessage(data.answer, false);
-          this.isDisabled = false;
-          this.isAwaitingResponse = false;
+          if (!isStreaming) {
+            this.addMessage(data.answer, false);
+            this.isDisabled = false;
+            this.isAwaitingResponse = false;
+          }
+          return data;
+        })
+        .then(async function* (this: ChatComponent, data) {
+          // Add the response to the chat
+          // eslint-disable-next-line unicorn/no-negated-condition
+          const reader = data.body
+            ?.pipeThrough(new TextDecoderStream())
+            .pipeThrough(new EventSourceParserStream())
+            .getReader();
+
+          if (!reader) {
+            throw new Error('No response body or body is not readable');
+          }
+
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done || value?.data === 'Stream closed') {
+              break;
+            }
+            if (value?.data) {
+              yield JSON.parse(value.data);
+            }
+            this.addMessage(value?.data, false);
+            this.isDisabled = false;
+            this.isAwaitingResponse = false;
+          }
         });
       // Enable the input field and submit button again
     } catch (error) {
@@ -452,19 +476,20 @@ export class ChatComponent extends LitElement {
   }
 
   // Handle the click on a default prompt
-  handleDefaultQuestionClick(question: string, event?: Event): void {
+  handleDefaultPromptClick(question: string, event?: Event): void {
     event?.preventDefault();
     this.questionInput.value = question;
     this.currentQuestion = question;
   }
 
   // Handle the click on the chat button and send the question to the API
-  handleUserQuestionSubmit(event: Event): void {
+  handleUserChatSubmit(event: Event): void {
     event.preventDefault();
+    const type = 'chat';
     const userQuestion = this.questionInput.value;
     if (userQuestion) {
       this.currentQuestion = userQuestion;
-      this.sendQuestionToAPI(userQuestion);
+      this.sendQuestionToAPI(userQuestion, this.requestOptions, type);
       this.questionInput.value = '';
       this.isResetInput = false;
     }
@@ -606,7 +631,7 @@ export class ChatComponent extends LitElement {
                                         class="items__link"
                                         href="#"
                                         @click="${(event: Event) =>
-                                          this.handleDefaultQuestionClick(followupQuestion, event)}"
+                                          this.handleDefaultPromptClick(followupQuestion, event)}"
                                         >${followupQuestion}</a
                                       >
                                     </li>
@@ -657,7 +682,7 @@ export class ChatComponent extends LitElement {
                             role="button"
                             href="#"
                             class="defaults__button"
-                            @click="${(event: Event) => this.handleDefaultQuestionClick(prompt, event)}"
+                            @click="${(event: Event) => this.handleDefaultPromptClick(prompt, event)}"
                           >
                             ${prompt}
                             <span class="defaults__span">Ask now</span>
@@ -689,7 +714,7 @@ export class ChatComponent extends LitElement {
             />
             <button
               class="chatbox__button"
-              @click="${this.handleUserQuestionSubmit}"
+              @click="${this.handleUserChatSubmit}"
               title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
               ?disabled="${this.isDisabled}"
             >
