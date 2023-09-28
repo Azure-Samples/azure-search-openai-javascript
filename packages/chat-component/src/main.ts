@@ -371,8 +371,7 @@ export class ChatComponent extends LitElement {
     /*     if (this.currentQuestion.trim() === '') {
       return;
     } */
-    this.isStreaming = true;
-    //const isStreaming = type === 'chat' ? (options.stream = true) : (options.stream = undefined);
+    this.isStreaming = type === 'chat' && options.stream;
     // Empty the current messages to start a new chat
     // TODO: add chat history (first locally with local storage, then with a backend database)
     this.chatMessages = [];
@@ -433,7 +432,6 @@ export class ChatComponent extends LitElement {
       if (value?.data) {
         yield JSON.parse(value.data);
       }
-      console.log(value?.data, 'data part from iterable');
     }
   };
 
@@ -449,7 +447,6 @@ export class ChatComponent extends LitElement {
         const chunks = this.getDataChunks<Partial<BotResponse> & { id: string }>(this.apiResponse as Response);
         const userMessage = this.chatMessages;
         for await (const chunk of chunks) {
-          console.log(chunk, 'chunk');
           if (chunk.answer) {
             message = chunk.answer;
             this.chatMessages = [
@@ -465,8 +462,7 @@ export class ChatComponent extends LitElement {
               for await (const chunk of chunks) {
                 const botBubble = this.shadowRoot?.querySelector('.chat__txt:not(.user-message) p');
                 if (botBubble && chunk.answer) {
-                  const currentText = botBubble.innerHTML;
-                  botBubble.innerHTML = currentText + chunk.answer;
+                  botBubble.append(document.createTextNode(chunk.answer));
                 }
               }
             }
@@ -518,15 +514,19 @@ export class ChatComponent extends LitElement {
     const userQuestion = this.questionInput.value;
     if (userQuestion) {
       this.currentQuestion = userQuestion;
-      this.apiResponse = await this.getAPIResponse(userQuestion, this.requestOptions, type);
-      console.log('!!!!!!!api response', this.apiResponse);
-      const response = this.apiResponse as BotResponse;
-      const message: string = response.answer;
-      this.addMessage(message, false);
-      this.isDisabled = false;
-      this.isAwaitingResponse = false;
-      this.questionInput.value = '';
-      this.isResetInput = false;
+      try {
+        this.apiResponse = await this.getAPIResponse(userQuestion, this.requestOptions, type);
+        const response = this.apiResponse as BotResponse;
+        const message: string = response.answer;
+        this.addMessage(message, false);
+        this.isDisabled = false;
+        this.isAwaitingResponse = false;
+        this.questionInput.value = '';
+        this.isResetInput = false;
+        // eslint-disable-next-line unicorn/prefer-optional-catch-binding
+      } catch (error) {
+        this.handleAPIError();
+      }
     }
   }
 

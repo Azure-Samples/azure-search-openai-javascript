@@ -22,7 +22,7 @@ declare interface ProcessTextReturn {
 declare interface RequestOptions {
   method: string;
   approach: string;
-  stream?: boolean;
+  stream: boolean;
   overrides: RequestOverrides;
 }
 
