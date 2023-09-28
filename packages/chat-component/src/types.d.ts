@@ -44,4 +44,5 @@ declare interface BotResponse {
   thoughts: string | null;
   data_points: string[];
   error?: string;
+  done?: boolean;
 }

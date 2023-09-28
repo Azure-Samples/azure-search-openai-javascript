@@ -427,6 +427,7 @@ export class ChatComponent extends LitElement {
     for (;;) {
       const { done, value } = await reader.read();
       if (done || value?.data === 'Stream closed') {
+        yield JSON.parse(`{ "done": true }`);
         break;
       }
       if (value?.data) {
@@ -458,8 +459,10 @@ export class ChatComponent extends LitElement {
               },
             ];
             this.requestUpdate();
-            if (chunk.answer !== '') {
+            console.log(chunk, 'chunk');
+            if (chunk.answer !== '' && chunk.done === false) {
               for await (const chunk of chunks) {
+                console.log(chunk, 'chunk');
                 const botBubble = this.shadowRoot?.querySelector('.chat__txt:not(.user-message) p');
                 if (botBubble && chunk.answer) {
                   botBubble.append(document.createTextNode(chunk.answer));
@@ -516,6 +519,7 @@ export class ChatComponent extends LitElement {
       this.currentQuestion = userQuestion;
       try {
         this.apiResponse = await this.getAPIResponse(userQuestion, this.requestOptions, type);
+        console.log(this.apiResponse, 'apiResponse');
         const response = this.apiResponse as BotResponse;
         const message: string = response.answer;
         this.addMessage(message, false);
