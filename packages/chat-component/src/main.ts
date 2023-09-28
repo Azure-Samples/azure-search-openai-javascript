@@ -4,7 +4,7 @@ import { customElement, query, property } from 'lit/decorators.js';
 import { globalConfig, requestOptions } from './config/global-config.js';
 import { processText } from './utils/index.ts';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
-import type { ChatMessage, Citation, RequestOptions } from './types';
+import type { BotResponse, ChatMessage, Citation, RequestOptions } from './types';
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
@@ -39,6 +39,10 @@ export class ChatComponent extends LitElement {
   // Has the response been copied to the clipboard
   @property({ type: Boolean })
   isResponseCopied = false;
+  @property({ type: Boolean })
+  isStreaming = false;
+  // api response
+  apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
   chatMessages: ChatMessage[] = [];
   hasDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
@@ -362,12 +366,13 @@ export class ChatComponent extends LitElement {
   `;
 
   // Send the question to the Open AI API and render the answer in the chat
-  async sendQuestionToAPI(question: string, options: RequestOptions, type: string): Promise<void> {
+  async getAPIResponse(question: string, options: RequestOptions, type: string): Promise<BotResponse | Response> {
     // Simulate an API call (replace with actual API endpoint)
-    if (this.currentQuestion.trim() === '') {
+    /*     if (this.currentQuestion.trim() === '') {
       return;
-    }
-    const isStreaming = type === 'chat' ? (options.stream = true) : (options.stream = undefined);
+    } */
+    this.isStreaming = true;
+    //const isStreaming = type === 'chat' ? (options.stream = true) : (options.stream = undefined);
     // Empty the current messages to start a new chat
     // TODO: add chat history (first locally with local storage, then with a backend database)
     this.chatMessages = [];
@@ -380,99 +385,123 @@ export class ChatComponent extends LitElement {
     this.isDisabled = true;
     // Show loading indicator while waiting for the API response
     this.isAwaitingResponse = true;
-    try {
-      await fetch(`${globalConfig.API_URL}${type}`, {
-        method: options.method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          // must enable history persistence
-          history: [
-            {
-              user: this.currentQuestion,
-            },
-          ],
-          approach: options.approach[0],
-          overrides: options.overrides,
-          stream: isStreaming,
-        }),
-      })
-        .then((response) => {
-          if (response.status > 299 || !response.ok) {
-            this.handleAPIError();
-            throw new Error(response.statusText) || 'API Response Error';
-          }
-          const data = response.json();
-          return data;
-        })
-        .then((data) => {
-          if (!isStreaming) {
-            this.addMessage(data.answer, false);
-            this.isDisabled = false;
-            this.isAwaitingResponse = false;
-          }
-          return data;
-        })
-        .then(async function* (this: ChatComponent, data) {
-          // Add the response to the chat
-          // eslint-disable-next-line unicorn/no-negated-condition
-          const reader = data.body
-            ?.pipeThrough(new TextDecoderStream())
-            .pipeThrough(new EventSourceParserStream())
-            .getReader();
+    const response = await fetch(`${globalConfig.API_URL}${type}`, {
+      method: options.method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        // must enable history persistence
+        history: [
+          {
+            user: this.currentQuestion,
+          },
+        ],
+        approach: options.approach,
+        overrides: options.overrides,
+        stream: this.isStreaming,
+      }),
+    });
 
-          if (!reader) {
-            throw new Error('No response body or body is not readable');
-          }
-
-          for (;;) {
-            const { done, value } = await reader.read();
-            if (done || value?.data === 'Stream closed') {
-              break;
-            }
-            if (value?.data) {
-              yield JSON.parse(value.data);
-            }
-            this.addMessage(value?.data, false);
-            this.isDisabled = false;
-            this.isAwaitingResponse = false;
-          }
-        });
-      // Enable the input field and submit button again
-    } catch (error) {
-      console.error('API Response Exception. Error:', error);
+    if (this.isStreaming) {
+      return response;
     }
+
+    const parsedResponse: BotResponse = await response.json();
+    if (response.status > 299 || !response.ok) {
+      this.handleAPIError();
+      throw new Error(response.statusText) || 'API Response Error';
+    }
+    return parsedResponse;
   }
 
+  getDataChunks = async function* <T>(response: Response): AsyncGenerator<T, void> {
+    const reader: any = response.body
+      ?.pipeThrough(new TextDecoderStream())
+      .pipeThrough(new EventSourceParserStream())
+      .getReader();
+
+    if (!reader) {
+      throw new Error('No response body or body is not readable');
+    }
+
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done || value?.data === 'Stream closed') {
+        break;
+      }
+      if (value?.data) {
+        yield JSON.parse(value.data);
+      }
+      console.log(value?.data, 'data part from iterable');
+    }
+  };
+
   // Add a message to the chat, when the user or the API sends a message
-  addMessage(message: string, isUserMessage: boolean): void {
+  addMessage(message: string, isUserMessage: boolean) {
     const citations: Citation[] = [];
     const followingSteps: string[] = [];
     const followupQuestions: string[] = [];
-    // Check if message is a bot message to process citations and follow-up questions
-    if (!isUserMessage) {
-      const processedText = processText(message, [citations, followingSteps, followupQuestions]);
-      message = processedText.replacedText;
-      // Push all lists coming from processText to the corresponding arrays
-      citations.push(...(processedText.arrays[0] as unknown as Citation[]));
-      followingSteps.push(...(processedText.arrays[1] as string[]));
-      followupQuestions.push(...(processedText.arrays[2] as string[]));
-    }
     // Get the timestamp for the message
     const timestamp = this.getTimestamp();
-    // Add the message to the chat messages array
-    this.chatMessages = [
-      ...this.chatMessages,
-      {
-        text: message,
-        timestamp: timestamp,
-        isUserMessage,
-        citations: [...new Set(citations)],
-        followupQuestions,
-        followingSteps,
-      },
-    ];
+    const updateChatWithMessageorChunk = async (part: string, isChunk: boolean) => {
+      if (isChunk) {
+        const chunks = this.getDataChunks<Partial<BotResponse> & { id: string }>(this.apiResponse as Response);
+        const userMessage = this.chatMessages;
+        for await (const chunk of chunks) {
+          console.log(chunk, 'chunk');
+          if (chunk.answer) {
+            message = chunk.answer;
+            this.chatMessages = [
+              ...userMessage,
+              {
+                text: message,
+                timestamp: timestamp,
+                isUserMessage,
+              },
+            ];
+            this.requestUpdate();
+            if (chunk.answer !== '') {
+              for await (const chunk of chunks) {
+                const botBubble = this.shadowRoot?.querySelector('.chat__txt:not(.user-message) p');
+                if (botBubble && chunk.answer) {
+                  const currentText = botBubble.innerHTML;
+                  botBubble.innerHTML = currentText + chunk.answer;
+                }
+              }
+            }
+          }
+        }
+      }
+      this.chatMessages = [
+        ...this.chatMessages,
+        {
+          text: part,
+          timestamp: timestamp,
+          isUserMessage,
+          citations: [...new Set(citations)],
+          followupQuestions,
+          followingSteps,
+        },
+      ];
+      this.requestUpdate();
+    };
+    // Check if message is a bot message to process citations and follow-up questions
+    if (isUserMessage) {
+      updateChatWithMessageorChunk(message, false);
+    } else {
+      if (this.isStreaming) {
+        updateChatWithMessageorChunk(message, true);
+      } else {
+        const processedText = processText(message, [citations, followingSteps, followupQuestions]);
+        message = processedText.replacedText;
+        // Push all lists coming from processText to the corresponding arrays
+        citations.push(...(processedText.arrays[0] as unknown as Citation[]));
+        followingSteps.push(...(processedText.arrays[1] as string[]));
+        followupQuestions.push(...(processedText.arrays[2] as string[]));
+        updateChatWithMessageorChunk(message, false);
+      }
+    }
   }
 
   // Handle the click on a default prompt
@@ -483,13 +512,19 @@ export class ChatComponent extends LitElement {
   }
 
   // Handle the click on the chat button and send the question to the API
-  handleUserChatSubmit(event: Event): void {
+  async handleUserChatSubmit(event: Event): Promise<void> {
     event.preventDefault();
     const type = 'chat';
     const userQuestion = this.questionInput.value;
     if (userQuestion) {
       this.currentQuestion = userQuestion;
-      this.sendQuestionToAPI(userQuestion, this.requestOptions, type);
+      this.apiResponse = await this.getAPIResponse(userQuestion, this.requestOptions, type);
+      console.log('!!!!!!!api response', this.apiResponse);
+      const response = this.apiResponse as BotResponse;
+      const message: string = response.answer;
+      this.addMessage(message, false);
+      this.isDisabled = false;
+      this.isAwaitingResponse = false;
       this.questionInput.value = '';
       this.isResetInput = false;
     }

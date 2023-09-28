@@ -21,7 +21,7 @@ declare interface ProcessTextReturn {
 
 declare interface RequestOptions {
   method: string;
-  approach: string[];
+  approach: string;
   stream?: boolean;
   overrides: RequestOverrides;
 }
@@ -37,4 +37,11 @@ declare interface RequestOverrides {
   prompt_template_prefix?: string;
   prompt_template_suffix?: string;
   exclude_category?: string[];
+}
+
+declare interface BotResponse {
+  answer: string;
+  thoughts: string | null;
+  data_points: string[];
+  error?: string;
 }
