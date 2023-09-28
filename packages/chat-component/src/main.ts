@@ -427,51 +427,80 @@ export class ChatComponent extends LitElement {
     for (;;) {
       const { done, value } = await reader.read();
       if (done || value?.data === 'Stream closed') {
-        yield JSON.parse(`{ "done": true }`);
         break;
       }
       if (value?.data) {
-        yield JSON.parse(value.data);
+        yield new Promise<T>((resolve /*, reject*/) => {
+          setTimeout(() => resolve(JSON.parse(value.data)), globalConfig.BOT_TYPING_EFFECT_INTERVAL);
+        });
       }
     }
   };
 
+  // TODO: refactor this function to support streaming
+  processStreamedResponse(chunk: string, { citations, followingSteps, followupQuestions }) {
+    const processedText = processText(chunk, [citations, followingSteps, followupQuestions]);
+    chunk = processedText.replacedText;
+    // Push all lists coming from processText to the corresponding arrays
+    citations.push(...(processedText.arrays[0] as unknown as Citation[]));
+    followingSteps.push(...(processedText.arrays[1] as string[]));
+    followupQuestions.push(...(processedText.arrays[2] as string[]));
+
+    return {
+      chunk,
+      citations,
+      followingSteps,
+      followupQuestions,
+    };
+  }
+
+  async appendTextMessage({ timestamp, isUserMessage }) {
+    const chunks = this.getDataChunks<Partial<BotResponse> & { id: string }>(this.apiResponse as Response);
+    const userMessage = this.chatMessages;
+
+    // add a new empty message to the chat so that the bot can start typing
+    this.chatMessages = [
+      ...userMessage,
+      {
+        text: '',
+        timestamp: timestamp,
+        isUserMessage,
+      },
+    ];
+
+    const currentMessage: string[] = [];
+
+    for await (const chunk of chunks) {
+      if (chunk.answer) {
+        currentMessage.push(chunk.answer);
+
+        // TODO: process the current accumulated text if we detect a closing ] in the chunk
+        // if (chunk.answer.includes(']')) { }
+
+        this.chatMessages[this.chatMessages.length - 1].text += chunk.answer;
+        this.requestUpdate('chatMessages');
+      }
+    }
+
+    return true;
+  }
+
   // Add a message to the chat, when the user or the API sends a message
-  addMessage(message: string, isUserMessage: boolean) {
+  async addMessage(message: string, isUserMessage: boolean) {
     const citations: Citation[] = [];
     const followingSteps: string[] = [];
     const followupQuestions: string[] = [];
     // Get the timestamp for the message
     const timestamp = this.getTimestamp();
-    const updateChatWithMessageorChunk = async (part: string, isChunk: boolean) => {
+    const updateChatWithMessageOrChunk = async (part: string, isChunk: boolean) => {
       if (isChunk) {
-        const chunks = this.getDataChunks<Partial<BotResponse> & { id: string }>(this.apiResponse as Response);
-        const userMessage = this.chatMessages;
-        for await (const chunk of chunks) {
-          if (chunk.answer) {
-            message = chunk.answer;
-            this.chatMessages = [
-              ...userMessage,
-              {
-                text: message,
-                timestamp: timestamp,
-                isUserMessage,
-              },
-            ];
-            this.requestUpdate();
-            console.log(chunk, 'chunk');
-            if (chunk.answer !== '' && chunk.done === false) {
-              for await (const chunk of chunks) {
-                console.log(chunk, 'chunk');
-                const botBubble = this.shadowRoot?.querySelector('.chat__txt:not(.user-message) p');
-                if (botBubble && chunk.answer) {
-                  botBubble.append(document.createTextNode(chunk.answer));
-                }
-              }
-            }
-          }
-        }
+        await this.appendTextMessage({
+          timestamp,
+          isUserMessage,
+        });
+        return true;
       }
+
       this.chatMessages = [
         ...this.chatMessages,
         {
@@ -483,14 +512,33 @@ export class ChatComponent extends LitElement {
           followingSteps,
         },
       ];
-      this.requestUpdate();
+      return true;
     };
+
     // Check if message is a bot message to process citations and follow-up questions
     if (isUserMessage) {
-      updateChatWithMessageorChunk(message, false);
+      updateChatWithMessageOrChunk(message, false);
     } else {
       if (this.isStreaming) {
-        updateChatWithMessageorChunk(message, true);
+        await updateChatWithMessageOrChunk(message /* undefined */, true);
+
+        // start processing once the streaming is done
+        const lastMessage = this.chatMessages[this.chatMessages.length - 1].text;
+        const processedText = processText(lastMessage, [citations, followingSteps, followupQuestions]);
+        message = processedText.replacedText;
+        citations.push(...(processedText.arrays[0] as unknown as Citation[]));
+        followingSteps.push(...(processedText.arrays[1] as string[]));
+        followupQuestions.push(...(processedText.arrays[2] as string[]));
+
+        // update last message
+        this.chatMessages[this.chatMessages.length - 1] = {
+          ...this.chatMessages[this.chatMessages.length - 1],
+          text: message,
+          citations,
+          followupQuestions,
+          followingSteps,
+        };
+        this.requestUpdate('chatMessages');
       } else {
         const processedText = processText(message, [citations, followingSteps, followupQuestions]);
         message = processedText.replacedText;
@@ -498,7 +546,7 @@ export class ChatComponent extends LitElement {
         citations.push(...(processedText.arrays[0] as unknown as Citation[]));
         followingSteps.push(...(processedText.arrays[1] as string[]));
         followupQuestions.push(...(processedText.arrays[2] as string[]));
-        updateChatWithMessageorChunk(message, false);
+        updateChatWithMessageOrChunk(message, false);
       }
     }
   }

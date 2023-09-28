@@ -1,4 +1,6 @@
 const globalConfig = {
+  BOT_TYPING_EFFECT_INTERVAL: 50, // in ms
+
   // Is default prompts enabled?
   IS_DEFAULT_PROMPTS_ENABLED: true,
   // Default prompts to display in the chat
