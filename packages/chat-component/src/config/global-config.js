@@ -34,8 +34,8 @@ const NEXT_QUESTION_INDICATOR = 'Next Questions:';
 
 const requestOptions = {
   method: 'POST',
-  approach: ['rrr', 'rrr'],
-  stream: true,
+  approach: 'rrr',
+  stream: false,
   overrides: {
     retrieval_mode: 'hybrid',
     semantic_ranker: true,
