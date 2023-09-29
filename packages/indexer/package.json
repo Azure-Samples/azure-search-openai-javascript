@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@azure/identity": "^3.3.0",
-    "@azure/monitor-opentelemetry": "^1.0.0-beta.2",
+    "@azure/monitor-opentelemetry": "^1.0.0",
     "@azure/search-documents": "^12.0.0-beta.3",
     "@azure/storage-blob": "^12.15.0",
     "@dqbd/tiktoken": "^1.0.7",
@@ -34,6 +34,8 @@
     "@fastify/multipart": "^7.7.3",
     "@fastify/sensible": "^5.0.0",
     "@fastify/type-provider-json-schema-to-ts": "^2.2.2",
+    "@opentelemetry/instrumentation": "^0.43.0",
+    "@opentelemetry/instrumentation-fastify": "^0.32.2",
     "commander": "^11.0.0",
     "dotenv": "^16.3.1",
     "fastify": "^4.22.2",
