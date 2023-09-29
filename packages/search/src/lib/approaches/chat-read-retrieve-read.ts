@@ -90,10 +90,8 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
         thoughts: id === 0 ? thoughts : undefined,
         answer: chunk.choices[0].delta.content ?? '',
       };
-      yield {
-        id: String(id++),
-        data: JSON.stringify(responseChunk),
-      };
+      yield responseChunk;
+      id++;
     }
   }
 

@@ -2,7 +2,6 @@ import path, { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { type FastifyPluginAsync } from 'fastify';
 import AutoLoad, { type AutoloadPluginOptions } from '@fastify/autoload';
-import { FastifySSEPlugin } from 'fastify-sse-v2';
 import cors from '@fastify/cors';
 
 export type AppOptions = {
@@ -18,7 +17,6 @@ const __dirname = path.dirname(__filename);
 const app: FastifyPluginAsync<AppOptions> = async (fastify, options_): Promise<void> => {
   // Place here your custom code!
 
-  fastify.register(FastifySSEPlugin);
   fastify.register(cors, {});
 
   // Do not touch the following lines

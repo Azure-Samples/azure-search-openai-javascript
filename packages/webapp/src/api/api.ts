@@ -1,4 +1,3 @@
-import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { type AskRequest, type AskResponse, type ChatRequest } from './models.js';
 
 const baseUrl = import.meta.env.VITE_SEARCH_API_URI ?? '';
@@ -75,23 +74,32 @@ export function getCitationFilePath(citation: string): string {
   return `/content/${citation}`;
 }
 
-export async function* getChunksFromResponse<T>(response: Response): AsyncGenerator<T, void> {
-  const reader = response.body
-    ?.pipeThrough(new TextDecoderStream())
-    .pipeThrough(new EventSourceParserStream())
-    .getReader();
+export class NdJsonParserStream extends TransformStream<string, JSON> {
+  constructor() {
+    let controller: TransformStreamDefaultController<JSON>;
+    super({
+      start: (_controller) => {
+        controller = _controller;
+      },
+      transform: (chunk) => {
+        const jsonChunks = chunk.split('\n').filter(Boolean);
+        for (const jsonChunk of jsonChunks) {
+          controller.enqueue(JSON.parse(jsonChunk));
+        }
+      },
+    });
+  }
+}
 
+export async function* getChunksFromResponse<T>(response: Response): AsyncGenerator<T, void> {
+  const reader = response.body?.pipeThrough(new TextDecoderStream()).pipeThrough(new NdJsonParserStream()).getReader();
   if (!reader) {
     throw new Error('No response body or body is not readable');
   }
 
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done || value?.data === 'Stream closed') {
-      break;
-    }
-    if (value.data) {
-      yield JSON.parse(value.data);
-    }
+  let value: JSON | undefined;
+  let done: boolean;
+  while ((({ value, done } = await reader.read()), !done)) {
+    yield value as T;
   }
 }

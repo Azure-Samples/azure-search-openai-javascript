@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { Readable } from 'node:stream';
 import { type FastifyPluginAsync } from 'fastify';
 import { type JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import { type SchemaTypes } from '../plugins/schemas.js';
@@ -83,11 +84,17 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       const { history, overrides, stream } = request.body;
       try {
         if (stream) {
+          const buffer = new Readable();
+          // Dummy implementation needed
+          buffer._read = () => {};
+          reply.type('application/x-ndjson').send(buffer);
+
           const chunks = await chatApproach.runWithStreaming(history, overrides ?? {});
           for await (const chunk of chunks) {
-            reply.sse(chunk);
+            buffer.push(JSON.stringify(chunk) + '\n');
           }
-          reply.sseContext.source.end();
+          // eslint-disable-next-line unicorn/no-null
+          buffer.push(null);
         } else {
           return await chatApproach.run(history, overrides ?? {});
         }
@@ -120,11 +127,17 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       const { question, overrides, stream } = request.body;
       try {
         if (stream) {
+          const buffer = new Readable();
+          // Dummy implementation needed
+          buffer._read = () => {};
+          reply.type('application/x-ndjson').send(buffer);
+
           const chunks = await askApproach.runWithStreaming(question, overrides ?? {});
           for await (const chunk of chunks) {
-            reply.sse(chunk);
+            buffer.push(JSON.stringify(chunk) + '\n');
           }
-          reply.sseContext.source.end();
+          // eslint-disable-next-line unicorn/no-null
+          buffer.push(null);
         } else {
           return await askApproach.run(question, overrides ?? {});
         }

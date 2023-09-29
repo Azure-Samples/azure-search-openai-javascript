@@ -6,11 +6,7 @@ export interface ApproachResponse {
   thoughts: string;
 }
 
-export type ApproachResponseChunk = {
-  id: string;
-  // JSON stringified Partial<ApproachResponse>
-  data: string;
-};
+export type ApproachResponseChunk = Partial<ApproachResponse>;
 
 export type ApproachOverrides = {
   retrieval_mode?: 'hybrid' | 'text' | 'vectors';
