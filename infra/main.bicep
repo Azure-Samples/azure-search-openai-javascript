@@ -204,7 +204,7 @@ module searchApi './core/host/container-app.bicep' = {
         value: storageContainerName
       }
     ], useApplicationInsights ? [{
-      name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+      name: 'APPLICATION_INSIGHTS_CONNECTION_STRING'
       secretRef: 'appinsights-cs'
     }] : [])
     imageName: !empty(searchApiImageName) ? searchApiImageName : 'nginx:latest'
@@ -269,7 +269,7 @@ module indexerApi './core/host/container-app.bicep' = {
         value: storageContainerName
       }
     ], useApplicationInsights ? [{
-      name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+      name: 'APPLICATION_INSIGHTS_CONNECTION_STRING'
       secretRef: 'appinsights-cs'
     }] : [])
     imageName: !empty(indexerApiImageName) ? indexerApiImageName : 'nginx:latest'

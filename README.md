@@ -189,7 +189,7 @@ either you or they can follow these steps:
 
 ## Enabling optional features
 
-<!-- ### Enabling Application Insights
+### Enabling Application Insights
 
 To enable Application Insights and the tracing of each request, along with the logging of errors, set the `AZURE_USE_APPLICATION_INSIGHTS` variable to true before running `azd up`
 
@@ -201,7 +201,7 @@ To inspect the performance of chat requests, use the "Drill into Samples" button
 
 ![Tracing screenshot](docs/transaction-tracing.png)
 
-To see any exceptions and server errors, navigate to the "Investigate -> Failures" blade and use the filtering tools to locate a specific exception. You can see Python stack traces on the right-hand side. -->
+To see any exceptions and server errors, navigate to the "Investigate -> Failures" blade and use the filtering tools to locate a specific exception. You can see Python stack traces on the right-hand side.
 
 ### Enabling authentication
 

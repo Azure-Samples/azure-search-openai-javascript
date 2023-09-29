@@ -16,6 +16,7 @@ export interface AppConfig {
   kbFieldsContent: string;
   kbFieldsSourcePage: string;
   allowedOrigins: string;
+  applicationInsightsConnectionString?: string;
 }
 
 const camelCaseToUpperSnakeCase = (string_: string) => string_.replaceAll(/[A-Z]/g, (l) => `_${l}`).toUpperCase();
@@ -40,11 +41,12 @@ export default fp(
       kbFieldsContent: process.env.KB_FIELDS_CONTENT || 'content',
       kbFieldsSourcePage: process.env.KB_FIELDS_SOURCEPAGE || 'sourcepage',
       allowedOrigins: process.env.ALLOWED_ORIGINS || '*',
+      applicationInsightsConnectionString: process.env.APPLICATION_INSIGHTS_CONNECTION_STRING,
     };
 
-    // Check that all config values are set
+    // Check that all required config values are set
     for (const [key, value] of Object.entries(config)) {
-      if (!value) {
+      if (!value && key !== 'applicationInsightsConnectionString') {
         const variableName = camelCaseToUpperSnakeCase(key).replace('OPEN_AI', 'OPENAI');
         const message = `${variableName} environment variable must be set`;
         fastify.log.error(message);
