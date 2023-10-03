@@ -617,6 +617,68 @@ export class ChatComponent extends LitElement {
     navigator.clipboard.writeText(response);
     this.isResponseCopied = true;
   }
+  renderTextEntry(textEntry: ChatMessageText) {
+    const entries = [html`<p>${unsafeHTML(textEntry.value)}</p>`];
+
+    // render steps
+    if (textEntry.followingSteps && textEntry.followingSteps.length > 0) {
+      entries.push(
+        html` <ol class="items__list steps">
+          ${textEntry.followingSteps.map(
+            (followingStep) => html` <li class="items__listItem--step">${unsafeHTML(followingStep)}</li> `,
+          )}
+        </ol>`,
+      );
+    }
+
+    return entries;
+  }
+
+  renderCitation(citations: Citation[] | undefined) {
+    // render citations
+    if (citations && citations.length > 0) {
+      return html`
+        <h3 class="subheadline--small">Citations</h3>
+        <ol class="items__list">
+          ${citations.map(
+            (citation) => html`
+              <li class="items__listItem--citation">
+                <a class="items__link" href="${citation.text}" target="_blank" rel="noopener noreferrer"
+                  >${citation.ref}. ${citation.text}</a
+                >
+              </li>
+            `,
+          )}
+        </ol>
+      `;
+    }
+
+    return '';
+  }
+
+  renderFollowupQuestions(followupQuestions: string[] | undefined) {
+    if (followupQuestions && followupQuestions.length > 0) {
+      return html`
+        <h3 class="subheadline--small">You may also want to ask...</h3>
+        <ol class="items__list followup">
+          ${followupQuestions.map(
+            (followupQuestion) => html`
+              <li class="items__listItem--followup">
+                <a
+                  class="items__link"
+                  href="#"
+                  @click="${(event: Event) => this.handleDefaultPromptClick(followupQuestion, event)}"
+                  >${followupQuestion}</a
+                >
+              </li>
+            `,
+          )}
+        </ol>
+      `;
+    }
+
+    return '';
+  }
 
   // Render the chat component as a web component
   override render() {
@@ -662,56 +724,9 @@ export class ChatComponent extends LitElement {
                   (message) => html`
                     <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
                       <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
-                        <p>${message.text}</p>
-                        ${message.followingSteps && message.followingSteps.length > 0
-                          ? html`
-                              <ul class="items__list steps">
-                                ${message.followingSteps.map(
-                                  (followingStep) => html` <li class="items__listItem--step">${followingStep}</li> `,
-                                )}
-                              </ul>
-                            `
-                          : ''}
-                        ${message.citations && message.citations.length > 0
-                          ? html`
-                              <h3 class="subheadline--small">Citations</h3>
-                              <ul class="items__list">
-                                ${message.citations.map(
-                                  (citation) => html`
-                                    <li class="items__listItem--citation">
-                                      <a
-                                        class="items__link"
-                                        href="${citation.text}"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        >${citation.ref}. ${citation.text}</a
-                                      >
-                                    </li>
-                                  `,
-                                )}
-                              </ul>
-                            `
-                          : ''}
-                        ${message.followupQuestions && message.followupQuestions.length > 0
-                          ? html`
-                              <h3 class="subheadline--small">You may also want to ask...</h3>
-                              <ul class="items__list followup">
-                                ${message.followupQuestions.map(
-                                  (followupQuestion) => html`
-                                    <li class="items__listItem--followup">
-                                      <a
-                                        class="items__link"
-                                        href="#"
-                                        @click="${(event: Event) =>
-                                          this.handleDefaultPromptClick(followupQuestion, event)}"
-                                        >${followupQuestion}</a
-                                      >
-                                    </li>
-                                  `,
-                                )}
-                              </ul>
-                            `
-                          : ''}
+                        ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
+                        ${this.renderFollowupQuestions(message.followupQuestions)}
+                        ${this.renderCitation(message.citations)}
                       </div>
                       <p class="chat__txt--info">
                         <span class="timestamp">${message.timestamp}</span>,
