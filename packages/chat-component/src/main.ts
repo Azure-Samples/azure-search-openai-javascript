@@ -144,8 +144,6 @@ export class ChatComponent extends LitElement {
     }
     .subheadline--small {
       font-size: 12px;
-      margin: 0;
-      padding: 0;
       text-transform: uppercase;
       text-decoration: underline;
     }
