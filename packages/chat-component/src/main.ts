@@ -552,16 +552,18 @@ export class ChatComponent extends LitElement {
       this.currentQuestion = userQuestion;
       try {
         this.apiResponse = await this.getAPIResponse(userQuestion, this.requestOptions, type);
-        console.log(this.apiResponse, 'apiResponse');
-        const response = this.apiResponse as BotResponse;
-        const message: string = response.answer;
-        this.addMessage(message, false);
-        this.isDisabled = false;
         this.isAwaitingResponse = false;
+        this.isDisabled = false;
         this.questionInput.value = '';
         this.isResetInput = false;
+
+        const response = this.apiResponse as BotResponse;
+        const message: string = response.answer;
+        await this.addMessage(message, false);
+
         // eslint-disable-next-line unicorn/prefer-optional-catch-binding
       } catch (error) {
+        console.error(error);
         this.handleAPIError();
       }
     }
