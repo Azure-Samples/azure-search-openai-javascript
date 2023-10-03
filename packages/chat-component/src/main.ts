@@ -285,7 +285,6 @@ export class ChatComponent extends LitElement {
       color: var(--text-color);
     }
     .steps .items__listItem--step {
-      display: block;
       padding: 5px 0;
       border-bottom: 1px solid var(--light-gray);
     }
