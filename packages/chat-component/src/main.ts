@@ -479,7 +479,7 @@ export class ChatComponent extends LitElement {
     const timestamp = this.getTimestamp();
     const updateChatWithMessageOrChunk = async (part: string, isChunk: boolean) => {
       if (isChunk) {
-        await this.appendTextMessage({
+        await this.consumeStreamedMessage({
           timestamp,
           isUserMessage,
         });
@@ -489,12 +489,16 @@ export class ChatComponent extends LitElement {
       this.chatMessages = [
         ...this.chatMessages,
         {
-          text: part,
+          text: [
+            {
+              value: part,
+              followingSteps,
+            },
+          ],
+          followupQuestions,
+          citations: [...new Set(citations)],
           timestamp: timestamp,
           isUserMessage,
-          citations: [...new Set(citations)],
-          followupQuestions,
-          followingSteps,
         },
       ];
       return true;
@@ -506,25 +510,9 @@ export class ChatComponent extends LitElement {
     } else {
       if (this.isStreaming) {
         await updateChatWithMessageOrChunk(message /* undefined */, true);
-
-        // start processing once the streaming is done
-        const lastMessage = this.chatMessages[this.chatMessages.length - 1].text;
-        const processedText = processText(lastMessage, [citations, followingSteps, followupQuestions]);
-        message = processedText.replacedText;
-        citations.push(...(processedText.arrays[0] as unknown as Citation[]));
-        followingSteps.push(...(processedText.arrays[1] as string[]));
-        followupQuestions.push(...(processedText.arrays[2] as string[]));
-
-        // update last message
-        this.chatMessages[this.chatMessages.length - 1] = {
-          ...this.chatMessages[this.chatMessages.length - 1],
-          text: message,
-          citations,
-          followupQuestions,
-          followingSteps,
-        };
         this.requestUpdate('chatMessages');
       } else {
+        // non-streamed response
         const processedText = processText(message, [citations, followingSteps, followupQuestions]);
         message = processedText.replacedText;
         // Push all lists coming from processText to the corresponding arrays
