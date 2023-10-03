@@ -397,7 +397,7 @@ export class ChatComponent extends LitElement {
     return parsedResponse;
   }
 
-  getDataChunks = async function* <T>(response: Response): AsyncGenerator<T, void> {
+  readStream = async function* <T>(response: Response): AsyncGenerator<T, void> {
     const reader: any = response.body
       ?.pipeThrough(new TextDecoderStream())
       .pipeThrough(new EventSourceParserStream())
@@ -414,7 +414,9 @@ export class ChatComponent extends LitElement {
       }
       if (value?.data) {
         yield new Promise<T>((resolve /*, reject*/) => {
-          setTimeout(() => resolve(JSON.parse(value.data)), globalConfig.BOT_TYPING_EFFECT_INTERVAL);
+          setTimeout(() => {
+            resolve(JSON.parse(value.data));
+          }, globalConfig.BOT_TYPING_EFFECT_INTERVAL);
         });
       }
     }
