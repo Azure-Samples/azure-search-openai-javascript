@@ -613,7 +613,7 @@ export class ChatComponent extends LitElement {
 
   // Copy response to clipboard
   copyResponseToClipboard(): void {
-    const response = this.chatMessages[this.chatMessages.length - 1].text;
+    const response = this.chatMessages.at(-1)?.text.at(-1)?.value as string;
     navigator.clipboard.writeText(response);
     this.isResponseCopied = true;
   }
