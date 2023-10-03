@@ -1,12 +1,16 @@
+export declare interface ChatMessageText {
+  value: string;
+  followingSteps?: string[];
+}
+
 // We declare a simple interface for the chat messages
 // and the citations
 export declare interface ChatMessage {
-  text: string;
+  text: ChatMessageText[];
+  citations?: Citation[];
+  followupQuestions?: string[];
   isUserMessage: boolean;
   timestamp: string;
-  citations?: Citation[];
-  followingSteps?: string[];
-  followupQuestions?: string[];
 }
 
 export declare interface Citation {
