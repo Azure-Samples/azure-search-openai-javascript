@@ -358,9 +358,6 @@ export class ChatComponent extends LitElement {
   // Send the question to the Open AI API and render the answer in the chat
   async getAPIResponse(question: string, options: RequestOptions, type: string): Promise<BotResponse | Response> {
     this.isStreaming = type === 'chat' && options.stream;
-    // Empty the current messages to start a new chat
-    // TODO: add chat history (first locally with local storage, then with a backend database)
-    this.chatMessages = [];
     // Add the question to the chat
     this.addMessage(question, true);
     // Remove default prompts
