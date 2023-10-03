@@ -4,7 +4,7 @@ import { customElement, query, property } from 'lit/decorators.js';
 import { globalConfig, requestOptions } from './config/global-config.js';
 import { processText } from './utils/index.ts';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
-import type { BotResponse, ChatMessage, Citation, RequestOptions } from './types';
+import type { BotResponse, ChatMessage, ChatMessageText, Citation, RequestOptions } from './types';
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
@@ -422,52 +422,204 @@ export class ChatComponent extends LitElement {
     }
   };
 
-  // TODO: refactor this function to support streaming
-  processStreamedResponse(chunk: string, { citations, followingSteps, followupQuestions }) {
-    const processedText = processText(chunk, [citations, followingSteps, followupQuestions]);
-    chunk = processedText.replacedText;
-    // Push all lists coming from processText to the corresponding arrays
-    citations.push(...(processedText.arrays[0] as unknown as Citation[]));
-    followingSteps.push(...(processedText.arrays[1] as string[]));
-    followupQuestions.push(...(processedText.arrays[2] as string[]));
+  async consumeStreamedMessage({ timestamp, isUserMessage }) {
+    const chunks = this.readStream<Partial<BotResponse> & { id: string }>(this.apiResponse as Response);
 
-    return {
-      chunk,
-      citations,
-      followingSteps,
-      followupQuestions,
-    };
-  }
-
-  async appendTextMessage({ timestamp, isUserMessage }) {
-    const chunks = this.getDataChunks<Partial<BotResponse> & { id: string }>(this.apiResponse as Response);
-    const userMessage = this.chatMessages;
-
-    // add a new empty message to the chat so that the bot can start typing
+    // we need to prepare an empty instance of the chat message so that we can start populating it
     this.chatMessages = [
-      ...userMessage,
+      ...this.chatMessages,
       {
-        text: '',
+        text: [{ value: '', followingSteps: [] }],
+        followupQuestions: [],
+        citations: [],
         timestamp: timestamp,
         isUserMessage,
       },
     ];
 
-    const currentMessage: string[] = [];
+    const streamedMessageRaw: string[] = [];
+    const stepsBuffer: string[] = [];
+    const followupQuestionsBuffer: string[] = [];
+    let isProcessingStep = false;
+    let isLastStep = false;
+    let isFollowupQuestion = false;
+    let stepIndex = 0;
+    let textBlockIndex = 0;
 
     for await (const chunk of chunks) {
-      if (chunk.answer) {
-        currentMessage.push(chunk.answer);
+      let chunkValue = chunk.answer as string;
 
-        // TODO: process the current accumulated text if we detect a closing ] in the chunk
-        // if (chunk.answer.includes(']')) { }
-
-        this.chatMessages[this.chatMessages.length - 1].text += chunk.answer;
-        this.requestUpdate('chatMessages');
+      if (chunkValue === '') {
+        continue;
       }
+
+      streamedMessageRaw.push(chunkValue);
+
+      // we use numeric values to identify the beginning of a step
+      // if we match a number, store it in the buffer and move on to the next iteration
+      const LIST_ITEM_NUMBER = /(\d+)/;
+      let matchedStepIndex = chunkValue.match(LIST_ITEM_NUMBER)?.[0];
+      if (matchedStepIndex) {
+        stepsBuffer.push(matchedStepIndex);
+        continue;
+      }
+
+      // followup questions are marked either with the word 'Next Questions:' or '<<text>>' or both at the same time
+      // these markers may be split across multiple chunks, so we need to buffer them!
+      // TODO: support followup questions wrapped in <<text>> markers
+      const matchedFollowupQuestionMarker = !isFollowupQuestion && chunkValue.includes('Next');
+      if (matchedFollowupQuestionMarker) {
+        followupQuestionsBuffer.push(chunkValue);
+        continue;
+      } else if (followupQuestionsBuffer.length > 0 && chunkValue.includes('Question')) {
+        isFollowupQuestion = true;
+        followupQuestionsBuffer.push(chunkValue);
+        continue;
+      } else if (isFollowupQuestion) {
+        isFollowupQuestion = true;
+        chunkValue = chunkValue.replace(/:?\n/, '');
+      }
+
+      // if we are here, it means we have previously matched a number, followed by a dot (in current chunk)
+      // we can assume that we are at the beginning of a step!
+      if (stepsBuffer.length > 0 && chunkValue.includes('.')) {
+        isProcessingStep = true;
+        matchedStepIndex = stepsBuffer[0];
+
+        // we don't need the current buffer anymore
+        stepsBuffer.length = 0;
+      } else if (chunkValue.includes('\n\n')) {
+        // if we are here, it means we may have reached the end of the last step
+        // in order to eliminate false positives, we need to check if we currently
+        // have a step in progress
+
+        // eslint-disable-next-line unicorn/no-lonely-if
+        if (isProcessingStep) {
+          // mark the next iteration as the last step
+          // so that all remaining text (in current chunk) is added to the last step
+          isLastStep = true;
+        }
+      }
+
+      // if we are at the beginning of a step, we need to remove the step number and dot from the chunk value
+      // we simply clear the current chunk value
+      if (matchedStepIndex || isProcessingStep) {
+        if (matchedStepIndex) {
+          chunkValue = '';
+        }
+
+        // set the step index that is needed to update the correct step entry
+        stepIndex = matchedStepIndex ? Number(matchedStepIndex) - 1 : stepIndex;
+        this.updateFollowingStepOrFollowupQuestionEntry({ chunkValue, textBlockIndex, stepIndex, isFollowupQuestion });
+
+        if (isLastStep) {
+          // we reached the end of the last step. Reset all flags and counters
+          isProcessingStep = false;
+          isLastStep = false;
+          isFollowupQuestion = false;
+          stepIndex = 0;
+
+          // when we reach the end of a series of steps, we have to increment the text block index
+          // so that we start process the next text block
+          textBlockIndex++;
+        }
+      } else {
+        this.updateTextEntry({ chunkValue, textBlockIndex });
+      }
+      const citations = this.parseCitations(streamedMessageRaw.join(''));
+      this.updateCitationsEntry(citations);
+
+      this.requestUpdate('chatMessages');
     }
 
-    return true;
+    console.log(streamedMessageRaw.join(''));
+
+    return streamedMessageRaw.join('');
+  }
+
+  // update the citations entry and wrap the citations in a sup tag
+  updateCitationsEntry(citations: Citation[]) {
+    const lastMessageEntry = this.chatMessages.at(-1);
+    const updateCitationReference = (match, capture) => {
+      const citation = citations.find((citation) => citation.text === capture);
+      if (citation) {
+        return `<sup>[${citation.ref}]</sup>`;
+      }
+      return match;
+    };
+
+    if (lastMessageEntry) {
+      lastMessageEntry.citations = citations;
+
+      lastMessageEntry.text.map((textEntry) => {
+        textEntry.value = textEntry.value.replaceAll(/\[(.*?)]/g, updateCitationReference);
+        textEntry.followingSteps = textEntry.followingSteps?.map((step) =>
+          step.replaceAll(/\[(.*?)]/g, updateCitationReference),
+        );
+        return textEntry;
+      });
+    }
+  }
+
+  // parse and format citations
+  parseCitations(inputText: string): Citation[] {
+    const findCitations = /\[(.*?)]/g;
+    const citation: NonNullable<unknown> = {};
+    let referenceCounter = 1;
+
+    // extract citation (filename) from the text and map it to a reference number
+    inputText.replaceAll(findCitations, (_, capture) => {
+      const citationText = capture.trim();
+      if (!citation[citationText]) {
+        citation[citationText] = referenceCounter++;
+      }
+      return '';
+    });
+
+    return Object.keys(citation).map((text, index) => ({
+      ref: index + 1,
+      text,
+    }));
+  }
+
+  // update the text block entry
+  updateTextEntry({ chunkValue, textBlockIndex }: { chunkValue: string; textBlockIndex: number }) {
+    const { text: lastChatMessageTextEntry } = this.chatMessages.at(-1) as ChatMessage;
+
+    if (!lastChatMessageTextEntry[textBlockIndex]) {
+      lastChatMessageTextEntry[textBlockIndex] = {
+        value: '',
+        followingSteps: [],
+      };
+    }
+    lastChatMessageTextEntry[textBlockIndex].value += chunkValue;
+  }
+
+  // update the following steps or followup questions entry
+  updateFollowingStepOrFollowupQuestionEntry({
+    chunkValue,
+    textBlockIndex,
+    stepIndex,
+    isFollowupQuestion,
+  }: {
+    chunkValue: string;
+    textBlockIndex: number;
+    stepIndex: number;
+    isFollowupQuestion: boolean;
+  }) {
+    // following steps and followup questions are treated the same way. They are just stored in different arrays
+    const { followupQuestions, text: lastChatMessageTextEntry } = this.chatMessages.at(-1) as ChatMessage;
+    if (isFollowupQuestion && followupQuestions) {
+      followupQuestions[stepIndex] = (followupQuestions[stepIndex] || '') + chunkValue;
+      return;
+    }
+
+    if (lastChatMessageTextEntry && lastChatMessageTextEntry[textBlockIndex]) {
+      const { followingSteps } = lastChatMessageTextEntry[textBlockIndex];
+      if (followingSteps) {
+        followingSteps[stepIndex] = (followingSteps[stepIndex] || '') + chunkValue;
+      }
+    }
   }
 
   // Add a message to the chat, when the user or the API sends a message
