@@ -257,12 +257,6 @@ export class ChatComponent extends LitElement {
     .user-message .chat__txt--info {
       text-align: right;
     }
-    .items__list {
-      display: flex;
-      padding-inline-start: 0;
-      list-style: none;
-      padding: 20px 0;
-    }
     .items__list.followup {
       display: flex;
       flex-direction: column;
