@@ -18,7 +18,6 @@ import type { BotResponse, ChatMessage, Citation, RequestOptions } from './types
 
 @customElement('chat-component')
 export class ChatComponent extends LitElement {
-  [x: string]: any;
   @property({ type: String })
   currentQuestion = '';
   @query('#question-input')
