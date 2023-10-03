@@ -4,6 +4,7 @@ import { customElement, query, property } from 'lit/decorators.js';
 import { globalConfig, requestOptions } from './config/global-config.js';
 import { processText } from './utils/index.ts';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import type { BotResponse, ChatMessage, ChatMessageText, Citation, RequestOptions } from './types';
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -759,6 +760,7 @@ export class ChatComponent extends LitElement {
     navigator.clipboard.writeText(response);
     this.isResponseCopied = true;
   }
+
   renderTextEntry(textEntry: ChatMessageText) {
     const entries = [html`<p>${unsafeHTML(textEntry.value)}</p>`];
 
