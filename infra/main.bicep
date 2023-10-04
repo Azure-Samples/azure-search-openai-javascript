@@ -38,15 +38,23 @@ param storageSkuName string
 param openAiServiceName string = ''
 param openAiResourceGroupName string = ''
 @description('Location for the OpenAI resource group')
-@allowed(['canadaeast', 'eastus', 'francecentral', 'japaneast', 'northcentralus'])
+@allowed(['australiaeast', 'canadaeast', 'eastus', 'eastus2', 'francecentral', 'japaneast', 'northcentralus', 'swedencentral', 'switzerlandnorth', 'uksouth', 'westeurope'])
 @metadata({
   azd: {
     type: 'location'
   }
 })
 param openAiResourceGroupLocation string
-
 param openAiSkuName string = 'S0'
+
+@description('Location for the Static Web App')
+@allowed(['westus2', 'centralus', 'eastus2', 'westeurope', 'eastasia', 'eastasiastage'])
+@metadata({
+  azd: {
+    type: 'location'
+  }
+})
+param webAppLocation string
 
 param formRecognizerServiceName string = ''
 param formRecognizerResourceGroupName string = ''
@@ -68,9 +76,12 @@ param principalId string = ''
 @description('Use Application Insights for monitoring and performance tracing')
 param useApplicationInsights bool = false
 
+// Only needed for CD due to internal policies restrictions
+param aliasTag string = ''
+
 var abbrs = loadJsonContent('abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
-var tags = { 'azd-env-name': environmentName }
+var tags = union({ 'azd-env-name': environmentName }, empty(aliasTag) ? {} : { alias: aliasTag })
 
 // Organize resources in a resource group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -127,7 +138,7 @@ module webApp './core/host/staticwebapp.bicep' = {
   scope: resourceGroup
   params: {
     name: !empty(webAppName) ? webAppName : '${abbrs.webStaticSites}web-${resourceToken}'
-    location: location
+    location: webAppLocation
     tags: union(tags, { 'azd-service-name': webAppName })
   }
 }
