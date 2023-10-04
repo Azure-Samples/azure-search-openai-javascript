@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export type Test = (typeof tap)['Test']['prototype'];
 
-const AppPath = path.join(__dirname, '..', 'dist', 'app.js');
+const AppPath = path.join(__dirname, '..', 'src', 'app.js');
 
 // Fill in this config with all the configurations
 // needed for testing the application
