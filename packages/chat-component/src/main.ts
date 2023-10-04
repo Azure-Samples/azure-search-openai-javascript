@@ -3,9 +3,9 @@ import { LitElement, html, css } from 'lit';
 import { customElement, query, property } from 'lit/decorators.js';
 import { globalConfig, requestOptions } from './config/global-config.js';
 import { processText } from './utils/index.ts';
-import { EventSourceParserStream } from 'eventsource-parser/stream';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import type { BotResponse, ChatMessage, ChatMessageText, Citation, RequestOptions } from './types';
+import { readStream } from './core/stream/index.ts';
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
@@ -398,33 +398,8 @@ export class ChatComponent extends LitElement {
     return parsedResponse;
   }
 
-  readStream = async function* <T>(response: Response): AsyncGenerator<T, void> {
-    const reader: any = response.body
-      ?.pipeThrough(new TextDecoderStream())
-      .pipeThrough(new EventSourceParserStream())
-      .getReader();
-
-    if (!reader) {
-      throw new Error('No response body or body is not readable');
-    }
-
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done || value?.data === 'Stream closed') {
-        break;
-      }
-      if (value?.data) {
-        yield new Promise<T>((resolve /*, reject*/) => {
-          setTimeout(() => {
-            resolve(JSON.parse(value.data));
-          }, globalConfig.BOT_TYPING_EFFECT_INTERVAL);
-        });
-      }
-    }
-  };
-
   async consumeStreamedMessage({ timestamp, isUserMessage }) {
-    const chunks = this.readStream<Partial<BotResponse> & { id: string }>(this.apiResponse as Response);
+    const chunks = readStream<Partial<BotResponse> & { id: string }>(this.apiResponse as Response);
 
     // we need to prepare an empty instance of the chat message so that we can start populating it
     this.chatMessages = [
@@ -449,6 +424,7 @@ export class ChatComponent extends LitElement {
 
     for await (const chunk of chunks) {
       let chunkValue = chunk.answer as string;
+      console.log(chunkValue);
 
       if (chunkValue === '') {
         continue;
