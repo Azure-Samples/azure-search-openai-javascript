@@ -701,8 +701,6 @@ export class ChatComponent extends LitElement {
         const response = this.apiResponse as BotResponse;
         const message: string = response.answer;
         await this.addMessage(message, false);
-
-        // eslint-disable-next-line unicorn/prefer-optional-catch-binding
       } catch (error) {
         console.error(error);
         this.handleAPIError();
