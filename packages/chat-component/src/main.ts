@@ -2,10 +2,10 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, query, property } from 'lit/decorators.js';
 import { globalConfig, requestOptions } from './config/global-config.js';
-import { processText } from './utils/index.ts';
+import { processText } from './utils/index.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import type { BotResponse, ChatMessage, ChatMessageText, Citation, RequestOptions } from './types';
-import { readStream } from './core/stream/index.ts';
+import { readStream } from './core/stream/index.js';
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
@@ -399,7 +399,7 @@ export class ChatComponent extends LitElement {
   }
 
   async consumeStreamedMessage({ timestamp, isUserMessage }) {
-    const chunks = readStream<Partial<BotResponse> & { id: string }>(this.apiResponse as Response);
+    const chunks = readStream<Partial<BotResponse>>(this.apiResponse as Response);
 
     // we need to prepare an empty instance of the chat message so that we can start populating it
     this.chatMessages = [
@@ -424,8 +424,6 @@ export class ChatComponent extends LitElement {
 
     for await (const chunk of chunks) {
       let chunkValue = chunk.answer as string;
-      console.log(chunkValue);
-
       if (chunkValue === '') {
         continue;
       }
