@@ -1,7 +1,7 @@
-import { test } from 'tap';
+import t from 'tap';
 import { MessageBuilder } from '../../src/lib/message-builder.js';
 
-test('MessageBuilder class', (t) => {
+t.test('MessageBuilder', (t) => {
   const systemContent = 'Welcome to the chat!';
   const chatgptModel = 'gpt-3.5-turbo';
   const messageBuilder = new MessageBuilder(systemContent, chatgptModel);
