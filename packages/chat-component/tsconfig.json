@@ -21,7 +21,6 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
-    "allowImportingTsExtensions": true,
     "emitDeclarationOnly": true,
     "plugins": [
       {
