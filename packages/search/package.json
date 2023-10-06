@@ -11,6 +11,7 @@
   "scripts": {
     "start": "fastify start -l info dist/app.js",
     "test": "tsc -p test/tsconfig.json && cpy package.json test-dist/ && tap --allow-incomplete-coverage \"test-dist/**/*.test.js\"",
+    "test:snapshot": "npm run -s test -- --snapshot",
     "build": "tsc",
     "watch": "tsc -w",
     "dev": "npm run build && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch\" \"npm:dev:start\"",
@@ -40,15 +41,19 @@
     "openai": "^4.4.0"
   },
   "devDependencies": {
+    "@tapjs/nock": "^3.1.7",
     "@types/node": "^18.0.0",
     "@types/tap": "^15.0.5",
     "concurrently": "^8.2.0",
     "cpy-cli": "^5.0.0",
     "fastify-tsconfig": "^2.0.0",
     "rimraf": "^5.0.1",
-    "tap": "^18.4.2",
-    "tap-parser": "^15.2.0",
-    "tap-yaml": "^2.2.0",
+    "tap": "^18.4.3",
     "typescript": "^5.1.6"
+  },
+  "tap": {
+    "plugin": [
+      "@tapjs/nock"
+    ]
   }
 }
