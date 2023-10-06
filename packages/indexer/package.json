@@ -13,7 +13,7 @@
   },
   "scripts": {
     "start": "fastify start -l info dist/app.js -p 3001",
-    "test": "tsc -p test/tsconfig.json && cpy package.json test-dist/ && tap --allow-incomplete-coverage \"test-dist/**/*.test.js\"",
+    "test": "tsc -p test/tsconfig.json && tap --allow-incomplete-coverage \"test-dist/**/*.test.js\"",
     "test:snapshot": "npm run -s test -- --snapshot",
     "build": "tsc",
     "watch": "tsc -w",
@@ -47,7 +47,6 @@
     "@types/node": "^18.0.0",
     "@types/tap": "^15.0.5",
     "concurrently": "^8.2.0",
-    "cpy-cli": "^5.0.0",
     "fastify-tsconfig": "^2.0.0",
     "rimraf": "^5.0.1",
     "tap": "^18.4.3",
