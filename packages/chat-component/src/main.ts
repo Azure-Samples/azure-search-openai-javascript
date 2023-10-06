@@ -1,11 +1,12 @@
 /* eslint-disable unicorn/template-indent */
-import { LitElement, html, css } from 'lit';
-import { customElement, query, property } from 'lit/decorators.js';
-import { globalConfig, requestOptions } from './config/global-config.js';
-import { processText } from './utils/index.js';
+import { LitElement, html } from 'lit';
+import { customElement, property, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import type { BotResponse, ChatMessage, ChatMessageText, Citation, RequestOptions } from './types';
-import { readStream } from './core/stream/index.js';
+import { chatHttpOptions, globalConfig, requestOptions } from './config/global-config.js';
+import { getAPIResponse } from './core/http/index.js';
+import { parseStreamedMessages } from './core/parser/index.js';
+import { mainStyle } from './style.js';
+import { getTimestamp, processText } from './utils/index.js';
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
@@ -44,577 +45,54 @@ export class ChatComponent extends LitElement {
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
-  chatMessages: ChatMessage[] = [];
+  chatThread: ChatThreadEntry[] = [];
   hasDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   chatInputLabelText: string = globalConfig.CHAT_INPUT_LABEL_TEXT;
 
-  requestOptions: RequestOptions = requestOptions;
+  chatRequestOptions: ChatRequestOptions = requestOptions;
+  chatHttpOptions: ChatHttpOptions = chatHttpOptions;
 
-  static override styles = css`
-    :host {
-      display: block;
-      padding: 16px;
-      --secondary-color: #f8fffd;
-      --text-color: #123f58;
-      --primary-color: rgba(241, 255, 165, 0.6);
-      --white: #fff;
-      --light-gray: #e3e3e3;
-      --dark-gray: #4e5288;
-      --accent-high: #8cdef2;
-      --accent-dark: #002b23;
-      --accent-light: #e6fbf7;
-      --accent-lighter: rgba(140, 222, 242, 0.4);
-      --error-color: #8a0000;
-    }
-    :host(.dark) {
-      display: block;
-      padding: 16px;
-      --secondary-color: #1f2e32;
-      --text-color: #ffffff;
-      --primary-color: rgba(241, 255, 165, 0.6);
-      --white: #000000;
-      --light-gray: #e3e3e3;
-      --dark-gray: #4e5288;
-      --accent-high: #005164;
-      --accent-dark: #b4e2ee;
-      --accent-light: #e6fbf7;
-      --accent-lighter: rgba(140, 222, 242, 0.4);
-      --error-color: #8a0000;
-    }
-    ul {
-      margin-block-start: 0;
-      margin-block-end: 0;
-    }
-    .button {
-      color: var(--text-color);
-      border: 0;
-      background: none;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    @keyframes chatmessageanimation {
-      0% {
-        opacity: 0.5;
-        top: 150px;
-      }
-      100% {
-        opacity: 1;
-        top: 0px;
-      }
-    }
-    @keyframes chatloadinganimation {
-      0% {
-        opacity: 0.5;
-      }
-      50% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0.5;
-      }
-    }
-    .display-none {
-      display: none;
-      visibility: hidden;
-    }
-    .display-flex {
-      display: flex;
-    }
-    .container-col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .container-row {
-      flex-direction: row;
-    }
-    .headline {
-      color: var(--text-color);
-      font-size: 1.5rem;
-      padding: 0;
-      margin: 0;
-    }
-    .subheadline {
-      color: var(--text-color);
-      font-size: 1.2rem;
-      padding: 0;
-      margin: 0;
-    }
-    .subheadline--small {
-      font-size: 12px;
-      text-transform: uppercase;
-      text-decoration: underline;
-    }
-    .chat__container {
-      min-width: 100%;
-    }
-    .chat__header {
-      display: flex;
-      justify-content: flex-end;
-    }
-    .chat__header--button {
-      border: 1px solid var(--accent-dark);
-      text-decoration: none;
-      border-radius: 5px;
-      background: var(--white);
-      display: flex;
-      align-items: center;
-      margin-left: 5px;
-      opacity: 1;
-      padding: 5px;
-      transition: all 0.3s ease-in-out;
-    }
-    .chat__header--button:disabled,
-    .chatbox__button:disabled,
-    .chatbox__input:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .chat__header--span {
-      margin-right: 5px;
-    }
-    .chatbox__container {
-      position: relative;
-      height: 50px;
-    }
-    .chatbox__button {
-      background: var(--accent-high);
-      border: none;
-      color: var(--text-color);
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 4px;
-      margin-left: 8px;
-      width: 80px;
-    }
-    .chatbox__button--reset {
-      position: absolute;
-      right: 115px;
-      top: 15px;
-      background: transparent;
-      border: none;
-      color: gray;
-      background: var(--accent-dark);
-      border-radius: 50%;
-      color: var(--white);
-      font-weight: bold;
-      height: 20px;
-      width: 20px;
-      cursor: pointer;
-    }
-    .chatbox__input {
-      border: 1px solid var(--accent-high);
-      background: var(--white);
-      color: var(--text-color);
-      border-radius: 4px;
-      padding: 8px;
-      flex: 1 1 auto;
-      font-size: 1rem;
-    }
-    .chat__list {
-      color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      padding: 0;
-      margin-bottom: 50px;
-    }
-    .chat__listItem {
-      max-width: 80%;
-      min-width: 70%;
-      display: flex;
-      flex-direction: column;
-      height: auto;
-    }
-    .chat__txt {
-      animation: chatmessageanimation 0.5s ease-in-out;
-      background-color: var(--secondary-color);
-      color: var(--text-color);
-      border-radius: 10px;
-      margin-top: 8px;
-      padding: 20px;
-      word-wrap: break-word;
-      margin-block-end: 0;
-      position: relative;
-    }
-    .chat__txt.error {
-      background-color: var(--error-color);
-      color: var(--white);
-    }
-    .chat__txt.user-message {
-      background-color: var(--accent-high);
-    }
-    .chat__listItem.user-message {
-      align-self: flex-end;
-    }
-    .chat__txt--info {
-      font-size: smaller;
-      font-style: italic;
-      margin: 0;
-      margin-top: 1px;
-    }
-    .user-message .chat__txt--info {
-      text-align: right;
-    }
-    .items__list.followup {
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-    }
-    .items__list.steps {
-      display: block;
-    }
-    .items__listItem--followup {
-      cursor: pointer;
-      color: var(--dark-gray);
-    }
-    .items__listItem--citation {
-      display: inline-block;
-      background-color: var(--accent-lighter);
-      border-radius: 5px;
-      text-decoration: none;
-      padding: 5px;
-      font-size: small;
-    }
-    .items__listItem--citation:not(first-child) {
-      margin-left: 5px;
-    }
-    .items__link {
-      text-decoration: none;
-      color: var(--text-color);
-    }
-    .steps .items__listItem--step {
-      padding: 5px 0;
-      border-bottom: 1px solid var(--light-gray);
-    }
-    .followup .items__link {
-      color: var(--dark-gray);
-      display: block;
-      padding: 5px 0;
-      border-bottom: 1px solid var(--light-gray);
-    }
-    .defaults__button {
-      text-decoration: none;
-      color: var(--text-color);
-      display: block;
-    }
-    .defaults__list {
-      list-style-type: none;
-      padding: 0;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-
-      @media (min-width: 1200px) {
-        flex-direction: row;
-      }
-    }
-    .defaults__listItem {
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid var(--accent-high);
-      background: var(--secondary-color);
-      margin: 4px;
-      color: var(--text-color);
-      justify-content: space-evenly;
-
-      @media (min-width: 768px) {
-        min-height: 100px;
-      }
-    }
-    .defaults__listItem:hover,
-    .defaults__listItem:focus {
-      color: var(--accent-dark);
-      background: var(--accent-light);
-      transition: all 0.3s ease-in-out;
-    }
-    .defaults__span {
-      font-weight: bold;
-      display: block;
-      margin-top: 20px;
-      text-decoration: underline;
-    }
-    .loading-skeleton {
-      display: flex;
-      margin-bottom: 50px;
-    }
-    .dot {
-      width: 10px;
-      height: 10px;
-      margin: 0 5px;
-      background-color: var(--accent-high);
-      border-radius: 50%;
-      animation: chatloadinganimation 1.5s infinite;
-    }
-    .dot:nth-child(2) {
-      animation-delay: 0.5s;
-    }
-    .dot:nth-child(3) {
-      animation-delay: 1s;
-    }
-  `;
+  static override styles = [mainStyle];
 
   // Send the question to the Open AI API and render the answer in the chat
-  async getAPIResponse(question: string, options: RequestOptions, type: string): Promise<BotResponse | Response> {
-    this.isStreaming = type === 'chat' && options.stream;
-    // Add the question to the chat
-    this.addMessage(question, true);
-    // Remove default prompts
-    this.isChatStarted = true;
-    this.hasDefaultPromptsEnabled = false;
-    // Disable the input field and submit button while waiting for the API response
-    this.isDisabled = true;
-    // Show loading indicator while waiting for the API response
-    this.isAwaitingResponse = true;
-    const response = await fetch(`${globalConfig.API_URL}${type}`, {
-      method: options.method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        // must enable history persistence
-        history: [
-          {
-            user: this.currentQuestion,
-          },
-        ],
-        approach: options.approach,
-        overrides: options.overrides,
-        stream: this.isStreaming,
-      }),
-    });
-
-    if (this.isStreaming) {
-      return response;
-    }
-
-    const parsedResponse: BotResponse = await response.json();
-    if (response.status > 299 || !response.ok) {
-      this.handleAPIError();
-      throw new Error(response.statusText) || 'API Response Error';
-    }
-    return parsedResponse;
-  }
-
-  async consumeStreamedMessage({ timestamp, isUserMessage }) {
-    const chunks = readStream<Partial<BotResponse>>(this.apiResponse as Response);
-
-    // we need to prepare an empty instance of the chat message so that we can start populating it
-    this.chatMessages = [
-      ...this.chatMessages,
-      {
-        text: [{ value: '', followingSteps: [] }],
-        followupQuestions: [],
-        citations: [],
-        timestamp: timestamp,
-        isUserMessage,
-      },
-    ];
-
-    const streamedMessageRaw: string[] = [];
-    const stepsBuffer: string[] = [];
-    const followupQuestionsBuffer: string[] = [];
-    let isProcessingStep = false;
-    let isLastStep = false;
-    let isFollowupQuestion = false;
-    let stepIndex = 0;
-    let textBlockIndex = 0;
-
-    for await (const chunk of chunks) {
-      let chunkValue = chunk.answer as string;
-      if (chunkValue === '') {
-        continue;
-      }
-
-      streamedMessageRaw.push(chunkValue);
-
-      // we use numeric values to identify the beginning of a step
-      // if we match a number, store it in the buffer and move on to the next iteration
-      const LIST_ITEM_NUMBER = /(\d+)/;
-      let matchedStepIndex = chunkValue.match(LIST_ITEM_NUMBER)?.[0];
-      if (matchedStepIndex) {
-        stepsBuffer.push(matchedStepIndex);
-        continue;
-      }
-
-      // followup questions are marked either with the word 'Next Questions:' or '<<text>>' or both at the same time
-      // these markers may be split across multiple chunks, so we need to buffer them!
-      // TODO: support followup questions wrapped in <<text>> markers
-      const matchedFollowupQuestionMarker = !isFollowupQuestion && chunkValue.includes('Next');
-      if (matchedFollowupQuestionMarker) {
-        followupQuestionsBuffer.push(chunkValue);
-        continue;
-      } else if (followupQuestionsBuffer.length > 0 && chunkValue.includes('Question')) {
-        isFollowupQuestion = true;
-        followupQuestionsBuffer.push(chunkValue);
-        continue;
-      } else if (isFollowupQuestion) {
-        isFollowupQuestion = true;
-        chunkValue = chunkValue.replace(/:?\n/, '');
-      }
-
-      // if we are here, it means we have previously matched a number, followed by a dot (in current chunk)
-      // we can assume that we are at the beginning of a step!
-      if (stepsBuffer.length > 0 && chunkValue.includes('.')) {
-        isProcessingStep = true;
-        matchedStepIndex = stepsBuffer[0];
-
-        // we don't need the current buffer anymore
-        stepsBuffer.length = 0;
-      } else if (chunkValue.includes('\n\n')) {
-        // if we are here, it means we may have reached the end of the last step
-        // in order to eliminate false positives, we need to check if we currently
-        // have a step in progress
-
-        // eslint-disable-next-line unicorn/no-lonely-if
-        if (isProcessingStep) {
-          // mark the next iteration as the last step
-          // so that all remaining text (in current chunk) is added to the last step
-          isLastStep = true;
-        }
-      }
-
-      // if we are at the beginning of a step, we need to remove the step number and dot from the chunk value
-      // we simply clear the current chunk value
-      if (matchedStepIndex || isProcessingStep) {
-        if (matchedStepIndex) {
-          chunkValue = '';
-        }
-
-        // set the step index that is needed to update the correct step entry
-        stepIndex = matchedStepIndex ? Number(matchedStepIndex) - 1 : stepIndex;
-        this.updateFollowingStepOrFollowupQuestionEntry({ chunkValue, textBlockIndex, stepIndex, isFollowupQuestion });
-
-        if (isLastStep) {
-          // we reached the end of the last step. Reset all flags and counters
-          isProcessingStep = false;
-          isLastStep = false;
-          isFollowupQuestion = false;
-          stepIndex = 0;
-
-          // when we reach the end of a series of steps, we have to increment the text block index
-          // so that we start process the next text block
-          textBlockIndex++;
-        }
-      } else {
-        this.updateTextEntry({ chunkValue, textBlockIndex });
-      }
-      const citations = this.parseCitations(streamedMessageRaw.join(''));
-      this.updateCitationsEntry(citations);
-
-      this.requestUpdate('chatMessages');
-    }
-
-    console.log(streamedMessageRaw.join(''));
-
-    return streamedMessageRaw.join('');
-  }
-
-  // update the citations entry and wrap the citations in a sup tag
-  updateCitationsEntry(citations: Citation[]) {
-    const lastMessageEntry = this.chatMessages.at(-1);
-    const updateCitationReference = (match, capture) => {
-      const citation = citations.find((citation) => citation.text === capture);
-      if (citation) {
-        return `<sup>[${citation.ref}]</sup>`;
-      }
-      return match;
-    };
-
-    if (lastMessageEntry) {
-      lastMessageEntry.citations = citations;
-
-      lastMessageEntry.text.map((textEntry) => {
-        textEntry.value = textEntry.value.replaceAll(/\[(.*?)]/g, updateCitationReference);
-        textEntry.followingSteps = textEntry.followingSteps?.map((step) =>
-          step.replaceAll(/\[(.*?)]/g, updateCitationReference),
-        );
-        return textEntry;
-      });
-    }
-  }
-
-  // parse and format citations
-  parseCitations(inputText: string): Citation[] {
-    const findCitations = /\[(.*?)]/g;
-    const citation: NonNullable<unknown> = {};
-    let referenceCounter = 1;
-
-    // extract citation (filename) from the text and map it to a reference number
-    inputText.replaceAll(findCitations, (_, capture) => {
-      const citationText = capture.trim();
-      if (!citation[citationText]) {
-        citation[citationText] = referenceCounter++;
-      }
-      return '';
-    });
-
-    return Object.keys(citation).map((text, index) => ({
-      ref: index + 1,
-      text,
-    }));
-  }
-
-  // update the text block entry
-  updateTextEntry({ chunkValue, textBlockIndex }: { chunkValue: string; textBlockIndex: number }) {
-    const { text: lastChatMessageTextEntry } = this.chatMessages.at(-1) as ChatMessage;
-
-    if (!lastChatMessageTextEntry[textBlockIndex]) {
-      lastChatMessageTextEntry[textBlockIndex] = {
-        value: '',
-        followingSteps: [],
-      };
-    }
-    lastChatMessageTextEntry[textBlockIndex].value += chunkValue;
-  }
-
-  // update the following steps or followup questions entry
-  updateFollowingStepOrFollowupQuestionEntry({
-    chunkValue,
-    textBlockIndex,
-    stepIndex,
-    isFollowupQuestion,
-  }: {
-    chunkValue: string;
-    textBlockIndex: number;
-    stepIndex: number;
-    isFollowupQuestion: boolean;
-  }) {
-    // following steps and followup questions are treated the same way. They are just stored in different arrays
-    const { followupQuestions, text: lastChatMessageTextEntry } = this.chatMessages.at(-1) as ChatMessage;
-    if (isFollowupQuestion && followupQuestions) {
-      followupQuestions[stepIndex] = (followupQuestions[stepIndex] || '') + chunkValue;
-      return;
-    }
-
-    if (lastChatMessageTextEntry && lastChatMessageTextEntry[textBlockIndex]) {
-      const { followingSteps } = lastChatMessageTextEntry[textBlockIndex];
-      if (followingSteps) {
-        followingSteps[stepIndex] = (followingSteps[stepIndex] || '') + chunkValue;
-      }
-    }
-  }
 
   // Add a message to the chat, when the user or the API sends a message
-  async addMessage(message: string, isUserMessage: boolean) {
+  async processApiResponse({ message, isUserMessage }: { message: string; isUserMessage: boolean }) {
     const citations: Citation[] = [];
     const followingSteps: string[] = [];
     const followupQuestions: string[] = [];
     // Get the timestamp for the message
-    const timestamp = this.getTimestamp();
+    const timestamp = getTimestamp();
     const updateChatWithMessageOrChunk = async (part: string, isChunk: boolean) => {
       if (isChunk) {
-        await this.consumeStreamedMessage({
-          timestamp,
-          isUserMessage,
+        // we need to prepare an empty instance of the chat message so that we can start populating it
+        this.chatThread = [
+          ...this.chatThread,
+          {
+            text: [{ value: '', followingSteps: [] }],
+            followupQuestions: [],
+            citations: [],
+            timestamp: timestamp,
+            isUserMessage,
+          },
+        ];
+
+        await parseStreamedMessages({
+          chatThread: this.chatThread,
+          apiResponseBody: (this.apiResponse as Response).body,
+          visit: () => {
+            // NOTE: this function is called whenever we mutate sub-properties of the array
+            this.requestUpdate('chatThread');
+          },
         });
         return true;
       }
 
-      this.chatMessages = [
-        ...this.chatMessages,
+      this.chatThread = [
+        ...this.chatThread,
         {
           text: [
             {
@@ -636,8 +114,7 @@ export class ChatComponent extends LitElement {
       updateChatWithMessageOrChunk(message, false);
     } else {
       if (this.isStreaming) {
-        await updateChatWithMessageOrChunk(message /* undefined */, true);
-        this.requestUpdate('chatMessages');
+        await updateChatWithMessageOrChunk(message, true);
       } else {
         // non-streamed response
         const processedText = processText(message, [citations, followingSteps, followupQuestions]);
@@ -662,33 +139,35 @@ export class ChatComponent extends LitElement {
   async handleUserChatSubmit(event: Event): Promise<void> {
     event.preventDefault();
     const type = 'chat';
-    const userQuestion = this.questionInput.value;
-    if (userQuestion) {
-      this.currentQuestion = userQuestion;
+    const question = this.questionInput.value;
+    if (question) {
+      this.currentQuestion = question;
       try {
-        this.apiResponse = await this.getAPIResponse(userQuestion, this.requestOptions, type);
+        this.isStreaming = type === 'chat' && this.chatHttpOptions.stream;
+        // Remove default prompts
+        this.isChatStarted = true;
+        this.hasDefaultPromptsEnabled = false;
+        // Disable the input field and submit button while waiting for the API response
+        this.isDisabled = true;
+        // Show loading indicator while waiting for the API response
+        this.processApiResponse({ message: question, isUserMessage: true });
+
+        this.isAwaitingResponse = true;
+        this.apiResponse = await getAPIResponse({ ...this.chatRequestOptions, question, type }, this.chatHttpOptions);
+
+        this.questionInput.value = '';
         this.isAwaitingResponse = false;
         this.isDisabled = false;
-        this.questionInput.value = '';
         this.isResetInput = false;
 
         const response = this.apiResponse as BotResponse;
         const message: string = response.answer;
-        await this.addMessage(message, false);
+        await this.processApiResponse({ message, isUserMessage: false });
       } catch (error) {
         console.error(error);
         this.handleAPIError();
       }
     }
-  }
-
-  // Get the current timestamp to display with the chat message
-  getTimestamp(): string {
-    return new Date().toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true,
-    });
   }
 
   // Reset the input field and the current question
@@ -702,7 +181,7 @@ export class ChatComponent extends LitElement {
   // Reset the chat and show the default prompts
   resetCurrentChat(): void {
     this.isChatStarted = false;
-    this.chatMessages = [];
+    this.chatThread = [];
     this.isDisabled = false;
     this.hasDefaultPromptsEnabled = true;
     this.isResponseCopied = false;
@@ -728,7 +207,7 @@ export class ChatComponent extends LitElement {
 
   // Copy response to clipboard
   copyResponseToClipboard(): void {
-    const response = this.chatMessages.at(-1)?.text.at(-1)?.value as string;
+    const response = this.chatThread.at(-1)?.text.at(-1)?.value as string;
     navigator.clipboard.writeText(response);
     this.isResponseCopied = true;
   }
@@ -836,7 +315,7 @@ export class ChatComponent extends LitElement {
                 </button>
               </div>
               <ul class="chat__list" aria-live="assertive">
-                ${this.chatMessages.map(
+                ${this.chatThread.map(
                   (message) => html`
                     <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
                       <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
@@ -945,19 +424,12 @@ export class ChatComponent extends LitElement {
           ${this.hasDefaultPromptsEnabled
             ? ''
             : html`
-                <button type="button" @click="${this.showDefaultPrompts}" class="deaults__span button">
+                <button type="button" @click="${this.showDefaultPrompts}" class="defaults__span button">
                   ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
                 </button>
               `}
         </div>
       </section>
     `;
-  }
-}
-
-// Register the custom element
-declare global {
-  interface HTMLElementTagNameMap {
-    'chat-component': ChatComponent;
   }
 }

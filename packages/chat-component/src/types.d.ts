@@ -1,11 +1,16 @@
-export declare interface ChatMessageText {
+declare interface ChatHttpOptions {
+  method: string;
+  url: string;
+  stream: boolean;
+}
+declare interface ChatMessageText {
   value: string;
   followingSteps?: string[];
 }
 
 // We declare a simple interface for the chat messages
 // and the citations
-export declare interface ChatMessage {
+declare interface ChatThreadEntry {
   text: ChatMessageText[];
   citations?: Citation[];
   followupQuestions?: string[];
@@ -13,7 +18,7 @@ export declare interface ChatMessage {
   timestamp: string;
 }
 
-export declare interface Citation {
+declare interface Citation {
   ref: number;
   text: string;
 }
@@ -23,11 +28,11 @@ declare interface ProcessTextReturn {
   arrays: Array<Array<string> | Array<Citation>>;
 }
 
-declare interface RequestOptions {
-  method: string;
+declare interface ChatRequestOptions {
   approach: string;
-  stream: boolean;
   overrides: RequestOverrides;
+  type: string;
+  question: string;
 }
 
 declare interface RequestOverrides {

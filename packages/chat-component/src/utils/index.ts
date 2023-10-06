@@ -2,7 +2,6 @@
 // We keep it in this util file because we may not need it once we introduce
 // a new response format with TypeChat or a similar component
 import { NEXT_QUESTION_INDICATOR } from '../config/global-config.js';
-import type { Citation, ProcessTextReturn } from '../types';
 
 // Let's give the response a type so we can use it in the component
 
@@ -20,7 +19,7 @@ export function processText(inputText: string, arrays: Array<Array<string> | Arr
   let citations: Citation[] = [];
   let referenceCounter = 1;
   // eslint-disable-next-line unicorn/prefer-string-replace-all
-  let replacedText = inputText.replace(findCitations, (match, capture) => {
+  let replacedText = inputText.replace(findCitations, (_match, capture) => {
     const citationText = capture.trim();
     if (!citation[citationText]) {
       citation[citationText] = referenceCounter++;
@@ -76,4 +75,13 @@ export function cleanUpFollowUp(followUpList: string[]): string[] {
     followUpList = followUpList.map((followUp) => followUp.replace('<<', '').replace('>>', ''));
   }
   return followUpList;
+}
+
+// Get the current timestamp to display with the chat message
+export function getTimestamp() {
+  return new Date().toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  });
 }
