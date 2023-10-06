@@ -1,4 +1,4 @@
-export async function callHtpApi(
+export async function callHttpApi(
   { question, type, approach, overrides }: ChatRequestOptions,
   { method, url, stream }: ChatHttpOptions,
 ) {
@@ -25,7 +25,7 @@ export async function getAPIResponse(
   requestOptions: ChatRequestOptions,
   httpOptions: ChatHttpOptions,
 ): Promise<BotResponse | Response> {
-  const response = await callHtpApi(requestOptions, httpOptions);
+  const response = await callHttpApi(requestOptions, httpOptions);
 
   if (httpOptions.stream) {
     return response;
