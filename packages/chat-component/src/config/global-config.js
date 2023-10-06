@@ -25,8 +25,6 @@ const globalConfig = {
   COPY_RESPONSE_BUTTON_LABEL_TEXT: 'Copy Response',
   COPIED_SUCCESSFULLY_MESSAGE: 'Response copied!',
   LOADING_INDICATOR_TEXT: 'Please wait. We are searching for an answer...',
-  // API URL for development purposes
-  API_URL: 'http://localhost:3000/',
   // API ERROR HANDLING IN UI
   API_ERROR_MESSAGE: 'Sorry, we are having some problems. Please try again later.',
   // Config pertaining the response format
@@ -35,9 +33,7 @@ const globalConfig = {
 const NEXT_QUESTION_INDICATOR = 'Next Questions:';
 
 const requestOptions = {
-  method: 'POST',
   approach: 'rrr',
-  stream: true,
   overrides: {
     retrieval_mode: 'hybrid',
     semantic_ranker: true,
@@ -46,4 +42,11 @@ const requestOptions = {
   },
 };
 
-export { globalConfig, requestOptions, NEXT_QUESTION_INDICATOR };
+const chatHttpOptions = {
+  // API URL for development purposes
+  url: 'http://localhost:3000/',
+  method: 'POST',
+  stream: true,
+};
+
+export { globalConfig, requestOptions, chatHttpOptions, NEXT_QUESTION_INDICATOR };

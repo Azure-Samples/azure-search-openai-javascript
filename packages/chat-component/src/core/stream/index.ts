@@ -1,8 +1,8 @@
 import { NdJsonParserStream } from './data-format/ndjson.js';
 import { globalConfig } from '../../config/global-config.js';
 
-export async function* readStream<T>(response: Response): AsyncGenerator<T, void> {
-  const reader = response.body?.pipeThrough(new TextDecoderStream()).pipeThrough(new NdJsonParserStream()).getReader();
+export async function* readStream<T>(responseBody: ReadableStream<Uint8Array> | null): AsyncGenerator<T, void> {
+  const reader = responseBody?.pipeThrough(new TextDecoderStream()).pipeThrough(new NdJsonParserStream()).getReader();
   if (!reader) {
     throw new Error('No response body or body is not readable');
   }
