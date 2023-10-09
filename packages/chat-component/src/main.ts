@@ -167,6 +167,8 @@ export class ChatComponent extends LitElement {
 
         const response = this.apiResponse as BotResponse;
         const message: string = response.answer;
+        this.chatDataPoints = response.data_points;
+        this.chatThoughts = response.thoughts;
         await this.processApiResponse({ message, isUserMessage: false });
       } catch (error) {
         console.error(error);
