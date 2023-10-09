@@ -217,17 +217,23 @@ export class ChatComponent extends LitElement {
     this.isResponseCopied = true;
   }
 
-  // show thought process
+  // show thought process aside
   showThoughtProcess(event: Event): void {
     event.preventDefault();
     this.isShowingThoughtProcess = true;
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.add('aside-open');
   }
-
+  // hide thought process aside
   hideThoughtProcess(event: Event): void {
     event.preventDefault();
     this.isShowingThoughtProcess = false;
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.remove('aside-open');
+  }
+  // display active tab content
+  activateTab(event: Event): void {
+    event.preventDefault();
+    const tab = event.target as HTMLElement;
+    console.log('tab', tab);
   }
 
   renderTextEntry(textEntry: ChatMessageText) {
