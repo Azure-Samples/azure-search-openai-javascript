@@ -43,6 +43,7 @@ export class ChatComponent extends LitElement {
   @property({ type: Boolean })
   isStreaming = false;
   // Is showing thought process panel
+  @property({ type: Boolean })
   isShowingThoughtProcess = false;
   // api response
   apiResponse = {} as BotResponse | Response;
@@ -219,14 +220,12 @@ export class ChatComponent extends LitElement {
     event.preventDefault();
     this.isShowingThoughtProcess = true;
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.add('aside-open');
-    this.requestUpdate();
   }
 
   hideThoughtProcess(event: Event): void {
     event.preventDefault();
     this.isShowingThoughtProcess = false;
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.remove('aside-open');
-    this.requestUpdate();
   }
 
   renderTextEntry(textEntry: ChatMessageText) {
@@ -476,6 +475,23 @@ export class ChatComponent extends LitElement {
                       height="12"
                     />
                   </button>
+                </div>
+                <div class="aside__content">
+                  <nav>
+                    <ul class="aside__list">
+                      <li class="aside__listItem">
+                        <span>Thought Process</span>
+                        <div class="tab">One</div>
+                      </li>
+                      <li class="aside__listItem">
+                        <span>Supporting Context</span>
+                        <div class="tab">Two</div>
+                      </li>
+                      <li class="aside__listItem">
+                        <div class="tab">Three</div>
+                      </li>
+                    </ul>
+                  </nav>
                 </div>
               </aside>
             `
