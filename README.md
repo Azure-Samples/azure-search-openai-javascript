@@ -297,21 +297,21 @@ The primary differences:
 
 Feature comparison:
 
-| Feature                 | azure-search-openai-demo | sample-app-aoai-chatGPT                  |
-| ----------------------- | ------------------------ | ---------------------------------------- |
-| RAG approach            | Multiple approaches      | Only via ChatCompletion API data_sources |
-| Vector support          | ✅ Yes                   | ✅ Yes                                   |
-| Data ingestion          | ✅ Yes (MD)              | ✅ Yes (PDF, TXT, MD, HTML)              |
-| Persistent chat history | ❌ No (browser tab only) | ✅ Yes, in CosmosDB                      |
+| Feature                 | azure-search-openai-javascript | sample-app-aoai-chatGPT                  |
+| ----------------------- | ------------------------------ | ---------------------------------------- |
+| RAG approach            | Multiple approaches            | Only via ChatCompletion API data_sources |
+| Vector support          | ✅ Yes                         | ✅ Yes                                   |
+| Data ingestion          | ✅ Yes (MD)                    | ✅ Yes (PDF, TXT, MD, HTML)              |
+| Persistent chat history | ❌ No (browser tab only)       | ✅ Yes, in CosmosDB                      |
 
 Technology comparison:
 
-| Tech       | azure-search-openai-demo  | sample-app-aoai-chatGPT |
-| ---------- | ------------------------- | ----------------------- |
-| Frontend   | React/Lit                 | React                   |
-| Backend    | Node.js (Fastify)         | Python (Flask)          |
-| Vector DB  | Azure Cognitive Search    | Azure Cognitive Search  |
-| Deployment | Azure Developer CLI (azd) | Azure Portal, az, azd   |
+| Tech       | azure-search-openai-javascript | sample-app-aoai-chatGPT |
+| ---------- | ------------------------------ | ----------------------- |
+| Frontend   | React/Lit                      | React                   |
+| Backend    | Node.js (Fastify)              | Python (Flask)          |
+| Vector DB  | Azure Cognitive Search         | Azure Cognitive Search  |
+| Deployment | Azure Developer CLI (azd)      | Azure Portal, az, azd   |
 
 </details>
 
