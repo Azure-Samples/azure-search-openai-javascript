@@ -67,9 +67,19 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     const chatContent = chatCompletion.choices[0].message.content ?? '';
 
     return {
-      data_points: dataPoints,
-      answer: chatContent,
-      thoughts: thoughts,
+      choices: [
+        {
+          index: 0,
+          message: {
+            content: chatContent,
+            role: 'assistant',
+            context: {
+              data_points: dataPoints,
+              thoughts: thoughts,
+            },
+          },
+        },
+      ],
     };
   }
 
@@ -86,9 +96,20 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     let id = 0;
     for await (const chunk of chatCompletion) {
       const responseChunk = {
-        data_points: id === 0 ? dataPoints : undefined,
-        thoughts: id === 0 ? thoughts : undefined,
-        answer: chunk.choices[0].delta.content ?? '',
+        choices: [
+          {
+            index: 0,
+            delta: {
+              content: chunk.choices[0].delta.content ?? '',
+              role: 'assistant' as const,
+              context: {
+                data_points: id === 0 ? dataPoints : undefined,
+                thoughts: id === 0 ? thoughts : undefined,
+              },
+            },
+            finish_reason: chunk.choices[0].finish_reason,
+          },
+        ],
       };
       yield responseChunk;
       id++;
