@@ -13,8 +13,8 @@ import {
   type ChatRequest,
   type ChatTurn,
   getChunksFromResponse,
-  ChatResponseChunk,
-  Message,
+  type ChatResponseChunk,
+  type Message,
 } from '../../api/index.js';
 import { Answer, AnswerError, AnswerLoading } from '../../components/Answer/index.js';
 import { QuestionInput } from '../../components/QuestionInput/index.js';

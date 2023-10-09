@@ -29,7 +29,7 @@ export const AnalysisPanel = ({
   const isDisabledThoughtProcessTab: boolean = !answer.context?.thoughts;
   const isDisabledSupportingContentTab: boolean = answer.context?.data_points?.length === 0;
   const isDisabledCitationTab: boolean = !activeCitation;
-  const sanitizedThoughts = DOMPurify.sanitize(answer.context?.thoughts!);
+  const sanitizedThoughts = DOMPurify.sanitize(answer.context?.thoughts ?? '');
 
   return (
     <Pivot
