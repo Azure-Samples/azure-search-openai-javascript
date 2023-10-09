@@ -102,14 +102,27 @@ export const mainStyle = css`
   .chat__containerWrapper {
     display: grid;
     grid-template-columns: 1fr;
+    gutter: 20px;
   }
   .chat__containerWrapper.aside-open {
     display: grid;
     grid-template-columns: 1fr;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
 
     @media (min-width: 1024px) {
       grid-template-columns: 1fr 1fr;
     }
+  }
+  .chat__containerWrapper.aside-open .aside {
+    width: 100%;
+  }
+  .aside {
+    width: 0;
+  }
+  .aside__header {
+    display: flex;
+    justify-content: end;
   }
   .chat__header {
     display: flex;
