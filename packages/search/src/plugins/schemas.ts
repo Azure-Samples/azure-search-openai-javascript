@@ -79,18 +79,23 @@ export const messageSchema = {
 
 export const approachResponseSchema = {
   $id: 'approachResponse',
-  choices: {
-    type: 'array',
-    items: {
-      type: 'object',
-      properties: {
-        index: { type: 'number' },
-        message: { $ref: 'message' },
+  type: 'object',
+  properties: {
+    choices: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          index: { type: 'number' },
+          message: { $ref: 'message' },
+        },
+        required: ['index', 'message'],
+        additionalProperties: false,
       },
-      required: ['index', 'message'],
-      additionalProperties: false,
     },
+    object: { type: 'string' },
   },
+  required: ['choices', 'object'],
 } as const;
 
 export const schemas = [chatRequestSchema, askRequestSchema, messageSchema, approachResponseSchema];

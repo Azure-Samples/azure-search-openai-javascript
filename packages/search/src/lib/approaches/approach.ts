@@ -5,6 +5,7 @@ export interface ApproachResponse {
     index: number;
     message: ApproachResponseMessage;
   }>;
+  object: 'chat.completion';
 }
 
 export interface ApproachResponseChunk {
@@ -13,6 +14,7 @@ export interface ApproachResponseChunk {
     delta: Partial<ApproachResponseMessage>;
     finish_reason: string | null;
   }>;
+  object: 'chat.completion.chunk';
 }
 
 export type ApproachResponseMessage = Message & {
