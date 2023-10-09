@@ -168,8 +168,8 @@ export class ChatComponent extends LitElement {
 
         const response = this.apiResponse as BotResponse;
         const message: string = response.answer;
-        this.chatDataPoints = response.data_points;
-        this.chatThoughts = response.thoughts;
+        console.log('###### message', message);
+        console.log('###### response', response);
         await this.processApiResponse({ message, isUserMessage: false });
       } catch (error) {
         console.error(error);
@@ -237,6 +237,16 @@ export class ChatComponent extends LitElement {
     event.preventDefault();
     const tab = event.target as HTMLElement;
     console.log('tab', tab);
+    const tabName = tab.textContent;
+    console.log('tabName', tabName);
+    const tabs = this.shadowRoot?.querySelectorAll('.aside__tab');
+    console.log('tabs', tabs);
+    const links = this.shadowRoot?.querySelectorAll('.aside__link');
+    console.log('links', links);
+    if (tabs) for (const tab of tabs) tab.classList.remove('active');
+    if (links) for (const link of links) link.classList.remove('active');
+    tab.classList.add('active');
+    tab.parentElement?.classList.add('active');
   }
 
   renderTextEntry(textEntry: ChatMessageText) {
@@ -489,15 +499,15 @@ export class ChatComponent extends LitElement {
                 </div>
                 <nav class="aside__nav">
                   <ul class="aside__list">
-                    <li class="aside__listItem active">
+                    <li class="aside__listItem">
                       <a 
-                        class="aside__link"
+                        class="aside__link active"
                         role="button"
                         href="#"
                         @click="${(event: Event) => this.activateTab(event)}"
-                        title="Thought Process"
+                        title="${globalConfig.THOUGHT_PROCESS_LABEL}"
                       >
-                        Thought Process
+                      ${globalConfig.THOUGHT_PROCESS_LABEL}
                       </a>
                     </li>
                     <li class="aside__listItem">
@@ -506,9 +516,9 @@ export class ChatComponent extends LitElement {
                         role="button"
                         href="#"
                         @click="${(event: Event) => this.activateTab(event)}"
-                        title="Supporting Context"
+                        title="${globalConfig.SUPPORT_CONTEXT_LABEL}"
                       >
-                      Supporting Context
+                      ${globalConfig.SUPPORT_CONTEXT_LABEL}
                       </a>
                     </li>
                     <li class="aside__listItem">
@@ -517,23 +527,24 @@ export class ChatComponent extends LitElement {
                         role="button"
                         href="#"
                         @click="${(event: Event) => this.activateTab(event)}"
-                        title="Citations"
+                        title="${globalConfig.CITATIONS_LABEL}"
                       >
-                      Citations
+                      ${globalConfig.CITATIONS_LABEL}
                       </a>
                     </li>
                   </ul>
                 </nav>
                 <div class="aside__content">
                   <div class="aside__tab active">
-                    <h3 class="subheadline--small">Thought Process</h3>
-                    <p>${this.chatThoughts}</p>
+                    <h3 class="subheadline--small">${globalConfig.THOUGHT_PROCESS_LABEL}</h3>
+                    <div class="aside__innerContainer">
+                    </div> 
                   </div>
                   <div class="aside__tab">
-                    <h3 class="subheadline--small">Supporting Context</h3>
+                    <h3 class="subheadline--small">${globalConfig.SUPPORT_CONTEXT_LABEL}</h3>
                   </div>
                   <div class="aside__tab">
-                    <h3 class="subheadline--small">Citations</h3>
+                    <h3 class="subheadline--small">${globalConfig.CITATIONS_LABEL}</h3>
                   </div>
                 </div>
               </div>

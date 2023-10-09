@@ -130,15 +130,22 @@ export const mainStyle = css`
     list-style-type: none;
     padding: 20px 0;
   }
-  .aside__listItem.active {
-    border-bottom: 2px solid var(--accent-high);
+  .aside__link.active {
+    border-bottom: 4px solid var(--accent-high);
+  }
+  .aside__link:not(.active):hover {
+    border-bottom: 4px solid var(--accent-light);
+    cursor: pointer;
   }
   .aside__link {
+    border-bottom: 4px solid transparent;
     text-decoration: none;
     color: var(--text-color);
     font-weight: bold;
     font-size: small;
     cursor: pointer;
+    display: block;
+    padding: 10px;
   }
   .aside__content {
     position: relative;

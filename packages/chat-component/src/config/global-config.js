@@ -30,6 +30,9 @@ const globalConfig = {
   // API ERROR HANDLING IN UI
   API_ERROR_MESSAGE: 'Sorry, we are having some problems. Please try again later.',
   // Config pertaining the response format
+  THOUGHT_PROCESS_LABEL: 'Thought Process',
+  SUPPORT_CONTEXT_LABEL: 'Support Context',
+  CITATIONS_LABEL: 'Citations',
 };
 
 const NEXT_QUESTION_INDICATOR = 'Next Questions:';
