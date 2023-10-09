@@ -76,12 +76,15 @@ param principalId string = ''
 @description('Use Application Insights for monitoring and performance tracing')
 param useApplicationInsights bool = false
 
+param allowedOrigin string
+
 // Only needed for CD due to internal policies restrictions
 param aliasTag string = ''
 
 var abbrs = loadJsonContent('abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = union({ 'azd-env-name': environmentName }, empty(aliasTag) ? {} : { alias: aliasTag })
+var allowedOrigins = empty(allowedOrigin) ? [webApp.outputs.uri] : [webApp.outputs.uri, allowedOrigin]
 
 // Organize resources in a resource group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -154,6 +157,7 @@ module searchApi './core/host/container-app.bicep' = {
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
     managedIdentity: true
+    allowedOrigins: allowedOrigins
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
     secrets: useApplicationInsights ? [
@@ -528,3 +532,5 @@ output AZURE_STORAGE_RESOURCE_GROUP string = storageResourceGroup.name
 output WEBAPP_URI string = webApp.outputs.uri
 output SEARCH_API_URI string = searchApi.outputs.uri
 output INDEXER_API_URI string = indexerApi.outputs.uri
+
+output ALLOWED_ORIGINS string = join(allowedOrigins, ',')
