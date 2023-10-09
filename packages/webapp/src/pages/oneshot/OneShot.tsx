@@ -14,7 +14,7 @@ import {
 
 import styles from './OneShot.module.css';
 
-import { askApi, Approaches, type ChatResponse, type AskRequest, RetrievalMode, Message } from '../../api/index.js';
+import { askApi, Approaches, type AskRequest, RetrievalMode, type Message } from '../../api/index.js';
 import { Answer, AnswerError } from '../../components/Answer/index.js';
 import { QuestionInput } from '../../components/QuestionInput/index.js';
 import { ExampleList } from '../../components/Example/index.js';
