@@ -3,6 +3,8 @@ import { flushSync } from 'react-dom';
 import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Dropdown, type IDropdownOption } from '@fluentui/react';
 import { SparkleFilled } from '@fluentui/react-icons';
 
+import 'chat-component';
+
 import styles from './Chat.module.css';
 
 import {
@@ -200,6 +202,10 @@ const Chat = () => {
         />
         <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
       </div>
+      <div className={styles.chatRoot}>
+        <chat-component></chat-component>
+      </div>
+
       <div className={styles.chatRoot}>
         <div className={styles.chatContainer}>
           {lastQuestionReference.current ? (
