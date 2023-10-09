@@ -54,6 +54,8 @@ export class ChatComponent extends LitElement {
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   chatInputLabelText: string = globalConfig.CHAT_INPUT_LABEL_TEXT;
+  chatDataPoints: string[] = [];
+  chatThoughts: string | null = '';
 
   chatRequestOptions: ChatRequestOptions = requestOptions;
   chatHttpOptions: ChatHttpOptions = chatHttpOptions;
