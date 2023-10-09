@@ -9,10 +9,12 @@ import {
   chatApi,
   RetrievalMode,
   Approaches,
-  type AskResponse,
+  type ChatResponse,
   type ChatRequest,
   type ChatTurn,
   getChunksFromResponse,
+  ChatResponseChunk,
+  Message,
 } from '../../api/index.js';
 import { Answer, AnswerError, AnswerLoading } from '../../components/Answer/index.js';
 import { QuestionInput } from '../../components/QuestionInput/index.js';
@@ -43,7 +45,7 @@ const Chat = () => {
   const [activeAnalysisPanelTab, setActiveAnalysisPanelTab] = useState<AnalysisPanelTabs | undefined>(undefined);
 
   const [selectedAnswer, setSelectedAnswer] = useState<number>(0);
-  const [answers, setAnswers] = useState<[user: string, response: AskResponse][]>([]);
+  const [answers, setAnswers] = useState<[user: string, response: Message][]>([]);
 
   const makeApiRequest = async (question: string) => {
     lastQuestionReference.current = question;
@@ -54,12 +56,12 @@ const Chat = () => {
     setActiveAnalysisPanelTab(undefined);
 
     try {
-      const history: ChatTurn[] = answers.map((a) => ({ user: a[0], bot: a[1].answer }));
+      const history: ChatTurn[] = answers.map((a) => ({ user: a[0], bot: a[1].content }));
       const request: ChatRequest = {
-        history: [...history, { user: question, bot: undefined }],
-        approach: Approaches.ReadRetrieveRead,
+        messages: [...history, { user: question, bot: undefined }],
         stream: useStream,
-        overrides: {
+        context: {
+          approach: Approaches.ReadRetrieveRead,
           promptTemplate: promptTemplate.length === 0 ? undefined : promptTemplate,
           excludeCategory: excludeCategory.length === 0 ? undefined : excludeCategory,
           top: retrieveCount,
@@ -73,29 +75,32 @@ const Chat = () => {
       const chatResponse = await chatApi(request);
       if (useStream) {
         const response = chatResponse as Response;
-        const askResponse: AskResponse = {
-          answer: '',
-          data_points: [],
-          thoughts: '',
+        const message: Message = {
+          content: '',
+          role: 'assistant',
+          context: {
+            data_points: [],
+            thoughts: '',
+          },
         };
 
-        const chunks = await getChunksFromResponse<Partial<AskResponse> & { id: string }>(response);
+        const chunks = await getChunksFromResponse<ChatResponseChunk>(response);
         for await (const chunk of chunks) {
-          if (chunk.data_points) {
-            askResponse.data_points = chunk.data_points;
-            askResponse.thoughts = chunk.thoughts ?? '';
-          } else if (chunk.answer) {
-            askResponse.answer += chunk.answer;
+          if (chunk.choices[0].delta.context?.data_points) {
+            message.context!.data_points = chunk.choices[0].delta.context?.data_points;
+            message.context!.thoughts = chunk.choices[0].delta.context?.thoughts ?? '';
+          } else if (chunk.choices[0].delta.content) {
+            message.content += chunk.choices[0].delta.content;
             setIsLoading(false);
             // Disable batching
             flushSync(() => {
-              setAnswers([...answers, [question, { ...askResponse }]]);
+              setAnswers([...answers, [question, { ...message }]]);
             });
           }
         }
       } else {
-        const result = chatResponse as AskResponse;
-        setAnswers([...answers, [question, result]]);
+        const message = (chatResponse as ChatResponse).choices[0].message;
+        setAnswers([...answers, [question, message]]);
       }
     } catch (error_) {
       setError(error_);

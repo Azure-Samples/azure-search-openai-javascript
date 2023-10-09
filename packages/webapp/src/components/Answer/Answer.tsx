@@ -4,12 +4,12 @@ import DOMPurify from 'dompurify';
 
 import styles from './Answer.module.css';
 
-import { type AskResponse, getCitationFilePath } from '../../api/index.js';
+import { type Message, getCitationFilePath } from '../../api/index.js';
 import { parseAnswerToHtml } from './AnswerParser.jsx';
 import { AnswerIcon } from './AnswerIcon.jsx';
 
 interface Props {
-  answer: AskResponse;
+  answer: Message;
   isSelected?: boolean;
   onCitationClicked: (filePath: string) => void;
   onThoughtProcessClicked: () => void;
@@ -27,7 +27,7 @@ export const Answer = ({
   onFollowupQuestionClicked,
   showFollowupQuestions,
 }: Props) => {
-  const parsedAnswer = useMemo(() => parseAnswerToHtml(answer.answer, onCitationClicked), [answer]);
+  const parsedAnswer = useMemo(() => parseAnswerToHtml(answer.content, onCitationClicked), [answer]);
 
   const sanitizedAnswerHtml = DOMPurify.sanitize(parsedAnswer.answerHtml);
 
@@ -43,7 +43,7 @@ export const Answer = ({
               title="Show thought process"
               ariaLabel="Show thought process"
               onClick={() => onThoughtProcessClicked()}
-              disabled={!answer.thoughts}
+              disabled={!answer.context?.thoughts}
             />
             <IconButton
               style={{ color: 'black' }}
@@ -51,7 +51,7 @@ export const Answer = ({
               title="Show supporting content"
               ariaLabel="Show supporting content"
               onClick={() => onSupportingContentClicked()}
-              disabled={answer.data_points.length === 0}
+              disabled={answer.context?.data_points?.length === 0}
             />
           </div>
         </Stack>
