@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 import styles from './AnalysisPanel.module.css';
 
 import { SupportingContent } from '../SupportingContent/index.js';
-import { type AskResponse } from '../../api/index.js';
+import { type Message } from '../../api/index.js';
 import { AnalysisPanelTabs } from './AnalysisPanelTabs.jsx';
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
   onActiveTabChanged: (tab: AnalysisPanelTabs) => void;
   activeCitation: string | undefined;
   citationHeight: string;
-  answer: AskResponse;
+  answer: Message;
 }
 
 const pivotItemDisabledStyle = { disabled: true, style: { color: 'grey' } };
@@ -26,11 +26,10 @@ export const AnalysisPanel = ({
   className,
   onActiveTabChanged,
 }: Props) => {
-  const isDisabledThoughtProcessTab: boolean = !answer.thoughts;
-  const isDisabledSupportingContentTab: boolean = answer.data_points.length === 0;
+  const isDisabledThoughtProcessTab: boolean = !answer.context?.thoughts;
+  const isDisabledSupportingContentTab: boolean = answer.context?.data_points?.length === 0;
   const isDisabledCitationTab: boolean = !activeCitation;
-
-  const sanitizedThoughts = DOMPurify.sanitize(answer.thoughts!);
+  const sanitizedThoughts = DOMPurify.sanitize(answer.context?.thoughts!);
 
   return (
     <Pivot
@@ -45,13 +44,15 @@ export const AnalysisPanel = ({
       >
         <div className={styles.thoughtProcess} dangerouslySetInnerHTML={{ __html: sanitizedThoughts }}></div>
       </PivotItem>
-      <PivotItem
-        itemKey={AnalysisPanelTabs.SupportingContentTab}
-        headerText="Supporting content"
-        headerButtonProps={isDisabledSupportingContentTab ? pivotItemDisabledStyle : undefined}
-      >
-        <SupportingContent supportingContent={answer.data_points} />
-      </PivotItem>
+      {answer.context?.data_points && (
+        <PivotItem
+          itemKey={AnalysisPanelTabs.SupportingContentTab}
+          headerText="Supporting content"
+          headerButtonProps={isDisabledSupportingContentTab ? pivotItemDisabledStyle : undefined}
+        >
+          <SupportingContent supportingContent={answer.context!.data_points!} />
+        </PivotItem>
+      )}
       <PivotItem
         itemKey={AnalysisPanelTabs.CitationTab}
         headerText="Citation"

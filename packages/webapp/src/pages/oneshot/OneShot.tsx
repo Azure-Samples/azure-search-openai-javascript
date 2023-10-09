@@ -14,7 +14,7 @@ import {
 
 import styles from './OneShot.module.css';
 
-import { askApi, Approaches, type AskResponse, type AskRequest, RetrievalMode } from '../../api/index.js';
+import { askApi, Approaches, type ChatResponse, type AskRequest, RetrievalMode, Message } from '../../api/index.js';
 import { Answer, AnswerError } from '../../components/Answer/index.js';
 import { QuestionInput } from '../../components/QuestionInput/index.js';
 import { ExampleList } from '../../components/Example/index.js';
@@ -37,7 +37,7 @@ export function Component(): JSX.Element {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<unknown>();
-  const [answer, setAnswer] = useState<AskResponse>();
+  const [answer, setAnswer] = useState<Message>();
 
   const [activeCitation, setActiveCitation] = useState<string>();
   const [activeAnalysisPanelTab, setActiveAnalysisPanelTab] = useState<AnalysisPanelTabs | undefined>(undefined);
@@ -53,8 +53,8 @@ export function Component(): JSX.Element {
     try {
       const request: AskRequest = {
         question,
-        approach,
-        overrides: {
+        context: {
+          approach,
           promptTemplate: promptTemplate.length === 0 ? undefined : promptTemplate,
           promptTemplatePrefix: promptTemplatePrefix.length === 0 ? undefined : promptTemplatePrefix,
           promptTemplateSuffix: promptTemplateSuffix.length === 0 ? undefined : promptTemplateSuffix,
@@ -66,7 +66,7 @@ export function Component(): JSX.Element {
         },
       };
       const result = await askApi(request);
-      setAnswer(result);
+      setAnswer(result.choices[0].message);
     } catch (error_) {
       setError(error_);
     } finally {

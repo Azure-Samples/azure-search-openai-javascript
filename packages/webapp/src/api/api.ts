@@ -1,8 +1,8 @@
-import { type AskRequest, type AskResponse, type ChatRequest } from './models.js';
+import { type AskRequest, type ChatResponse, type ChatRequest } from './models.js';
 
 const baseUrl = import.meta.env.VITE_SEARCH_API_URI ?? '';
 
-export async function askApi(options: AskRequest): Promise<AskResponse> {
+export async function askApi(options: AskRequest): Promise<ChatResponse> {
   const response = await fetch(`${baseUrl}/ask`, {
     method: 'POST',
     headers: {
@@ -11,21 +11,21 @@ export async function askApi(options: AskRequest): Promise<AskResponse> {
     body: JSON.stringify({
       question: options.question,
       context: {
-        approach: options.approach,
-        retrieval_mode: options.overrides?.retrievalMode,
-        semantic_ranker: options.overrides?.semanticRanker,
-        semantic_captions: options.overrides?.semanticCaptions,
-        top: options.overrides?.top,
-        temperature: options.overrides?.temperature,
-        prompt_template: options.overrides?.promptTemplate,
-        prompt_template_prefix: options.overrides?.promptTemplatePrefix,
-        prompt_template_suffix: options.overrides?.promptTemplateSuffix,
-        exclude_category: options.overrides?.excludeCategory,
+        approach: options.context?.approach,
+        retrieval_mode: options.context?.retrievalMode,
+        semantic_ranker: options.context?.semanticRanker,
+        semantic_captions: options.context?.semanticCaptions,
+        top: options.context?.top,
+        temperature: options.context?.temperature,
+        prompt_template: options.context?.promptTemplate,
+        prompt_template_prefix: options.context?.promptTemplatePrefix,
+        prompt_template_suffix: options.context?.promptTemplateSuffix,
+        exclude_category: options.context?.excludeCategory,
       },
     }),
   });
 
-  const parsedResponse: AskResponse = await response.json();
+  const parsedResponse: ChatResponse = await response.json();
   if (response.status > 299 || !response.ok) {
     throw new Error(parsedResponse.error || 'Unknown error');
   }
@@ -33,27 +33,27 @@ export async function askApi(options: AskRequest): Promise<AskResponse> {
   return parsedResponse;
 }
 
-export async function chatApi(options: ChatRequest): Promise<AskResponse | Response> {
+export async function chatApi(options: ChatRequest): Promise<ChatResponse | Response> {
   const response = await fetch(`${baseUrl}/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      messages: options.history,
+      messages: options.messages,
       stream: options.stream,
       context: {
-        approach: options.approach,
-        retrieval_mode: options.overrides?.retrievalMode,
-        semantic_ranker: options.overrides?.semanticRanker,
-        semantic_captions: options.overrides?.semanticCaptions,
-        top: options.overrides?.top,
-        temperature: options.overrides?.temperature,
-        prompt_template: options.overrides?.promptTemplate,
-        prompt_template_prefix: options.overrides?.promptTemplatePrefix,
-        prompt_template_suffix: options.overrides?.promptTemplateSuffix,
-        exclude_category: options.overrides?.excludeCategory,
-        suggest_followup_questions: options.overrides?.suggestFollowupQuestions,
+        approach: options.context?.approach,
+        retrieval_mode: options.context?.retrievalMode,
+        semantic_ranker: options.context?.semanticRanker,
+        semantic_captions: options.context?.semanticCaptions,
+        top: options.context?.top,
+        temperature: options.context?.temperature,
+        prompt_template: options.context?.promptTemplate,
+        prompt_template_prefix: options.context?.promptTemplatePrefix,
+        prompt_template_suffix: options.context?.promptTemplateSuffix,
+        exclude_category: options.context?.excludeCategory,
+        suggest_followup_questions: options.context?.suggestFollowupQuestions,
       },
     }),
   });
@@ -62,7 +62,7 @@ export async function chatApi(options: ChatRequest): Promise<AskResponse | Respo
     return response;
   }
 
-  const parsedResponse: AskResponse = await response.json();
+  const parsedResponse: ChatResponse = await response.json();
   if (response.status > 299 || !response.ok) {
     throw new Error(parsedResponse.error || 'Unknown error');
   }

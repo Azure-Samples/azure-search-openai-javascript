@@ -20,19 +20,37 @@ export type AskRequestOverrides = {
   promptTemplate?: string;
   promptTemplatePrefix?: string;
   promptTemplateSuffix?: string;
-  suggestFollowupQuestions?: boolean;
 };
 
 export type AskRequest = {
   question: string;
-  approach: Approaches;
-  overrides?: AskRequestOverrides;
+  context?: AskRequestOverrides & {
+    approach?: Approaches;
+  };
 };
 
-export type AskResponse = {
-  answer: string;
-  thoughts: string | null;
-  data_points: string[];
+export type Message = {
+  content: string;
+  role: string;
+  context?: Record<string, any> & {
+    data_points?: string[];
+    thoughts?: string;
+  };
+};
+
+export type ChatResponse = {
+  choices: Array<{
+    index: number;
+    message: Message;
+  }>;
+  error?: string;
+};
+
+export type ChatResponseChunk = {
+  choices: Array<{
+    index: number;
+    delta: Partial<Message>;
+  }>;
   error?: string;
 };
 
@@ -42,8 +60,10 @@ export type ChatTurn = {
 };
 
 export type ChatRequest = {
-  history: ChatTurn[];
+  messages: ChatTurn[];
   stream?: boolean;
-  approach: Approaches;
-  overrides?: AskRequestOverrides;
+  context?: AskRequestOverrides & {
+    approach?: Approaches;
+    suggestFollowupQuestions?: boolean;
+  };
 };
