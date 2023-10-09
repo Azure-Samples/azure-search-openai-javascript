@@ -4,8 +4,7 @@ export const chatRequestSchema = {
   $id: 'chatRequest',
   type: 'object',
   properties: {
-    approach: { type: 'string' },
-    history: {
+    messages: {
       type: 'array',
       items: {
         type: 'object',
@@ -16,29 +15,40 @@ export const chatRequestSchema = {
       },
     },
     stream: { type: 'boolean' },
-    overrides: {
+    context: {
       type: 'object',
-      // TODO: need to type this better
+      properties: {
+        approach: { type: 'string' },
+      },
+      additionalProperties: { type: 'string' },
+    },
+    session_state: {
+      type: 'object',
       additionalProperties: { type: 'string' },
     },
   },
-  required: ['approach', 'history'],
+  required: ['messages'],
 } as const;
 
 export const askRequestSchema = {
   $id: 'askRequest',
   type: 'object',
   properties: {
-    approach: { type: 'string' },
     question: { type: 'string' },
     stream: { type: 'boolean' },
-    overrides: {
+    context: {
       type: 'object',
-      // TODO: need to type this better
+      properties: {
+        approach: { type: 'string' },
+      },
+      additionalProperties: { type: 'string' },
+    },
+    session_state: {
+      type: 'object',
       additionalProperties: { type: 'string' },
     },
   },
-  required: ['approach', 'question'],
+  required: ['question'],
 } as const;
 
 export const approachResponseSchema = {

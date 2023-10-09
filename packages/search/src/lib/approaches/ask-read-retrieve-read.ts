@@ -9,7 +9,7 @@ import { type LangchainService } from '../../plugins/langchain.js';
 import { CsvLookupTool, HtmlCallbackHandler } from '../langchain/index.js';
 import {
   type ApproachResponseChunk,
-  type ApproachOverrides,
+  type ApproachContext,
   type AskApproach,
   type ApproachResponse,
 } from './approach.js';
@@ -57,7 +57,7 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
     super(search, openai, chatGptModel, embeddingModel, sourcePageField, contentField);
   }
 
-  async run(userQuery: string, overrides?: ApproachOverrides): Promise<ApproachResponse> {
+  async run(userQuery: string, context?: ApproachContext): Promise<ApproachResponse> {
     let searchResults: string[] = [];
 
     const htmlTracer = new HtmlCallbackHandler();
@@ -65,7 +65,7 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
     callbackManager.addHandler(htmlTracer);
 
     const searchAndStore = async (query: string): Promise<string> => {
-      const { results, content } = await this.searchDocuments(query, overrides);
+      const { results, content } = await this.searchDocuments(query, context);
       searchResults = results;
       return content;
     };
@@ -82,14 +82,14 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
     ];
 
     const chatModel = await this.langchain.getChat({
-      temperature: Number(overrides?.temperature) || 0.3,
+      temperature: Number(context?.temperature) || 0.3,
     });
 
     const executor = await initializeAgentExecutorWithOptions(tools, chatModel, {
       agentType: 'chat-zero-shot-react-description',
       agentArgs: {
-        prefix: overrides?.prompt_template_prefix ?? TEMPLATE_PREFIX,
-        suffix: overrides?.prompt_template_suffix ?? TEMPLATE_SUFFIX,
+        prefix: context?.prompt_template_prefix ?? TEMPLATE_PREFIX,
+        suffix: context?.prompt_template_suffix ?? TEMPLATE_SUFFIX,
         inputVariables: ['input', 'agent_scratchpad'],
       },
       returnIntermediateSteps: true,
@@ -110,7 +110,7 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
   }
 
   // eslint-disable-next-line require-yield
-  async *runWithStreaming(_query: string, _overrides?: ApproachOverrides): AsyncGenerator<ApproachResponseChunk, void> {
+  async *runWithStreaming(_query: string, _context?: ApproachContext): AsyncGenerator<ApproachResponseChunk, void> {
     throw new Error('Streaming not supported for this approach.');
   }
 }

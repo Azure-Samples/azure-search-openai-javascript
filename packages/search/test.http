@@ -15,9 +15,9 @@ POST {{api_host}}/chat
 Content-Type: application/json
 
 {
-  "history": [{ "user": "What happens if a rental doesn't fit the description?" }],
-  "approach":"rrr",
-  "overrides": {
+  "messages": [{ "user": "What happens if a rental doesn't fit the description?" }],
+  "context": {
+    "approach":"rrr",
     "retrieval_mode": "hybrid",
     "semantic_ranker": true,
     "semantic_captions": false,
@@ -33,10 +33,10 @@ POST {{api_host}}/chat
 Content-Type: application/json
 
 {
-  "history": [{ "user": "What happens if a rental doesn't fit the description?" }],
+  "messages": [{ "user": "What happens if a rental doesn't fit the description?" }],
   "stream": true,
-  "approach":"rrr",
-  "overrides": {
+  "context": {
+    "approach":"rrr",
     "retrieval_mode": "hybrid",
     "semantic_ranker": true,
     "semantic_captions": false,
@@ -53,8 +53,8 @@ Content-Type: application/json
 
 {
   "question": "What is the refund policy?",
-  "approach":"rtr",
-  "overrides": {
+  "context": {
+    "approach":"rtr",
     "retrieval_mode": "hybrid",
     "semantic_ranker": true,
     "semantic_captions": false,
@@ -70,8 +70,8 @@ Content-Type: application/json
 
 {
   "question": "How to contact a representative?",
-  "approach":"rrr",
-  "overrides": {
+  "context": {
+    "approach":"rrr",
     "retrieval_mode": "hybrid",
     "semantic_ranker": true,
     "semantic_captions": false,

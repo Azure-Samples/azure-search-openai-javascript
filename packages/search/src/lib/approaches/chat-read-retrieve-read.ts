@@ -3,7 +3,7 @@ import { type OpenAiService } from '../../plugins/openai.js';
 import {
   type ChatApproach,
   type ApproachResponse,
-  type ChatApproachOverrides,
+  type ChatApproachContext,
   type ApproachResponseChunk,
 } from './approach.js';
 import { ApproachBase } from './approach-base.js';
@@ -60,8 +60,8 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     this.chatGptTokenLimit = getTokenLimit(chatGptModel);
   }
 
-  async run(history: HistoryMessage[], overrides?: ChatApproachOverrides): Promise<ApproachResponse> {
-    const { completionRequest, dataPoints, thoughts } = await this.baseRun(history, overrides);
+  async run(history: HistoryMessage[], context?: ChatApproachContext): Promise<ApproachResponse> {
+    const { completionRequest, dataPoints, thoughts } = await this.baseRun(history, context);
     const openAiChat = await this.openai.getChat();
     const chatCompletion = await openAiChat.completions.create(completionRequest);
     const chatContent = chatCompletion.choices[0].message.content ?? '';
@@ -75,9 +75,9 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
 
   async *runWithStreaming(
     history: HistoryMessage[],
-    overrides?: ChatApproachOverrides,
+    context?: ChatApproachContext,
   ): AsyncGenerator<ApproachResponseChunk, void> {
-    const { completionRequest, dataPoints, thoughts } = await this.baseRun(history, overrides);
+    const { completionRequest, dataPoints, thoughts } = await this.baseRun(history, context);
     const openAiChat = await this.openai.getChat();
     const chatCompletion = await openAiChat.completions.create({
       ...completionRequest,
@@ -95,7 +95,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     }
   }
 
-  private async baseRun(history: HistoryMessage[], overrides?: ChatApproachOverrides) {
+  private async baseRun(history: HistoryMessage[], context?: ChatApproachContext) {
     const userQuery = 'Generate search query for: ' + history[history.length - 1].user;
 
     // STEP 1: Generate an optimized keyword search query based on the chat history and the last question
@@ -128,14 +128,14 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     // STEP 2: Retrieve relevant documents from the search index with the GPT optimized query
     // -----------------------------------------------------------------------
 
-    const { query, results, content } = await this.searchDocuments(queryText, overrides);
-    const followUpQuestionsPrompt = overrides?.suggest_followup_questions ? FOLLOW_UP_QUESTIONS_PROMPT_CONTENT : '';
+    const { query, results, content } = await this.searchDocuments(queryText, context);
+    const followUpQuestionsPrompt = context?.suggest_followup_questions ? FOLLOW_UP_QUESTIONS_PROMPT_CONTENT : '';
 
     // STEP 3: Generate a contextual and content specific answer using the search results and chat history
     // -----------------------------------------------------------------------
 
     // Allow client to replace the entire prompt, or to inject into the exiting prompt using >>>
-    const promptOverride = overrides?.prompt_template;
+    const promptOverride = context?.prompt_template;
     let systemMessage: string;
     if (promptOverride?.startsWith('>>>')) {
       systemMessage = SYSTEM_MESSAGE_CHAT_CONVERSATION.replace(
@@ -171,7 +171,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
       completionRequest: {
         model: this.chatGptModel,
         messages: finalMessages,
-        temperature: Number(overrides?.temperature ?? 0.7),
+        temperature: Number(context?.temperature ?? 0.7),
         max_tokens: 1024,
         n: 1,
       },

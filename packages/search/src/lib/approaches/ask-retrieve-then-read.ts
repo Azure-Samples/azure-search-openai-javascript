@@ -4,7 +4,7 @@ import { messagesToString } from '../message.js';
 import { MessageBuilder } from '../message-builder.js';
 import {
   type ApproachResponse,
-  type ApproachOverrides,
+  type ApproachContext,
   type AskApproach,
   type ApproachResponseChunk,
 } from './approach.js';
@@ -46,9 +46,9 @@ export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
     super(search, openai, chatGptModel, embeddingModel, sourcePageField, contentField);
   }
 
-  async run(userQuery: string, overrides?: ApproachOverrides): Promise<ApproachResponse> {
-    const { query, results, content } = await this.searchDocuments(userQuery, overrides);
-    const messageBuilder = new MessageBuilder(overrides?.prompt_template || SYSTEM_CHAT_TEMPLATE, this.chatGptModel);
+  async run(userQuery: string, context?: ApproachContext): Promise<ApproachResponse> {
+    const { query, results, content } = await this.searchDocuments(userQuery, context);
+    const messageBuilder = new MessageBuilder(context?.prompt_template || SYSTEM_CHAT_TEMPLATE, this.chatGptModel);
 
     // Add user question
     const userContent = `${userQuery}\nSources:\n${content}`;
@@ -64,7 +64,7 @@ export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
     const chatCompletion = await openAiChat.completions.create({
       model: this.chatGptModel,
       messages,
-      temperature: Number(overrides?.temperature ?? 0.3),
+      temperature: Number(context?.temperature ?? 0.3),
       max_tokens: 1024,
       n: 1,
     });
@@ -79,7 +79,7 @@ export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
   }
 
   // eslint-disable-next-line require-yield
-  async *runWithStreaming(_query: string, _overrides?: ApproachOverrides): AsyncGenerator<ApproachResponseChunk, void> {
+  async *runWithStreaming(_query: string, _context?: ApproachContext): AsyncGenerator<ApproachResponseChunk, void> {
     throw new Error('Streaming not supported for this approach.');
   }
 }
