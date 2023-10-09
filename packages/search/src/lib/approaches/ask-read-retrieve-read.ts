@@ -116,6 +116,7 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
           },
         },
       ],
+      object: 'chat.completion',
     };
   }
 

@@ -80,6 +80,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
           },
         },
       ],
+      object: 'chat.completion',
     };
   }
 
@@ -110,6 +111,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
             finish_reason: chunk.choices[0].finish_reason,
           },
         ],
+        object: 'chat.completion.chunk' as const,
       };
       yield responseChunk;
       id++;
