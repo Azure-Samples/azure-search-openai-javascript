@@ -124,6 +124,34 @@ export const mainStyle = css`
     display: flex;
     justify-content: end;
   }
+  .aside__list {
+    display: flex;
+    justify-content: space-around;
+    list-style-type: none;
+    padding: 20px 0;
+  }
+  .aside__listItem.active {
+    border-bottom: 2px solid var(--accent-high);
+  }
+  .aside__link {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: bold;
+    font-size: small;
+    cursor: pointer;
+  }
+  .aside__content {
+    position: relative;
+  }
+  .aside__tab {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    display: none;
+  }
+  .aside__tab.active {
+    display: block;
+  }
   .chat__header {
     display: flex;
     justify-content: flex-end;
