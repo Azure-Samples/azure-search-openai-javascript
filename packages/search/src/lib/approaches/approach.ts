@@ -1,12 +1,27 @@
-import { type HistoryMessage } from '../message.js';
+import { type Message, type HistoryMessage } from '../message.js';
 
 export interface ApproachResponse {
-  data_points: string[];
-  answer: string;
-  thoughts: string;
+  choices: Array<{
+    index: number;
+    message: ApproachResponseMessage;
+  }>;
 }
 
-export type ApproachResponseChunk = Partial<ApproachResponse>;
+export interface ApproachResponseChunk {
+  choices: Array<{
+    index: number;
+    delta: Partial<ApproachResponseMessage>;
+    finish_reason: string | null;
+  }>;
+}
+
+export type ApproachResponseMessage = Message & {
+  context?: Record<string, any> & {
+    data_points?: string[];
+    thoughts?: string;
+  };
+  session_state?: Record<string, any>;
+};
 
 export type ApproachContext = {
   retrieval_mode?: 'hybrid' | 'text' | 'vectors';

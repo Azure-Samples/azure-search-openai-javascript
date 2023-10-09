@@ -103,9 +103,19 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
     const answer = result.output.replace('[CognitiveSearch]', '').replace('[Employee]', '');
 
     return {
-      data_points: searchResults,
-      answer,
-      thoughts: htmlTracer.getAndResetLog(),
+      choices: [
+        {
+          index: 0,
+          message: {
+            content: answer,
+            role: 'assistant' as const,
+            context: {
+              data_points: searchResults,
+              thoughts: htmlTracer.getAndResetLog(),
+            },
+          },
+        },
+      ],
     };
   }
 

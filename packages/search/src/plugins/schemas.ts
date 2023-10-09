@@ -51,21 +51,56 @@ export const askRequestSchema = {
   required: ['question'],
 } as const;
 
-export const approachResponseSchema = {
-  $id: 'approachResponse',
-  data_points: {
-    type: 'array',
-    items: { type: 'string' },
+export const messageSchema = {
+  $id: 'message',
+  type: 'object',
+  properties: {
+    content: { type: 'string' },
+    role: { type: 'string' },
+    context: {
+      type: 'object',
+      properties: {
+        data_points: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+        thoughts: { type: 'string' },
+      },
+      additionalProperties: true,
+    },
+    session_state: {
+      type: 'object',
+      additionalProperties: true,
+    },
   },
-  answer: { type: 'string' },
-  thoughts: { type: 'string' },
-  required: ['data_points', 'answer', 'thoughts'],
+  required: ['content', 'role'],
   additionalProperties: false,
 } as const;
 
-export const schemas = [chatRequestSchema, askRequestSchema, approachResponseSchema];
+export const approachResponseSchema = {
+  $id: 'approachResponse',
+  choices: {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        index: { type: 'number' },
+        message: { $ref: 'message' },
+      },
+      required: ['index', 'message'],
+      additionalProperties: false,
+    },
+  },
+} as const;
 
-export type SchemaTypes = [typeof chatRequestSchema, typeof askRequestSchema, typeof approachResponseSchema];
+export const schemas = [chatRequestSchema, askRequestSchema, messageSchema, approachResponseSchema];
+
+export type SchemaTypes = [
+  typeof chatRequestSchema,
+  typeof askRequestSchema,
+  typeof messageSchema,
+  typeof approachResponseSchema,
+];
 
 export default fp(async (fastify, _options): Promise<void> => {
   for (const schema of schemas) {
