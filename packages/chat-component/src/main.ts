@@ -235,20 +235,32 @@ export class ChatComponent extends LitElement {
   // display active tab content
   activateTab(event: Event): void {
     event.preventDefault();
-    const tab = event.target as HTMLElement;
-    console.log('tab', tab);
-    const tabName = tab.textContent;
-    console.log('tabName', tabName);
-    const tabs = this.shadowRoot?.querySelectorAll('.aside__tab');
-    console.log('tabs', tabs);
-    const links = this.shadowRoot?.querySelectorAll('.aside__link');
-    console.log('links', links);
-    if (tabs) for (const tab of tabs) tab.classList.remove('active');
-    if (links) for (const link of links) link.classList.remove('active');
-    tab.classList.add('active');
-    tab.parentElement?.classList.add('active');
+    const clickedLink = event.target as HTMLElement;
+    const linksNodeList = this.shadowRoot?.querySelectorAll('.aside__link');
+
+    if (linksNodeList) {
+      const linksArray = [...linksNodeList];
+      const clickedIndex = linksArray.indexOf(clickedLink);
+      const tabsNodeList = this.shadowRoot?.querySelectorAll('.aside__tab');
+
+      if (tabsNodeList) {
+        const tabsArray = [...tabsNodeList] as HTMLElement[];
+
+        for (const [index, tab] of tabsArray.entries()) {
+          if (index === clickedIndex) {
+            tab.classList.add('active');
+            clickedLink.classList.add('active');
+          } else {
+            tab.classList.remove('active');
+            const otherLink = linksArray[index] as HTMLElement;
+            otherLink.classList.remove('active');
+          }
+        }
+      }
+    }
   }
 
+  // Render text entries in bubbles
   renderTextEntry(textEntry: ChatMessageText) {
     const entries = [html`<p>${unsafeHTML(textEntry.value)}</p>`];
 
