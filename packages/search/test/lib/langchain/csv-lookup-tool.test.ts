@@ -9,7 +9,7 @@ t.test('CsvLookupTool', async (t) => {
 3,Bob Smith,40`;
 
   // Mock readFile function
-  const readFile = async (filename: string) => csv;
+  const readFile = async (_filename: string) => csv;
   const { CsvLookupTool } = await t.mockImport('../../../src/lib/langchain/csv-lookup-tool.js', {
     'node:fs/promises': { readFile },
   });

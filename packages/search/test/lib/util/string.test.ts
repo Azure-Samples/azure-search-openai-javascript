@@ -12,6 +12,7 @@ t.test('removeNewlines', (t) => {
 t.test('parseBoolean', (t) => {
   t.equal(parseBoolean('true'), true);
   t.equal(parseBoolean('false'), false);
+  // eslint-disable-next-line unicorn/no-useless-undefined
   t.equal(parseBoolean(undefined), false);
   t.equal(parseBoolean(true), true);
   t.equal(parseBoolean(false), false);

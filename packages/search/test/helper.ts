@@ -23,7 +23,7 @@ async function config() {
     try {
       // Check if .env file exists
       await fs.access(ENV_PATH);
-    } catch (e) {
+    } catch {
       throw new Error(`.env file not found at ${ENV_PATH}: required to update snapshots`);
     }
   } else {
