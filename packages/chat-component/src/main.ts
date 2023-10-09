@@ -1,5 +1,6 @@
 /* eslint-disable unicorn/template-indent */
 import { LitElement, html } from 'lit';
+import DOMPurify from 'dompurify';
 import { customElement, property, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { chatHttpOptions, globalConfig, requestOptions } from './config/global-config.js';
@@ -131,15 +132,15 @@ export class ChatComponent extends LitElement {
   // Handle the click on a default prompt
   handleDefaultPromptClick(question: string, event?: Event): void {
     event?.preventDefault();
-    this.questionInput.value = question;
-    this.currentQuestion = question;
+    this.questionInput.value = DOMPurify.sanitize(question);
+    this.currentQuestion = this.questionInput.value;
   }
 
   // Handle the click on the chat button and send the question to the API
   async handleUserChatSubmit(event: Event): Promise<void> {
     event.preventDefault();
     const type = 'chat';
-    const question = this.questionInput.value;
+    const question = DOMPurify.sanitize(this.questionInput.value);
     if (question) {
       this.currentQuestion = question;
       try {
