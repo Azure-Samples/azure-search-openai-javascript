@@ -2,8 +2,14 @@
   "name": "chat-component",
   "version": "0.0.1",
   "description": "A minimal OpenAI chat web component to hook as a client to any backend implementation",
-  "main": "main.js",
-  "module": "main.js",
+  "main": "./dist/chat-component.umd.cjs",
+  "module": "./dist/chat-component.js",
+  "exports": {
+    ".": {
+      "import": "./dist/chat-component.js",
+      "require": "./dist/chat-component.udm.cjs"
+    }
+  },
   "type": "module",
   "scripts": {
     "clean": "rimraf dist *.tgz",
@@ -15,11 +21,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@rollup/plugin-terser": "^0.4.3",
-    "@rollup/plugin-typescript": "^11.1.3",
     "dompurify": "^3.0.6",
-    "lit": "^2.8.0",
-    "rollup": "^3.29.1"
+    "lit": "^2.8.0"
   },
   "devDependencies": {
     "@types/dompurify": "^3.0.3",
