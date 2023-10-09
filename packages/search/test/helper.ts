@@ -19,17 +19,6 @@ async function config() {
   // Copy package.json to the test directory
   await fs.copyFile(path.join(__dirname, '../../package.json'), path.join(__dirname, '../../test-dist/package.json'));
 
-  // Use dummy values when .env file is not present
-  process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT = 'chat';
-  process.env.AZURE_OPENAI_CHATGPT_MODEL = 'gpt-3.5-turbo';
-  process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT = 'embeddings';
-  process.env.AZURE_OPENAI_EMBEDDING_MODEL = '';
-  process.env.AZURE_OPENAI_SERVICE = 'https://example.com';
-  process.env.AZURE_SEARCH_INDEX = 'gptkbindex';
-  process.env.AZURE_SEARCH_SERVICE = 'https://example.com';
-  process.env.AZURE_STORAGE_ACCOUNT = 'dummystorage';
-  process.env.AZURE_STORAGE_CONTAINER = 'content';
-
   if (process.env.TAP_SNAPSHOT) {
     try {
       // Check if .env file exists
@@ -37,6 +26,18 @@ async function config() {
     } catch (e) {
       throw new Error(`.env file not found at ${ENV_PATH}: required to update snapshots`);
     }
+  } else {
+    // Use fixed values when .env file is not present
+    // Note: if you update snapshots, you must also update the values here to match your .env file
+    process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT = 'chat';
+    process.env.AZURE_OPENAI_CHATGPT_MODEL = 'gpt-3.5-turbo';
+    process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT = 'embedding';
+    process.env.AZURE_OPENAI_EMBEDDING_MODEL = '';
+    process.env.AZURE_OPENAI_SERVICE = 'cog-x2y5k2ccncqou';
+    process.env.AZURE_SEARCH_INDEX = 'gptkbindex';
+    process.env.AZURE_SEARCH_SERVICE = 'gptkb-x2y5k2ccncqou';
+    process.env.AZURE_STORAGE_ACCOUNT = 'stx2y5k2ccncqou';
+    process.env.AZURE_STORAGE_CONTAINER = 'content';
   }
 
   return {};
