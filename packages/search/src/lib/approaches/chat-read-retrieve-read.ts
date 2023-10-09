@@ -221,6 +221,9 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     messageBuilder.appendMessage('user', userContent, appendIndex);
 
     for (const historyMessage of history.slice(0, -1).reverse()) {
+      if (messageBuilder.tokens > maxTokens) {
+        break;
+      }
       if (historyMessage.bot) {
         messageBuilder.appendMessage('assistant', historyMessage.bot, appendIndex);
       }
