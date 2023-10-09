@@ -76,13 +76,13 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       },
     } as const,
     handler: async function (request, reply) {
-      const { approach } = request.body;
-      const chatApproach = fastify.approaches.chat[approach];
+      const { approach } = request.body.context ?? {};
+      const chatApproach = fastify.approaches.chat[approach ?? 'rrr'];
       if (!chatApproach) {
         return reply.badRequest(`Chat approach "${approach}" is unknown or not implemented.`);
       }
 
-      const { history, overrides, stream } = request.body;
+      const { messages, context, stream } = request.body;
       try {
         if (stream) {
           const buffer = new Readable();
@@ -90,14 +90,14 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
           buffer._read = () => {};
           reply.type('application/x-ndjson').send(buffer);
 
-          const chunks = await chatApproach.runWithStreaming(history, overrides ?? {});
+          const chunks = await chatApproach.runWithStreaming(messages, (context as any) ?? {});
           for await (const chunk of chunks) {
             buffer.push(JSON.stringify(chunk) + '\n');
           }
           // eslint-disable-next-line unicorn/no-null
           buffer.push(null);
         } else {
-          return await chatApproach.run(history, overrides ?? {});
+          return await chatApproach.run(messages, (context as any) ?? {});
         }
       } catch (_error: unknown) {
         const error = _error as Error;
@@ -119,13 +119,13 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       },
     } as const,
     handler: async function (request, reply) {
-      const { approach } = request.body;
-      const askApproach = fastify.approaches.ask[approach];
+      const { approach } = request.body.context ?? {};
+      const askApproach = fastify.approaches.ask[approach ?? 'rtr'];
       if (!askApproach) {
         return reply.badRequest(`Ask approach "${approach}" is unknown or not implemented.`);
       }
 
-      const { question, overrides, stream } = request.body;
+      const { question, context, stream } = request.body;
       try {
         if (stream) {
           const buffer = new Readable();
@@ -133,14 +133,14 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
           buffer._read = () => {};
           reply.type('application/x-ndjson').send(buffer);
 
-          const chunks = await askApproach.runWithStreaming(question, overrides ?? {});
+          const chunks = await askApproach.runWithStreaming(question, (context as any) ?? {});
           for await (const chunk of chunks) {
             buffer.push(JSON.stringify(chunk) + '\n');
           }
           // eslint-disable-next-line unicorn/no-null
           buffer.push(null);
         } else {
-          return await askApproach.run(question, overrides ?? {});
+          return await askApproach.run(question, (context as any) ?? {});
         }
       } catch (_error: unknown) {
         const error = _error as Error;

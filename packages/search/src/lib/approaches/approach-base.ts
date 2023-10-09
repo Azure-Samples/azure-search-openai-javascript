@@ -1,7 +1,7 @@
 import { type SearchClient } from '@azure/search-documents';
 import { type OpenAiService } from '../../plugins/openai.js';
 import { parseBoolean, removeNewlines } from '../util/index.js';
-import { type ApproachOverrides } from './approach.js';
+import { type ApproachContext } from './approach.js';
 
 export interface SearchDocumentsResult {
   query: string;
@@ -19,12 +19,12 @@ export class ApproachBase {
     protected contentField: string,
   ) {}
 
-  protected async searchDocuments(query?: string, overrides: ApproachOverrides = {}): Promise<SearchDocumentsResult> {
-    const hasText = ['text', 'hybrid', undefined].includes(overrides?.retrieval_mode);
-    const hasVectors = ['vectors', 'hybrid', undefined].includes(overrides?.retrieval_mode);
-    const useSemanticCaption = parseBoolean(overrides?.semantic_captions) && hasText;
-    const top = overrides?.top ? Number(overrides?.top) : 3;
-    const excludeCategory: string | undefined = overrides?.exclude_category;
+  protected async searchDocuments(query?: string, context: ApproachContext = {}): Promise<SearchDocumentsResult> {
+    const hasText = ['text', 'hybrid', undefined].includes(context?.retrieval_mode);
+    const hasVectors = ['vectors', 'hybrid', undefined].includes(context?.retrieval_mode);
+    const useSemanticCaption = parseBoolean(context?.semantic_captions) && hasText;
+    const top = context?.top ? Number(context?.top) : 3;
+    const excludeCategory: string | undefined = context?.exclude_category;
     const filter = excludeCategory ? `category ne '${excludeCategory.replace("'", "''")}'` : undefined;
 
     // If retrieval mode includes vectors, compute an embedding for the query
@@ -42,7 +42,7 @@ export class ApproachBase {
     const queryText = hasText ? query : '';
 
     // Use semantic L2 reranker if requested and if retrieval mode is text or hybrid (vectors + text)
-    const searchResults = await (overrides?.semantic_ranker && hasText
+    const searchResults = await (context?.semantic_ranker && hasText
       ? this.search.search(queryText, {
           filter,
           queryType: 'semantic',

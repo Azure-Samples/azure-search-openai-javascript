@@ -8,7 +8,7 @@ export interface ApproachResponse {
 
 export type ApproachResponseChunk = Partial<ApproachResponse>;
 
-export type ApproachOverrides = {
+export type ApproachContext = {
   retrieval_mode?: 'hybrid' | 'text' | 'vectors';
   semantic_ranker?: boolean;
   semantic_captions?: boolean;
@@ -20,19 +20,19 @@ export type ApproachOverrides = {
   exclude_category?: string;
 };
 
-export type ChatApproachOverrides = ApproachOverrides & {
+export type ChatApproachContext = ApproachContext & {
   suggest_followup_questions?: boolean;
 };
 
 export interface ChatApproach {
-  run(history: HistoryMessage[], overrides?: ChatApproachOverrides): Promise<ApproachResponse>;
+  run(history: HistoryMessage[], context?: ChatApproachContext): Promise<ApproachResponse>;
   runWithStreaming(
     history: HistoryMessage[],
-    overrides?: ChatApproachOverrides,
+    context?: ChatApproachContext,
   ): AsyncGenerator<ApproachResponseChunk, void>;
 }
 
 export interface AskApproach {
-  run(query: string, overrides?: ApproachOverrides): Promise<ApproachResponse>;
-  runWithStreaming(query: string, overrides?: ApproachOverrides): AsyncGenerator<ApproachResponseChunk, void>;
+  run(query: string, context?: ApproachContext): Promise<ApproachResponse>;
+  runWithStreaming(query: string, context?: ApproachContext): AsyncGenerator<ApproachResponseChunk, void>;
 }

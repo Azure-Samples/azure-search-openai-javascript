@@ -10,8 +10,8 @@ export async function askApi(options: AskRequest): Promise<AskResponse> {
     },
     body: JSON.stringify({
       question: options.question,
-      approach: options.approach,
-      overrides: {
+      context: {
+        approach: options.approach,
         retrieval_mode: options.overrides?.retrievalMode,
         semantic_ranker: options.overrides?.semanticRanker,
         semantic_captions: options.overrides?.semanticCaptions,
@@ -40,10 +40,10 @@ export async function chatApi(options: ChatRequest): Promise<AskResponse | Respo
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      history: options.history,
-      approach: options.approach,
+      messages: options.history,
       stream: options.stream,
-      overrides: {
+      context: {
+        approach: options.approach,
         retrieval_mode: options.overrides?.retrievalMode,
         semantic_ranker: options.overrides?.semanticRanker,
         semantic_captions: options.overrides?.semanticCaptions,

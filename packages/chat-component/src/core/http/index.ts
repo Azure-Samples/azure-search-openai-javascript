@@ -3,19 +3,23 @@ export async function callHttpApi(
   { method, url, stream }: ChatHttpOptions,
 ) {
   const chatBody = JSON.stringify({
-    history: [
+    messages: [
       {
         user: question,
       },
     ],
-    approach,
-    overrides,
+    context: {
+      ...overrides,
+      approach,
+    },
     stream,
   });
   const askBody = JSON.stringify({
     question,
-    approach,
-    overrides,
+    context: {
+      ...overrides,
+      approach,
+    },
     stream: false,
   });
   const body = type === 'chat' ? chatBody : askBody;
