@@ -42,6 +42,8 @@ export class ChatComponent extends LitElement {
   isResponseCopied = false;
   @property({ type: Boolean })
   isStreaming = false;
+  // Is showing thought process panel
+  isShowingThoughtProcess = false;
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
@@ -212,6 +214,17 @@ export class ChatComponent extends LitElement {
     this.isResponseCopied = true;
   }
 
+  // show thought process
+  showThoughtProcess(): void {
+    this.isShowingThoughtProcess = true;
+    this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.add('aside-open');
+  }
+
+  hideThoughtProcess(): void {
+    this.isShowingThoughtProcess = false;
+    this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.remove('aside-open');
+  }
+
   renderTextEntry(textEntry: ChatMessageText) {
     const entries = [html`<p>${unsafeHTML(textEntry.value)}</p>`];
 
@@ -278,157 +291,178 @@ export class ChatComponent extends LitElement {
   // Render the chat component as a web component
   override render() {
     return html`
-      <section class="chat__container" id="chat-container">
-        ${this.isChatStarted
-          ? html`
-              <div class="chat__header">
-                <button
-                  title="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
-                  class="button chat__header--button"
-                  @click="${this.copyResponseToClipboard}"
-                  ?disabled="${this.isDisabled}"
-                >
-                  <span class="chat__header--span"
-                    >${this.isResponseCopied
-                      ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-                      : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
-                  >
-                  <img
-                    src="${this.isResponseCopied ? './public/svg/doublecheck-icon.svg' : './public/svg/copy-icon.svg'}"
-                    alt="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-                    width="12"
-                    height="12"
-                  />
-                </button>
-                <button
-                  title="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
-                  class="button chat__header--button"
-                  @click="${this.resetCurrentChat}"
-                >
-                  <span class="chat__header--span">${globalConfig.RESET_CHAT_BUTTON_TITLE}</span>
-                  <img
-                    src="./public/svg/delete-icon.svg"
-                    alt="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
-                    width="12"
-                    height="12"
-                  />
-                </button>
-              </div>
-              <ul class="chat__list" aria-live="assertive">
-                ${this.chatThread.map(
-                  (message) => html`
-                    <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
-                      <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
-                        ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
-                        ${this.renderFollowupQuestions(message.followupQuestions)}
-                        ${this.renderCitation(message.citations)}
-                      </div>
-                      <p class="chat__txt--info">
-                        <span class="timestamp">${message.timestamp}</span>,
-                        <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
-                      </p>
-                    </li>
-                  `,
-                )}
-                ${this.hasAPIError
-                  ? html`
-                      <li class="chat__listItem">
-                        <p class="chat__txt error">${globalConfig.API_ERROR_MESSAGE}</p>
-                      </li>
-                    `
-                  : ''}
-              </ul>
-            `
-          : ''}
-        ${this.isAwaitingResponse && !this.hasAPIError
-          ? html`
-              <div id="loading-indicator" class="loading-skeleton" aria-label="${globalConfig.LOADING_INDICATOR_TEXT}">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-              </div>
-            `
-          : ''}
-        <!-- Default prompts: use the variables above to edit the heading -->
-        <div class="chat__container">
-          <!-- Conditionally render default prompts based on hasDefaultPromptsEnabled -->
-          ${this.hasDefaultPromptsEnabled
+      <section id="chat__containerWrapper" class="chat__containerWrapper">
+        <section class="chat__container" id="chat-container">
+          ${this.isChatStarted
             ? html`
-                <div class="defaults__container">
-                  <h2 class="subheadline">${this.defaultPromptsHeading}</h2>
-                  <ul class="defaults__list">
-                    ${this.defaultPrompts.map(
-                      (prompt) => html`
-                        <li class="defaults__listItem">
-                          <a
-                            role="button"
-                            href="#"
-                            class="defaults__button"
-                            @click="${(event: Event) => this.handleDefaultPromptClick(prompt, event)}"
-                          >
-                            ${prompt}
-                            <span class="defaults__span">Ask now</span>
-                          </a>
+                <ul class="chat__list" aria-live="assertive">
+                  ${this.chatThread.map(
+                    (message) => html`
+                      <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
+                        <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
+                          ${message.isUserMessage
+                            ? ''
+                            : html` <div class="chat__header">
+                                <button
+                                  title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
+                                  class="button chat__header--button"
+                                  @click="${this.showThoughtProcess}"
+                                >
+                                  <span class="chat__header--span"
+                                    >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
+                                  >
+                                  <img
+                                    src="./public/svg/lightbulb-icon.svg"
+                                    alt="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
+                                    width="12"
+                                    height="12"
+                                  />
+                                </button>
+                                <button
+                                  title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+                                  class="button chat__header--button"
+                                  @click="${this.copyResponseToClipboard}"
+                                  ?disabled="${this.isDisabled}"
+                                >
+                                  <span class="chat__header--span"
+                                    >${this.isResponseCopied
+                                      ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
+                                      : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
+                                  >
+                                  <img
+                                    src="${this.isResponseCopied
+                                      ? './public/svg/doublecheck-icon.svg'
+                                      : './public/svg/copy-icon.svg'}"
+                                    alt="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+                                    width="12"
+                                    height="12"
+                                  />
+                                </button>
+                              </div>`}
+                          ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
+                          ${this.renderFollowupQuestions(message.followupQuestions)}
+                          ${this.renderCitation(message.citations)}
+                        </div>
+                        <p class="chat__txt--info">
+                          <span class="timestamp">${message.timestamp}</span>,
+                          <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
+                        </p>
+                      </li>
+                    `,
+                  )}
+                  ${this.hasAPIError
+                    ? html`
+                        <li class="chat__listItem">
+                          <p class="chat__txt error">${globalConfig.API_ERROR_MESSAGE}</p>
                         </li>
-                      `,
-                    )}
-                  </ul>
+                      `
+                    : ''}
+                </ul>
+              `
+            : ''}
+          ${this.isAwaitingResponse && !this.hasAPIError
+            ? html`
+                <div
+                  id="loading-indicator"
+                  class="loading-skeleton"
+                  aria-label="${globalConfig.LOADING_INDICATOR_TEXT}"
+                >
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
                 </div>
               `
             : ''}
-        </div>
-        <form id="chat-form" class="form__container">
-          <label id="chatbox-label" for="question-input">${globalConfig.CHAT_INPUT_LABEL_TEXT}</label>
-
-          <div class="chatbox__container container-col container-row">
-            <input
-              class="chatbox__input"
-              id="question-input"
-              placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}"
-              aria-labelledby="chatbox-label"
-              id="chatbox"
-              name="chatbox"
-              type="text"
-              :value=""
-              ?disabled="${this.isDisabled}"
-              autocomplete="off"
-              @keyup="${this.handleOnInputChange}"
-            />
-            <button
-              class="chatbox__button"
-              @click="${this.handleUserChatSubmit}"
-              title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
-              ?disabled="${this.isDisabled}"
-            >
-              <img
-                src="./public/svg/send-icon.svg"
-                alt="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
-                width="25"
-                height="25"
-              />
-            </button>
-            <button
-              title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
-              class="chatbox__button--reset"
-              .hidden="${!this.isResetInput}"
-              type="reset"
-              id="resetBtn"
-              title="Clear input"
-              @click="${this.resetInputField}"
-            >
-              ${globalConfig.RESET_BUTTON_LABEL_TEXT}
-            </button>
+          <!-- Default prompts: use the variables above to edit the heading -->
+          <div class="chat__container">
+            <!-- Conditionally render default prompts based on hasDefaultPromptsEnabled -->
+            ${this.hasDefaultPromptsEnabled
+              ? html`
+                  <div class="defaults__container">
+                    <h2 class="subheadline">${this.defaultPromptsHeading}</h2>
+                    <ul class="defaults__list">
+                      ${this.defaultPrompts.map(
+                        (prompt) => html`
+                          <li class="defaults__listItem">
+                            <a
+                              role="button"
+                              href="#"
+                              class="defaults__button"
+                              @click="${(event: Event) => this.handleDefaultPromptClick(prompt, event)}"
+                            >
+                              ${prompt}
+                              <span class="defaults__span">Ask now</span>
+                            </a>
+                          </li>
+                        `,
+                      )}
+                    </ul>
+                  </div>
+                `
+              : ''}
           </div>
-        </form>
-        <div class="chat__container--footer">
-          ${this.hasDefaultPromptsEnabled
-            ? ''
-            : html`
-                <button type="button" @click="${this.showDefaultPrompts}" class="defaults__span button">
-                  ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
-                </button>
-              `}
-        </div>
+          <form id="chat-form" class="form__container">
+            <label id="chatbox-label" for="question-input">${globalConfig.CHAT_INPUT_LABEL_TEXT}</label>
+
+            <div class="chatbox__container container-col container-row">
+              <input
+                class="chatbox__input"
+                id="question-input"
+                placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}"
+                aria-labelledby="chatbox-label"
+                id="chatbox"
+                name="chatbox"
+                type="text"
+                :value=""
+                ?disabled="${this.isDisabled}"
+                autocomplete="off"
+                @keyup="${this.handleOnInputChange}"
+              />
+              <button
+                class="chatbox__button"
+                @click="${this.handleUserChatSubmit}"
+                title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
+                ?disabled="${this.isDisabled}"
+              >
+                <img
+                  src="./public/svg/send-icon.svg"
+                  alt="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
+                  width="25"
+                  height="25"
+                />
+              </button>
+              <button
+                title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
+                class="chatbox__button--reset"
+                .hidden="${!this.isResetInput}"
+                type="reset"
+                id="resetBtn"
+                title="Clear input"
+                @click="${this.resetInputField}"
+              >
+                ${globalConfig.RESET_BUTTON_LABEL_TEXT}
+              </button>
+            </div>
+          </form>
+          <div class="chat__container--footer">
+            ${this.hasDefaultPromptsEnabled
+              ? ''
+              : html`
+                  <button type="button" @click="${this.showDefaultPrompts}" class="defaults__span button">
+                    ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
+                  </button>
+                `}
+          </div>
+        </section>
+        ${this.isShowingThoughtProcess
+          ? html`
+              <aside class="aside">
+                <div class="aside__header">
+                  <h2>Hello Thought Process</h2>
+                </div>
+              </aside>
+            `
+          : ''}
       </section>
     `;
   }
