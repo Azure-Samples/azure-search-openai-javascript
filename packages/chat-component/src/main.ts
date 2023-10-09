@@ -233,6 +233,8 @@ export class ChatComponent extends LitElement {
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.remove('aside-open');
   }
   // display active tab content
+  // this is basically a tab component
+  // and it would be ideal to decouple it from the chat component
   activateTab(event: Event): void {
     event.preventDefault();
     const clickedLink = event.target as HTMLElement;
@@ -259,7 +261,6 @@ export class ChatComponent extends LitElement {
       }
     }
   }
-
   // Render text entries in bubbles
   renderTextEntry(textEntry: ChatMessageText) {
     const entries = [html`<p>${unsafeHTML(textEntry.value)}</p>`];
