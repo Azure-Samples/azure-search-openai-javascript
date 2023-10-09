@@ -12,6 +12,7 @@ param imageName string
 param keyVaultName string = ''
 param managedIdentity bool = !empty(keyVaultName)
 param targetPort int = 80
+param allowedOrigins array = []
 
 @description('CPU cores allocated to a single container instance, e.g. 0.5')
 param containerCpuCoreCount string = '0.5'
@@ -19,7 +20,7 @@ param containerCpuCoreCount string = '0.5'
 @description('Memory allocated to a single container instance, e.g. 1Gi')
 param containerMemory string = '1.0Gi'
 
-resource app 'Microsoft.App/containerApps@2022-03-01' = {
+resource app 'Microsoft.App/containerApps@2023-05-01' = {
   name: name
   location: location
   tags: tags
@@ -32,6 +33,9 @@ resource app 'Microsoft.App/containerApps@2022-03-01' = {
         external: external
         targetPort: targetPort
         transport: 'auto'
+        corsPolicy: {
+          allowedOrigins: empty(allowedOrigins) ? ['*'] : allowedOrigins
+        }
       }
       secrets: concat(secrets, [
         {

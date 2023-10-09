@@ -15,6 +15,7 @@ export interface AppConfig {
   azureOpenAiEmbeddingModel: string;
   kbFieldsContent: string;
   kbFieldsSourcePage: string;
+  allowedOrigins: string;
 }
 
 const camelCaseToUpperSnakeCase = (string_: string) => string_.replaceAll(/[A-Z]/g, (l) => `_${l}`).toUpperCase();
@@ -38,6 +39,7 @@ export default fp(
       azureOpenAiEmbeddingModel: process.env.AZURE_OPENAI_EMBEDDING_MODEL || 'text-embedding-ada-002',
       kbFieldsContent: process.env.KB_FIELDS_CONTENT || 'content',
       kbFieldsSourcePage: process.env.KB_FIELDS_SOURCEPAGE || 'sourcepage',
+      allowedOrigins: process.env.ALLOWED_ORIGINS || '*',
     };
 
     // Check that all config values are set
