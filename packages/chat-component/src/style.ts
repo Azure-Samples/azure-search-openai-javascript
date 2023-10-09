@@ -97,6 +97,19 @@ export const mainStyle = css`
   }
   .chat__container {
     min-width: 100%;
+    transition: width 0.3s ease-in-out;
+  }
+  .chat__containerWrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .chat__containerWrapper.aside-open {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    @media (min-width: 1024px) {
+      grid-template-columns: 1fr 1fr;
+    }
   }
   .chat__header {
     display: flex;
@@ -122,6 +135,8 @@ export const mainStyle = css`
   }
   .chat__header--span {
     margin-right: 5px;
+    text-align: left;
+    font-size: smaller;
   }
   .chatbox__container {
     position: relative;

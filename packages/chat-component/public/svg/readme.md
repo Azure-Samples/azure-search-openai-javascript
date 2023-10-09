@@ -10,6 +10,7 @@ All icons in this sample are free and open source
 - [Copy Icon](https://fontawesome.com/icons/copy?f=classic&s=solid)
 - [Double Check Icon](https://fontawesome.com/icons/check-double?f=classic&s=solid)
 - [Email Icon](https://fontawesome.com/icons/envelope-open-text?f=classic&s=solid)
+- [Lightbulb Icon](https://fontawesome.com/icons/lightbulb?f=classic&s=solid)
 
 ## FontAwesome License
 
