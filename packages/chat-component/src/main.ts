@@ -93,6 +93,7 @@ export class ChatComponent extends LitElement {
             this.requestUpdate('chatThread');
           },
         });
+        console.log('#APPPPI RESPONSE', this.apiResponse);
         return true;
       }
 
@@ -486,25 +487,58 @@ export class ChatComponent extends LitElement {
                     />
                   </button>
                 </div>
+                <nav class="aside__nav">
+                  <ul class="aside__list">
+                    <li class="aside__listItem active">
+                      <a 
+                        class="aside__link"
+                        role="button"
+                        href="#"
+                        @click="${(event: Event) => this.activateTab(event)}"
+                        title="Thought Process"
+                      >
+                        Thought Process
+                      </a>
+                    </li>
+                    <li class="aside__listItem">
+                      <a 
+                        class="aside__link"
+                        role="button"
+                        href="#"
+                        @click="${(event: Event) => this.activateTab(event)}"
+                        title="Supporting Context"
+                      >
+                      Supporting Context
+                      </a>
+                    </li>
+                    <li class="aside__listItem">
+                      <a 
+                        class="aside__link"
+                        role="button"
+                        href="#"
+                        @click="${(event: Event) => this.activateTab(event)}"
+                        title="Citations"
+                      >
+                      Citations
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
                 <div class="aside__content">
-                  <nav>
-                    <ul class="aside__list">
-                      <li class="aside__listItem">
-                        <span>Thought Process</span>
-                        <div class="tab">One</div>
-                      </li>
-                      <li class="aside__listItem">
-                        <span>Supporting Context</span>
-                        <div class="tab">Two</div>
-                      </li>
-                      <li class="aside__listItem">
-                        <div class="tab">Three</div>
-                      </li>
-                    </ul>
-                  </nav>
+                  <div class="aside__tab active">
+                    <h3 class="subheadline--small">Thought Process</h3>
+                    <p>${this.chatThoughts}</p>
+                  </div>
+                  <div class="aside__tab">
+                    <h3 class="subheadline--small">Supporting Context</h3>
+                  </div>
+                  <div class="aside__tab">
+                    <h3 class="subheadline--small">Citations</h3>
+                  </div>
                 </div>
-              </aside>
-            `
+              </div>
+            </aside>
+          `
           : ''}
       </section>
     `;
