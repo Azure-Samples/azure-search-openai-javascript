@@ -215,14 +215,18 @@ export class ChatComponent extends LitElement {
   }
 
   // show thought process
-  showThoughtProcess(): void {
+  showThoughtProcess(event: Event): void {
+    event.preventDefault();
     this.isShowingThoughtProcess = true;
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.add('aside-open');
+    this.requestUpdate();
   }
 
-  hideThoughtProcess(): void {
+  hideThoughtProcess(event: Event): void {
+    event.preventDefault();
     this.isShowingThoughtProcess = false;
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.remove('aside-open');
+    this.requestUpdate();
   }
 
   renderTextEntry(textEntry: ChatMessageText) {
@@ -307,6 +311,7 @@ export class ChatComponent extends LitElement {
                                   title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                                   class="button chat__header--button"
                                   @click="${this.showThoughtProcess}"
+                                  ?disabled="${this.isShowingThoughtProcess}"
                                 >
                                   <span class="chat__header--span"
                                     >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
@@ -458,7 +463,19 @@ export class ChatComponent extends LitElement {
           ? html`
               <aside class="aside">
                 <div class="aside__header">
-                  <h2>Hello Thought Process</h2>
+                  <button
+                    title="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
+                    class="button chat__header--button"
+                    @click="${this.hideThoughtProcess}"
+                  >
+                    <span class="chat__header--span">${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span>
+                    <img
+                      src="./public/svg/close-icon.svg"
+                      alt="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
+                      width="12"
+                      height="12"
+                    />
+                  </button>
                 </div>
               </aside>
             `
