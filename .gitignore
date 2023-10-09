@@ -3,9 +3,8 @@
 *_env
 
 # Unit test / coverage reports
-.coverage
-.tap
-test-dist/
+.tap/
+packages/*/test-dist/
 
 # Environments
 .env
