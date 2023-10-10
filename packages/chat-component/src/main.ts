@@ -352,7 +352,7 @@ export class ChatComponent extends LitElement {
                                   title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                                   class="button chat__header--button"
                                   @click="${this.showThoughtProcess}"
-                                  ?disabled="${this.isShowingThoughtProcess && this.canShowThoughtProcess}"
+                                  ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
                                 >
                                   <span class="chat__header--span"
                                     >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
