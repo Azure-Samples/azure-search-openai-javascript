@@ -45,6 +45,8 @@ export class ChatComponent extends LitElement {
   // Is showing thought process panel
   @property({ type: Boolean })
   isShowingThoughtProcess = false;
+  @property({ type: Boolean })
+  canShowThoughtProcess = false;
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
@@ -97,6 +99,7 @@ export class ChatComponent extends LitElement {
           this.chatThoughtProcess = thoughtProcess as unknown as BotResponse[];
           this.chatThoughts = this.chatThoughtProcess[0].thoughts;
           this.chatDataPoints = this.chatThoughtProcess[0].data_points;
+          this.canShowThoughtProcess = true;
         });
         return true;
       }
@@ -234,6 +237,7 @@ export class ChatComponent extends LitElement {
     event.preventDefault();
     this.isShowingThoughtProcess = false;
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.remove('aside-open');
+    this.shadowRoot?.querySelector('#overlay')?.classList.remove('active');
   }
   // display active tab content
   // this is basically a tab component
@@ -348,7 +352,7 @@ export class ChatComponent extends LitElement {
                                   title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                                   class="button chat__header--button"
                                   @click="${this.showThoughtProcess}"
-                                  ?disabled="${this.isShowingThoughtProcess}"
+                                  ?disabled="${this.isShowingThoughtProcess && this.canShowThoughtProcess}"
                                 >
                                   <span class="chat__header--span"
                                     >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span

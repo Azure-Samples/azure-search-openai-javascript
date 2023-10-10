@@ -64,15 +64,15 @@ export const mainStyle = css`
     }
   }
   .overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    display: block;
+    display: flex;
     width: 100%;
     height: 0;
-    background: var(--dark-gray);
+    background: var(--accent-dark);
     z-index: 1;
     opacity: 0.8;
     transition: all 0.3s ease-in-out;
