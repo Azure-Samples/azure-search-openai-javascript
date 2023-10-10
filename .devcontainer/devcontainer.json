@@ -31,7 +31,8 @@
         "ms-azuretools.vscode-bicep",
         "ms-azuretools.vscode-docker",
         "esbenp.prettier-vscode",
-        "humao.rest-client"
+        "humao.rest-client",
+        "GitHub.copilot"
       ]
     }
   },
