@@ -63,6 +63,25 @@ export const mainStyle = css`
       opacity: 0.5;
     }
   }
+  .overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: block;
+    width: 100%;
+    height: 0;
+    background: var(--dark-gray);
+    z-index: 1;
+    opacity: 0.8;
+    transition: all 0.3s ease-in-out;
+  }
+  .overlay.active {
+    @media (max-width: 1024px) {
+      height: 100%;
+    }
+  }
   .display-none {
     display: none;
     visibility: hidden;
@@ -98,6 +117,7 @@ export const mainStyle = css`
   .chat__container {
     min-width: 100%;
     transition: width 0.3s ease-in-out;
+    max-height: 100vh;
   }
   .chat__containerWrapper {
     display: grid;
@@ -116,9 +136,23 @@ export const mainStyle = css`
   }
   .chat__containerWrapper.aside-open .aside {
     width: 100%;
+
+    @media (max-width: 1024px) {
+      width: 80%;
+    }
   }
-  .aside {
-    width: 0;
+  @media (max-width: 1024px) {
+    .aside {
+      top: 30px;
+      left: auto;
+      z-index: 2;
+      background: var(--white);
+      display: block;
+      padding: 20px;
+      position: absolute;
+      width: 80%;
+      border-radius: 10px;
+    }
   }
   .aside__header {
     display: flex;
@@ -152,12 +186,24 @@ export const mainStyle = css`
   }
   .aside__tab {
     position: absolute;
-    top: 50px;
-    left: 0;
+    top: 0;
+    left: 30px;
     display: none;
+
+    @media (max-width: 1024px) {
+      position: relative;
+      left: 0;
+    }
   }
   .aside__tab.active {
     display: block;
+  }
+  .aside__paragraph {
+    font-family: monospace;
+    font-size: large;
+    border: 1px solid var(--accent-light);
+    padding: 20px;
+    border-radius: 25px;
   }
   .chat__header {
     display: flex;
@@ -316,7 +362,11 @@ export const mainStyle = css`
     text-align: center;
     display: flex;
     flex-direction: column;
-
+  }
+  .defaults__list.always-row {
+    text-align: left;
+  }
+  .defaults__list:not(.always-row) {
     @media (min-width: 1200px) {
       flex-direction: row;
     }

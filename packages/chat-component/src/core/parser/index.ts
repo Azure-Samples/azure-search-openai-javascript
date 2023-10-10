@@ -19,9 +19,16 @@ export async function parseStreamedMessages({
   let isFollowupQuestion = false;
   let stepIndex = 0;
   let textBlockIndex = 0;
+  const thoughtProcess: string[] = [];
 
   for await (const chunk of chunks) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (chunk.hasOwnProperty('data_points')) {
+      thoughtProcess.push(chunk as string);
+      continue;
+    }
     let chunkValue = chunk.answer as string;
+
     if (chunkValue === '') {
       continue;
     }
@@ -110,8 +117,7 @@ export async function parseStreamedMessages({
 
     visit();
   }
-
-  return streamedMessageRaw.join('');
+  return streamedMessageRaw.join(''), thoughtProcess;
 }
 
 // update the citations entry and wrap the citations in a sup tag

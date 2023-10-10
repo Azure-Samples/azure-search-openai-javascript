@@ -54,8 +54,9 @@ export class ChatComponent extends LitElement {
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   chatInputLabelText: string = globalConfig.CHAT_INPUT_LABEL_TEXT;
-  chatDataPoints: string[] = [];
+  chatThoughtProcess: BotResponse[] = [];
   chatThoughts: string | null = '';
+  chatDataPoints: string[] = [];
 
   chatRequestOptions: ChatRequestOptions = requestOptions;
   chatHttpOptions: ChatHttpOptions = chatHttpOptions;
@@ -92,8 +93,11 @@ export class ChatComponent extends LitElement {
             // NOTE: this function is called whenever we mutate sub-properties of the array
             this.requestUpdate('chatThread');
           },
+        }).then((thoughtProcess) => {
+          this.chatThoughtProcess = thoughtProcess as unknown as BotResponse[];
+          this.chatThoughts = this.chatThoughtProcess[0].thoughts;
+          this.chatDataPoints = this.chatThoughtProcess[0].data_points;
         });
-        console.log('#APPPPI RESPONSE', this.apiResponse);
         return true;
       }
 
@@ -168,8 +172,6 @@ export class ChatComponent extends LitElement {
 
         const response = this.apiResponse as BotResponse;
         const message: string = response.answer;
-        console.log('###### message', message);
-        console.log('###### response', response);
         await this.processApiResponse({ message, isUserMessage: false });
       } catch (error) {
         console.error(error);
@@ -224,6 +226,7 @@ export class ChatComponent extends LitElement {
   showThoughtProcess(event: Event): void {
     event.preventDefault();
     this.isShowingThoughtProcess = true;
+    this.shadowRoot?.querySelector('#overlay')?.classList.add('active');
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.add('aside-open');
   }
   // hide thought process aside
@@ -328,6 +331,7 @@ export class ChatComponent extends LitElement {
   // Render the chat component as a web component
   override render() {
     return html`
+      <div id="overlay" class="overlay"></div>
       <section id="chat__containerWrapper" class="chat__containerWrapper">
         <section class="chat__container" id="chat-container">
           ${this.isChatStarted
@@ -551,13 +555,19 @@ export class ChatComponent extends LitElement {
                   <div class="aside__tab active">
                     <h3 class="subheadline--small">${globalConfig.THOUGHT_PROCESS_LABEL}</h3>
                     <div class="aside__innerContainer">
+                    ${this.chatThoughts ? html` <p class="aside__paragraph">${unsafeHTML(this.chatThoughts)}</p> ` : ''}
                     </div> 
                   </div>
                   <div class="aside__tab">
                     <h3 class="subheadline--small">${globalConfig.SUPPORT_CONTEXT_LABEL}</h3>
+                    <ul class="defaults__list always-row">
+                      ${this.chatDataPoints.map(
+                        (dataPoint) => html` <li class="defaults__listItem">${dataPoint}</li> `,
+                      )}
+                    </ul>
                   </div>
                   <div class="aside__tab">
-                    <h3 class="subheadline--small">${globalConfig.CITATIONS_LABEL}</h3>
+                      ${this.renderCitation(this.chatThread.at(-1)?.citations)}
                   </div>
                 </div>
               </div>

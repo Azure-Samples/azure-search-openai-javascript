@@ -30,7 +30,6 @@ export async function getAPIResponse(
   if (httpOptions.stream) {
     return response;
   }
-
   const parsedResponse: BotResponse = await response.json();
   if (response.status > 299 || !response.ok) {
     throw new Error(response.statusText) || 'API Response Error';
