@@ -10,7 +10,8 @@ const globalConfig = {
     'How to cancel a confirmed booking',
     'How to report a payment or refund issue, for example if a guest or host is asking to pay or be paid outside of the Contoso Real Estate platform',
   ],
-  DEFAULT_PROMPTS_HEADING: 'Start a conversation with our support team.',
+  DEFAULT_PROMPTS_HEADING_CHAT: 'Chat with our support team',
+  DEFAULT_PROMPTS_HEADING_ASK: 'Ask a question',
   // This are the chat bubbles that will be displayed in the chat
   CHAT_MESSAGES: [],
   // This are the labels for the chat button and input
@@ -48,5 +49,8 @@ const chatHttpOptions = {
   method: 'POST',
   stream: true,
 };
+// these can be set from developer settings!
+const INTERACTION_MODEL = ['chat', 'ask'];
+const APPROACH_MODEL = ['rrr', 'rtr'];
 
-export { globalConfig, requestOptions, chatHttpOptions, NEXT_QUESTION_INDICATOR };
+export { globalConfig, requestOptions, chatHttpOptions, NEXT_QUESTION_INDICATOR, INTERACTION_MODEL, APPROACH_MODEL };
