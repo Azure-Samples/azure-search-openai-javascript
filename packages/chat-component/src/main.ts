@@ -3,7 +3,7 @@ import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
 import { customElement, property, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { chatHttpOptions, globalConfig, requestOptions } from './config/global-config.js';
+import { chatHttpOptions, globalConfig, requestOptions, INTERACTION_MODEL } from './config/global-config.js';
 import { getAPIResponse } from './core/http/index.js';
 import { parseStreamedMessages } from './core/parser/index.js';
 import { mainStyle } from './style.js';
@@ -43,6 +43,11 @@ export class ChatComponent extends LitElement {
   isResponseCopied = false;
   @property({ type: Boolean })
   isStreaming = false;
+  // interaction type: should come from dynamic settings
+  // INTERACTION_MODEL defines the UI presentation and behavior
+  // but for now we can switch between 'chat' and 'ask', using this
+  @property({ type: String })
+  interactionModel = INTERACTION_MODEL[0];
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
@@ -139,28 +144,29 @@ export class ChatComponent extends LitElement {
   // Handle the click on the chat button and send the question to the API
   async handleUserChatSubmit(event: Event): Promise<void> {
     event.preventDefault();
-    const type = 'chat';
     const question = DOMPurify.sanitize(this.questionInput.value);
     if (question) {
       this.currentQuestion = question;
       try {
-        this.isStreaming = type === 'chat' && this.chatHttpOptions.stream;
+        const type = this.interactionModel;
+        this.isStreaming = type === 'ask' ? false : this.chatHttpOptions.stream;
         // Remove default prompts
         this.isChatStarted = true;
         this.hasDefaultPromptsEnabled = false;
         // Disable the input field and submit button while waiting for the API response
         this.isDisabled = true;
         // Show loading indicator while waiting for the API response
-        this.processApiResponse({ message: question, isUserMessage: true });
 
         this.isAwaitingResponse = true;
+        if (type === 'chat') {
+          this.processApiResponse({ message: question, isUserMessage: true });
+        }
         this.apiResponse = await getAPIResponse({ ...this.chatRequestOptions, question, type }, this.chatHttpOptions);
 
         this.questionInput.value = '';
         this.isAwaitingResponse = false;
         this.isDisabled = false;
         this.isResetInput = false;
-
         const response = this.apiResponse as BotResponse;
         const message: string = response.answer;
         await this.processApiResponse({ message, isUserMessage: false });
@@ -356,7 +362,11 @@ export class ChatComponent extends LitElement {
           ${this.hasDefaultPromptsEnabled
             ? html`
                 <div class="defaults__container">
-                  <h2 class="subheadline">${this.defaultPromptsHeading}</h2>
+                  <h2 class="subheadline">
+                    ${this.interactionModel === 'chat'
+                      ? globalConfig.DEFAULT_PROMPTS_HEADING_CHAT
+                      : globalConfig.DEFAULT_PROMPTS_HEADING_ASK}
+                  </h2>
                   <ul class="defaults__list">
                     ${this.defaultPrompts.map(
                       (prompt) => html`
