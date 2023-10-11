@@ -41,6 +41,7 @@
     "openai": "^4.4.0"
   },
   "devDependencies": {
+    "@tapjs/nock": "^3.1.11",
     "@types/node": "^18.0.0",
     "@types/tap": "^15.0.5",
     "concurrently": "^8.2.0",
