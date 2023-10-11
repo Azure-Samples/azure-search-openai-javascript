@@ -266,11 +266,17 @@ export class ChatComponent extends LitElement {
         for (const [index, tab] of tabsArray.entries()) {
           if (index === clickedIndex) {
             tab.classList.add('active');
+            tab.setAttribute('aria-hidden', 'false');
+            tab.setAttribute('tabindex', '0');
+            clickedLink.setAttribute('aria-selected', 'true');
             clickedLink.classList.add('active');
           } else {
             tab.classList.remove('active');
+            tab.setAttribute('aria-hidden', 'true');
+            tab.setAttribute('tabindex', '-1');
             const otherLink = linksArray[index] as HTMLElement;
             otherLink.classList.remove('active');
+            otherLink.setAttribute('aria-selected', 'false');
           }
         }
       }
@@ -527,12 +533,16 @@ export class ChatComponent extends LitElement {
                   </button>
                 </div>
                 <nav class="aside__nav">
-                  <ul class="aside__list">
+                  <ul class="aside__list" role="tablist">
                     <li class="aside__listItem">
-                      <a 
+                      <a
+                        id="tab-1"
                         class="aside__link active"
-                        role="button"
+                        role="tab"
                         href="#"
+                        aria-selected="true"
+                        aria-hidden="false"
+                        aria-controls="tabpanel-1"
                         @click="${(event: Event) => this.activateTab(event)}"
                         title="${globalConfig.THOUGHT_PROCESS_LABEL}"
                       >
@@ -541,9 +551,13 @@ export class ChatComponent extends LitElement {
                     </li>
                     <li class="aside__listItem">
                       <a 
+                        id="tab-2"
                         class="aside__link"
-                        role="button"
+                        role="tab"
                         href="#"
+                        aria-selected="false"
+                        aria-hidden="true"
+                        aria-controls="tabpanel-2"
                         @click="${(event: Event) => this.activateTab(event)}"
                         title="${globalConfig.SUPPORT_CONTEXT_LABEL}"
                       >
@@ -551,10 +565,14 @@ export class ChatComponent extends LitElement {
                       </a>
                     </li>
                     <li class="aside__listItem">
-                      <a 
+                      <a
+                        id="tab-3"
                         class="aside__link"
-                        role="button"
+                        role="tab"
                         href="#"
+                        aria-selected="false"
+                        aria-hidden="true"
+                        aria-controls="tabpanel-3"
                         @click="${(event: Event) => this.activateTab(event)}"
                         title="${globalConfig.CITATIONS_LABEL}"
                       >
@@ -564,13 +582,13 @@ export class ChatComponent extends LitElement {
                   </ul>
                 </nav>
                 <div class="aside__content">
-                  <div class="aside__tab active">
+                  <div id="tabpanel-1" class="aside__tab active" role="tabpanel" tabindex="0" aria-labelledby="tab-1">
                     <h3 class="subheadline--small">${globalConfig.THOUGHT_PROCESS_LABEL}</h3>
                     <div class="aside__innerContainer">
                     ${this.chatThoughts ? html` <p class="aside__paragraph">${unsafeHTML(this.chatThoughts)}</p> ` : ''}
                     </div> 
                   </div>
-                  <div class="aside__tab">
+                  <div id="tabpanel-2" class="aside__tab" role="tabpanel" aria-labelledby="tab-2" tabindex="-1">
                     <h3 class="subheadline--small">${globalConfig.SUPPORT_CONTEXT_LABEL}</h3>
                     <ul class="defaults__list always-row">
                       ${this.chatDataPoints.map(
@@ -578,7 +596,7 @@ export class ChatComponent extends LitElement {
                       )}
                     </ul>
                   </div>
-                  <div class="aside__tab">
+                  <div id="tabpanel-3" class="aside__tab" role="tabpanel" tabindex="-1" aria-labelledby="tab-3">
                       ${this.renderCitation(this.chatThread.at(-1)?.citations)}
                   </div>
                 </div>
