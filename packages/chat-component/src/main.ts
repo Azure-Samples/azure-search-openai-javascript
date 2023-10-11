@@ -133,7 +133,6 @@ export class ChatComponent extends LitElement {
         // non-streamed response
         const processedText = processText(message, [citations, followingSteps, followupQuestions]);
         message = processedText.replacedText;
-        console.log(message, '####MESSAGE####');
         // Push all lists coming from processText to the corresponding arrays
         citations.push(...(processedText.arrays[0] as unknown as Citation[]));
         followingSteps.push(...(processedText.arrays[1] as string[]));
