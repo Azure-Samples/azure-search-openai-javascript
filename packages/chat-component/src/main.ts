@@ -95,6 +95,7 @@ export class ChatComponent extends LitElement {
             // NOTE: this function is called whenever we mutate sub-properties of the array
             this.requestUpdate('chatThread');
           },
+          // this will be processing thought process only with streaming enabled
         }).then((thoughtProcess) => {
           this.chatThoughtProcess = thoughtProcess as unknown as BotResponse[];
           this.chatThoughts = this.chatThoughtProcess[0].thoughts;
@@ -132,6 +133,7 @@ export class ChatComponent extends LitElement {
         // non-streamed response
         const processedText = processText(message, [citations, followingSteps, followupQuestions]);
         message = processedText.replacedText;
+        console.log(message, '####MESSAGE####');
         // Push all lists coming from processText to the corresponding arrays
         citations.push(...(processedText.arrays[0] as unknown as Citation[]));
         followingSteps.push(...(processedText.arrays[1] as string[]));
@@ -174,6 +176,12 @@ export class ChatComponent extends LitElement {
         this.isResetInput = false;
 
         const response = this.apiResponse as BotResponse;
+        // adds thought process support when streaming is disabled
+        if (!this.isStreaming) {
+          this.chatThoughts = response.thoughts;
+          this.chatDataPoints = response.data_points;
+          this.canShowThoughtProcess = true;
+        }
         const message: string = response.answer;
         await this.processApiResponse({ message, isUserMessage: false });
       } catch (error) {
