@@ -462,7 +462,9 @@ export class ChatComponent extends LitElement {
               : ''}
           </div>
           <form id="chat-form" class="form__container">
-            <label id="chatbox-label" for="question-input">${globalConfig.CHAT_INPUT_LABEL_TEXT}</label>
+            <label id="chatbox-label" for="question-input" class="form__label"
+              >${globalConfig.CHAT_INPUT_LABEL_TEXT}</label
+            >
 
             <div class="chatbox__container container-col container-row">
               <input
@@ -504,7 +506,7 @@ export class ChatComponent extends LitElement {
               </button>
             </div>
           </form>
-          <div class="chat__container--footer">
+          <div class="chat__containerFooter">
             ${this.hasDefaultPromptsEnabled
               ? ''
               : html`

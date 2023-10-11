@@ -141,6 +141,9 @@ export const mainStyle = css`
       width: 80%;
     }
   }
+  .chat__containerFooter {
+    padding: 0 0 50px 0;
+  }
   @media (max-width: 1024px) {
     .aside {
       top: 30px;
@@ -153,6 +156,15 @@ export const mainStyle = css`
       width: 80%;
       border-radius: 10px;
     }
+  }
+  .form__container {
+    margin-top: 30px;
+    padding: 10px;
+  }
+  .form__label {
+    display: block;
+    padding: 5px 0;
+    font-size: small;
   }
   .aside__header {
     display: flex;
