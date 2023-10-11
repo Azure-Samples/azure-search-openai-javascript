@@ -56,22 +56,22 @@ The application is made from multiple components, including:
 
 ## Getting started
 
-## Azure account requirements
+## Azure account prerequisites
 
-**IMPORTANT:** In order to deploy and run this example, you'll need:
+**IMPORTANT:** In order to deploy and run this sample, you'll need:
 
-- **Azure account**. If you're new to Azure, [get an Azure account for free](https://azure.microsoft.com/free/cognitive-search/) and you'll get some free Azure credits to get started.
+- **Azure account**. If you're new to Azure, [get an Azure account for free](https://azure.microsoft.com/free/cognitive-search/) to get free Azure credits to get started.
 - **Azure subscription with access enabled for the Azure OpenAI service**. You can request access with [this form](https://aka.ms/oaiapply).
 - **Azure account permissions**:
-  * Your Azure account must have `Microsoft.Authorization/roleAssignments/write` permissions, such as [Role Based Access Control Administrator](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#role-based-access-control-administrator-preview), [User Access Administrator](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#user-access-administrator), or [Owner](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#owner). If you don't have subscription-level permissions, you must be granted [RBAC](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#role-based-access-control-administrator-preview) for an existing resource group and [deploy to that existing group](#existing-resource-group).
-  * Your Azure account also needs `Microsoft.Resources/deployments/write` permissions on the subscription level.
+  * Your Azure account must have `Microsoft.Authorization/roleAssignments/write` permissions, such as [Role Based Access Control Administrator](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#role-based-access-control-administrator-preview), [User Access Administrator](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#user-access-administrator), or [Owner](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#owner). If you don't have subscription-level permissions, they must be granted to you with [RBAC](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#role-based-access-control-administrator-preview) for an existing resource group and [deploy to that existing group](#existing-resource-group).
+  * Your Azure account also needs `Microsoft.Resources/deployments/write` permissions at a subscription level.
 
 ## Azure deployment
 
 ### Cost estimation
 
-Pricing varies per region and usage, so it isn't possible to predict exact costs for your usage.
-However, you can try the [Azure pricing calculator](https://azure.com/e/8ffbe5b1919c4c72aed89b022294df76) for the resources below.
+Pricing may vary per region and usage. Exact costs cannot be estimated.
+You may try the [Azure pricing calculator](https://azure.com/e/8ffbe5b1919c4c72aed89b022294df76) for the resources below.
 
 - Azure Container Apps: Pay-as-you-go tier. Costs based on vCPU and memory used. [Pricing](https://azure.microsoft.com/pricing/details/container-apps/)
 - Azure Static Web Apps: Free Tier. [Pricing](https://azure.microsoft.com/pricing/details/app-service/static/)
@@ -86,9 +86,10 @@ either by deleting the resource group in the Portal or running `azd down`.
 
 ### Project setup
 
-You have a few options for setting up this project.
-The easiest way to get started is GitHub Codespaces, since it will setup all the tools for you,
-but you can also [set it up locally](#local-environment) if desired.
+There are multiple ways to successfully setup this project.
+
+The easiest way to get started is with GitHub Codespacesm that provides preconfigurations to setup all the tools for you. [Read more below](#github-codespaces).
+Alternatively you can [set up your local environment](#local-environment) follwing the instructions below.
 
 #### GitHub Codespaces
 
@@ -98,7 +99,7 @@ You can run this repo virtually by using GitHub Codespaces, which will open a we
 
 #### VS Code Remote Containers
 
-A related option is VS Code Remote Containers, which will open the project in your local VS Code using the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers):
+A similar option to Codespaces is VS Code Remote Containers, that will open the project in your local VS Code instance using the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers):
 
 [![Open in Remote - Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/azure-search-openai-javascript)
 
@@ -110,7 +111,7 @@ A related option is VS Code Remote Containers, which will open the project in yo
 - [Powershell 7+ (pwsh)](https://github.com/powershell/powershell) - For Windows users only.
   - **Important**: Ensure you can run `pwsh.exe` from a PowerShell command. If this fails, you likely need to upgrade PowerShell.
 
-Then bring down the project code:
+Then get the project code:
 
 1. Create a new folder and switch to it in the terminal
 1. Run `azd auth login`
