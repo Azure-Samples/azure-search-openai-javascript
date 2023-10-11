@@ -117,7 +117,7 @@ export async function parseStreamedMessages({
 
     visit();
   }
-  return streamedMessageRaw.join(''), thoughtProcess;
+  return thoughtProcess;
 }
 
 // update the citations entry and wrap the citations in a sup tag
