@@ -200,18 +200,19 @@ export class ChatComponent extends LitElement {
   }
 
   // Reset the chat and show the default prompts
-  resetCurrentChat(): void {
+  resetCurrentChat(event: Event): void {
     this.isChatStarted = false;
     this.chatThread = [];
     this.isDisabled = false;
     this.hasDefaultPromptsEnabled = true;
     this.isResponseCopied = false;
+    this.hideThoughtProcess(event);
   }
 
   // Show the default prompts when enabled
-  showDefaultPrompts(): void {
+  showDefaultPrompts(event: Event): void {
     if (!this.hasDefaultPromptsEnabled) {
-      this.resetCurrentChat();
+      this.resetCurrentChat(event);
     }
   }
 
