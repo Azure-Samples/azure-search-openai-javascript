@@ -10,6 +10,8 @@ services:
     dist: dist
     language: ts
     host: staticwebapp
+    build:
+      command: echo "webapp will be built before deployment"
     hooks:
       predeploy:
         windows:

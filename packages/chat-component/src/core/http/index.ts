@@ -2,22 +2,29 @@ export async function callHttpApi(
   { question, type, approach, overrides }: ChatRequestOptions,
   { method, url, stream }: ChatHttpOptions,
 ) {
+  const chatBody = JSON.stringify({
+    history: [
+      {
+        user: question,
+      },
+    ],
+    approach,
+    overrides,
+    stream,
+  });
+  const askBody = JSON.stringify({
+    question,
+    approach,
+    overrides,
+    stream: false,
+  });
+  const body = type === 'chat' ? chatBody : askBody;
   return await fetch(`${url}${type}`, {
     method: method,
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      // must enable history persistence
-      history: [
-        {
-          user: question,
-        },
-      ],
-      approach,
-      overrides,
-      stream,
-    }),
+    body,
   });
 }
 
@@ -26,8 +33,8 @@ export async function getAPIResponse(
   httpOptions: ChatHttpOptions,
 ): Promise<BotResponse | Response> {
   const response = await callHttpApi(requestOptions, httpOptions);
-
-  if (httpOptions.stream) {
+  const streamResponse = requestOptions.type === 'ask' ? false : httpOptions.stream;
+  if (streamResponse) {
     return response;
   }
   const parsedResponse: BotResponse = await response.json();
