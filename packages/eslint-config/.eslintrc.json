@@ -4,7 +4,8 @@
       "extends": "./index.js",
       "files": ["*.js", "*.ts"],
       "rules": {
-        "unicorn/prefer-module": "off"
+        "unicorn/prefer-module": "off",
+        "no-prototype-builtins": "off"
       }
     }
   ]

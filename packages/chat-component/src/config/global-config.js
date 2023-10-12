@@ -25,10 +25,15 @@ const globalConfig = {
   // Copy response to clipboard
   COPY_RESPONSE_BUTTON_LABEL_TEXT: 'Copy Response',
   COPIED_SUCCESSFULLY_MESSAGE: 'Response copied!',
+  SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT: 'Show thought process',
+  HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT: 'Hide thought process',
   LOADING_INDICATOR_TEXT: 'Please wait. We are searching for an answer...',
   // API ERROR HANDLING IN UI
   API_ERROR_MESSAGE: 'Sorry, we are having some problems. Please try again later.',
   // Config pertaining the response format
+  THOUGHT_PROCESS_LABEL: 'Thought Process',
+  SUPPORT_CONTEXT_LABEL: 'Support Context',
+  CITATIONS_LABEL: 'Citations',
 };
 
 const NEXT_QUESTION_INDICATOR = 'Next Questions:';
