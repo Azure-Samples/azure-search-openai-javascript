@@ -112,7 +112,7 @@ export class ApproachBase {
       return answers[0].text;
     }
     if (searchResults.count ?? 0 > 0) {
-      const results = [];
+      const results: string[] = [];
       for await (const result of searchResults.results) {
         // TODO: ensure typings
         const document = result.document as any;

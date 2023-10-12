@@ -1,6 +1,7 @@
 // This file contains code that we reuse between our tests.
 import * as helper from 'fastify-cli/helper.js';
 import * as path from 'node:path';
+import fs from 'node:fs/promises';
 import type * as tap from 'tap';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -14,9 +15,18 @@ const AppPath = path.join(__dirname, '..', 'src', 'app.js');
 // Fill in this config with all the configurations
 // needed for testing the application
 async function config() {
-  process.env.LISTINGS_API_URL = 'https://example.com';
-  process.env.OPENAI_API_URL = 'https://api.com';
-  process.env.OPENAI_API_KEY = '123';
+  // Copy package.json to the test directory
+  await fs.copyFile(path.join(__dirname, '../../package.json'), path.join(__dirname, '../../test-dist/package.json'));
+
+  process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT = 'chat';
+  process.env.AZURE_OPENAI_CHATGPT_MODEL = 'gpt-3.5-turbo';
+  process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT = 'embeddings';
+  process.env.AZURE_OPENAI_EMBEDDING_MODEL = '';
+  process.env.AZURE_OPENAI_SERVICE = 'https://example.com';
+  process.env.AZURE_SEARCH_INDEX = 'testindex';
+  process.env.AZURE_SEARCH_SERVICE = 'https://example.com';
+  process.env.AZURE_STORAGE_ACCOUNT = 'dummystorage';
+  process.env.AZURE_STORAGE_CONTAINER = 'testfiles';
   return {};
 }
 

@@ -15,7 +15,7 @@ POST {{api_host}}/chat
 Content-Type: application/json
 
 {
-  "history": [{ "user": "What happens is a rental doesn't fit the description?" }],
+  "history": [{ "user": "What happens if a rental doesn't fit the description?" }],
   "approach":"rrr",
   "overrides": {
     "retrieval_mode": "hybrid",
@@ -33,7 +33,7 @@ POST {{api_host}}/chat
 Content-Type: application/json
 
 {
-  "history": [{ "user": "What happens is a rental doesn't fit the description?" }],
+  "history": [{ "user": "What happens if a rental doesn't fit the description?" }],
   "stream": true,
   "approach":"rrr",
   "overrides": {
