@@ -4,8 +4,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 echo "Loading azd .env file from current environment"
 export $(azd env get-values | xargs)
 
-echo 'Installing dependencies'
+echo 'Installing dependencies and building CLI'
 npm ci
+npm run build
 
 echo 'Running "index-files" CLI tool'
 npx index-files \
