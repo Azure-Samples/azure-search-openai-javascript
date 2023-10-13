@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@types/dompurify": "^3.0.3",
-    "lit-analyzer": "^1.2.1",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
     "vite": "^4.4.5"
