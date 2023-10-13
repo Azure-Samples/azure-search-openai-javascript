@@ -71,7 +71,7 @@ export class Indexer {
             sortable: false,
             facetable: false,
             vectorSearchDimensions: 1536,
-            vectorSearchConfiguration: 'default',
+            vectorSearchProfile: 'default',
           },
           {
             name: 'category',
@@ -103,7 +103,7 @@ export class Indexer {
           ],
         },
         vectorSearch: {
-          algorithmConfigurations: [
+          algorithms: [
             {
               name: 'default',
               kind: 'hnsw',
