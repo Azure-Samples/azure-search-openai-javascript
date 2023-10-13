@@ -1,3 +1,16 @@
+---
+page_type: sample
+languages:
+  - javascript
+  - typescript
+  - nodejs
+products:
+  - azure
+  - azure-cognitive-services
+  - azure-openai
+urlFragment: azure-search-openai-javascript
+---
+
 # ChatGPT + Enterprise data with Azure OpenAI and Cognitive Search
 
 ## Table of Contents
