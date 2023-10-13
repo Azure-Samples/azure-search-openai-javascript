@@ -9,13 +9,13 @@
     "test": "test"
   },
   "scripts": {
-    "start": "fastify start -l info dist/app.js",
+    "start": "fastify start -l info --options dist/app.js",
     "test": "tsc -p test/tsconfig.json && tap --allow-incomplete-coverage \"test-dist/**/*.test.js\"",
     "test:snapshot": "npm run -s test -- --snapshot",
     "build": "tsc",
     "watch": "tsc -w",
     "dev": "npm run build && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch\" \"npm:dev:start\"",
-    "dev:start": "fastify start --pretty-logs --ignore-watch=.ts$ -w -l debug dist/app.js",
+    "dev:start": "fastify start --pretty-logs --ignore-watch=.ts$ -w -l debug --options dist/app.js",
     "docker:build": "docker build --tag api --file ./Dockerfile ../..",
     "docker:run": "docker run --rm --publish 3000:3000 --env-file ../../.env api",
     "clean": "rimraf dist *.tgz"
