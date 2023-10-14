@@ -1,30 +1,14 @@
-import { useRef, useState, useEffect } from 'react';
-import { flushSync } from 'react-dom';
-import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Dropdown, type IDropdownOption } from '@fluentui/react';
-import { SparkleFilled } from '@fluentui/react-icons';
-
-import 'chat-component';
-
+import { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
-
-import {
-  chatApi,
-  RetrievalMode,
-  Approaches,
-  type ChatResponse,
-  type ChatRequest,
-  type ChatTurn,
-  getChunksFromResponse,
-  type ChatResponseChunk,
-  type Message,
-} from '../../api/index.js';
-import { Answer, AnswerError, AnswerLoading } from '../../components/Answer/index.js';
-import { QuestionInput } from '../../components/QuestionInput/index.js';
-import { ExampleList } from '../../components/Example/index.js';
-import { UserChatMessage } from '../../components/UserChatMessage/index.js';
-import { AnalysisPanel, AnalysisPanelTabs } from '../../components/AnalysisPanel/index.js';
+import { RetrievalMode } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
 import { ClearChatButton } from '../../components/ClearChatButton/index.js';
+import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField } from '@fluentui/react';
+import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
+import 'chat-component';
+
+// TODO: implement
+const clearChat = () => {};
 
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -34,90 +18,13 @@ const Chat = () => {
   const [useSemanticRanker, setUseSemanticRanker] = useState<boolean>(true);
   const [useStream, setUseStream] = useState<boolean>(true);
   const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(false);
-  const [excludeCategory, setExcludeCategory] = useState<string>('');
+  const [, setExcludeCategory] = useState<string>('');
   const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(true);
 
   const lastQuestionReference = useRef<string>('');
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<unknown>();
-
-  const [activeCitation, setActiveCitation] = useState<string>();
-  const [activeAnalysisPanelTab, setActiveAnalysisPanelTab] = useState<AnalysisPanelTabs | undefined>(undefined);
-
-  const [selectedAnswer, setSelectedAnswer] = useState<number>(0);
-  const [answers, setAnswers] = useState<[user: string, response: Message][]>([]);
-
-  const makeApiRequest = async (question: string) => {
-    lastQuestionReference.current = question;
-
-    error && setError(undefined);
-    setIsLoading(true);
-    setActiveCitation(undefined);
-    setActiveAnalysisPanelTab(undefined);
-
-    try {
-      const history: ChatTurn[] = answers.map((a) => ({ user: a[0], bot: a[1].content }));
-      const request: ChatRequest = {
-        messages: [...history, { user: question, bot: undefined }],
-        stream: useStream,
-        context: {
-          approach: Approaches.ReadRetrieveRead,
-          promptTemplate: promptTemplate.length === 0 ? undefined : promptTemplate,
-          excludeCategory: excludeCategory.length === 0 ? undefined : excludeCategory,
-          top: retrieveCount,
-          retrievalMode: retrievalMode,
-          semanticRanker: useSemanticRanker,
-          semanticCaptions: useSemanticCaptions,
-          suggestFollowupQuestions: useSuggestFollowupQuestions,
-        },
-      };
-
-      const chatResponse = await chatApi(request);
-      if (useStream) {
-        const response = chatResponse as Response;
-        const message: Message = {
-          content: '',
-          role: 'assistant',
-          context: {
-            data_points: [],
-            thoughts: '',
-          },
-        };
-
-        const chunks = await getChunksFromResponse<ChatResponseChunk>(response);
-        for await (const chunk of chunks) {
-          if (chunk.choices[0].delta.context?.data_points) {
-            message.context!.data_points = chunk.choices[0].delta.context?.data_points;
-            message.context!.thoughts = chunk.choices[0].delta.context?.thoughts ?? '';
-          } else if (chunk.choices[0].delta.content) {
-            message.content += chunk.choices[0].delta.content;
-            setIsLoading(false);
-            // Disable batching
-            flushSync(() => {
-              setAnswers([...answers, [question, { ...message }]]);
-            });
-          }
-        }
-      } else {
-        const message = (chatResponse as ChatResponse).choices[0].message;
-        setAnswers([...answers, [question, message]]);
-      }
-    } catch (error_) {
-      setError(error_);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const clearChat = () => {
-    lastQuestionReference.current = '';
-    error && setError(undefined);
-    setActiveCitation(undefined);
-    setActiveAnalysisPanelTab(undefined);
-    setAnswers([]);
-  };
+  const [isLoading] = useState<boolean>(false);
 
   useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' }), [isLoading]);
 
@@ -163,35 +70,6 @@ const Chat = () => {
     setUseSuggestFollowupQuestions(!!checked);
   };
 
-  const onExampleClicked = (example: string) => {
-    makeApiRequest(example);
-  };
-
-  const onShowCitation = (citation: string, index: number) => {
-    if (
-      activeCitation === citation &&
-      activeAnalysisPanelTab === AnalysisPanelTabs.CitationTab &&
-      selectedAnswer === index
-    ) {
-      setActiveAnalysisPanelTab(undefined);
-    } else {
-      setActiveCitation(citation);
-      setActiveAnalysisPanelTab(AnalysisPanelTabs.CitationTab);
-    }
-
-    setSelectedAnswer(index);
-  };
-
-  const onToggleTab = (tab: AnalysisPanelTabs, index: number) => {
-    if (activeAnalysisPanelTab === tab && selectedAnswer === index) {
-      setActiveAnalysisPanelTab(undefined);
-    } else {
-      setActiveAnalysisPanelTab(tab);
-    }
-
-    setSelectedAnswer(index);
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.commandsContainer}>
@@ -203,165 +81,93 @@ const Chat = () => {
         <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
       </div>
       <div className={styles.chatRoot}>
-        <chat-component></chat-component>
-      </div>
-
-      <div className={styles.chatRoot}>
-        <div className={styles.chatContainer}>
-          {lastQuestionReference.current ? (
-            <div className={styles.chatMessageStream}>
-              {answers.map((answer, index) => (
-                <div key={index}>
-                  <UserChatMessage message={answer[0]} />
-                  <div className={styles.chatMessageGpt}>
-                    <Answer
-                      key={index}
-                      answer={answer[1]}
-                      isSelected={selectedAnswer === index && activeAnalysisPanelTab !== undefined}
-                      onCitationClicked={(c) => onShowCitation(c, index)}
-                      onThoughtProcessClicked={() => onToggleTab(AnalysisPanelTabs.ThoughtProcessTab, index)}
-                      onSupportingContentClicked={() => onToggleTab(AnalysisPanelTabs.SupportingContentTab, index)}
-                      onFollowupQuestionClicked={(q) => makeApiRequest(q)}
-                      showFollowupQuestions={useSuggestFollowupQuestions && answers.length - 1 === index}
-                    />
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <>
-                  <UserChatMessage message={lastQuestionReference.current} />
-                  <div className={styles.chatMessageGptMinWidth}>
-                    <AnswerLoading />
-                  </div>
-                </>
-              )}
-              {error ? (
-                <>
-                  <UserChatMessage message={lastQuestionReference.current} />
-                  <div className={styles.chatMessageGptMinWidth}>
-                    <AnswerError
-                      error={error.toString()}
-                      onRetry={() => makeApiRequest(lastQuestionReference.current)}
-                    />
-                  </div>
-                </>
-              ) : undefined}
-              <div ref={chatMessageStreamEnd} />
-            </div>
-          ) : (
-            <div className={styles.chatEmptyState}>
-              <SparkleFilled
-                fontSize={'120px'}
-                primaryFill={'rgba(115, 118, 225, 1)'}
-                aria-hidden="true"
-                aria-label="Chat logo"
-              />
-              <h1 className={styles.chatEmptyStateTitle}>Chat with your data</h1>
-              <h2 className={styles.chatEmptyStateSubtitle}>Ask anything or try an example</h2>
-              <ExampleList onExampleClicked={onExampleClicked} />
-            </div>
-          )}
-
-          <div className={styles.chatInput}>
-            <QuestionInput
-              clearOnSend
-              placeholder="Type a new question (e.g. what is the refund policy?)"
-              disabled={isLoading}
-              onSend={(question) => makeApiRequest(question)}
-            />
-          </div>
+        <div className={styles.chatEmptyState}>
+          <chat-component
+            inputPosition="sticky"
+            interactionModel="chat"
+            title="Ask anything or try an example"
+          ></chat-component>
         </div>
-
-        {answers.length > 0 && activeAnalysisPanelTab && (
-          <AnalysisPanel
-            className={styles.chatAnalysisPanel}
-            activeCitation={activeCitation}
-            onActiveTabChanged={(x) => onToggleTab(x, selectedAnswer)}
-            citationHeight="810px"
-            answer={answers[selectedAnswer][1]}
-            activeTab={activeAnalysisPanelTab}
-          />
-        )}
-
-        <Panel
-          headerText="Configure answer generation"
-          isOpen={isConfigPanelOpen}
-          isBlocking={false}
-          onDismiss={() => setIsConfigPanelOpen(false)}
-          closeButtonAriaLabel="Close"
-          onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
-          isFooterAtBottom={true}
-        >
-          <TextField
-            className={styles.chatSettingsSeparator}
-            defaultValue={promptTemplate}
-            label="Override prompt template"
-            multiline
-            autoAdjustHeight
-            onChange={onPromptTemplateChange}
-          />
-
-          <SpinButton
-            className={styles.chatSettingsSeparator}
-            label="Retrieve this many search results:"
-            min={1}
-            max={50}
-            defaultValue={retrieveCount.toString()}
-            onChange={onRetrieveCountChange}
-          />
-          <TextField
-            className={styles.chatSettingsSeparator}
-            label="Exclude category"
-            onChange={onExcludeCategoryChanged}
-          />
-          <Checkbox
-            className={styles.chatSettingsSeparator}
-            checked={useSemanticRanker}
-            label="Use semantic ranker for retrieval"
-            onChange={onUseSemanticRankerChange}
-          />
-          <Checkbox
-            className={styles.chatSettingsSeparator}
-            checked={useSemanticCaptions}
-            label="Use query-contextual summaries instead of whole documents"
-            onChange={onUseSemanticCaptionsChange}
-            disabled={!useSemanticRanker}
-          />
-          <Checkbox
-            className={styles.chatSettingsSeparator}
-            checked={useSuggestFollowupQuestions}
-            label="Suggest follow-up questions"
-            onChange={onUseSuggestFollowupQuestionsChange}
-          />
-          <Dropdown
-            className={styles.chatSettingsSeparator}
-            label="Retrieval mode"
-            options={[
-              {
-                key: 'hybrid',
-                text: 'Vectors + Text (Hybrid)',
-                selected: retrievalMode == RetrievalMode.Hybrid,
-                data: RetrievalMode.Hybrid,
-              },
-              {
-                key: 'vectors',
-                text: 'Vectors',
-                selected: retrievalMode == RetrievalMode.Vectors,
-                data: RetrievalMode.Vectors,
-              },
-              { key: 'text', text: 'Text', selected: retrievalMode == RetrievalMode.Text, data: RetrievalMode.Text },
-            ]}
-            required
-            onChange={onRetrievalModeChange}
-          />
-          <Checkbox
-            className={styles.chatSettingsSeparator}
-            checked={useStream}
-            label="Stream chat completion responses"
-            onChange={onUseStreamChange}
-          />
-        </Panel>
       </div>
+
+      <Panel
+        headerText="Configure answer generation"
+        isOpen={isConfigPanelOpen}
+        isBlocking={false}
+        onDismiss={() => setIsConfigPanelOpen(false)}
+        closeButtonAriaLabel="Close"
+        onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
+        isFooterAtBottom={true}
+      >
+        <TextField
+          className={styles.chatSettingsSeparator}
+          defaultValue={promptTemplate}
+          label="Override prompt template"
+          multiline
+          autoAdjustHeight
+          onChange={onPromptTemplateChange}
+        />
+
+        <SpinButton
+          className={styles.chatSettingsSeparator}
+          label="Retrieve this many search results:"
+          min={1}
+          max={50}
+          defaultValue={retrieveCount.toString()}
+          onChange={onRetrieveCountChange}
+        />
+        <TextField
+          className={styles.chatSettingsSeparator}
+          label="Exclude category"
+          onChange={onExcludeCategoryChanged}
+        />
+        <Checkbox
+          className={styles.chatSettingsSeparator}
+          checked={useSemanticRanker}
+          label="Use semantic ranker for retrieval"
+          onChange={onUseSemanticRankerChange}
+        />
+        <Checkbox
+          className={styles.chatSettingsSeparator}
+          checked={useSemanticCaptions}
+          label="Use query-contextual summaries instead of whole documents"
+          onChange={onUseSemanticCaptionsChange}
+          disabled={!useSemanticRanker}
+        />
+        <Checkbox
+          className={styles.chatSettingsSeparator}
+          checked={useSuggestFollowupQuestions}
+          label="Suggest follow-up questions"
+          onChange={onUseSuggestFollowupQuestionsChange}
+        />
+        <Dropdown
+          className={styles.chatSettingsSeparator}
+          label="Retrieval mode"
+          options={[
+            {
+              key: 'hybrid',
+              text: 'Vectors + Text (Hybrid)',
+              selected: retrievalMode == RetrievalMode.Hybrid,
+              data: RetrievalMode.Hybrid,
+            },
+            {
+              key: 'vectors',
+              text: 'Vectors',
+              selected: retrievalMode == RetrievalMode.Vectors,
+              data: RetrievalMode.Vectors,
+            },
+            { key: 'text', text: 'Text', selected: retrievalMode == RetrievalMode.Text, data: RetrievalMode.Text },
+          ]}
+          required
+          onChange={onRetrievalModeChange}
+        />
+        <Checkbox
+          className={styles.chatSettingsSeparator}
+          checked={useStream}
+          label="Stream chat completion responses"
+          onChange={onUseStreamChange}
+        />
+      </Panel>
     </div>
   );
 };

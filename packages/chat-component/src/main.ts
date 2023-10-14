@@ -21,6 +21,21 @@ import { getTimestamp, processText } from './utils/index.js';
 
 @customElement('chat-component')
 export class ChatComponent extends LitElement {
+  //--
+  // Public attributes
+  // --
+
+  @property({ type: Boolean, attribute: 'inputPosition' })
+  inputPosition = 'sticky';
+
+  // interaction type: should come from dynamic settings
+  // INTERACTION_MODEL defines the UI presentation and behavior
+  // but for now we can switch between 'chat' and 'ask', using this
+  @property({ type: String, attribute: 'interactionModel' })
+  interactionModel = INTERACTION_MODEL[0];
+
+  //--
+
   @property({ type: String })
   currentQuestion = '';
   @query('#question-input')
@@ -48,11 +63,6 @@ export class ChatComponent extends LitElement {
   isShowingThoughtProcess = false;
   @property({ type: Boolean })
   canShowThoughtProcess = false;
-  // interaction type: should come from dynamic settings
-  // INTERACTION_MODEL defines the UI presentation and behavior
-  // but for now we can switch between 'chat' and 'ask', using this
-  @property({ type: String })
-  interactionModel = INTERACTION_MODEL[0];
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
@@ -61,7 +71,6 @@ export class ChatComponent extends LitElement {
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
-  chatInputLabelText: string = globalConfig.CHAT_INPUT_LABEL_TEXT;
   chatThoughtProcess: BotResponse[] = [];
   chatThoughts: string | null = '';
   chatDataPoints: string[] = [];
@@ -446,11 +455,11 @@ export class ChatComponent extends LitElement {
             ${this.hasDefaultPromptsEnabled
               ? html`
                   <div class="defaults__container">
-                    <h2 class="subheadline">
+                    <h1 class="headline">
                       ${this.interactionModel === 'chat'
-                        ? globalConfig.DEFAULT_PROMPTS_HEADING_CHAT
-                        : globalConfig.DEFAULT_PROMPTS_HEADING_ASK}
-                    </h2>
+                        ? this.title || globalConfig.DEFAULT_PROMPTS_HEADING_CHAT
+                        : this.title || globalConfig.DEFAULT_PROMPTS_HEADING_ASK}
+                    </h1>
                     <ul class="defaults__list">
                       ${this.defaultPrompts.map(
                         (prompt) => html`
@@ -472,11 +481,10 @@ export class ChatComponent extends LitElement {
                 `
               : ''}
           </div>
-          <form id="chat-form" class="form__container">
-            <label id="chatbox-label" for="question-input" class="form__label"
-              >${globalConfig.CHAT_INPUT_LABEL_TEXT}</label
-            >
-
+          <form
+            id="chat-form"
+            class="form__container ${this.inputPosition === 'sticky' ? 'form__container-sticky' : ''}"
+          >
             <div class="chatbox__container container-col container-row">
               <input
                 class="chatbox__input"
@@ -516,16 +524,15 @@ export class ChatComponent extends LitElement {
                 ${globalConfig.RESET_BUTTON_LABEL_TEXT}
               </button>
             </div>
-          </form>
-          <div class="chat__containerFooter">
+
             ${this.hasDefaultPromptsEnabled
               ? ''
-              : html`
+              : html`<div class="chat__containerFooter">
                   <button type="button" @click="${this.showDefaultPrompts}" class="defaults__span button">
                     ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
                   </button>
-                `}
-          </div>
+                </div>`}
+          </form>
         </section>
         ${this.isShowingThoughtProcess
           ? html`
