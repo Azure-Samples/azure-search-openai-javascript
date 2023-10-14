@@ -2,6 +2,7 @@ import { css } from 'lit';
 
 export const mainStyle = css`
   :host {
+    width: 100vw;
     display: block;
     padding: 16px;
     --secondary-color: #f8fffd;
@@ -136,13 +137,11 @@ export const mainStyle = css`
   }
   .chat__containerWrapper.aside-open .aside {
     width: 100%;
+    border-left: 1px solid #d2d2d2;
 
     @media (max-width: 1024px) {
       width: 80%;
     }
-  }
-  .chat__containerFooter {
-    padding: 0 0 50px 0;
   }
   @media (max-width: 1024px) {
     .aside {
@@ -160,6 +159,12 @@ export const mainStyle = css`
   .form__container {
     margin-top: 30px;
     padding: 10px;
+  }
+  .form__container-sticky {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    background: var(--accent-light);
   }
   .form__label {
     display: block;

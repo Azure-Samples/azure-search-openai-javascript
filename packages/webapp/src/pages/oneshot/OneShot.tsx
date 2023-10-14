@@ -1,25 +1,22 @@
-import { useRef, useState } from 'react';
 import {
   Checkbox,
   ChoiceGroup,
-  type IChoiceGroupOption,
-  Panel,
   DefaultButton,
-  Spinner,
-  TextField,
-  SpinButton,
-  type IDropdownOption,
   Dropdown,
+  Panel,
+  SpinButton,
+  TextField,
+  type IChoiceGroupOption,
+  type IDropdownOption,
 } from '@fluentui/react';
+import { useState } from 'react';
 
 import styles from './OneShot.module.css';
 
-import { askApi, Approaches, type AskRequest, RetrievalMode, type Message } from '../../api/index.js';
-import { Answer, AnswerError } from '../../components/Answer/index.js';
-import { QuestionInput } from '../../components/QuestionInput/index.js';
-import { ExampleList } from '../../components/Example/index.js';
-import { AnalysisPanel, AnalysisPanelTabs } from '../../components/AnalysisPanel/index.js';
+import { Approaches, RetrievalMode } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/SettingsButton.jsx';
+
+import 'chat-component';
 
 export function Component(): JSX.Element {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -31,48 +28,7 @@ export function Component(): JSX.Element {
   const [retrieveCount, setRetrieveCount] = useState<number>(3);
   const [useSemanticRanker, setUseSemanticRanker] = useState<boolean>(true);
   const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(false);
-  const [excludeCategory, setExcludeCategory] = useState<string>('');
-
-  const lastQuestionReference = useRef<string>('');
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<unknown>();
-  const [answer, setAnswer] = useState<Message>();
-
-  const [activeCitation, setActiveCitation] = useState<string>();
-  const [activeAnalysisPanelTab, setActiveAnalysisPanelTab] = useState<AnalysisPanelTabs | undefined>(undefined);
-
-  const makeApiRequest = async (question: string) => {
-    lastQuestionReference.current = question;
-
-    error && setError(undefined);
-    setIsLoading(true);
-    setActiveCitation(undefined);
-    setActiveAnalysisPanelTab(undefined);
-
-    try {
-      const request: AskRequest = {
-        question,
-        context: {
-          approach,
-          promptTemplate: promptTemplate.length === 0 ? undefined : promptTemplate,
-          promptTemplatePrefix: promptTemplatePrefix.length === 0 ? undefined : promptTemplatePrefix,
-          promptTemplateSuffix: promptTemplateSuffix.length === 0 ? undefined : promptTemplateSuffix,
-          excludeCategory: excludeCategory.length === 0 ? undefined : excludeCategory,
-          top: retrieveCount,
-          retrievalMode: retrievalMode,
-          semanticRanker: useSemanticRanker,
-          semanticCaptions: useSemanticCaptions,
-        },
-      };
-      const result = await askApi(request);
-      setAnswer(result.choices[0].message);
-    } catch (error_) {
-      setError(error_);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [, setExcludeCategory] = useState<string>('');
 
   const onPromptTemplateChange = (
     _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -123,27 +79,6 @@ export function Component(): JSX.Element {
     setExcludeCategory(newValue || '');
   };
 
-  const onExampleClicked = (example: string) => {
-    makeApiRequest(example);
-  };
-
-  const onShowCitation = (citation: string) => {
-    if (activeCitation === citation && activeAnalysisPanelTab === AnalysisPanelTabs.CitationTab) {
-      setActiveAnalysisPanelTab(undefined);
-    } else {
-      setActiveCitation(citation);
-      setActiveAnalysisPanelTab(AnalysisPanelTabs.CitationTab);
-    }
-  };
-
-  const onToggleTab = (tab: AnalysisPanelTabs) => {
-    if (activeAnalysisPanelTab === tab) {
-      setActiveAnalysisPanelTab(undefined);
-    } else {
-      setActiveAnalysisPanelTab(tab);
-    }
-  };
-
   const approaches: IChoiceGroupOption[] = [
     {
       key: Approaches.RetrieveThenRead,
@@ -153,53 +88,13 @@ export function Component(): JSX.Element {
       key: Approaches.ReadRetrieveRead,
       text: 'Read-Retrieve-Read',
     },
-    // {
-    //   key: Approaches.ReadDecomposeAsk,
-    //   text: 'Read-Decompose-Ask',
-    // },
   ];
 
   return (
     <div className={styles.oneshotContainer}>
       <div className={styles.oneshotTopSection}>
         <SettingsButton className={styles.settingsButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
-        <h1 className={styles.oneshotTitle}>Ask your data</h1>
-        <div className={styles.oneshotQuestionInput}>
-          <QuestionInput
-            placeholder="Example: What is the refund policy?"
-            disabled={isLoading}
-            onSend={(question) => makeApiRequest(question)}
-          />
-        </div>
-      </div>
-      <div className={styles.oneshotBottomSection}>
-        {isLoading && <Spinner label="Generating answer" />}
-        {!lastQuestionReference.current && <ExampleList onExampleClicked={onExampleClicked} />}
-        {!isLoading && answer && !error && (
-          <div className={styles.oneshotAnswerContainer}>
-            <Answer
-              answer={answer}
-              onCitationClicked={(x) => onShowCitation(x)}
-              onThoughtProcessClicked={() => onToggleTab(AnalysisPanelTabs.ThoughtProcessTab)}
-              onSupportingContentClicked={() => onToggleTab(AnalysisPanelTabs.SupportingContentTab)}
-            />
-          </div>
-        )}
-        {error ? (
-          <div className={styles.oneshotAnswerContainer}>
-            <AnswerError error={error.toString()} onRetry={() => makeApiRequest(lastQuestionReference.current)} />
-          </div>
-        ) : undefined}
-        {activeAnalysisPanelTab && answer && (
-          <AnalysisPanel
-            className={styles.oneshotAnalysisPanel}
-            activeCitation={activeCitation}
-            onActiveTabChanged={(x) => onToggleTab(x)}
-            citationHeight="600px"
-            answer={answer}
-            activeTab={activeAnalysisPanelTab}
-          />
-        )}
+        <chat-component inputPosition="sticky" interactionModel="ask" title="Ask your data"></chat-component>
       </div>
 
       <Panel
