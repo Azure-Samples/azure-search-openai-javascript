@@ -1,9 +1,9 @@
 import { type AskRequest, type ChatResponse, type ChatRequest } from './models.js';
 
-const baseUrl = import.meta.env.VITE_SEARCH_API_URI ?? '';
+export const apiBaseUrl = import.meta.env.VITE_SEARCH_API_URI ?? '';
 
 export async function askApi(options: AskRequest): Promise<ChatResponse> {
-  const response = await fetch(`${baseUrl}/ask`, {
+  const response = await fetch(`${apiBaseUrl}/ask`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ export async function askApi(options: AskRequest): Promise<ChatResponse> {
 }
 
 export async function chatApi(options: ChatRequest): Promise<ChatResponse | Response> {
-  const response = await fetch(`${baseUrl}/chat`, {
+  const response = await fetch(`${apiBaseUrl}/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export async function chatApi(options: ChatRequest): Promise<ChatResponse | Resp
 }
 
 export function getCitationFilePath(citation: string): string {
-  return `/content/${citation}`;
+  return `${apiBaseUrl}/content/${citation}`;
 }
 
 export class NdJsonParserStream extends TransformStream<string, JSON> {
