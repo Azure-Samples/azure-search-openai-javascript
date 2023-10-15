@@ -166,7 +166,7 @@ export function Component(): JSX.Element {
         <h1 className={styles.oneshotTitle}>Ask your data</h1>
         <div className={styles.oneshotQuestionInput}>
           <QuestionInput
-            placeholder="Example: What is the redund policy?"
+            placeholder="Example: What is the refund policy?"
             disabled={isLoading}
             onSend={(question) => makeApiRequest(question)}
           />
