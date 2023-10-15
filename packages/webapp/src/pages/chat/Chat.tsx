@@ -33,7 +33,7 @@ const Chat = () => {
   const [useStream, setUseStream] = useState<boolean>(true);
   const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(false);
   const [excludeCategory, setExcludeCategory] = useState<string>('');
-  const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(false);
+  const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(true);
 
   const lastQuestionReference = useRef<string>('');
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
