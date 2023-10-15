@@ -83,7 +83,7 @@ export class NdJsonParserStream extends TransformStream<string, JSON> {
         controller = _controller;
       },
       transform: (chunk) => {
-        const jsonChunks = chunk.split('\n');
+        const jsonChunks = chunk.split('\n').filter(Boolean);
         for (const jsonChunk of jsonChunks) {
           try {
             this.buffer += jsonChunk;
