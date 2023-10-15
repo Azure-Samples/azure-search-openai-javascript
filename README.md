@@ -377,7 +377,11 @@ Technology comparison:
 <details><a id="switch-gpt4"></a>
 <summary>How do you use GPT-4 with this sample?</summary>
 
-In `infra/main.bicep`, change `chatGptModelName` to 'gpt-4' instead of 'gpt-35-turbo'. You may also need to adjust the capacity above that line depending on how much TPM your account is allowed.
+Run these commands:
+```bash
+azd env set AZURE_OPENAI_CHATGPT_MODEL gpt-4
+```
+You may also need to adjust the capacity in `infra/main.bicep` file, depending on how much TPM your account is allowed.
 
 </details>
 <details><a id="chat-ask-diff"></a>
