@@ -14,15 +14,19 @@ import { getTokenLimit } from '../tokens.js';
 const SYSTEM_MESSAGE_CHAT_CONVERSATION = `Assistant helps the Consto Real Estate company customers with support questions regarding terms of service, privacy policy, and questions about support requests. Be brief in your answers.
 Answer ONLY with the facts listed in the list of sources below. If there isn't enough information below, say you don't know. Do not generate answers that don't use the sources below. If asking a clarifying question to the user would help, ask the question.
 For tabular information return it as an html table. Do not return markdown format. If the question is not in English, answer in the language used in the question.
-Each source has a name followed by colon and the actual information, always include the source name for each fact you use in the response. Use square brackets to reference the source, e.g. [info1.txt]. Don't combine sources, list each source separately, e.g. [info1.txt][info2.pdf].
+Each source has a name followed by colon and the actual information, always include the source name for each fact you use in the response. Use square brackets to reference the source, for example: [info1.txt]. Don't combine sources, list each source separately, for example: [info1.txt][info2.pdf].
 {follow_up_questions_prompt}
 {injected_prompt}
 `;
 
-const FOLLOW_UP_QUESTIONS_PROMPT_CONTENT = `Generate three very brief follow-up questions that the user would likely ask next about rentals.
-Use double angle brackets to reference the questions, e.g. <<Am I allowed to invite friends for a party?>>.
-Try not to repeat questions that have already been asked.
-Only generate questions and do not generate any text before or after the questions, such as 'Next Questions'`;
+const FOLLOW_UP_QUESTIONS_PROMPT_CONTENT = `Generate 3 very brief follow-up questions that the user would likely ask next.
+Enclose the follow-up questions in double angle brackets. Example:
+<<Am I allowed to invite friends for a party?>>
+<<How can I ask for a refund?>>
+<<What If I break something?>>
+
+Do no repeat questions that have already been asked.
+Make sure the last question ends with ">>".`;
 
 const QUERY_PROMPT_TEMPLATE = `Below is a history of the conversation so far, and a new question asked by the user that needs to be answered by searching in a knowledge base about terms of service, privacy policy, and questions about support requests.
 Generate a search query based on the conversation and the new question.
@@ -188,7 +192,15 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
       this.chatGptTokenLimit,
     );
 
-    const messageToDisplay = messagesToString(messages);
+    const firstQuery = messagesToString(messages);
+    const secondQuery = messagesToString(finalMessages);
+    const thoughts = `Search query:
+${query}
+
+Conversations:
+${firstQuery}
+
+${secondQuery}`.replaceAll('\n', '<br>');
 
     return {
       completionRequest: {
@@ -199,7 +211,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
         n: 1,
       },
       dataPoints: results,
-      thoughts: `Searched for:<br>${query}<br><br>Conversations:<br>${messageToDisplay.replace('\n', '<br>')}`,
+      thoughts,
     };
   }
 
