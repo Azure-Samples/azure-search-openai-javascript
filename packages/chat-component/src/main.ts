@@ -33,14 +33,20 @@ export class ChatComponent extends LitElement {
   // Public attributes
   // --
 
-  @property({ type: String, attribute: 'input-position' })
+  @property({ type: String, attribute: 'data-input-position' })
   inputPosition = 'sticky';
 
-  @property({ type: String, attribute: 'interaction-model' })
+  @property({ type: String, attribute: 'data-interaction-model' })
   interactionModel: 'ask' | 'chat' = 'chat';
 
-  @property({ type: String, attribute: 'api-url' })
+  @property({ type: String, attribute: 'data-api-url' })
   apiUrl = chatHttpOptions.url;
+
+  @property({ type: String, attribute: 'data-use-stream' })
+  useStream: 'true' | 'false' = chatHttpOptions.stream;
+
+  @property({ type: String, attribute: 'data-overrides', converter: (value) => JSON.parse(value || '{}') })
+  overrides: RequestOverrides = {};
 
   //--
 
@@ -71,9 +77,6 @@ export class ChatComponent extends LitElement {
   // Has the response been copied to the clipboard
   @property({ type: Boolean })
   isResponseCopied = false;
-
-  @property({ type: Boolean })
-  isStreaming = false;
 
   // Is showing thought process panel
   @property({ type: Boolean })
@@ -161,7 +164,7 @@ export class ChatComponent extends LitElement {
     if (isUserMessage) {
       updateChatWithMessageOrChunk(message, false);
     } else {
-      if (this.isStreaming) {
+      if (this.useStream) {
         await updateChatWithMessageOrChunk(message, true);
       } else {
         // non-streamed response
@@ -191,7 +194,6 @@ export class ChatComponent extends LitElement {
       this.currentQuestion = question;
       try {
         const type = this.interactionModel;
-        this.isStreaming = type === 'ask' ? false : this.chatHttpOptions.stream;
         // Remove default prompts
         this.isChatStarted = true;
         this.hasDefaultPromptsEnabled = false;
@@ -203,12 +205,24 @@ export class ChatComponent extends LitElement {
         if (type === 'chat') {
           this.processApiResponse({ message: question, isUserMessage: true });
         }
+
         this.apiResponse = await getAPIResponse(
-          { ...this.chatRequestOptions, question, type },
           {
+            ...this.chatRequestOptions,
+            overrides: {
+              ...this.chatRequestOptions.overrides,
+              ...this.overrides,
+            },
+            question,
+            type,
+          },
+          {
+            // use defaults
             ...this.chatHttpOptions,
-            // override the url if the user has provided one
+
+            // override if the user has provided different values
             url: this.apiUrl,
+            stream: this.useStream.toLowerCase() === 'true',
           },
         );
 
@@ -218,7 +232,7 @@ export class ChatComponent extends LitElement {
         this.isResetInput = false;
         const response = this.apiResponse as BotResponse;
         // adds thought process support when streaming is disabled
-        if (!this.isStreaming) {
+        if (!this.useStream) {
           this.chatThoughts = response.thoughts;
           this.chatDataPoints = response.data_points;
           this.canShowThoughtProcess = true;
