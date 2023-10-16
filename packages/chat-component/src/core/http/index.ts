@@ -23,7 +23,7 @@ export async function callHttpApi(
     stream: false,
   });
   const body = type === 'chat' ? chatBody : askBody;
-  return await fetch(`${url}${type}`, {
+  return await fetch(`${url}/${type}`, {
     method: method,
     headers: {
       'Content-Type': 'application/json',
