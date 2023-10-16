@@ -21,6 +21,7 @@ import 'chat-component';
 export function Component(): JSX.Element {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
   const [approach, setApproach] = useState<Approaches>(Approaches.RetrieveThenRead);
+  const [apiEndpoint, setApiEndpoint] = useState<string>('http://localhost:3000');
   const [promptTemplate, setPromptTemplate] = useState<string>('');
   const [promptTemplatePrefix, setPromptTemplatePrefix] = useState<string>('');
   const [promptTemplateSuffix, setPromptTemplateSuffix] = useState<string>('');
@@ -28,7 +29,7 @@ export function Component(): JSX.Element {
   const [retrieveCount, setRetrieveCount] = useState<number>(3);
   const [useSemanticRanker, setUseSemanticRanker] = useState<boolean>(true);
   const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(false);
-  const [, setExcludeCategory] = useState<string>('');
+  const [excludeCategory, setExcludeCategory] = useState<string>('');
 
   const onPromptTemplateChange = (
     _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -49,6 +50,10 @@ export function Component(): JSX.Element {
     newValue?: string,
   ) => {
     setPromptTemplateSuffix(newValue || '');
+  };
+
+  const onApiEndpointChange = (_event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+    setApiEndpoint(newValue || '');
   };
 
   const onRetrieveCountChange = (_event?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
@@ -90,15 +95,29 @@ export function Component(): JSX.Element {
     },
   ];
 
+  const overrides = {
+    retrievalMode,
+    retrieveCount,
+    useSemanticRanker,
+    useSemanticCaptions,
+    excludeCategory,
+    promptTemplate,
+    promptTemplatePrefix,
+    promptTemplateSuffix,
+  };
+
   return (
     <div className={styles.oneshotContainer}>
       <div className={styles.oneshotTopSection}>
         <SettingsButton className={styles.settingsButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
         <chat-component
           title="Ask your data"
-          input-position="sticky"
-          interaction-model="ask"
-          api-url="http://localhost:3000"
+          data-input-position="sticky"
+          data-interaction-model="ask"
+          data-api-url={apiEndpoint}
+          data-use-stream="false"
+          data-approach="rrr"
+          data-overrides={JSON.stringify(overrides)}
         ></chat-component>
       </div>
 
@@ -111,6 +130,12 @@ export function Component(): JSX.Element {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
+        <TextField
+          className={styles.chatSettingsSeparator}
+          defaultValue={apiEndpoint}
+          label="API endpoint"
+          onChange={onApiEndpointChange}
+        />
         <ChoiceGroup
           className={styles.oneshotSettingsSeparator}
           label="Approach"

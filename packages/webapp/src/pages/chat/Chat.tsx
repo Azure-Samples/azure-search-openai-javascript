@@ -2,26 +2,22 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
 import { RetrievalMode } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
-import { ClearChatButton } from '../../components/ClearChatButton/index.js';
 import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
 import 'chat-component';
 
-// TODO: implement
-const clearChat = () => {};
-
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
   const [promptTemplate, setPromptTemplate] = useState<string>('');
+  const [apiEndpoint, setApiEndpoint] = useState<string>('http://localhost:3000');
   const [retrieveCount, setRetrieveCount] = useState<number>(3);
   const [retrievalMode, setRetrievalMode] = useState<RetrievalMode>(RetrievalMode.Hybrid);
   const [useSemanticRanker, setUseSemanticRanker] = useState<boolean>(true);
   const [useStream, setUseStream] = useState<boolean>(true);
   const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(false);
-  const [, setExcludeCategory] = useState<string>('');
+  const [excludeCategory, setExcludeCategory] = useState<string>('');
   const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(true);
 
-  const lastQuestionReference = useRef<string>('');
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
   const [isLoading] = useState<boolean>(false);
@@ -33,6 +29,10 @@ const Chat = () => {
     newValue?: string,
   ) => {
     setPromptTemplate(newValue || '');
+  };
+
+  const onApiEndpointChange = (_event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+    setApiEndpoint(newValue || '');
   };
 
   const onRetrieveCountChange = (_event?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
@@ -70,23 +70,33 @@ const Chat = () => {
     setUseSuggestFollowupQuestions(!!checked);
   };
 
+  const overrides = {
+    retrievalMode,
+    top: retrieveCount,
+    useSemanticRanker,
+    useSemanticCaptions,
+    excludeCategory,
+    promptTemplate,
+    promptTemplatePrefix: '',
+    promptTemplateSuffix: '',
+    suggestFollowupQuestions: useSuggestFollowupQuestions,
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.commandsContainer}>
-        <ClearChatButton
-          className={styles.commandButton}
-          onClick={clearChat}
-          disabled={!lastQuestionReference.current || isLoading}
-        />
         <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
       </div>
       <div className={styles.chatRoot}>
         <div className={styles.chatEmptyState}>
           <chat-component
             title="Ask anything or try an example"
-            input-position="sticky"
-            interaction-model="chat"
-            api-url="http://localhost:3000"
+            data-input-position="sticky"
+            data-interaction-model="chat"
+            data-api-url={apiEndpoint}
+            data-use-stream={useStream}
+            data-approach="rrr"
+            data-overrides={JSON.stringify(overrides)}
           ></chat-component>
         </div>
       </div>
@@ -100,6 +110,12 @@ const Chat = () => {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
+        <TextField
+          className={styles.chatSettingsSeparator}
+          defaultValue={apiEndpoint}
+          label="API endpoint"
+          onChange={onApiEndpointChange}
+        />
         <TextField
           className={styles.chatSettingsSeparator}
           defaultValue={promptTemplate}
