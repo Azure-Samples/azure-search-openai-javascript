@@ -83,9 +83,10 @@ const Chat = () => {
       <div className={styles.chatRoot}>
         <div className={styles.chatEmptyState}>
           <chat-component
-            inputPosition="sticky"
-            interactionModel="chat"
             title="Ask anything or try an example"
+            input-position="sticky"
+            interaction-model="chat"
+            api-url="http://localhost:3000"
           ></chat-component>
         </div>
       </div>

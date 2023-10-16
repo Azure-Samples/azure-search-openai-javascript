@@ -3,7 +3,7 @@ import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
 import { customElement, property, query } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { chatHttpOptions, globalConfig, requestOptions, INTERACTION_MODEL } from './config/global-config.js';
+import { chatHttpOptions, globalConfig, requestOptions } from './config/global-config.js';
 import { getAPIResponse } from './core/http/index.js';
 import { parseStreamedMessages } from './core/parser/index.js';
 import { mainStyle } from './style.js';
@@ -33,44 +33,55 @@ export class ChatComponent extends LitElement {
   // Public attributes
   // --
 
-  @property({ type: Boolean, attribute: 'inputPosition' })
+  @property({ type: String, attribute: 'input-position' })
   inputPosition = 'sticky';
 
-  // interaction type: should come from dynamic settings
-  // INTERACTION_MODEL defines the UI presentation and behavior
-  // but for now we can switch between 'chat' and 'ask', using this
-  @property({ type: String, attribute: 'interactionModel' })
-  interactionModel = INTERACTION_MODEL[0];
+  @property({ type: String, attribute: 'interaction-model' })
+  interactionModel: 'ask' | 'chat' = 'chat';
+
+  @property({ type: String, attribute: 'api-url' })
+  apiUrl = chatHttpOptions.url;
 
   //--
 
   @property({ type: String })
   currentQuestion = '';
+
   @query('#question-input')
   questionInput!: HTMLInputElement;
+
   // Default prompts to display in the chat
   @property({ type: Boolean })
   isDisabled = false;
+
   @property({ type: Boolean })
   isChatStarted = false;
+
   @property({ type: Boolean })
   isResetInput = false;
+
   // The program is awaiting response from API
   @property({ type: Boolean })
   isAwaitingResponse = false;
+
   // Show error message to the end-user, if API call fails
   @property({ type: Boolean })
   hasAPIError = false;
+
   // Has the response been copied to the clipboard
   @property({ type: Boolean })
   isResponseCopied = false;
+
   @property({ type: Boolean })
   isStreaming = false;
+
   // Is showing thought process panel
   @property({ type: Boolean })
   isShowingThoughtProcess = false;
+
   @property({ type: Boolean })
   canShowThoughtProcess = false;
+
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
@@ -192,7 +203,14 @@ export class ChatComponent extends LitElement {
         if (type === 'chat') {
           this.processApiResponse({ message: question, isUserMessage: true });
         }
-        this.apiResponse = await getAPIResponse({ ...this.chatRequestOptions, question, type }, this.chatHttpOptions);
+        this.apiResponse = await getAPIResponse(
+          { ...this.chatRequestOptions, question, type },
+          {
+            ...this.chatHttpOptions,
+            // override the url if the user has provided one
+            url: this.apiUrl,
+          },
+        );
 
         this.questionInput.value = '';
         this.isAwaitingResponse = false;

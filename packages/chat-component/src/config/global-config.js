@@ -49,12 +49,11 @@ const requestOptions = {
 
 const chatHttpOptions = {
   // API URL for development purposes
-  url: 'http://localhost:3000/',
+  url: 'http://localhost:3000',
   method: 'POST',
   stream: true,
 };
-// these can be set from developer settings!
-const INTERACTION_MODEL = ['chat', 'ask'];
+
 const APPROACH_MODEL = ['rrr', 'rtr'];
 
-export { globalConfig, requestOptions, chatHttpOptions, NEXT_QUESTION_INDICATOR, INTERACTION_MODEL, APPROACH_MODEL };
+export { globalConfig, requestOptions, chatHttpOptions, NEXT_QUESTION_INDICATOR, APPROACH_MODEL };

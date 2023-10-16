@@ -94,7 +94,12 @@ export function Component(): JSX.Element {
     <div className={styles.oneshotContainer}>
       <div className={styles.oneshotTopSection}>
         <SettingsButton className={styles.settingsButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
-        <chat-component inputPosition="sticky" interactionModel="ask" title="Ask your data"></chat-component>
+        <chat-component
+          title="Ask your data"
+          input-position="sticky"
+          interaction-model="ask"
+          api-url="http://localhost:3000"
+        ></chat-component>
       </div>
 
       <Panel
