@@ -8,6 +8,14 @@ import { getAPIResponse } from './core/http/index.js';
 import { parseStreamedMessages } from './core/parser/index.js';
 import { mainStyle } from './style.js';
 import { getTimestamp, processText } from './utils/index.js';
+
+// TODO: allow host applications to customize these icons
+import iconLightBulb from '../public/svg/lightbulb-icon.svg?inline';
+import iconDoubleCheck from '../public/svg/doublecheck-icon.svg?inline';
+import iconCopyToClipboard from '../public/svg/copy-icon.svg?inline';
+import iconSend from '../public/svg/send-icon.svg?inline';
+import iconClose from '../public/svg/close-icon.svg?inline';
+
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
@@ -388,7 +396,7 @@ export class ChatComponent extends LitElement {
                                     >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
                                   >
                                   <img
-                                    src="./public/svg/lightbulb-icon.svg"
+                                    src="${iconLightBulb}"
                                     alt="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                                     width="12"
                                     height="12"
@@ -406,9 +414,7 @@ export class ChatComponent extends LitElement {
                                       : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
                                   >
                                   <img
-                                    src="${this.isResponseCopied
-                                      ? './public/svg/doublecheck-icon.svg'
-                                      : './public/svg/copy-icon.svg'}"
+                                    src="${this.isResponseCopied ? iconDoubleCheck : iconCopyToClipboard}"
                                     alt="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
                                     width="12"
                                     height="12"
@@ -505,12 +511,7 @@ export class ChatComponent extends LitElement {
                 title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
                 ?disabled="${this.isDisabled}"
               >
-                <img
-                  src="./public/svg/send-icon.svg"
-                  alt="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
-                  width="25"
-                  height="25"
-                />
+                <img src="${iconSend}" alt="${globalConfig.CHAT_BUTTON_LABEL_TEXT}" width="25" height="25" />
               </button>
               <button
                 title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
@@ -545,7 +546,7 @@ export class ChatComponent extends LitElement {
                   >
                     <span class="chat__header--span">${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span>
                     <img
-                      src="./public/svg/close-icon.svg"
+                      src="${iconClose}"
                       alt="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                       width="12"
                       height="12"
