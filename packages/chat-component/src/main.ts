@@ -366,7 +366,11 @@ export class ChatComponent extends LitElement {
           ${citations.map(
             (citation) => html`
               <li class="items__listItem--citation">
-                <a class="items__link" href="${citation.text}" target="_blank" rel="noopener noreferrer"
+                <a
+                  class="items__link"
+                  href="${this.apiUrl}/content/${citation.text}"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   >${citation.ref}. ${citation.text}</a
                 >
               </li>
