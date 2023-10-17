@@ -93,7 +93,6 @@ export class ChatComponent extends LitElement {
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
-  chatThoughtProcess: BotResponse[] = [];
   chatThoughts: string | null = '';
   chatDataPoints: string[] = [];
 
@@ -125,7 +124,7 @@ export class ChatComponent extends LitElement {
           },
         ];
 
-        await parseStreamedMessages({
+        const result = await parseStreamedMessages({
           chatThread: this.chatThread,
           apiResponseBody: (this.apiResponse as Response).body,
           visit: () => {
@@ -133,12 +132,10 @@ export class ChatComponent extends LitElement {
             this.requestUpdate('chatThread');
           },
           // this will be processing thought process only with streaming enabled
-        }).then((thoughtProcess) => {
-          this.chatThoughtProcess = thoughtProcess as unknown as BotResponse[];
-          this.chatThoughts = this.chatThoughtProcess[0].thoughts;
-          this.chatDataPoints = this.chatThoughtProcess[0].data_points;
-          this.canShowThoughtProcess = true;
         });
+        this.chatThoughts = result.thoughts;
+        this.chatDataPoints = result.data_points;
+        this.canShowThoughtProcess = true;
         return true;
       }
 
@@ -233,12 +230,14 @@ export class ChatComponent extends LitElement {
         const response = this.apiResponse as BotResponse;
         // adds thought process support when streaming is disabled
         if (!this.useStream) {
-          this.chatThoughts = response.thoughts;
-          this.chatDataPoints = response.data_points;
+          this.chatThoughts = response.choices[0].message.context?.thoughts ?? '';
+          this.chatDataPoints = response.choices[0].message.context?.data_points ?? [];
           this.canShowThoughtProcess = true;
         }
-        const message: string = response.answer;
-        await this.processApiResponse({ message, isUserMessage: false });
+        await this.processApiResponse({
+          message: this.useStream ? '' : response.choices[0].message.content,
+          isUserMessage: false,
+        });
       } catch (error) {
         console.error(error);
         this.handleAPIError();
