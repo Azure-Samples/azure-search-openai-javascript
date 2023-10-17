@@ -32,7 +32,8 @@
         "ms-azuretools.vscode-docker",
         "esbenp.prettier-vscode",
         "humao.rest-client",
-        "GitHub.copilot"
+        "GitHub.copilot",
+        "runem.lit-plugin"
       ]
     }
   },
