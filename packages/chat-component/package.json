@@ -15,8 +15,8 @@
     "clean": "rimraf dist *.tgz",
     "start": "vite --port 8000 --host 0.0.0.0",
     "build": "vite build",
-    "build:rollup": "rollup -c",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "npm run build -s"
   },
   "author": "",
   "license": "MIT",
