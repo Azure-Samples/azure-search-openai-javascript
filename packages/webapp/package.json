@@ -12,7 +12,7 @@
     "@fluentui/react": "^8.110.7",
     "@fluentui/react-icons": "^2.0.206",
     "@react-spring/web": "^9.7.3",
-    "chat-component": "file:../chat-component",
+    "chat-component": "^0.0.1",
     "dompurify": "^3.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
