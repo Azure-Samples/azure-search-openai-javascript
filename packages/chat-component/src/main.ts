@@ -11,6 +11,7 @@ import { getTimestamp, processText } from './utils/index.js';
 
 // TODO: allow host applications to customize these icons
 import iconLightBulb from '../public/svg/lightbulb-icon.svg?inline';
+import iconDelete from '../public/svg/delete-icon.svg?inline';
 import iconDoubleCheck from '../public/svg/doublecheck-icon.svg?inline';
 import iconCopyToClipboard from '../public/svg/copy-icon.svg?inline';
 import iconSend from '../public/svg/send-icon.svg?inline';
@@ -105,8 +106,6 @@ export class ChatComponent extends LitElement {
 
   // Add a message to the chat, when the user or the API sends a message
   async processApiResponse({ message, isUserMessage }: { message: string; isUserMessage: boolean }) {
-    console.log('useStream', this.useStream);
-
     const citations: Citation[] = [];
     const followingSteps: string[] = [];
     const followupQuestions: string[] = [];
@@ -411,6 +410,16 @@ export class ChatComponent extends LitElement {
         <section class="chat__container" id="chat-container">
           ${this.isChatStarted
             ? html`
+                <div class="chat__header">
+                  <button
+                    title="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
+                    class="button chat__header--button"
+                    @click="${this.resetCurrentChat}"
+                  >
+                    <span class="chat__header--span">${globalConfig.RESET_CHAT_BUTTON_TITLE}</span>
+                    <img src="${iconDelete}" alt="${globalConfig.RESET_CHAT_BUTTON_TITLE}" width="12" height="12" />
+                  </button>
+                </div>
                 <ul class="chat__list" aria-live="assertive">
                   ${this.chatThread.map(
                     (message) => html`
