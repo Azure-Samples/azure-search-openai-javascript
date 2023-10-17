@@ -6,9 +6,9 @@ const globalConfig = {
   // Default prompts to display in the chat
   DISPLAY_DEFAULT_PROMPTS_BUTTON: 'Not sure what to ask? Try our suggestions!',
   DEFAULT_PROMPTS: [
-    'How to search and book rentals',
-    'How to cancel a confirmed booking',
-    'How to report a payment or refund issue, for example if a guest or host is asking to pay or be paid outside of the Contoso Real Estate platform',
+    'How to search and book rentals?',
+    'What is the refund policy?',
+    'How to contact a representative?',
   ],
   DEFAULT_PROMPTS_HEADING_CHAT: 'Chat with our support team',
   DEFAULT_PROMPTS_HEADING_ASK: 'Ask a question',
