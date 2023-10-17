@@ -9,7 +9,7 @@ export async function parseStreamedMessages({
   apiResponseBody: ReadableStream<Uint8Array> | null;
   visit: () => void;
 }) {
-  const chunks = readStream<Partial<BotResponse>>(apiResponseBody);
+  const chunks = readStream<BotResponseChunk>(apiResponseBody);
 
   const streamedMessageRaw: string[] = [];
   const stepsBuffer: string[] = [];
@@ -19,15 +19,19 @@ export async function parseStreamedMessages({
   let isFollowupQuestion = false;
   let stepIndex = 0;
   let textBlockIndex = 0;
-  const thoughtProcess: string[] = [];
+  const result = {
+    data_points: [] as string[],
+    thoughts: '',
+  };
 
   for await (const chunk of chunks) {
-    // eslint-disable-next-line no-prototype-builtins
-    if (chunk.hasOwnProperty('data_points')) {
-      thoughtProcess.push(chunk as string);
+    const { content, context } = chunk.choices[0].delta;
+    if (context?.data_points) {
+      result.data_points = context.data_points ?? [];
+      result.thoughts = context.thoughts ?? '';
       continue;
     }
-    let chunkValue = chunk.answer as string;
+    let chunkValue = content ?? '';
 
     if (chunkValue === '') {
       continue;
@@ -117,7 +121,7 @@ export async function parseStreamedMessages({
 
     visit();
   }
-  return thoughtProcess;
+  return result;
 }
 
 // update the citations entry and wrap the citations in a sup tag

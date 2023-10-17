@@ -55,3 +55,35 @@ declare interface BotResponse {
   error?: string;
   done?: boolean;
 }
+
+declare type MessageRole = 'system' | 'user' | 'assistant' | 'function';
+
+declare interface Message {
+  role: MessageRole;
+  content: string;
+}
+
+declare interface BotResponse {
+  choices: Array<{
+    index: number;
+    message: BotResponseMessage;
+  }>;
+  object: 'chat.completion';
+}
+
+declare interface BotResponseChunk {
+  choices: Array<{
+    index: number;
+    delta: Partial<BotResponseMessage>;
+    finish_reason: string | null;
+  }>;
+  object: 'chat.completion.chunk';
+}
+
+declare type BotResponseMessage = Message & {
+  context?: Record<string, any> & {
+    data_points?: string[];
+    thoughts?: string;
+  };
+  session_state?: Record<string, any>;
+};
