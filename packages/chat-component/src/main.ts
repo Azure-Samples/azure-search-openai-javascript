@@ -42,8 +42,8 @@ export class ChatComponent extends LitElement {
   @property({ type: String, attribute: 'data-api-url' })
   apiUrl = chatHttpOptions.url;
 
-  @property({ type: String, attribute: 'data-use-stream' })
-  useStream: 'true' | 'false' = chatHttpOptions.stream;
+  @property({ type: String, attribute: 'data-use-stream', converter: (value) => value?.toLowerCase() === 'true' })
+  useStream: boolean = chatHttpOptions.stream;
 
   @property({ type: String, attribute: 'data-overrides', converter: (value) => JSON.parse(value || '{}') })
   overrides: RequestOverrides = {};
@@ -105,6 +105,8 @@ export class ChatComponent extends LitElement {
 
   // Add a message to the chat, when the user or the API sends a message
   async processApiResponse({ message, isUserMessage }: { message: string; isUserMessage: boolean }) {
+    console.log('useStream', this.useStream);
+
     const citations: Citation[] = [];
     const followingSteps: string[] = [];
     const followupQuestions: string[] = [];
@@ -219,7 +221,7 @@ export class ChatComponent extends LitElement {
 
             // override if the user has provided different values
             url: this.apiUrl,
-            stream: this.useStream.toLowerCase() === 'true',
+            stream: this.useStream,
           },
         );
 
