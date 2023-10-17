@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
-import { RetrievalMode } from '../../api/index.js';
+import { RetrievalMode, apiBaseUrl } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
 import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
@@ -9,7 +9,6 @@ import 'chat-component';
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
   const [promptTemplate, setPromptTemplate] = useState<string>('');
-  const [apiEndpoint, setApiEndpoint] = useState<string>('http://localhost:3000');
   const [retrieveCount, setRetrieveCount] = useState<number>(3);
   const [retrievalMode, setRetrievalMode] = useState<RetrievalMode>(RetrievalMode.Hybrid);
   const [useSemanticRanker, setUseSemanticRanker] = useState<boolean>(true);
@@ -29,10 +28,6 @@ const Chat = () => {
     newValue?: string,
   ) => {
     setPromptTemplate(newValue || '');
-  };
-
-  const onApiEndpointChange = (_event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-    setApiEndpoint(newValue || '');
   };
 
   const onRetrieveCountChange = (_event?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
@@ -93,7 +88,7 @@ const Chat = () => {
             title="Ask anything or try an example"
             data-input-position="sticky"
             data-interaction-model="chat"
-            data-api-url={apiEndpoint}
+            data-api-url={apiBaseUrl}
             data-use-stream={useStream}
             data-approach="rrr"
             data-overrides={JSON.stringify(overrides)}
@@ -110,12 +105,6 @@ const Chat = () => {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
-        <TextField
-          className={styles.chatSettingsSeparator}
-          defaultValue={apiEndpoint}
-          label="API endpoint"
-          onChange={onApiEndpointChange}
-        />
         <TextField
           className={styles.chatSettingsSeparator}
           defaultValue={promptTemplate}

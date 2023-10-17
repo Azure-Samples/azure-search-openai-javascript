@@ -13,7 +13,7 @@ import { useState } from 'react';
 
 import styles from './OneShot.module.css';
 
-import { Approaches, RetrievalMode } from '../../api/index.js';
+import { Approaches, RetrievalMode, apiBaseUrl } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/SettingsButton.jsx';
 
 import 'chat-component';
@@ -21,7 +21,6 @@ import 'chat-component';
 export function Component(): JSX.Element {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
   const [approach, setApproach] = useState<Approaches>(Approaches.RetrieveThenRead);
-  const [apiEndpoint, setApiEndpoint] = useState<string>('http://localhost:3000');
   const [promptTemplate, setPromptTemplate] = useState<string>('');
   const [promptTemplatePrefix, setPromptTemplatePrefix] = useState<string>('');
   const [promptTemplateSuffix, setPromptTemplateSuffix] = useState<string>('');
@@ -50,10 +49,6 @@ export function Component(): JSX.Element {
     newValue?: string,
   ) => {
     setPromptTemplateSuffix(newValue || '');
-  };
-
-  const onApiEndpointChange = (_event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-    setApiEndpoint(newValue || '');
   };
 
   const onRetrieveCountChange = (_event?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
@@ -114,7 +109,7 @@ export function Component(): JSX.Element {
           title="Ask your data"
           data-input-position="sticky"
           data-interaction-model="ask"
-          data-api-url={apiEndpoint}
+          data-api-url={apiBaseUrl}
           data-use-stream="false"
           data-approach="rrr"
           data-overrides={JSON.stringify(overrides)}
@@ -130,12 +125,6 @@ export function Component(): JSX.Element {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
-        <TextField
-          className={styles.chatSettingsSeparator}
-          defaultValue={apiEndpoint}
-          label="API endpoint"
-          onChange={onApiEndpointChange}
-        />
         <ChoiceGroup
           className={styles.oneshotSettingsSeparator}
           label="Approach"
