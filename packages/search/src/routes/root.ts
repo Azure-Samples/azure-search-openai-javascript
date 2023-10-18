@@ -111,7 +111,7 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
     schema: {
       description: 'Ask the bot a question',
       tags: ['ask'],
-      body: { $ref: 'askRequest' },
+      body: { $ref: 'chatRequest' },
       response: {
         // 200: { $ref: 'approachResponse' },
         400: { $ref: 'httpError' },
@@ -125,7 +125,7 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
         return reply.badRequest(`Ask approach "${approach}" is unknown or not implemented.`);
       }
 
-      const { question, context, stream } = request.body;
+      const { messages, context, stream } = request.body;
       try {
         if (stream) {
           const buffer = new Readable();
@@ -133,14 +133,14 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
           buffer._read = () => {};
           reply.type('application/x-ndjson').send(buffer);
 
-          const chunks = await askApproach.runWithStreaming(question, (context as any) ?? {});
+          const chunks = await askApproach.runWithStreaming(messages[0].content, (context as any) ?? {});
           for await (const chunk of chunks) {
             buffer.push(JSON.stringify(chunk) + '\n');
           }
           // eslint-disable-next-line unicorn/no-null
           buffer.push(null);
         } else {
-          return await askApproach.run(question, (context as any) ?? {});
+          return await askApproach.run(messages[0].content, (context as any) ?? {});
         }
       } catch (_error: unknown) {
         const error = _error as Error;

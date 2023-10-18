@@ -7,7 +7,7 @@ import {
   type ApproachResponseChunk,
 } from './approach.js';
 import { ApproachBase } from './approach-base.js';
-import { type HistoryMessage, type Message, messagesToString } from '../message.js';
+import { type Message, messagesToString } from '../message.js';
 import { MessageBuilder } from '../message-builder.js';
 import { getTokenLimit } from '../tokens.js';
 
@@ -64,8 +64,8 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     this.chatGptTokenLimit = getTokenLimit(chatGptModel);
   }
 
-  async run(history: HistoryMessage[], context?: ChatApproachContext): Promise<ApproachResponse> {
-    const { completionRequest, dataPoints, thoughts } = await this.baseRun(history, context);
+  async run(messages: Message[], context?: ChatApproachContext): Promise<ApproachResponse> {
+    const { completionRequest, dataPoints, thoughts } = await this.baseRun(messages, context);
     const openAiChat = await this.openai.getChat();
     const chatCompletion = await openAiChat.completions.create(completionRequest);
     const chatContent = chatCompletion.choices[0].message.content ?? '';
@@ -89,10 +89,10 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
   }
 
   async *runWithStreaming(
-    history: HistoryMessage[],
+    messages: Message[],
     context?: ChatApproachContext,
   ): AsyncGenerator<ApproachResponseChunk, void> {
-    const { completionRequest, dataPoints, thoughts } = await this.baseRun(history, context);
+    const { completionRequest, dataPoints, thoughts } = await this.baseRun(messages, context);
     const openAiChat = await this.openai.getChat();
     const chatCompletion = await openAiChat.completions.create({
       ...completionRequest,
@@ -122,16 +122,16 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     }
   }
 
-  private async baseRun(history: HistoryMessage[], context?: ChatApproachContext) {
-    const userQuery = 'Generate search query for: ' + history[history.length - 1].user;
+  private async baseRun(messages: Message[], context?: ChatApproachContext) {
+    const userQuery = 'Generate search query for: ' + messages[messages.length - 1].content;
 
     // STEP 1: Generate an optimized keyword search query based on the chat history and the last question
     // -----------------------------------------------------------------------
 
-    const messages = this.getMessagesFromHistory(
+    const initialMessages = this.getMessagesFromHistory(
       QUERY_PROMPT_TEMPLATE,
       this.chatGptModel,
-      history,
+      messages,
       userQuery,
       QUERY_PROMPT_FEW_SHOTS,
       this.chatGptTokenLimit - userQuery.length,
@@ -140,7 +140,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     const openAiChat = await this.openai.getChat();
     const chatCompletion = await openAiChat.completions.create({
       model: this.chatGptModel,
-      messages,
+      messages: initialMessages,
       temperature: 0,
       max_tokens: 32,
       n: 1,
@@ -149,7 +149,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     let queryText = chatCompletion.choices[0].message.content?.trim();
     if (queryText === '0') {
       // Use the last user input if we failed to generate a better query
-      queryText = history[history.length - 1].user;
+      queryText = messages[messages.length - 1].content;
     }
 
     // STEP 2: Retrieve relevant documents from the search index with the GPT optimized query
@@ -184,15 +184,15 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
     const finalMessages = this.getMessagesFromHistory(
       systemMessage,
       this.chatGptModel,
-      history,
+      messages,
       // Model does not handle lengthy system messages well.
       // Moving sources to latest user conversation to solve follow up questions prompt.
-      `${history[history.length - 1].user}\n\nSources:\n${content}`,
+      `${messages[messages.length - 1].content}\n\nSources:\n${content}`,
       [],
       this.chatGptTokenLimit,
     );
 
-    const firstQuery = messagesToString(messages);
+    const firstQuery = messagesToString(initialMessages);
     const secondQuery = messagesToString(finalMessages);
     const thoughts = `Search query:
 ${query}
@@ -218,7 +218,7 @@ ${secondQuery}`.replaceAll('\n', '<br>');
   private getMessagesFromHistory(
     systemPrompt: string,
     model: string,
-    history: HistoryMessage[],
+    history: Message[],
     userContent: string,
     fewShots: Message[] = [],
     maxTokens = 4096,
@@ -238,18 +238,11 @@ ${secondQuery}`.replaceAll('\n', '<br>');
       if (messageBuilder.tokens > maxTokens) {
         break;
       }
-      if (historyMessage.bot) {
-        messageBuilder.appendMessage('assistant', historyMessage.bot, appendIndex);
-      }
-      if (historyMessage.user) {
-        messageBuilder.appendMessage('user', historyMessage.user, appendIndex);
-      }
-      if (messageBuilder.tokens > maxTokens) {
-        break;
+      if (historyMessage.role === 'assistant' || historyMessage.role === 'user') {
+        messageBuilder.appendMessage(historyMessage.role, historyMessage.content, appendIndex);
       }
     }
 
-    const messages = messageBuilder.messages;
-    return messages.map((m) => ({ role: m.role, content: m.content }));
+    return messageBuilder.messages;
   }
 }
