@@ -1,4 +1,4 @@
-import { type Message, type HistoryMessage } from '../message.js';
+import { type Message } from '../message.js';
 
 export interface ApproachResponse {
   choices: Array<{
@@ -42,11 +42,8 @@ export type ChatApproachContext = ApproachContext & {
 };
 
 export interface ChatApproach {
-  run(history: HistoryMessage[], context?: ChatApproachContext): Promise<ApproachResponse>;
-  runWithStreaming(
-    history: HistoryMessage[],
-    context?: ChatApproachContext,
-  ): AsyncGenerator<ApproachResponseChunk, void>;
+  run(messages: Message[], context?: ChatApproachContext): Promise<ApproachResponse>;
+  runWithStreaming(messages: Message[], context?: ChatApproachContext): AsyncGenerator<ApproachResponseChunk, void>;
 }
 
 export interface AskApproach {

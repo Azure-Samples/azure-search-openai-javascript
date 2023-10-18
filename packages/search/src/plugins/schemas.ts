@@ -9,9 +9,15 @@ export const chatRequestSchema = {
       items: {
         type: 'object',
         properties: {
-          bot: { type: 'string' },
-          user: { type: 'string' },
+          content: { type: 'string' },
+          // can be only: assistant, user, system or function
+          role: {
+            type: 'string',
+            enum: ['system', 'user', 'assistant', 'function'],
+          },
         },
+        required: ['content', 'role'],
+        additionalProperties: false,
       },
     },
     stream: { type: 'boolean' },
@@ -28,27 +34,6 @@ export const chatRequestSchema = {
     },
   },
   required: ['messages'],
-} as const;
-
-export const askRequestSchema = {
-  $id: 'askRequest',
-  type: 'object',
-  properties: {
-    question: { type: 'string' },
-    stream: { type: 'boolean' },
-    context: {
-      type: 'object',
-      properties: {
-        approach: { type: 'string' },
-      },
-      additionalProperties: { type: 'string' },
-    },
-    session_state: {
-      type: 'object',
-      additionalProperties: { type: 'string' },
-    },
-  },
-  required: ['question'],
 } as const;
 
 export const messageSchema = {
@@ -98,14 +83,9 @@ export const approachResponseSchema = {
   required: ['choices', 'object'],
 } as const;
 
-export const schemas = [chatRequestSchema, askRequestSchema, messageSchema, approachResponseSchema];
+export const schemas = [chatRequestSchema, messageSchema, approachResponseSchema];
 
-export type SchemaTypes = [
-  typeof chatRequestSchema,
-  typeof askRequestSchema,
-  typeof messageSchema,
-  typeof approachResponseSchema,
-];
+export type SchemaTypes = [typeof chatRequestSchema, typeof messageSchema, typeof approachResponseSchema];
 
 export default fp(async (fastify, _options): Promise<void> => {
   for (const schema of schemas) {

@@ -15,7 +15,10 @@ POST {{api_host}}/chat
 Content-Type: application/json
 
 {
-  "messages": [{ "user": "What happens if a rental doesn't fit the description?" }],
+  "messages": [{
+    "content": "What happens if a rental doesn't fit the description?",
+    "role": "user"
+  }],
   "context": {
     "approach":"rrr",
     "retrieval_mode": "hybrid",
@@ -33,7 +36,10 @@ POST {{api_host}}/chat
 Content-Type: application/json
 
 {
-  "messages": [{ "user": "What happens if a rental doesn't fit the description?" }],
+  "messages": [{
+    "content": "What happens if a rental doesn't fit the description?",
+    "role": "user"
+  }],
   "stream": true,
   "context": {
     "approach":"rrr",
@@ -52,7 +58,10 @@ POST {{api_host}}/ask
 Content-Type: application/json
 
 {
-  "question": "What is the refund policy?",
+  "messages": [{
+    "content": "What is the refund policy?",
+    "role": "user"
+  }],
   "context": {
     "approach":"rtr",
     "retrieval_mode": "hybrid",
@@ -69,7 +78,10 @@ POST {{api_host}}/ask
 Content-Type: application/json
 
 {
-  "question": "How to contact a representative?",
+  "messages": [{
+    "content": "How to contact a representative?",
+    "role": "user"
+  }],
   "context": {
     "approach":"rrr",
     "retrieval_mode": "hybrid",

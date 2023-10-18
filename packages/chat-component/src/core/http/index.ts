@@ -2,33 +2,24 @@ export async function callHttpApi(
   { question, type, approach, overrides }: ChatRequestOptions,
   { method, url, stream }: ChatHttpOptions,
 ) {
-  const chatBody = JSON.stringify({
-    messages: [
-      {
-        user: question,
-      },
-    ],
-    context: {
-      ...overrides,
-      approach,
-    },
-    stream,
-  });
-  const askBody = JSON.stringify({
-    question,
-    context: {
-      ...overrides,
-      approach,
-    },
-    stream: false,
-  });
-  const body = type === 'chat' ? chatBody : askBody;
   return await fetch(`${url}/${type}`, {
     method: method,
     headers: {
       'Content-Type': 'application/json',
     },
-    body,
+    body: JSON.stringify({
+      messages: [
+        {
+          content: question,
+          role: 'user',
+        },
+      ],
+      context: {
+        ...overrides,
+        approach,
+      },
+      stream: type === 'chat' ? stream : false,
+    }),
   });
 }
 
