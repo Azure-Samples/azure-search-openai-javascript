@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "module": "es2020",
+    "target": "esnext",
+    "module": "esnext",
     "lib": ["esnext", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "inlineSources": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
@@ -22,6 +22,7 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
     "emitDeclarationOnly": true,
+    "useDefineForClassFields": false,
     "plugins": [
       {
         "name": "ts-lit-plugin",
@@ -29,6 +30,5 @@
       }
     ]
   },
-  "include": ["**/*.ts"],
-  "exclude": []
+  "include": ["src/**/*.ts"]
 }
