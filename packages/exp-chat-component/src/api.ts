@@ -1,4 +1,4 @@
-import { type ChatResponse, ChatRequestOptions, ChatResponseChunk } from './models.js';
+import { type ChatResponse, type ChatRequestOptions, type ChatResponseChunk } from './models.js';
 
 export const apiBaseUrl = import.meta.env.VITE_CHAT_API_URI ?? 'http://localhost:3000';
 

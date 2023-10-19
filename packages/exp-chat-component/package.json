@@ -1,15 +1,15 @@
 {
-  "name": "exp-chat-component",
+  "name": "@azure/chat",
   "version": "1.0.0",
   "description": "Chat web component implementing Azure ML Chat backend protocol",
   "private": true,
   "type": "module",
-  "main": "./dist/chat-component.umd.cjs",
-  "module": "./dist/chat-component.js",
+  "main": "./dist/azm-chat.umd.cjs",
+  "module": "./dist/azm-chat.js",
   "exports": {
     ".": {
-      "import": "./dist/chat-component.js",
-      "require": "./dist/chat-component.udm.cjs"
+      "import": "./dist/azm-chat.js",
+      "require": "./dist/azm-chat.umd.cjs"
     }
   },
   "scripts": {

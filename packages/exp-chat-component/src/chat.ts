@@ -2,7 +2,13 @@ import { LitElement, css, html, nothing } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Message, ChatRequestOptions, ChatResponse, ChatMessage, ChatResponseChunk } from './models.js';
+import {
+  type Message,
+  type ChatRequestOptions,
+  type ChatResponse,
+  type ChatMessage,
+  type ChatResponseChunk,
+} from './models.js';
 import { getCitationUrl, getCompletion } from './api.js';
 import { parseMessageIntoHtml } from './message-parser.js';
 
@@ -55,7 +61,7 @@ export const defaultOptions: ChatComponentOptions = {
  * fires:
  * - messagesUpdated
  */
-@customElement('chat-component')
+@customElement('azm-chat')
 export class ChatComponent extends LitElement {
   @property({
     type: Object,
@@ -135,10 +141,11 @@ export class ChatComponent extends LitElement {
         <ul>
           ${map(
             suggestions,
-            (suggestion) =>
-              html`<li>
+            (suggestion) => html`
+              <li>
                 <button @click=${() => this.onSuggestionClicked(suggestion)}>${suggestion}</button>
-              </li>`,
+              </li>
+            `,
           )}
         </ul>
       </section>
@@ -147,19 +154,21 @@ export class ChatComponent extends LitElement {
 
   private renderMessage = (message: Message) => {
     const parsedMessage = parseMessageIntoHtml(message.content, this.renderCitationLink);
-    return html`<li class="message">
-      <slot name="message-header"></slot>
-      <div class="message-body">
-        <p>${parsedMessage.html}</p>
-        ${parsedMessage.citations.length > 0
-          ? html`<b>Citations</b> ${map(parsedMessage.citations, this.renderCitation)}`
-          : nothing}
-        ${parsedMessage.followupQuestions.length > 0
-          ? html`<b>Follow-up questions</b> ${map(parsedMessage.followupQuestions, this.renderFollowupQuestion)}`
-          : nothing}
-      </div>
-      <div class="message-role">${message.role}</div>
-    </li>`;
+    return html`
+      <li class="message">
+        <slot name="message-header"></slot>
+        <div class="message-body">
+          <p>${parsedMessage.html}</p>
+          ${parsedMessage.citations.length > 0
+            ? html`<b>Citations</b> ${map(parsedMessage.citations, this.renderCitation)}`
+            : nothing}
+          ${parsedMessage.followupQuestions.length > 0
+            ? html`<b>Follow-up questions</b> ${map(parsedMessage.followupQuestions, this.renderFollowupQuestion)}`
+            : nothing}
+        </div>
+        <div class="message-role">${message.role}</div>
+      </li>
+    `;
   };
 
   private renderError = () => {
@@ -194,7 +203,7 @@ export class ChatComponent extends LitElement {
             placeholder="${this.options.strings.chatInputPlaceholder}"
             type="text"
             .value=${this.question}
-            @input=${(e) => (this.question = e.target.value)}
+            @input=${(event) => (this.question = event.target.value)}
             autocomplete="off"
           />
           <button @click=${this.onChatSubmit} title="${this.options.strings.chatInputButtonLabel}">
@@ -220,6 +229,6 @@ export class ChatComponent extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'chat-component': ChatComponent;
+    'azm-chat': ChatComponent;
   }
 }

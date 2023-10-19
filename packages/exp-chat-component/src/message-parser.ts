@@ -1,4 +1,4 @@
-import { HTMLTemplateResult, html, nothing } from 'lit';
+import { type HTMLTemplateResult, html, nothing } from 'lit';
 
 export type ParsedMessage = {
   html: HTMLTemplateResult;
@@ -14,8 +14,8 @@ export function parseMessageIntoHtml(
   const followupQuestions: string[] = [];
 
   // Extract any follow-up questions that might be in the message
-  let text = message
-    .replaceAll(/<<([^>>]+)>>/g, (_match, content) => {
+  const text = message
+    .replaceAll(/<<([^>]+)>>/g, (_match, content) => {
       followupQuestions.push(content);
       return '';
     })
@@ -23,17 +23,18 @@ export function parseMessageIntoHtml(
     .trim();
 
   // Extract any citations that might be in the message
-  const parts = text.split(/\[([^\]]+)\]/g);
+  const parts = text.split(/\[([^\]]+)]/g);
   const result = html`${parts.map((part, index) => {
     if (index % 2 === 0) {
       return html`${part}`;
     } else if (index + 1 < parts.length) {
+      // Handle only completed citations
       let citationIndex = citations.indexOf(part);
-      if (citationIndex !== -1) {
-        citationIndex++;
-      } else {
+      if (citationIndex === -1) {
         citations.push(part);
         citationIndex = citations.length;
+      } else {
+        citationIndex++;
       }
       return renderCitationReference(part, citationIndex);
     } else {
