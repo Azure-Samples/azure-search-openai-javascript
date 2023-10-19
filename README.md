@@ -120,6 +120,7 @@ A similar option to Codespaces is VS Code Remote Containers, that will open the 
 
 - [Azure Developer CLI](https://aka.ms/azure-dev/install)
 - [Node.js 18+](https://nodejs.org/en/download/)
+- [Docker for Desktop](https://www.docker.com/products/docker-desktop/)
 - [Git](https://git-scm.com/downloads)
 - [Powershell 7+ (pwsh)](https://github.com/powershell/powershell) - For Windows users only.
   - **Important**: Ensure you can run `pwsh.exe` from a PowerShell command. If this fails, you likely need to upgrade PowerShell.
