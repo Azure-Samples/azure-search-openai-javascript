@@ -6,7 +6,7 @@ export $(azd env get-values | xargs)
 
 echo 'Installing dependencies and building CLI'
 npm ci
-npm run build
+npm run build --workspace=indexer
 
 echo 'Running "index-files" CLI tool'
 npx index-files \
