@@ -51,10 +51,9 @@ export class ApproachBase {
           semanticConfiguration: 'default',
           top,
           captions: useSemanticCaption ? 'extractive|highlight-false' : undefined,
-          vectorQueries: [
+          vectors: [
             {
-              vector: queryVector,
-              kind: 'vector',
+              value: queryVector,
               kNearestNeighborsCount: queryVector ? 50 : undefined,
               fields: queryVector ? ['embedding'] : undefined,
             },
@@ -63,10 +62,9 @@ export class ApproachBase {
       : this.search.search(queryText, {
           filter,
           top,
-          vectorQueries: [
+          vectors: [
             {
-              vector: queryVector,
-              kind: 'vector',
+              value: queryVector,
               kNearestNeighborsCount: queryVector ? 50 : undefined,
               fields: queryVector ? ['embedding'] : undefined,
             },
