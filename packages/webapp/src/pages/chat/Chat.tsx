@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
 import { RetrievalMode, apiBaseUrl } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
-import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField } from '@fluentui/react';
+import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField, TooltipHost } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
 import 'chat-component';
 
@@ -105,74 +105,91 @@ const Chat = () => {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
-        <TextField
-          className={styles.chatSettingsSeparator}
-          defaultValue={promptTemplate}
-          label="Override prompt template"
-          multiline
-          autoAdjustHeight
-          onChange={onPromptTemplateChange}
-        />
+        <TooltipHost content="Allows user to customize the chatbot's behavior by providing initial context.">
+          <TextField
+            id="promptTemplate"
+            className={styles.chatSettingsSeparator}
+            defaultValue={promptTemplate}
+            label="Override prompt template"
+            multiline
+            autoAdjustHeight
+            onChange={onPromptTemplateChange}
+          />
+        </TooltipHost>
 
-        <SpinButton
-          className={styles.chatSettingsSeparator}
-          label="Retrieve this many search results:"
-          min={1}
-          max={50}
-          defaultValue={retrieveCount.toString()}
-          onChange={onRetrieveCountChange}
-        />
-        <TextField
-          className={styles.chatSettingsSeparator}
-          label="Exclude category"
-          onChange={onExcludeCategoryChanged}
-        />
-        <Checkbox
-          className={styles.chatSettingsSeparator}
-          checked={useSemanticRanker}
-          label="Use semantic ranker for retrieval"
-          onChange={onUseSemanticRankerChange}
-        />
-        <Checkbox
-          className={styles.chatSettingsSeparator}
-          checked={useSemanticCaptions}
-          label="Use query-contextual summaries instead of whole documents"
-          onChange={onUseSemanticCaptionsChange}
-          disabled={!useSemanticRanker}
-        />
-        <Checkbox
-          className={styles.chatSettingsSeparator}
-          checked={useSuggestFollowupQuestions}
-          label="Suggest follow-up questions"
-          onChange={onUseSuggestFollowupQuestionsChange}
-        />
-        <Dropdown
-          className={styles.chatSettingsSeparator}
-          label="Retrieval mode"
-          options={[
-            {
-              key: 'hybrid',
-              text: 'Vectors + Text (Hybrid)',
-              selected: retrievalMode == RetrievalMode.Hybrid,
-              data: RetrievalMode.Hybrid,
-            },
-            {
-              key: 'vectors',
-              text: 'Vectors',
-              selected: retrievalMode == RetrievalMode.Vectors,
-              data: RetrievalMode.Vectors,
-            },
-            { key: 'text', text: 'Text', selected: retrievalMode == RetrievalMode.Text, data: RetrievalMode.Text },
-          ]}
-          required
-          onChange={onRetrievalModeChange}
-        />
-        <Checkbox
-          className={styles.chatSettingsSeparator}
-          checked={useStream}
-          label="Stream chat completion responses"
-          onChange={onUseStreamChange}
-        />
+        <TooltipHost content="Number of results affecting final answer.">
+          <SpinButton
+            className={styles.chatSettingsSeparator}
+            label="Retrieve this many search results:"
+            min={1}
+            max={50}
+            defaultValue={retrieveCount.toString()}
+            onChange={onRetrieveCountChange}
+          />
+        </TooltipHost>
+        <TooltipHost content="Example categories include ...">
+          <TextField
+            className={styles.chatSettingsSeparator}
+            label="Exclude category"
+            onChange={onExcludeCategoryChanged}
+          />
+        </TooltipHost>
+        <TooltipHost content="Semantic ranker is a machine learning model to improve the relevance and accuracy of search results.">
+          <Checkbox
+            className={styles.chatSettingsSeparator}
+            checked={useSemanticRanker}
+            label="Use semantic ranker for retrieval"
+            onChange={onUseSemanticRankerChange}
+          />
+        </TooltipHost>
+        <TooltipHost content="Can improve the relevance and accuracy of search results by providing a more concise and focused summary of the most relevant Info12Regularrmation related to the query or context.">
+          <Checkbox
+            className={styles.chatSettingsSeparator}
+            checked={useSemanticCaptions}
+            label="Use query-contextual summaries instead of whole documents"
+            onChange={onUseSemanticCaptionsChange}
+            disabled={!useSemanticRanker}
+          />
+        </TooltipHost>
+        <TooltipHost content="Provide follow-up questions to continue conversation.">
+          <Checkbox
+            className={styles.chatSettingsSeparator}
+            checked={useSuggestFollowupQuestions}
+            label="Suggest follow-up questions"
+            onChange={onUseSuggestFollowupQuestionsChange}
+          />
+        </TooltipHost>
+        <TooltipHost content="The retrieval mode choices determine how the chatbot retrieves and ranks responses based on semantic similarity to the user's query. `Vectors + Text (Hybrid)` uses a combination of vector embeddings and text matching, `Vectors` uses only vector embeddings, and `Text` uses only text matching.">
+          <Dropdown
+            className={styles.chatSettingsSeparator}
+            label="Retrieval mode"
+            options={[
+              {
+                key: 'hybrid',
+                text: 'Vectors + Text (Hybrid)',
+                selected: retrievalMode == RetrievalMode.Hybrid,
+                data: RetrievalMode.Hybrid,
+              },
+              {
+                key: 'vectors',
+                text: 'Vectors',
+                selected: retrievalMode == RetrievalMode.Vectors,
+                data: RetrievalMode.Vectors,
+              },
+              { key: 'text', text: 'Text', selected: retrievalMode == RetrievalMode.Text, data: RetrievalMode.Text },
+            ]}
+            required
+            onChange={onRetrievalModeChange}
+          />
+        </TooltipHost>
+        <TooltipHost content="Continuously deliver responses as they are generated or wait until all responses are generated before delivering them.">
+          <Checkbox
+            className={styles.chatSettingsSeparator}
+            checked={useStream}
+            label="Stream chat completion responses"
+            onChange={onUseStreamChange}
+          />
+        </TooltipHost>
       </Panel>
     </div>
   );
