@@ -17,8 +17,8 @@
     "dev": "vite --port 8000",
     "build": "vite build && tsc",
     "watch": "vite build --watch --minify false",
-    "clean": "rimraf dist *.tgz",
-    "prepare": "npm run build -s"
+    "lint": "lit-analyzer",
+    "clean": "rimraf dist *.tgz"
   },
   "author": "Microsoft",
   "license": "MIT",
@@ -34,6 +34,7 @@
     "lit": "^3.0.0"
   },
   "devDependencies": {
+    "lit-analyzer": "^1.2.1",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
     "vite": "^4.5.0"
