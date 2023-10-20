@@ -13,6 +13,7 @@ import {
 import { getCitationUrl, getCompletion } from './api.js';
 import { parseMessageIntoHtml } from './message-parser.js';
 import sendSvg from '../assets/send.svg?raw';
+import questionSvg from '../assets/question.svg?raw';
 
 export type ChatComponentOptions = ChatRequestOptions & {
   oneShot: boolean;
@@ -200,26 +201,16 @@ export class ChatComponent extends LitElement {
       : nothing;
   };
 
-  protected renderMessage = (message: Message) => {
-    const parsedMessage = parseMessageIntoHtml(message.content, this.renderCitationLink);
-    // TODO: avoid side-effect
+  protected renderMessage = (message: ParsedMessage) => {
     return html`
       <div class="message ${message.role}">
         ${message.role === 'assistant' ? html`<slot name="message-header"></slot>` : nothing}
         <div class="message-body">
-          <div class="content">${parsedMessage.html}</div>
-          ${parsedMessage.citations.length > 0
+          <div class="content">${message.html}</div>
+          ${message.citations.length > 0
             ? html`<div class="citations">
                 <div class="citations-title">${this.options.strings.citationsTitle}</div>
-                ${map(parsedMessage.citations, this.renderCitation)}
-              </div>`
-            : nothing}
-          ${parsedMessage.followupQuestions.length > 0
-            ? html`<div class="questions">
-                <b>${this.options.strings.followUpQuestionsTitle}</b> ${map(
-                  parsedMessage.followupQuestions,
-                  this.renderFollowupQuestion,
-                )}
+                ${map(message.citations, this.renderCitation)}
               </div>`
             : nothing}
         </div>
@@ -251,8 +242,18 @@ export class ChatComponent extends LitElement {
     </button>`;
   };
 
-  protected renderFollowupQuestion = (question: string) => {
-    return html`<button class="question" @click=${() => this.onSuggestionClicked(question)}>${question}</button>`;
+  protected renderFollowupQuestions = (questions: string[]) => {
+    return questions.length > 0
+      ? html`<div class="questions">
+          <span class="question-icon" title=${this.options.strings.followUpQuestionsTitle}>
+            ${unsafeSVG(questionSvg)} </span
+          >${map(
+            questions,
+            (question) =>
+              html`<button class="question" @click=${() => this.onSuggestionClicked(question)}>${question}</button>`,
+          )}
+        </div>`
+      : nothing;
   };
 
   protected renderChatInput = () => {
@@ -280,6 +281,7 @@ export class ChatComponent extends LitElement {
   };
 
   protected override render() {
+    const parsedMessages = this.messages.map((message) => parseMessageIntoHtml(message, this.renderCitationLink));
     return html`
       <section class="chat-container">
         ${this.options.enablePromptSuggestions &&
@@ -288,8 +290,9 @@ export class ChatComponent extends LitElement {
           ? this.renderSuggestions(this.options.promptSuggestions)
           : nothing}
         <div class="messages">
-          ${repeat(this.messages, (_, index) => index, this.renderMessage)} ${this.renderLoader()}
+          ${repeat(parsedMessages, (_, index) => index, this.renderMessage)} ${this.renderLoader()}
           ${this.hasError ? this.renderError() : nothing}
+          ${this.renderFollowupQuestions(parsedMessages.at(-1)?.followupQuestions ?? [])}
         </div>
         ${this.renderChatInput()}
       </section>
@@ -351,6 +354,7 @@ export class ChatComponent extends LitElement {
     }
     button {
       font-size: 1rem;
+      border-radius: calc(var(--border-radius) / 2);
       outline: var(--focus-outline) transparent;
       transition: outline 0.3s ease;
 
@@ -378,7 +382,6 @@ export class ChatComponent extends LitElement {
     }
     .citation {
       font-size: 0.85rem;
-      border-radius: calc(var(--border-radius) / 2);
       color: var(--citation-color);
       background: var(--citation-bg);
       border: var(--citation-border);
@@ -459,13 +462,37 @@ export class ChatComponent extends LitElement {
       font-size: 0.85rem;
       opacity: 0.6;
     }
+    .questions {
+      margin: var(--space-md) 0;
+      color: var(--primary);
+      text-align: right;
+    }
+    .question-icon {
+      vertical-align: middle;
+      display: inline-block;
+      height: 1.7rem;
+      width: 1.7rem;
+      margin-bottom: var(--space-xs);
+      margin-left: var(--space-xs);
+    }
+    .question {
+      padding: var(--space-xs) var(--space-md);
+      margin-bottom: var(--space-xs);
+      margin-left: var(--space-xs);
+      vertical-align: middle;
+      color: var(--primary);
+      background: var(--card-bg);
+      border: 1px solid var(--primary);
+      &:hover {
+        background: color-mix(in srgb, var(--card-bg), var(--primary) 5%);
+      }
+    }
     .submit-button {
       display: flex;
       align-items: center;
       justify-content: center;
       width: 48px;
       border: var(--button-border);
-      border-radius: var(--border-radius);
       background: var(--submit-button-bg);
       color: var(--submit-button-color);
       &:disabled {
@@ -490,7 +517,6 @@ export class ChatComponent extends LitElement {
         padding: var(--space-md);
         color: var(--retry-button-color);
         background: var(--retry-button-bg);
-        border-radius: calc(var(--border-radius) / 2);
         border: var(--retry-button-border);
 
         &:hover {
