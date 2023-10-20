@@ -7,7 +7,7 @@ export const toolTipText = {
   useSemanticRanker:
     'Semantic ranker is a machine learning model to improve the relevance and accuracy of search results.',
   useQueryContextSummaries:
-    'Can improve the relevance and accuracy of search results by providing a more concise and focused summary of the most relevant Info12Regularrmation related to the query or context.',
+    'Can improve the relevance and accuracy of search results by providing a more concise and focused summary of the most relevant information related to the query or context.',
   suggestFollowupQuestions: 'Provide follow-up questions to continue conversation.',
   retrievalMode:
     "The retrieval mode choices determine how the chatbot retrieves and ranks responses based on semantic similarity to the user's query. `Vectors + Text (Hybrid)` uses a combination of vector embeddings and text matching, `Vectors` uses only vector embeddings, and `Text` uses only text matching.",
