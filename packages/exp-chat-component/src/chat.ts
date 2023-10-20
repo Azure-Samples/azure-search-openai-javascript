@@ -1,7 +1,8 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { customElement, property, state } from 'lit/decorators.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import { customElement, property, state, query } from 'lit/decorators.js';
 import {
   type Message,
   type ChatRequestOptions,
@@ -11,14 +12,16 @@ import {
 } from './models.js';
 import { getCitationUrl, getCompletion } from './api.js';
 import { parseMessageIntoHtml } from './message-parser.js';
+import sendSvg from '../assets/send.svg?raw';
 
 export type ChatComponentOptions = ChatRequestOptions & {
   oneShot: boolean;
   enablePromptSuggestions: boolean;
   promptSuggestions: string[];
   strings: {
-    promptSuggestionsLabel: string;
-    citationsLabel: string;
+    promptSuggestionsTitle: string;
+    citationsTitle: string;
+    followUpQuestionsTitle: string;
     chatInputPlaceholder: string;
     chatInputButtonLabel: string;
     assistant: string;
@@ -33,7 +36,7 @@ export const defaultOptions: ChatComponentOptions = {
   approach: 'rrr' as const,
   suggestFollowupQuestions: true,
   oneShot: false,
-  stream: true,
+  stream: false,
   chunkIntervalMs: 30,
   enablePromptSuggestions: true,
   promptSuggestions: [
@@ -43,9 +46,10 @@ export const defaultOptions: ChatComponentOptions = {
   ],
   messages: [],
   strings: {
-    promptSuggestionsLabel: 'Ask anything or try an example',
-    citationsLabel: 'Citations',
-    chatInputPlaceholder: 'Type your question (e.g. "How to search and book rentals?")',
+    promptSuggestionsTitle: 'Ask anything or try an example',
+    citationsTitle: 'Citations:',
+    followUpQuestionsTitle: 'Follow-up questions:',
+    chatInputPlaceholder: 'Ask me anything...',
     chatInputButtonLabel: 'Send question',
     assistant: 'Support Assistant',
     user: 'You',
@@ -77,29 +81,39 @@ export class ChatComponent extends LitElement {
   @state() protected hasError = false;
   @state() protected isLoading = false;
   @state() protected isStreaming = false;
+  @query('.messages') protected messagesElement;
+  @query('.chat-input') protected chatInputElement;
 
   onSuggestionClicked(suggestion: string) {
     this.question = suggestion;
-    this.onChatSubmit();
+    this.onSendClicked();
   }
 
   onCitationClicked(citation: string) {
-    // todo
     const path = getCitationUrl(citation);
-    console.log(path);
+    window.open(path, '_blank');
   }
 
-  async onChatSubmit() {
+  onKeyPressed(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.onSendClicked();
+    }
+  }
+
+  async onSendClicked(isRetry = false) {
     if (this.isLoading) return;
 
     this.hasError = false;
-    this.messages = [
-      ...this.messages,
-      {
-        content: this.question,
-        role: 'user',
-      },
-    ];
+    if (!isRetry) {
+      this.messages = [
+        ...this.messages,
+        {
+          content: this.question,
+          role: 'user',
+        },
+      ];
+    }
     this.question = '';
     this.isLoading = true;
     try {
@@ -123,30 +137,46 @@ export class ChatComponent extends LitElement {
           } else if (chunk.choices[0].delta.content) {
             message.content += chunk.choices[0].delta.content;
             this.messages = [...messages, message];
+            this.scrollToLastMessage();
           }
         }
       } else {
         const chatResponse = response as ChatResponse;
         this.messages = [...this.messages, chatResponse.choices[0].message];
+        this.scrollToLastMessage();
       }
 
       this.isLoading = false;
       this.isStreaming = false;
       const messagesUpdatedEvent = new CustomEvent('messagesUpdated', {
         detail: { messages: this.messages },
+        bubbles: true,
       });
       this.dispatchEvent(messagesUpdatedEvent);
     } catch (error) {
       this.hasError = true;
+      this.isLoading = false;
+      this.isStreaming = false;
       console.error(error);
     }
   }
 
+  protected scrollToLastMessage() {
+    // Need to be delayed to run after the DOM refresh
+    setTimeout(() => {
+      const { bottom } = this.messagesElement.getBoundingClientRect();
+      const { top } = this.chatInputElement.getBoundingClientRect();
+      if (bottom > top) {
+        window.scrollBy(0, bottom - top);
+      }
+    }, 0);
+  }
+
   protected renderSuggestions = (suggestions: string[]) => {
     return html`
-      <section class="suggestions">
-        <h2>${this.options.strings.promptSuggestionsLabel}</h2>
-        <div class="suggestions-list">
+      <section class="suggestions-container">
+        <h2>${this.options.strings.promptSuggestionsTitle}</h2>
+        <div class="suggestions">
           ${map(
             suggestions,
             (suggestion) =>
@@ -162,11 +192,8 @@ export class ChatComponent extends LitElement {
   protected renderLoader = () => {
     return this.isLoading && !this.isStreaming
       ? html`<div class="message assistant">
-          <slot name="message-header"></slot>
           <div class="message-body">
-            <p>
-              <slot name="loader"><div class="loader"></div></slot>
-            </p>
+            <slot name="loader"><div class="loader"></div></slot>
             <div class="message-role">${this.options.strings.assistant}</div>
           </div>
         </div>`
@@ -179,12 +206,20 @@ export class ChatComponent extends LitElement {
       <div class="message ${message.role}">
         ${message.role === 'assistant' ? html`<slot name="message-header"></slot>` : nothing}
         <div class="message-body">
-          <p>${parsedMessage.html}</p>
+          <div class="content">${parsedMessage.html}</div>
           ${parsedMessage.citations.length > 0
-            ? html`<b>Citations</b> ${map(parsedMessage.citations, this.renderCitation)}`
+            ? html`<div class="citations">
+                <div class="citations-title">${this.options.strings.citationsTitle}</div>
+                ${map(parsedMessage.citations, this.renderCitation)}
+              </div>`
             : nothing}
           ${parsedMessage.followupQuestions.length > 0
-            ? html`<b>Follow-up questions</b> ${map(parsedMessage.followupQuestions, this.renderFollowupQuestion)}`
+            ? html`<div class="questions">
+                <b>${this.options.strings.followUpQuestionsTitle}</b> ${map(
+                  parsedMessage.followupQuestions,
+                  this.renderFollowupQuestion,
+                )}
+              </div>`
             : nothing}
         </div>
         <div class="message-role">
@@ -195,77 +230,152 @@ export class ChatComponent extends LitElement {
   };
 
   protected renderError = () => {
-    return html`<p class="error">Error!</p>`;
+    return html`<div class="message assistant error">
+      <div class="message-body">
+        <span class="error-message">${this.options.strings.errorMessage}</span>
+        <button @click=${() => this.onSendClicked(true)}>${this.options.strings.retryButton}</button>
+      </div>
+    </div>`;
   };
 
   protected renderCitation = (citation: string, index: number) => {
-    return html`<button @click=${() => this.onCitationClicked(citation)}>${index}. ${citation}</button>`;
+    return html`<button class="citation" @click=${() => this.onCitationClicked(citation)}>
+      ${index}. ${citation}
+    </button>`;
   };
 
   protected renderCitationLink = (citation: string, index: number) => {
-    return html`<button @click=${() => this.onCitationClicked(citation)}><sup>[${index}]</sup></button>`;
+    return html`<button class="citation-link" @click=${() => this.onCitationClicked(citation)}>
+      <sup>[${index}]</sup>
+    </button>`;
   };
 
   protected renderFollowupQuestion = (question: string) => {
-    return html`<button @click=${() => this.onSuggestionClicked(question)}>${question}</button>`;
+    return html`<button class="question" @click=${() => this.onSuggestionClicked(question)}>${question}</button>`;
   };
 
   protected override render() {
     return html`
       <section class="chat-container">
-        ${this.options.enablePromptSuggestions && this.options.promptSuggestions.length > 0
+        ${this.options.enablePromptSuggestions &&
+        this.options.promptSuggestions.length > 0 &&
+        this.messages.length === 0
           ? this.renderSuggestions(this.options.promptSuggestions)
           : nothing}
-        <div class="chat-messages">
+        <div class="messages">
           ${repeat(this.messages, (_, index) => index, this.renderMessage)} ${this.renderLoader()}
         </div>
         ${this.hasError ? this.renderError() : nothing}
-        <div class="chat-input">
+        <form class="chat-input">
           <textarea
             class="text-input"
             placeholder="${this.options.strings.chatInputPlaceholder}"
-            type="text"
             .value=${this.question}
-            @input=${(event) => (this.question = event.target.value)}
             autocomplete="off"
+            @input=${(event) => (this.question = event.target.value)}
+            @keypress=${this.onKeyPressed}
             ?disabled=${this.isLoading}
           ></textarea>
           <button
-            @click=${this.onChatSubmit}
+            class="submit-button"
+            @click=${() => this.onSendClicked()}
             title="${this.options.strings.chatInputButtonLabel}"
             ?disabled=${this.isLoading || !this.question}
           >
-            ${this.options.strings.chatInputButtonLabel}
+            ${unsafeSVG(sendSvg)}
           </button>
-        </div>
+        </form>
       </section>
     `;
   }
 
   static override styles = css`
     :host {
-      --primary: var(--azc-primary, #0af);
-      --accent: var(--azc-accent, #64f);
-      --error: var(--azc-error, #e20);
-      --border-radius: var(--azc-border-radius, 6px);
+      /* Base properties */
+      --primary: var(--azc-primary, #07f);
+      --error: var(--azc-error, #e30);
+      --text-color: var(--azc-text-color, #000);
+      --text-invert-color: var(--azc--text-invert-color, #fff);
+      --bg-color: var(--azc-bg-color, #fff);
+      --disabled-color: var(--azc-disabled-color, #ccc);
+      --card-shadow: var(--azc-card-shadow, 0 0.3px 0.9px rgba(0 0 0 / 12%), 0 1.6px 3.6px rgba(0 0 0 / 16%));
       --space-md: var(--azc-space-md, 12px);
       --space-xl: var(--azc-space-xl, calc(var(--space-md) * 2));
-      --error-color: var(--azc-error-color, #e20);
-      --error-border: var(--azc-error-border, #e20);
-      --error-bg: var(--azc-error-bg, #fec);
-      --user-message-color: var(--azc-user-message-color, #000);
-      --user-message-border: var(--azc-user-message-border, grey);
-      --user-message-bg: var(--azc-user-message-bg, lightgrey);
-      --bot-message-color: var(--azc-bot-message-color, #000);
-      --bot-message-border: var(--azc-bot-message-border, grey);
-      --bot-message-bg: var(--azc-user-message-bg, lightgrey);
-      --chat-input-color: var(--azc-chat-input-color, #000);
-      --chat-input-border: var(--azc-chat-input-border, #000);
-      --chat-input-bg: var(--azc-chat-input-bg, #f5f5f5);
-      --submit-button-color: var(--azc-button-color, #000);
-      --submit-button-border: var(--azc-submit-button-color, #000);
-      --submit-button-bg: var(--azc-submit-button-color, #f2f2f2);
+      --space-xs: var(--azc-space-xs, calc(var(--space-md) / 2));
+      --space-xxs: var(--azc-space-xs, calc(var(--space-md) / 4));
+      --border-radius: var(--azc-border-radius, 16px);
+      --focus-outline: var(--azc-focus-outline, 2px solid);
 
+      /* Component-specific properties */
+      --error-color: var(--azc-error-color, var(--error));
+      --error-bg: var(--azc-error-bg, var(--bg-color));
+      --error-border: var(--azc-error-border, none);
+      --retry-button-color: var(--azc-retry-button-color, var(--text-color));
+      --retry-button-bg: var(--azc-retry-button-bg, #f0f0f0);
+      --retry-button-bg-hover: var(--azc-retry-button-bg, #e5e5e5);
+      --retry-button-border: var(--azc-retry-button-border, none);
+      --suggestion-color: var(--azc-suggestion-color, var(--text-color));
+      --suggestion-bg: var(--azc-suggestion-bg, var(--bg-color));
+      --suggestion-border: var(--azc-suggestion-border, none);
+      --suggestion-shadow: var(--azc-suggestion-shadow, 0 6px 16px -1.5px rgba(141 141 141 / 30%));
+      --user-message-color: var(--azc-user-message-color, var(--text-invert-color));
+      --user-message-border: var(--azc-user-message-border, none);
+      --user-message-bg: var(--azc-user-message-bg, var(--primary));
+      --bot-message-color: var(--azc-bot-message-color, var(--text-color));
+      --bot-message-border: var(--azc-bot-message-border, none);
+      --bot-message-bg: var(--azc-bot-message-bg, var(--bg-color));
+      --citation-color: var(--azc-citation-color, var(--text-invert-color));
+      --citation-bg: var(--azc-citation-bg, var(--primary));
+      --citation-bg-hover: var(--azc-citation-bg, color-mix(in srgb, var(--primary), #000 10%));
+      --chat-input-color: var(--azc-chat-input-color, var(--text-color));
+      --chat-input-border: var(--azc-chat-input-border, none);
+      --chat-input-bg: var(--azc-chat-input-bg, var(--bg-color));
+      --submit-button-color: var(--azc-button-color, var(--primary));
+      --submit-button-border: var(--azc-submit-button-border, none);
+      --submit-button-bg: var(--azc-submit-button-bg, none);
+      --submit-button-bg-hover: var(--azc-submit-button-color, #f0f0f0);
+    }
+    *:focus-visible {
+      outline: var(--focus-outline) var(--primary);
+    }
+    svg {
+      fill: currentColor;
+    }
+    button {
+      font-size: 1rem;
+      outline: var(--focus-outline) transparent;
+      transition: outline 0.3s ease;
+
+      &:not(:disabled) {
+        cursor: pointer;
+      }
+    }
+    a,
+    .citation-link {
+      padding: 0;
+      color: var(--primary);
+      background: none;
+      border: none;
+      white-space: normal;
+    }
+    .citation {
+      font-size: 0.85rem;
+      border-radius: calc(var(--border-radius) / 2);
+      color: var(--citation-color);
+      background: var(--citation-bg);
+      border: var(--citation-border);
+      padding: var(--space-xxs) var(--space-xs);
+      margin-right: var(--space-xs);
+      margin-top: var(--space-xs);
+
+      &:hover {
+        background: var(--citation-bg-hover);
+      }
+    }
+    .citations-title {
+      font-weight: bold;
+    }
+    .chat-container {
       font-family:
         'Segoe UI',
         -apple-system,
@@ -273,62 +383,128 @@ export class ChatComponent extends LitElement {
         Roboto,
         'Helvetica Neue',
         sans-serif;
+      margin: var(--space-xl);
     }
-    *:focus-visible {
-      outline: 2px solid var(--primary);
-    }
-    button {
-      font-size: 1rem;
-    }
-    .suggestions {
+    .suggestions-container {
       text-align: center;
     }
-    .suggestions-list {
+    .suggestions {
       display: flex;
       gap: var(--space-md);
     }
     .suggestion {
       flex: 1 1 0;
-      padding: var(--space-md);
-      border: 1px solid #999;
+      padding: var(--space-xl) var(--space-md);
+      color: var(--sugestion-color);
+      background: var(--suggestion-bg);
+      border: var(--suggestion-border);
       border-radius: var(--border-radius);
-      background: #eee;
-      cursor: pointer;
+      box-shadow: var(--suggestion-shadow);
+
+      &:hover {
+        outline: var(--focus-outline) var(--primary);
+      }
     }
-    .chat-messages {
-      margin: var(--space-md) 0;
+    .messages {
+      margin: var(--space-xl) 0;
       display: flex;
       flex-direction: column;
       gap: var(--space-md);
     }
     .user {
       align-self: end;
+      color: var(--user-message-color);
+      background: var(--user-message-bg);
+      border: var(--user-message-border);
     }
     .assistant {
+      color: var(--bot-message-color);
+      background: var(--bot-message-bg);
+      border: var(--bot-message-border);
+      box-shadow: var(--card-shadow);
     }
     .message {
+      position: relative;
       width: auto;
       max-width: 70%;
-      border: 1px solid var(--azc-message-border, grey);
-      border-radius: calc(var(--border-radius) * 2);
+      border-radius: var(--border-radius);
       padding: var(--space-xl);
+      margin-bottom: var(--space-xl);
+      animation: fade-in-up 0.3s ease;
     }
     .message-body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .content {
       white-space: pre-line;
     }
+    .message-role {
+      position: absolute;
+      right: var(--space-xl);
+      bottom: -1.25em;
+      color: var(--text-color);
+      font-size: 0.85rem;
+      opacity: 0.6;
+    }
     .submit-button {
-      border: 1px solid var(--button-border);
-      background: var(--azc-submit-button-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      border: var(--button-border);
       border-radius: var(--border-radius);
+      background: var(--submit-button-bg);
+      color: var(--submit-button-color);
+      &:disabled {
+        color: var(--disabled-color);
+      }
+      &:hover:not(:disabled) {
+        background: var(--submit-button-bg-hover);
+      }
     }
     .error {
       color: var(--error-color);
+      background: var(--error-bg);
+      outline: var(--focus-outline) var(--error);
+
+      & .message-body {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      & button {
+        flex: 0;
+        padding: var(--space-md);
+        color: var(--retry-button-color);
+        background: var(--retry-button-bg);
+        border-radius: calc(var(--border-radius) / 2);
+        border: var(--retry-button-border);
+
+        &:hover {
+          background: var(--retry-button-bg-hover);
+        }
+      }
+    }
+    .error-message {
+      flex: 1;
     }
     .chat-input {
+      position: sticky;
+      bottom: 0;
       display: flex;
-      border: 1px solid var(--chat-input-border);
+      background: var(--chat-input-bg);
+      border: var(--chat-input-border);
       border-radius: var(--border-radius);
       padding: var(--space-md);
+      box-shadow: var(--card-shadow);
+      outline: var(--focus-outline) transparent;
+      transition: outline 0.3s ease;
+
+      &:has(.text-input:focus-visible) {
+        outline: var(--focus-outline) var(--primary);
+      }
     }
     .text-input {
       font-family: inherit;
@@ -337,16 +513,20 @@ export class ChatComponent extends LitElement {
       height: 3rem;
       border: none;
       resize: none;
+      background: none;
       &:focus {
         outline: none;
       }
+      &:disabled {
+        opacity: 0.7;
+      }
     }
     .loader {
-      --size: 4rem;
-      --stroke-width: calc(var(--size) / 8);
-      width: var(--size);
-      height: var(--stroke-width);
-      background-color: currentColor;
+      width: 100px;
+      height: 4px;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      background-color: var(--primary);
       transform: scaleX(0);
       transform-origin: center left;
       animation: cubic-bezier(0.85, 0, 0.15, 1) 2s infinite load-animation;
@@ -368,6 +548,16 @@ export class ChatComponent extends LitElement {
       100% {
         transform: scaleX(0);
         transform-origin: center right;
+      }
+    }
+    @keyframes fade-in-up {
+      0% {
+        opacity: 0.5;
+        top: 100px;
+      }
+      100% {
+        opacity: 1;
+        top: 0px;
       }
     }
   `;
