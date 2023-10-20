@@ -36,7 +36,7 @@ export const defaultOptions: ChatComponentOptions = {
   approach: 'rrr' as const,
   suggestFollowupQuestions: true,
   oneShot: false,
-  stream: false,
+  stream: true,
   chunkIntervalMs: 30,
   enablePromptSuggestions: true,
   promptSuggestions: [
@@ -191,9 +191,9 @@ export class ChatComponent extends LitElement {
 
   protected renderLoader = () => {
     return this.isLoading && !this.isStreaming
-      ? html`<div class="message assistant">
+      ? html`<div class="message assistant loader">
           <div class="message-body">
-            <slot name="loader"><div class="loader"></div></slot>
+            <slot name="loader"><div class="loader-animation"></div></slot>
             <div class="message-role">${this.options.strings.assistant}</div>
           </div>
         </div>`
@@ -202,6 +202,7 @@ export class ChatComponent extends LitElement {
 
   protected renderMessage = (message: Message) => {
     const parsedMessage = parseMessageIntoHtml(message.content, this.renderCitationLink);
+    // TODO: avoid side-effect
     return html`
       <div class="message ${message.role}">
         ${message.role === 'assistant' ? html`<slot name="message-header"></slot>` : nothing}
@@ -254,6 +255,30 @@ export class ChatComponent extends LitElement {
     return html`<button class="question" @click=${() => this.onSuggestionClicked(question)}>${question}</button>`;
   };
 
+  protected renderChatInput = () => {
+    return html`<div class="chat-input">
+      <form class="input-form">
+        <textarea
+          class="text-input"
+          placeholder="${this.options.strings.chatInputPlaceholder}"
+          .value=${this.question}
+          autocomplete="off"
+          @input=${(event) => (this.question = event.target.value)}
+          @keypress=${this.onKeyPressed}
+          .disabled=${this.isLoading}
+        ></textarea>
+        <button
+          class="submit-button"
+          @click=${() => this.onSendClicked()}
+          title="${this.options.strings.chatInputButtonLabel}"
+          .disabled=${this.isLoading || !this.question}
+        >
+          ${unsafeSVG(sendSvg)}
+        </button>
+      </form>
+    </div>`;
+  };
+
   protected override render() {
     return html`
       <section class="chat-container">
@@ -264,27 +289,9 @@ export class ChatComponent extends LitElement {
           : nothing}
         <div class="messages">
           ${repeat(this.messages, (_, index) => index, this.renderMessage)} ${this.renderLoader()}
+          ${this.hasError ? this.renderError() : nothing}
         </div>
-        ${this.hasError ? this.renderError() : nothing}
-        <form class="chat-input">
-          <textarea
-            class="text-input"
-            placeholder="${this.options.strings.chatInputPlaceholder}"
-            .value=${this.question}
-            autocomplete="off"
-            @input=${(event) => (this.question = event.target.value)}
-            @keypress=${this.onKeyPressed}
-            ?disabled=${this.isLoading}
-          ></textarea>
-          <button
-            class="submit-button"
-            @click=${() => this.onSendClicked()}
-            title="${this.options.strings.chatInputButtonLabel}"
-            ?disabled=${this.isLoading || !this.question}
-          >
-            ${unsafeSVG(sendSvg)}
-          </button>
-        </form>
+        ${this.renderChatInput()}
       </section>
     `;
   }
@@ -296,8 +303,9 @@ export class ChatComponent extends LitElement {
       --error: var(--azc-error, #e30);
       --text-color: var(--azc-text-color, #000);
       --text-invert-color: var(--azc--text-invert-color, #fff);
-      --bg-color: var(--azc-bg-color, #fff);
       --disabled-color: var(--azc-disabled-color, #ccc);
+      --bg: var(--azc-bg, #eee);
+      --card-bg: var(--azc-card-bg, #fff);
       --card-shadow: var(--azc-card-shadow, 0 0.3px 0.9px rgba(0 0 0 / 12%), 0 1.6px 3.6px rgba(0 0 0 / 16%));
       --space-md: var(--azc-space-md, 12px);
       --space-xl: var(--azc-space-xl, calc(var(--space-md) * 2));
@@ -308,29 +316,29 @@ export class ChatComponent extends LitElement {
 
       /* Component-specific properties */
       --error-color: var(--azc-error-color, var(--error));
-      --error-bg: var(--azc-error-bg, var(--bg-color));
       --error-border: var(--azc-error-border, none);
+      --error-bg: var(--azc-error-bg, var(--card-bg));
       --retry-button-color: var(--azc-retry-button-color, var(--text-color));
       --retry-button-bg: var(--azc-retry-button-bg, #f0f0f0);
       --retry-button-bg-hover: var(--azc-retry-button-bg, #e5e5e5);
       --retry-button-border: var(--azc-retry-button-border, none);
       --suggestion-color: var(--azc-suggestion-color, var(--text-color));
-      --suggestion-bg: var(--azc-suggestion-bg, var(--bg-color));
       --suggestion-border: var(--azc-suggestion-border, none);
+      --suggestion-bg: var(--azc-suggestion-bg, var(--card-bg));
       --suggestion-shadow: var(--azc-suggestion-shadow, 0 6px 16px -1.5px rgba(141 141 141 / 30%));
       --user-message-color: var(--azc-user-message-color, var(--text-invert-color));
       --user-message-border: var(--azc-user-message-border, none);
       --user-message-bg: var(--azc-user-message-bg, var(--primary));
       --bot-message-color: var(--azc-bot-message-color, var(--text-color));
       --bot-message-border: var(--azc-bot-message-border, none);
-      --bot-message-bg: var(--azc-bot-message-bg, var(--bg-color));
       --citation-color: var(--azc-citation-color, var(--text-invert-color));
+      --bot-message-bg: var(--azc-bot-message-bg, var(--card-bg));
       --citation-bg: var(--azc-citation-bg, var(--primary));
       --citation-bg-hover: var(--azc-citation-bg, color-mix(in srgb, var(--primary), #000 10%));
       --chat-input-color: var(--azc-chat-input-color, var(--text-color));
       --chat-input-border: var(--azc-chat-input-border, none);
-      --chat-input-bg: var(--azc-chat-input-bg, var(--bg-color));
       --submit-button-color: var(--azc-button-color, var(--primary));
+      --chat-input-bg: var(--azc-chat-input-bg, var(--card-bg));
       --submit-button-border: var(--azc-submit-button-border, none);
       --submit-button-bg: var(--azc-submit-button-bg, none);
       --submit-button-bg-hover: var(--azc-submit-button-color, #f0f0f0);
@@ -350,7 +358,17 @@ export class ChatComponent extends LitElement {
         cursor: pointer;
       }
     }
-    a,
+    .chat-container {
+      position: relative;
+      background: var(--bg);
+      font-family:
+        'Segoe UI',
+        -apple-system,
+        BlinkMacSystemFont,
+        Roboto,
+        'Helvetica Neue',
+        sans-serif;
+    }
     .citation-link {
       padding: 0;
       color: var(--primary);
@@ -375,18 +393,9 @@ export class ChatComponent extends LitElement {
     .citations-title {
       font-weight: bold;
     }
-    .chat-container {
-      font-family:
-        'Segoe UI',
-        -apple-system,
-        BlinkMacSystemFont,
-        Roboto,
-        'Helvetica Neue',
-        sans-serif;
-      margin: var(--space-xl);
-    }
     .suggestions-container {
       text-align: center;
+      padding: var(--space-xl);
     }
     .suggestions {
       display: flex;
@@ -406,7 +415,7 @@ export class ChatComponent extends LitElement {
       }
     }
     .messages {
-      margin: var(--space-xl) 0;
+      padding: var(--space-xl);
       display: flex;
       flex-direction: column;
       gap: var(--space-md);
@@ -430,7 +439,9 @@ export class ChatComponent extends LitElement {
       border-radius: var(--border-radius);
       padding: var(--space-xl);
       margin-bottom: var(--space-xl);
-      animation: fade-in-up 0.3s ease;
+      &.user {
+        animation: fade-in-up 0.3s ease;
+      }
     }
     .message-body {
       display: flex;
@@ -491,8 +502,15 @@ export class ChatComponent extends LitElement {
       flex: 1;
     }
     .chat-input {
+      --half-space-xl: calc(var(--space-xl) / 2);
       position: sticky;
       bottom: 0;
+      padding: var(--space-xl);
+      padding-top: var(--half-space-xl);
+      background: var(--bg);
+      box-shadow: 0 calc(-1 * var(--half-space-xl)) var(--half-space-xl) var(--bg);
+    }
+    .input-form {
       display: flex;
       background: var(--chat-input-bg);
       border: var(--chat-input-border);
@@ -514,6 +532,10 @@ export class ChatComponent extends LitElement {
       border: none;
       resize: none;
       background: none;
+      &::placeholder {
+        color: var(--text-color);
+        opacity: 0.4;
+      }
       &:focus {
         outline: none;
       }
@@ -521,7 +543,7 @@ export class ChatComponent extends LitElement {
         opacity: 0.7;
       }
     }
-    .loader {
+    .loader-animation {
       width: 100px;
       height: 4px;
       border-radius: var(--border-radius);
