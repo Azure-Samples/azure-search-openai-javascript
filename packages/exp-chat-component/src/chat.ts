@@ -3,15 +3,9 @@ import { map } from 'lit/directives/map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
-import {
-  type Message,
-  type ChatRequestOptions,
-  type ChatResponse,
-  type ChatMessage,
-  type ChatResponseChunk,
-} from './models.js';
+import { type ChatRequestOptions, type ChatResponse, type ChatMessage, type ChatResponseChunk } from './models.js';
 import { getCitationUrl, getCompletion } from './api.js';
-import { parseMessageIntoHtml } from './message-parser.js';
+import { type ParsedMessage, parseMessageIntoHtml } from './message-parser.js';
 import sendSvg from '../assets/send.svg?raw';
 import questionSvg from '../assets/question.svg?raw';
 
