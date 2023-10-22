@@ -175,10 +175,9 @@ export class ChatComponent extends LitElement {
         <div class="suggestions">
           ${map(
             suggestions,
-            (suggestion) =>
-              html`<button class="suggestion" @click=${() => this.onSuggestionClicked(suggestion)}>
-                ${suggestion}
-              </button>`,
+            (suggestion) => html`
+              <button class="suggestion" @click=${() => this.onSuggestionClicked(suggestion)}>${suggestion}</button>
+            `,
           )}
         </div>
       </section>
@@ -187,12 +186,14 @@ export class ChatComponent extends LitElement {
 
   protected renderLoader = () => {
     return this.isLoading && !this.isStreaming
-      ? html`<div class="message assistant loader">
+      ? html`
+        <div class="message assistant loader">
           <div class="message-body">
             <slot name="loader"><div class="loader-animation"></div></slot>
             <div class="message-role">${this.options.strings.assistant}</div>
           </div>
-        </div>`
+        </div>
+      `
       : nothing;
   };
 
@@ -203,10 +204,12 @@ export class ChatComponent extends LitElement {
         <div class="message-body">
           <div class="content">${message.html}</div>
           ${message.citations.length > 0
-            ? html`<div class="citations">
+            ? html`
+              <div class="citations">
                 <div class="citations-title">${this.options.strings.citationsTitle}</div>
                 ${map(message.citations, this.renderCitation)}
-              </div>`
+              </div>
+            `
             : nothing}
         </div>
         <div class="message-role">
@@ -217,64 +220,73 @@ export class ChatComponent extends LitElement {
   };
 
   protected renderError = () => {
-    return html`<div class="message assistant error">
-      <div class="message-body">
-        <span class="error-message">${this.options.strings.errorMessage}</span>
-        <button @click=${() => this.onSendClicked(true)}>${this.options.strings.retryButton}</button>
+    return html`
+      <div class="message assistant error">
+        <div class="message-body">
+          <span class="error-message">${this.options.strings.errorMessage}</span>
+          <button @click=${() => this.onSendClicked(true)}>${this.options.strings.retryButton}</button>
+        </div>
       </div>
-    </div>`;
+    `;
   };
 
   protected renderCitation = (citation: string, index: number) => {
-    return html`<button class="citation" @click=${() => this.onCitationClicked(citation)}>
-      ${index}. ${citation}
-    </button>`;
+    return html`
+      <button class="citation" @click=${() => this.onCitationClicked(citation)}>${index}. ${citation}</button>
+    `;
   };
 
   protected renderCitationLink = (citation: string, index: number) => {
-    return html`<button class="citation-link" @click=${() => this.onCitationClicked(citation)}>
-      <sup>[${index}]</sup>
-    </button>`;
+    return html`
+      <button class="citation-link" @click=${() => this.onCitationClicked(citation)}>
+        <sup>[${index}]</sup>
+      </button>
+    `;
   };
 
   protected renderFollowupQuestions = (questions: string[]) => {
     return questions.length > 0
-      ? html`<div class="questions">
+      ? html`
+        <div class="questions">
           <span class="question-icon" title=${this.options.strings.followUpQuestionsTitle}>
             ${unsafeSVG(questionSvg)} </span
           >${map(
-            questions,
-            (question) =>
-              html`<button class="question animation" @click=${() => this.onSuggestionClicked(question)}>
-                ${question}
-              </button>`,
-          )}
-        </div>`
+              questions,
+              (question) => html`
+                <button class="question animation" @click=${() => this.onSuggestionClicked(question)}>
+                  ${question}
+                </button>
+              `,
+            )}
+        </div>
+      `
       : nothing;
   };
 
   protected renderChatInput = () => {
-    return html`<div class="chat-input">
-      <form class="input-form">
-        <textarea
-          class="text-input"
-          placeholder="${this.options.strings.chatInputPlaceholder}"
-          .value=${this.question}
-          autocomplete="off"
-          @input=${(event) => (this.question = event.target.value)}
-          @keypress=${this.onKeyPressed}
-          .disabled=${this.isLoading}
-        ></textarea>
-        <button
-          class="submit-button"
-          @click=${() => this.onSendClicked()}
-          title="${this.options.strings.chatInputButtonLabel}"
-          .disabled=${this.isLoading || !this.question}
-        >
-          ${unsafeSVG(sendSvg)}
-        </button>
-      </form>
-    </div>`;
+    return html`
+      <div class="chat-input">
+        <form class="input-form">
+          <textarea
+            class="text-input"
+            placeholder="${this.options.strings.chatInputPlaceholder}"
+            .value=${this.question}
+            autocomplete="off"
+            @input=${(event) => (this.question = event.target.value)}
+            @keypress=${this.onKeyPressed}
+            .disabled=${this.isLoading}
+          ></textarea>
+          <button
+            class="submit-button"
+            @click=${() => this.onSendClicked()}
+            title="${this.options.strings.chatInputButtonLabel}"
+            .disabled=${this.isLoading || !this.question}
+          >
+            ${unsafeSVG(sendSvg)}
+          </button>
+        </form>
+      </div>
+    `;
   };
 
   protected override render() {
