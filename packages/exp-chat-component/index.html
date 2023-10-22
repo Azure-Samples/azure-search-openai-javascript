@@ -9,12 +9,18 @@
   </head>
   <body>
     <azc-chat>
-      <!-- <div slot="message-header">Custom Message Header</div> -->
+      <!-- <div slot="message-header">Custom Message Header <button>click here</button></div> -->
     </azc-chat>
     <style>
+      :root {
+        --azc-primary: #06b;
+        --azc-bg: #eee;
+        --azc-border-radius: 16px;
+      }
       html, body {
         font-size: 16px;
         margin: 0;
+        background: var(--azc-bg);
       }
     </style>
     <script type="module" src="/src/index.ts"></script>

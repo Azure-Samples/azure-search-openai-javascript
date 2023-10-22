@@ -559,6 +559,7 @@ export class ChatComponent extends LitElement {
       }
     }
     .text-input {
+      padding: var(--space-xs);
       font-family: inherit;
       font-size: 1rem;
       flex: 1 auto;
