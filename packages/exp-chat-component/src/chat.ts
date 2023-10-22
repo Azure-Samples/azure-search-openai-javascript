@@ -117,6 +117,7 @@ export class ChatComponent extends LitElement {
     }
     this.question = '';
     this.isLoading = true;
+    this.scrollToLastMessage();
     try {
       const response = await getCompletion({ ...this.options, messages: this.messages }, this.options.oneShot);
       if (this.options.stream && !this.options.oneShot) {
@@ -203,7 +204,7 @@ export class ChatComponent extends LitElement {
 
   protected renderMessage = (message: ParsedMessage) => {
     return html`
-      <div class="message ${message.role}">
+      <div class="message ${message.role} animation">
         ${message.role === 'assistant' ? html`<slot name="message-header"></slot>` : nothing}
         <div class="message-body">
           <div class="content">${message.html}</div>
@@ -250,7 +251,9 @@ export class ChatComponent extends LitElement {
           >${map(
             questions,
             (question) =>
-              html`<button class="question" @click=${() => this.onSuggestionClicked(question)}>${question}</button>`,
+              html`<button class="question animation" @click=${() => this.onSuggestionClicked(question)}>
+                ${question}
+              </button>`,
           )}
         </div>`
       : nothing;
@@ -349,6 +352,9 @@ export class ChatComponent extends LitElement {
     *:focus-visible {
       outline: var(--focus-outline) var(--primary);
     }
+    .animation {
+      animation: 0.3s ease;
+    }
     svg {
       fill: currentColor;
     }
@@ -443,7 +449,7 @@ export class ChatComponent extends LitElement {
       padding: var(--space-xl);
       margin-bottom: var(--space-xl);
       &.user {
-        animation: fade-in-up 0.3s ease;
+        animation-name: fade-in-up;
       }
     }
     .message-body {
@@ -476,6 +482,7 @@ export class ChatComponent extends LitElement {
       margin-left: var(--space-xs);
     }
     .question {
+      position: relative;
       padding: var(--space-xs) var(--space-md);
       margin-bottom: var(--space-xs);
       margin-left: var(--space-xs);
@@ -483,6 +490,7 @@ export class ChatComponent extends LitElement {
       color: var(--primary);
       background: var(--card-bg);
       border: 1px solid var(--primary);
+      animation-name: fade-in-right;
       &:hover {
         background: color-mix(in srgb, var(--card-bg), var(--primary) 5%);
       }
@@ -606,6 +614,21 @@ export class ChatComponent extends LitElement {
       100% {
         opacity: 1;
         top: 0px;
+      }
+    }
+    @keyframes fade-in-right {
+      0% {
+        opacity: 0.5;
+        right: -100px;
+      }
+      100% {
+        opacity: 1;
+        right: 0;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .animation {
+        animation: none;
       }
     }
   `;
