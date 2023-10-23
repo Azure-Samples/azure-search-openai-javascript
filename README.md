@@ -33,6 +33,7 @@ urlFragment: azure-search-openai-javascript
   - [Enabling authentication](#enabling-authentication)
 - [Using the app](#using-the-app)
 - [Running locally](#running-locally)
+- [Using a different backend](#using-a-different-backend)
 - [Productionizing](#productionizing)
 - [Clean up](#clean-up)
 - [Resources](#resources)
@@ -250,6 +251,38 @@ Once in the web app:
 - Try different topics in chat or Q&A context. For chat, try follow up questions, clarifications, ask to simplify or elaborate on answer, etc.
 - Explore citations and sources
 - Click on "settings" to try different options, tweak prompts, etc.
+
+## Using a different backend
+
+The Search API service implements the [AzureML Chat Backend Protocol](https://github.com/Azure/azureml_run_specification/blob/chat-protocol/specs/chat-protocol/chat-app-protocol.md). It can be switched with any other service that implements the same protocol.
+
+For example, it's possible to use the [Python backend from this repository](https://github.com/Azure-Samples/azure-search-openai-demo) instead of our Node.js implemention. To do so, follow these steps:
+
+1. Deploy this repository, following the steps above.
+2. Get the frontend URL:
+
+- If you want to use the deployed web app, run `azd env get-values | grep WEBAPP_URI` to get the URL.
+- If you want to use the local web app, use `http://localhost:5173`.
+- If you want to use the Codespaces local web app, use `https://<your_codespace_base_url>-5173.app.github.dev`.
+
+3. Open the alternative backend repository your want to use, for example: https://github.com/Azure-Samples/azure-search-openai-demo
+4. Set the frontend URL as an allowed origin with `azd env set ALLOWED_ORIGIN <your_frontend_url>`.
+5. Follow the [steps to deploy the Python backend](https://github.com/Azure-Samples/azure-search-openai-demo#deploying-from-scratch).
+6. Once the Python backend is fully deployed, get the backend URL with `azd env get-values | grep BACKEND_URI`.
+7. Reopen this repository and set the backend URL with `azd env set BACKEND_URI <your_backend_url>`.
+8. Depending on whether you want to use the deployed web app or the local web app:
+
+- If you want to use the deployed web app, run `azd up` to redeploy.
+- If you want to use the local web app on your machine or in Codespaces, run:
+
+  ```sh
+  # Export the environment variable.
+  # The syntax may be different depending on your shell or if you're using Windows.
+  export BACKEND_URI=<your_backend_url>
+
+  # Start the app
+  npm start --workspace=webapp
+  ```
 
 ## Productionizing
 
