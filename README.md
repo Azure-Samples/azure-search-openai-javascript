@@ -254,9 +254,9 @@ Once in the web app:
 
 ## Using a different backend
 
-The Search API service implements the [AzureML Chat Backend Protocol](https://github.com/Azure/azureml_run_specification/blob/chat-protocol/specs/chat-protocol/chat-app-protocol.md). It can be switched with any other service that implements the same protocol.
+The Search API service implements the [AzureML Chat Backend Protocol](https://github.com/Azure/azureml_run_specification/blob/chat-protocol/specs/chat-protocol/chat-app-protocol.md). It can be swapped with any service that implements the same protocol, like the [Python backend client in this repository](https://github.com/Azure-Samples/azure-search-openai-demo) instead of the Node.js implementation featured in this repo.
 
-For example, it's possible to use the [Python backend from this repository](https://github.com/Azure-Samples/azure-search-openai-demo) instead of our Node.js implemention. To do so, follow these steps:
+To do so, follow these steps:
 
 1. Deploy this repository, following the steps above.
 2. Get the frontend URL:
@@ -269,7 +269,7 @@ For example, it's possible to use the [Python backend from this repository](http
 4. Set the frontend URL as an allowed origin with `azd env set ALLOWED_ORIGIN <your_frontend_url>`.
 5. Follow the [steps to deploy the Python backend](https://github.com/Azure-Samples/azure-search-openai-demo#deploying-from-scratch).
 6. Once the Python backend is fully deployed, get the backend URL with `azd env get-values | grep BACKEND_URI`.
-7. Reopen this repository and set the backend URL with `azd env set BACKEND_URI <your_backend_url>`.
+7. Set the backend URL in this repo, running `azd env set BACKEND_URI <your_backend_url>`.
 8. Depending on whether you want to use the deployed web app or the local web app:
 
 - If you want to use the deployed web app, run `azd up` to redeploy.
