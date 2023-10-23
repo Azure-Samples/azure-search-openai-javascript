@@ -187,13 +187,13 @@ export class ChatComponent extends LitElement {
   protected renderLoader = () => {
     return this.isLoading && !this.isStreaming
       ? html`
-        <div class="message assistant loader">
-          <div class="message-body">
-            <slot name="loader"><div class="loader-animation"></div></slot>
-            <div class="message-role">${this.options.strings.assistant}</div>
+          <div class="message assistant loader">
+            <div class="message-body">
+              <slot name="loader"><div class="loader-animation"></div></slot>
+              <div class="message-role">${this.options.strings.assistant}</div>
+            </div>
           </div>
-        </div>
-      `
+        `
       : nothing;
   };
 
@@ -205,11 +205,11 @@ export class ChatComponent extends LitElement {
           <div class="content">${message.html}</div>
           ${message.citations.length > 0
             ? html`
-              <div class="citations">
-                <div class="citations-title">${this.options.strings.citationsTitle}</div>
-                ${map(message.citations, this.renderCitation)}
-              </div>
-            `
+                <div class="citations">
+                  <div class="citations-title">${this.options.strings.citationsTitle}</div>
+                  ${map(message.citations, this.renderCitation)}
+                </div>
+              `
             : nothing}
         </div>
         <div class="message-role">
@@ -232,7 +232,7 @@ export class ChatComponent extends LitElement {
 
   protected renderCitation = (citation: string, index: number) => {
     return html`
-      <button class="citation" @click=${() => this.onCitationClicked(citation)}>${index}. ${citation}</button>
+      <button class="citation" @click=${() => this.onCitationClicked(citation)}>${index + 1}. ${citation}</button>
     `;
   };
 
@@ -247,10 +247,10 @@ export class ChatComponent extends LitElement {
   protected renderFollowupQuestions = (questions: string[]) => {
     return questions.length > 0
       ? html`
-        <div class="questions">
-          <span class="question-icon" title=${this.options.strings.followUpQuestionsTitle}>
-            ${unsafeSVG(questionSvg)} </span
-          >${map(
+          <div class="questions">
+            <span class="question-icon" title=${this.options.strings.followUpQuestionsTitle}>
+              ${unsafeSVG(questionSvg)} </span
+            >${map(
               questions,
               (question) => html`
                 <button class="question animation" @click=${() => this.onSuggestionClicked(question)}>
@@ -258,8 +258,8 @@ export class ChatComponent extends LitElement {
                 </button>
               `,
             )}
-        </div>
-      `
+          </div>
+        `
       : nothing;
   };
 
