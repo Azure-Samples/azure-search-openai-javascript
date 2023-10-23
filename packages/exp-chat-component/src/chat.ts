@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/template-indent */
 import { LitElement, css, html, nothing } from 'lit';
 import { map } from 'lit/directives/map.js';
 import { repeat } from 'lit/directives/repeat.js';
@@ -231,17 +232,15 @@ export class ChatComponent extends LitElement {
   };
 
   protected renderCitation = (citation: string, index: number) => {
-    return html`
-      <button class="citation" @click=${() => this.onCitationClicked(citation)}>${index + 1}. ${citation}</button>
-    `;
+    return html`<button class="citation" @click=${() => this.onCitationClicked(citation)}>
+      ${index + 1}. ${citation}
+    </button>`;
   };
 
   protected renderCitationLink = (citation: string, index: number) => {
-    return html`
-      <button class="citation-link" @click=${() => this.onCitationClicked(citation)}>
-        <sup>[${index}]</sup>
-      </button>
-    `;
+    return html`<button class="citation-link" @click=${() => this.onCitationClicked(citation)}>
+      <sup>[${index}]</sup>
+    </button>`;
   };
 
   protected renderFollowupQuestions = (questions: string[]) => {
