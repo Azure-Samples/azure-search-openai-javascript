@@ -6,6 +6,7 @@ import {
   Panel,
   SpinButton,
   TextField,
+  TooltipHost,
   type IChoiceGroupOption,
   type IDropdownOption,
 } from '@fluentui/react';
@@ -17,6 +18,7 @@ import { Approaches, RetrievalMode, apiBaseUrl } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/SettingsButton.jsx';
 
 import 'chat-component';
+import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 
 export function Component(): JSX.Element {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -125,93 +127,110 @@ export function Component(): JSX.Element {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
-        <ChoiceGroup
-          className={styles.oneshotSettingsSeparator}
-          label="Approach"
-          options={approaches}
-          defaultSelectedKey={approach}
-          onChange={onApproachChange}
-        />
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.approaches}>
+          <ChoiceGroup
+            className={styles.oneshotSettingsSeparator}
+            label="Approach"
+            options={approaches}
+            defaultSelectedKey={approach}
+            onChange={onApproachChange}
+          />
+        </TooltipHost>
 
         {(approach === Approaches.RetrieveThenRead || approach === Approaches.ReadDecomposeAsk) && (
-          <TextField
-            className={styles.oneshotSettingsSeparator}
-            defaultValue={promptTemplate}
-            label="Override prompt template"
-            multiline
-            autoAdjustHeight
-            onChange={onPromptTemplateChange}
-          />
+          <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
+            <TextField
+              className={styles.oneshotSettingsSeparator}
+              defaultValue={promptTemplate}
+              label="Override prompt template"
+              multiline
+              autoAdjustHeight
+              onChange={onPromptTemplateChange}
+            />
+          </TooltipHost>
         )}
 
         {approach === Approaches.ReadRetrieveRead && (
           <>
-            <TextField
-              className={styles.oneshotSettingsSeparator}
-              defaultValue={promptTemplatePrefix}
-              label="Override prompt prefix template"
-              multiline
-              autoAdjustHeight
-              onChange={onPromptTemplatePrefixChange}
-            />
-            <TextField
-              className={styles.oneshotSettingsSeparator}
-              defaultValue={promptTemplateSuffix}
-              label="Override prompt suffix template"
-              multiline
-              autoAdjustHeight
-              onChange={onPromptTemplateSuffixChange}
-            />
+            <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplatePrefix}>
+              <TextField
+                className={styles.oneshotSettingsSeparator}
+                defaultValue={promptTemplatePrefix}
+                label="Override prompt prefix template"
+                multiline
+                autoAdjustHeight
+                onChange={onPromptTemplatePrefixChange}
+              />
+            </TooltipHost>
+            <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplateSuffix}>
+              <TextField
+                className={styles.oneshotSettingsSeparator}
+                defaultValue={promptTemplateSuffix}
+                label="Override prompt suffix template"
+                multiline
+                autoAdjustHeight
+                onChange={onPromptTemplateSuffixChange}
+              />
+            </TooltipHost>
           </>
         )}
-
-        <SpinButton
-          className={styles.oneshotSettingsSeparator}
-          label="Retrieve this many search results:"
-          min={1}
-          max={50}
-          defaultValue={retrieveCount.toString()}
-          onChange={onRetrieveCountChange}
-        />
-        <TextField
-          className={styles.oneshotSettingsSeparator}
-          label="Exclude category"
-          onChange={onExcludeCategoryChanged}
-        />
-        <Checkbox
-          className={styles.oneshotSettingsSeparator}
-          checked={useSemanticRanker}
-          label="Use semantic ranker for retrieval"
-          onChange={onUseSemanticRankerChange}
-        />
-        <Checkbox
-          className={styles.oneshotSettingsSeparator}
-          checked={useSemanticCaptions}
-          label="Use query-contextual summaries instead of whole documents"
-          onChange={onUseSemanticCaptionsChange}
-          disabled={!useSemanticRanker}
-        />
-        <Dropdown
-          className={styles.oneshotSettingsSeparator}
-          label="Retrieval mode"
-          options={[
-            {
-              key: 'hybrid',
-              text: 'Vectors + Text (Hybrid)',
-              selected: retrievalMode == RetrievalMode.Hybrid,
-              data: RetrievalMode.Hybrid,
-            },
-            {
-              key: 'vectors',
-              text: 'Vectors',
-              selected: retrievalMode == RetrievalMode.Vectors,
-              data: RetrievalMode.Vectors,
-            },
-            { key: 'text', text: 'Text', selected: retrievalMode == RetrievalMode.Text, data: RetrievalMode.Text },
-          ]}
-          required
-          onChange={onRetrievalModeChange}
-        />
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.retrieveNumber}>
+          <SpinButton
+            className={styles.oneshotSettingsSeparator}
+            label="Retrieve this many search results:"
+            min={1}
+            max={50}
+            defaultValue={retrieveCount.toString()}
+            onChange={onRetrieveCountChange}
+          />
+        </TooltipHost>
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.excludeCategory}>
+          <TextField
+            className={styles.oneshotSettingsSeparator}
+            label="Exclude category"
+            onChange={onExcludeCategoryChanged}
+          />
+        </TooltipHost>
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.useSemanticRanker}>
+          <Checkbox
+            className={styles.oneshotSettingsSeparator}
+            checked={useSemanticRanker}
+            label="Use semantic ranker for retrieval"
+            onChange={onUseSemanticRankerChange}
+          />
+        </TooltipHost>
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.useQueryContextSummaries}>
+          <Checkbox
+            className={styles.oneshotSettingsSeparator}
+            checked={useSemanticCaptions}
+            label="Use query-contextual summaries instead of whole documents"
+            onChange={onUseSemanticCaptionsChange}
+            disabled={!useSemanticRanker}
+          />
+        </TooltipHost>
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.retrievalMode}>
+          <Dropdown
+            className={styles.oneshotSettingsSeparator}
+            label="Retrieval mode"
+            options={[
+              {
+                key: 'hybrid',
+                text: 'Vectors + Text (Hybrid)',
+                selected: retrievalMode == RetrievalMode.Hybrid,
+                data: RetrievalMode.Hybrid,
+              },
+              {
+                key: 'vectors',
+                text: 'Vectors',
+                selected: retrievalMode == RetrievalMode.Vectors,
+                data: RetrievalMode.Vectors,
+              },
+              { key: 'text', text: 'Text', selected: retrievalMode == RetrievalMode.Text, data: RetrievalMode.Text },
+            ]}
+            required
+            onChange={onRetrievalModeChange}
+          />
+        </TooltipHost>
       </Panel>
     </div>
   );

@@ -1,7 +1,12 @@
 // Keep values less than 20 words.
 // Don't add links to the tooltips.
 export const toolTipText = {
-  promptTemplate: "Allows user to customize the chatbot's behavior by providing initial context.",
+  approaches: 'Retrieve first uses Azure Search. Read first uses LangChain.',
+  promptTemplate: "Allows user to override the chatbot's prompt.",
+  promptTemplatePrefix:
+    "Allows user to provide a prefix to the chatbot's prompt. For example, `Answer the following question as if I were in high school.`",
+  promptTemplateSuffix:
+    "Allows user to provide a suffix to the chatbot's prompt. For example, `Return the first 50 words.`",
   retrieveNumber: 'Number of results affecting final answer',
   excludeCategory: 'Example categories include ...',
   useSemanticRanker:
@@ -14,14 +19,15 @@ export const toolTipText = {
   streamChat:
     'Continuously deliver responses as they are generated or wait until all responses are generated before delivering them.',
 };
+
 // beak: triangle color
 // beakCurtain: outer edge
 // calloutMain: content center
 // No style to control text color
 export const toolTipTextCalloutProps = {
   styles: {
-    beak: { background: 'lightgrey' },
-    beakCurtain: { background: 'lightgrey' },
-    calloutMain: { background: 'lightgrey' },
+    beak: { background: '#D3D3D3' },
+    beakCurtain: { background: '#D3D3D3' },
+    calloutMain: { background: '#D3D3D3' },
   },
 };
