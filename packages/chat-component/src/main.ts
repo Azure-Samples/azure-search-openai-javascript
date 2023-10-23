@@ -418,6 +418,7 @@ export class ChatComponent extends LitElement {
                   <button
                     title="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
                     class="button chat__header--button"
+                    data-testid="chat__reset--button"
                     @click="${this.resetCurrentChat}"
                   >
                     <span class="chat__header--span">${globalConfig.RESET_CHAT_BUTTON_TITLE}</span>

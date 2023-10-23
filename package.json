@@ -28,7 +28,9 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@playwright/test": "^1.39.0",
     "@tapjs/nock": "^3.1.13",
+    "@types/node": "^20.8.7",
     "concurrently": "^8.2.1",
     "eslint-config-shared": "^1.0.0",
     "lint-staged": "^14.0.1",

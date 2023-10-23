@@ -33,7 +33,8 @@
         "esbenp.prettier-vscode",
         "humao.rest-client",
         "GitHub.copilot",
-        "runem.lit-plugin"
+        "runem.lit-plugin",
+        "ms-playwright.playwright"
       ]
     }
   },
