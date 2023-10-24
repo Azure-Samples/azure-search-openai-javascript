@@ -1,0 +1,20 @@
+{
+  "messages": [{ "content": "How to search and book rentals?", "role": "user" }],
+  "context": {
+    "retrieval_mode": "hybrid",
+    "semantic_ranker": true,
+    "semantic_captions": false,
+    "suggest_followup_questions": true,
+    "retrievalMode": "hybrid",
+    "top": 3,
+    "useSemanticRanker": true,
+    "useSemanticCaptions": false,
+    "excludeCategory": "",
+    "promptTemplate": "",
+    "promptTemplatePrefix": "",
+    "promptTemplateSuffix": "",
+    "suggestFollowupQuestions": true,
+    "approach": "rrr"
+  },
+  "stream": true
+}

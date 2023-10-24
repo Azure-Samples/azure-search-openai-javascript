@@ -436,6 +436,7 @@ export class ChatComponent extends LitElement {
                                 <button
                                   title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                                   class="button chat__header--button"
+                                  data-testid="chat__show-thought-process"
                                   @click="${this.showThoughtProcess}"
                                   ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
                                 >
@@ -584,11 +585,12 @@ export class ChatComponent extends LitElement {
         </section>
         ${this.isShowingThoughtProcess
           ? html`
-              <aside class="aside">
+              <aside class="aside" data-testid="aside-thought-process">
                 <div class="aside__header">
                   <button
                     title="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                     class="button chat__header--button"
+                    data-testid="chat__hide-thought-process"
                     @click="${this.hideThoughtProcess}"
                   >
                     <span class="chat__header--span">${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span>
