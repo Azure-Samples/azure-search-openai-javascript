@@ -5,6 +5,7 @@ import { SettingsButton } from '../../components/SettingsButton/index.js';
 import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField, TooltipHost } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
 import 'chat-component';
+import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -105,9 +106,8 @@ const Chat = () => {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
-        <TooltipHost content="Allows user to customize the chatbot's behavior by providing initial context.">
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
           <TextField
-            id="promptTemplate"
             className={styles.chatSettingsSeparator}
             defaultValue={promptTemplate}
             label="Override prompt template"
@@ -117,7 +117,7 @@ const Chat = () => {
           />
         </TooltipHost>
 
-        <TooltipHost content="Number of results affecting final answer.">
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.retrieveNumber}>
           <SpinButton
             className={styles.chatSettingsSeparator}
             label="Retrieve this many search results:"
@@ -127,14 +127,14 @@ const Chat = () => {
             onChange={onRetrieveCountChange}
           />
         </TooltipHost>
-        <TooltipHost content="Example categories include ...">
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.excludeCategory}>
           <TextField
             className={styles.chatSettingsSeparator}
             label="Exclude category"
             onChange={onExcludeCategoryChanged}
           />
         </TooltipHost>
-        <TooltipHost content="Semantic ranker is a machine learning model to improve the relevance and accuracy of search results.">
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.useSemanticRanker}>
           <Checkbox
             className={styles.chatSettingsSeparator}
             checked={useSemanticRanker}
@@ -142,7 +142,7 @@ const Chat = () => {
             onChange={onUseSemanticRankerChange}
           />
         </TooltipHost>
-        <TooltipHost content="Can improve the relevance and accuracy of search results by providing a more concise and focused summary of the most relevant Info12Regularrmation related to the query or context.">
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.useQueryContextSummaries}>
           <Checkbox
             className={styles.chatSettingsSeparator}
             checked={useSemanticCaptions}
@@ -151,7 +151,7 @@ const Chat = () => {
             disabled={!useSemanticRanker}
           />
         </TooltipHost>
-        <TooltipHost content="Provide follow-up questions to continue conversation.">
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.suggestFollowupQuestions}>
           <Checkbox
             className={styles.chatSettingsSeparator}
             checked={useSuggestFollowupQuestions}
@@ -159,7 +159,7 @@ const Chat = () => {
             onChange={onUseSuggestFollowupQuestionsChange}
           />
         </TooltipHost>
-        <TooltipHost content="The retrieval mode choices determine how the chatbot retrieves and ranks responses based on semantic similarity to the user's query. `Vectors + Text (Hybrid)` uses a combination of vector embeddings and text matching, `Vectors` uses only vector embeddings, and `Text` uses only text matching.">
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.retrievalMode}>
           <Dropdown
             className={styles.chatSettingsSeparator}
             label="Retrieval mode"
@@ -182,7 +182,7 @@ const Chat = () => {
             onChange={onRetrievalModeChange}
           />
         </TooltipHost>
-        <TooltipHost content="Continuously deliver responses as they are generated or wait until all responses are generated before delivering them.">
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.streamChat}>
           <Checkbox
             className={styles.chatSettingsSeparator}
             checked={useStream}
