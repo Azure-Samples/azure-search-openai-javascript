@@ -57,6 +57,9 @@
     "bracketSpacing": true
   },
   "eslintConfig": {
-    "extends": "eslint-config-shared"
+    "extends": "eslint-config-shared",
+    "globals": {
+      "__ENV": "readonly"
+    }
   }
 }
