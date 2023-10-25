@@ -43,7 +43,7 @@
   "forwardPorts": [3000, 3001, 5173],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "npm install",
+  "postCreateCommand": "./.devcontainer/postCreateCommand.sh",
 
   // Set minimal host requirements for the container.
   "hostRequirements": {
