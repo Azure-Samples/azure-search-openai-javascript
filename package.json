@@ -13,6 +13,7 @@
     "start:indexer": "npm run dev --workspace=indexer",
     "test": "npm run test -ws --if-present",
     "test:playwright": "npx playwright test",
+    "test:load": "k6 run tests/load/index.js",
     "build": "npm run build -ws --if-present",
     "clean": "npm run clean -ws --if-present",
     "docker:build": "npm run docker:build -ws --if-present",
