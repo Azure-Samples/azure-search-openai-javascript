@@ -368,6 +368,7 @@ export class ChatComponent extends LitElement {
                 <a
                   class="items__link"
                   href="${this.apiUrl}/content/${citation.text}"
+                  data-testid="citation"
                   target="_blank"
                   rel="noopener noreferrer"
                   >${citation.ref}. ${citation.text}</a
