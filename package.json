@@ -11,7 +11,7 @@
     "start:webapp": "npm run dev --workspace=webapp",
     "start:search": "npm run dev --workspace=search",
     "start:indexer": "npm run dev --workspace=indexer",
-    "test": "npm run test -ws --if-present & npm run test:playwright",
+    "test": "npm run test -ws --if-present",
     "test:playwright": "npx playwright test",
     "build": "npm run build -ws --if-present",
     "clean": "npm run clean -ws --if-present",
