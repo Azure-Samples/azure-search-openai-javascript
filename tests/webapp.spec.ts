@@ -138,7 +138,7 @@ test.describe('developer settings', () => {
     await expect(page.locator('label').filter({ hasText: 'contextual summaries' }).locator('i')).not.toBeChecked();
     await expect(page.locator('label').filter({ hasText: 'follow-up questions' }).locator('i')).toBeChecked();
     await expect(page.locator('label').filter({ hasText: 'Stream chat' }).locator('i')).toBeChecked();
-    await expect(page.getByText('Vectors + Text (Hybrid)')).toBeVisible();
+    await expect(page.getByLabel('Retrieval mode')).toContainText('Vectors + Text (Hybrid)');
   });
 
   test('handle no stream parsing', async ({ page }) => {
