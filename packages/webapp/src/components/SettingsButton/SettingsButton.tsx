@@ -13,7 +13,7 @@ export const SettingsButton = ({ className, onClick }: Props) => {
     <button
       className={`${styles.container} ${className ?? ''}`}
       onClick={onClick}
-      data-testid={'button__developer-settings'}
+      data-testid="button__developer-settings"
     >
       <Settings24Regular />
       <Text>{'Developer settings'}</Text>

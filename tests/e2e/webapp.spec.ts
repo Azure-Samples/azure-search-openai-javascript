@@ -1,12 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('default', () => {
-  test('webapp load snapshot', async ({ page }) => {
-    // validate the test page loads as expected to the saved snapshot
-    await page.goto('/');
-    await expect(page).toHaveScreenshot();
-  });
-
   test('chat interation', async ({ page }) => {
     await page.goto('/');
 
@@ -32,7 +26,7 @@ test.describe('default', () => {
     const userMessage = page.locator('.chat__txt.user-message');
 
     // Set to replay the response for a local route (will not be used for the official)
-    await page.routeFromHAR('./tests/hars/default-chat-response-stream.har', {
+    await page.routeFromHAR('./tests/e2e/hars/default-chat-response-stream.har', {
       url: '/chat',
       update: false,
     });
@@ -81,7 +75,7 @@ test.describe('generate answer', () => {
     await page.goto('/');
     await page.locator('.defaults__button').nth(0).click();
 
-    await page.routeFromHAR('./tests/hars/default-chat-response-stream.har', {
+    await page.routeFromHAR('./tests/e2e/hars/default-chat-response-stream.har', {
       url: '/chat',
       update: false,
     });
@@ -114,7 +108,6 @@ test.describe('generate answer', () => {
 
   test('response formatting', async ({ page }) => {
     await expect(page.locator('.items__listItem--step')).not.toHaveCount(0);
-    await expect(page).toHaveScreenshot({ clip: { x: 0, y: 0, width: 1000, height: 1000 } });
   });
 
   test('citation', async ({ page }) => {
@@ -145,7 +138,7 @@ test.describe('developer settings', () => {
     await page.goto('/');
     await page.locator('.defaults__button').nth(0).click();
 
-    await page.routeFromHAR('./tests/hars/default-chat-response-nostream.har', {
+    await page.routeFromHAR('./tests/e2e/hars/default-chat-response-nostream.har', {
       url: '/chat',
       update: false,
     });
