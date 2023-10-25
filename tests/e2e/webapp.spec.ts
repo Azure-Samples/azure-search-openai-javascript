@@ -4,14 +4,14 @@ test.describe('default', () => {
   test('chat interation', async ({ page }) => {
     await page.goto('/');
 
-    const defaultQuestions = page.locator('.defaults__button');
+    const defaultQuestions = page.getByTestId('default-question');
 
     // expect there to be at least 3 default question buttons on page load
     await test.step('Get default questions', async () => {
       await expect(defaultQuestions).toHaveCount(3);
     });
 
-    const chatInput = page.locator('.chatbox__input');
+    const chatInput = page.getByTestId('question-input');
     const firstQuestionButton = defaultQuestions.nth(0);
     const firstQuestionText = ((await firstQuestionButton.textContent()) ?? '').replace('Ask now', '').trim();
 
@@ -31,11 +31,11 @@ test.describe('default', () => {
       update: false,
     });
 
-    const showThoughtProcess = page.getByTestId('chat__show-thought-process');
+    const showThoughtProcess = page.getByTestId('chat-show-thought-process');
     await test.step('Get answer', async () => {
       await expect(showThoughtProcess).not.toBeVisible();
 
-      await page.locator('.chatbox__button').click();
+      await page.getByTestId('submit-question-button').click();
 
       // wait for the thought process button to be enabled.
       await expect(showThoughtProcess).toBeEnabled({ timeout: 30_000 });
@@ -46,8 +46,13 @@ test.describe('default', () => {
       await expect(defaultQuestions).toHaveCount(0);
     });
 
+    // make sure the response is formatted as list items
+    await test.step('response formatting', async () => {
+      await expect(page.locator('.items__listItem--step')).not.toHaveCount(0);
+    });
+
     await test.step('Reset chat', async () => {
-      await page.getByTestId('chat__reset--button').click();
+      await page.getByTestId('chat-reset-button').click();
       await expect(userMessage).toHaveCount(0);
       await expect(defaultQuestions).toHaveCount(3);
     });
@@ -55,7 +60,7 @@ test.describe('default', () => {
 
   test('waiting for response', async ({ page }) => {
     await page.goto('/');
-    await page.locator('.defaults__button').nth(0).click();
+    await page.getByTestId('default-question').nth(0).click();
 
     await page.route('/chat', (route) =>
       route.fulfill({
@@ -64,29 +69,40 @@ test.describe('default', () => {
     );
 
     await expect(page.locator('.loading-skeleton')).not.toBeVisible();
-    await page.locator('.chatbox__button').click();
+    await page.getByTestId('submit-question-button').click();
     await expect(page.locator('.loading-skeleton')).toBeVisible();
-    await expect(page.locator('.chatbox__input')).not.toBeEnabled();
+    await expect(page.getByTestId('question-input')).not.toBeEnabled();
+  });
+
+  test('show error on failure', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('default-question').nth(0).click();
+
+    await page.route('/chat', (route) => route.abort());
+    await page.route('**/chat', (route) => route.abort());
+
+    await page.getByTestId('submit-question-button').click();
+    await expect(page.locator('.chat__txt.error')).toBeVisible();
   });
 });
 
 test.describe('generate answer', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.locator('.defaults__button').nth(0).click();
+    await page.getByTestId('default-question').nth(0).click();
 
     await page.routeFromHAR('./tests/e2e/hars/default-chat-response-stream.har', {
       url: '/chat',
       update: false,
     });
 
-    await page.locator('.chatbox__button').click();
+    await page.getByTestId('submit-question-button').click();
     // wait for the thought process button to be enabled.
-    await expect(page.getByTestId('chat__show-thought-process')).toBeEnabled({ timeout: 30_000 });
+    await expect(page.getByTestId('chat-show-thought-process')).toBeEnabled({ timeout: 30_000 });
   });
 
   test('show thought process', async ({ page }) => {
-    const showThoughtProcess = page.getByTestId('chat__show-thought-process');
+    const showThoughtProcess = page.getByTestId('chat-show-thought-process');
     const thoughtProcessAside = page.getByTestId('aside-thought-process');
 
     await test.step('show/hide aside', async () => {
@@ -94,20 +110,16 @@ test.describe('generate answer', () => {
       await showThoughtProcess.click();
       await expect(thoughtProcessAside).toBeVisible();
 
-      await page.getByTestId('chat__hide-thought-process').click();
+      await page.getByTestId('chat-hide-thought-process').click();
       await expect(thoughtProcessAside).not.toBeVisible();
     });
 
     await test.step('Reset chat', async () => {
       await showThoughtProcess.click();
       await expect(thoughtProcessAside).toBeVisible();
-      await page.getByTestId('chat__reset--button').click();
+      await page.getByTestId('chat-reset-button').click();
       await expect(thoughtProcessAside).not.toBeVisible();
     });
-  });
-
-  test('response formatting', async ({ page }) => {
-    await expect(page.locator('.items__listItem--step')).not.toHaveCount(0);
   });
 
   test('citation', async ({ page }) => {
@@ -136,7 +148,7 @@ test.describe('developer settings', () => {
 
   test('handle no stream parsing', async ({ page }) => {
     await page.goto('/');
-    await page.locator('.defaults__button').nth(0).click();
+    await page.getByTestId('default-question').nth(0).click();
 
     await page.routeFromHAR('./tests/e2e/hars/default-chat-response-nostream.har', {
       url: '/chat',
@@ -152,9 +164,9 @@ test.describe('developer settings', () => {
 
     await page.locator('button').filter({ hasText: 'Close' }).click();
 
-    await page.locator('.chatbox__button').click();
+    await page.getByTestId('submit-question-button').click();
     // wait for the thought process button to be enabled.
-    await expect(page.getByTestId('chat__show-thought-process')).toBeEnabled({ timeout: 30_000 });
+    await expect(page.getByTestId('chat-show-thought-process')).toBeEnabled({ timeout: 30_000 });
 
     await expect(page.locator('.items__listItem--step')).not.toHaveCount(0);
   });
