@@ -4,4 +4,4 @@ echo "Installing dependencies..."
 npm install
 
 echo "Installing playwright browsers..."
-npm run install:playwright
+npx playwright install --with-deps
