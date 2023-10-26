@@ -383,10 +383,11 @@ export class ChatComponent extends LitElement {
   }
 
   renderFollowupQuestions(followupQuestions: string[] | undefined) {
+    // render followup questions
     if (followupQuestions && followupQuestions.length > 0) {
       return html`
         <h3 class="subheadline--small">You may also want to ask...</h3>
-        <ol class="items__list followup">
+        <ul class="items__list followup">
           ${followupQuestions.map(
             (followupQuestion) => html`
               <li class="items__listItem--followup">
@@ -399,7 +400,7 @@ export class ChatComponent extends LitElement {
               </li>
             `,
           )}
-        </ol>
+        </ul>
       `;
     }
 

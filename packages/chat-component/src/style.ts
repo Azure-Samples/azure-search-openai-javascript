@@ -340,15 +340,20 @@ export const mainStyle = css`
   }
   .items__list.followup {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     padding: 20px;
+    list-style-type: none;
+    flex-wrap: wrap;
   }
   .items__list.steps {
     display: block;
   }
   .items__listItem--followup {
     cursor: pointer;
-    color: var(--dark-gray);
+    padding: 0 5px;
+    border-radius: 5px;
+    border: 1px solid var(--accent-high);
+    margin: 5px;
   }
   .items__listItem--citation {
     display: inline-block;
@@ -370,10 +375,11 @@ export const mainStyle = css`
     border-bottom: 1px solid var(--light-gray);
   }
   .followup .items__link {
-    color: var(--dark-gray);
+    color: var(--accent-high);
     display: block;
     padding: 5px 0;
     border-bottom: 1px solid var(--light-gray);
+    font-size: small;
   }
   .defaults__button {
     text-decoration: none;
