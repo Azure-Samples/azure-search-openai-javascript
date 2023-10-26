@@ -61,6 +61,6 @@ export function chat(baseUrl, stream = true) {
     const latencyMetric = stream ? chatStreamLatency : chatNoStreamLatency;
     latencyMetric.add(response.timings.duration, { type: 'API' });
 
-    sleep(between(5, 20));
+    sleep(between(5, 20)); // wait between 5 and 20 seconds between each user iteration
   });
 }
