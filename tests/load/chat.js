@@ -5,8 +5,14 @@ import { group, sleep } from 'k6';
 const chatStreamLatency = new Trend('chat_stream_duration');
 const chatNoStreamLatency = new Trend('chat_nostream_duration');
 
+function between(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+}
+
 function choose(list) {
-  return list[Math.floor(Math.random() * list.length)];
+  return list[between(0, list.length)];
 }
 
 export function chat(baseUrl, stream = true) {
@@ -55,6 +61,6 @@ export function chat(baseUrl, stream = true) {
     const latencyMetric = stream ? chatStreamLatency : chatNoStreamLatency;
     latencyMetric.add(response.timings.duration, { type: 'API' });
 
-    sleep(1);
+    sleep(between(5, 20));
   });
 }
