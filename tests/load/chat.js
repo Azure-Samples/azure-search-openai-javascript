@@ -47,6 +47,10 @@ export function chat(baseUrl, stream = true) {
 
     const response = http.post(`${baseUrl}/chat`, payload, parameters);
 
+    if (response.status !== 200) {
+      console.log(`Response: ${response.status} ${response.body}`);
+    }
+
     // add duration property to metric
     const latencyMetric = stream ? chatStreamLatency : chatNoStreamLatency;
     latencyMetric.add(response.timings.duration, { type: 'API' });
