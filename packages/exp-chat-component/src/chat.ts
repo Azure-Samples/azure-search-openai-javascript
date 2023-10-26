@@ -73,7 +73,7 @@ export class ChatComponent extends LitElement {
   options: ChatComponentOptions = defaultOptions;
 
   @property() question = '';
-  @state() protected messages: ChatMessage[] = [];
+  @property({ type: Array }) messages: ChatMessage[] = [];
   @state() protected hasError = false;
   @state() protected isLoading = false;
   @state() protected isStreaming = false;
