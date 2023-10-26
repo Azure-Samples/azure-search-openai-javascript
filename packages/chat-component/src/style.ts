@@ -5,13 +5,13 @@ export const mainStyle = css`
     width: 100vw;
     display: block;
     padding: 16px;
-    --secondary-color: #f8fffd;
+    --secondary-color: #f5f5f5;
     --text-color: #123f58;
     --primary-color: rgba(241, 255, 165, 0.6);
     --white: #fff;
     --light-gray: #e3e3e3;
     --dark-gray: #4e5288;
-    --accent-high: #8cdef2;
+    --accent-high: #0040ff;
     --accent-dark: #002b23;
     --accent-light: #e6fbf7;
     --accent-lighter: rgba(140, 222, 242, 0.4);
@@ -102,7 +102,7 @@ export const mainStyle = css`
     color: var(--text-color);
     font-size: 1.5rem;
     padding: 0;
-    margin: 0;
+    margin: 10px 0;
   }
   .subheadline {
     color: var(--text-color);
@@ -164,7 +164,7 @@ export const mainStyle = css`
     position: sticky;
     bottom: 0;
     z-index: 1;
-    background: var(--accent-light);
+    background: var(--secondary-color);
   }
   .form__label {
     display: block;
@@ -254,7 +254,7 @@ export const mainStyle = css`
     height: 50px;
   }
   .chatbox__button {
-    background: var(--accent-high);
+    background: var(--white);
     border: none;
     color: var(--text-color);
     font-weight: bold;
@@ -262,6 +262,11 @@ export const mainStyle = css`
     border-radius: 4px;
     margin-left: 8px;
     width: 80px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  .chatbox__button:hover,
+  .chatbox__button:focus {
+    background: var(--secondary-color);
   }
   .chatbox__button--reset {
     position: absolute;
@@ -273,13 +278,12 @@ export const mainStyle = css`
     background: var(--accent-dark);
     border-radius: 50%;
     color: var(--white);
-    font-weight: bold;
+    font-wdafaeight: bold;
     height: 20px;
     width: 20px;
     cursor: pointer;
   }
   .chatbox__input {
-    border: 1px solid var(--accent-high);
     background: var(--white);
     color: var(--text-color);
     border-radius: 4px;
@@ -311,13 +315,16 @@ export const mainStyle = css`
     word-wrap: break-word;
     margin-block-end: 0;
     position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
   .chat__txt.error {
-    background-color: var(--error-color);
-    color: var(--white);
+    border: 3px solid var(--error-color);
+    color: var(--error-color);
   }
   .chat__txt.user-message {
     background-color: var(--accent-high);
+    color: var(--white);
+    font-weight: bold;
   }
   .chat__listItem.user-message {
     align-self: flex-end;
@@ -379,6 +386,7 @@ export const mainStyle = css`
     text-align: center;
     display: flex;
     flex-direction: column;
+    justify-content: center;
   }
   .defaults__list.always-row {
     text-align: left;
@@ -391,11 +399,11 @@ export const mainStyle = css`
   .defaults__listItem {
     padding: 10px;
     border-radius: 10px;
-    border: 1px solid var(--accent-high);
-    background: var(--secondary-color);
+    background: var(--white);
     margin: 4px;
     color: var(--text-color);
     justify-content: space-evenly;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
     @media (min-width: 768px) {
       min-height: 100px;
@@ -404,7 +412,7 @@ export const mainStyle = css`
   .defaults__listItem:hover,
   .defaults__listItem:focus {
     color: var(--accent-dark);
-    background: var(--accent-light);
+    background: var(--secondary-color);
     transition: all 0.3s ease-in-out;
   }
   .defaults__span {
@@ -412,6 +420,11 @@ export const mainStyle = css`
     display: block;
     margin-top: 20px;
     text-decoration: underline;
+  }
+  .citation {
+    background-color: var(--accent-lighter);
+    border-radius: 3px;
+    padding: 3px;
   }
   .loading-skeleton {
     display: flex;
@@ -421,7 +434,7 @@ export const mainStyle = css`
     width: 10px;
     height: 10px;
     margin: 0 5px;
-    background-color: var(--accent-high);
+    background-color: var(--accent-lighter);
     border-radius: 50%;
     animation: chatloadinganimation 1.5s infinite;
   }
