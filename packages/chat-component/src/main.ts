@@ -370,6 +370,7 @@ export class ChatComponent extends LitElement {
                 <a
                   class="items__link"
                   href="${this.apiUrl}/content/${citation.text}"
+                  data-testid="citation"
                   target="_blank"
                   rel="noopener noreferrer"
                   >${citation.ref}. ${citation.text}</a
@@ -423,6 +424,7 @@ export class ChatComponent extends LitElement {
                   <button
                     title="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
                     class="button chat__header--button"
+                    data-testid="chat-reset-button"
                     @click="${this.resetCurrentChat}"
                   >
                     <span class="chat__header--span">${globalConfig.RESET_CHAT_BUTTON_TITLE}</span>
@@ -440,6 +442,7 @@ export class ChatComponent extends LitElement {
                                 <button
                                   title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                                   class="button chat__header--button"
+                                  data-testid="chat-show-thought-process"
                                   @click="${this.showThoughtProcess}"
                                   ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
                                 >
@@ -516,6 +519,7 @@ export class ChatComponent extends LitElement {
                               role="button"
                               href="#"
                               class="defaults__button"
+                              data-testid="default-question"
                               @click="${(event: Event) => this.handleDefaultPromptClick(prompt, event)}"
                             >
                               ${prompt}
@@ -536,6 +540,7 @@ export class ChatComponent extends LitElement {
             <div class="chatbox__container container-col container-row">
               <input
                 class="chatbox__input"
+                data-testid="question-input"
                 id="question-input"
                 placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}"
                 aria-labelledby="chatbox-label"
@@ -549,6 +554,7 @@ export class ChatComponent extends LitElement {
               />
               <button
                 class="chatbox__button"
+                data-testid="submit-question-button"
                 @click="${this.handleUserChatSubmit}"
                 title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
                 ?disabled="${this.isDisabled}"
@@ -579,11 +585,12 @@ export class ChatComponent extends LitElement {
         </section>
         ${this.isShowingThoughtProcess
           ? html`
-              <aside class="aside">
+              <aside class="aside" data-testid="aside-thought-process">
                 <div class="aside__header">
                   <button
                     title="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                     class="button chat__header--button"
+                    data-testid="chat-hide-thought-process"
                     @click="${this.hideThoughtProcess}"
                   >
                     <span class="chat__header--span">${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span>
