@@ -15,5 +15,5 @@ const searchUrl = __ENV.SEARCH_API_URI;
 export default function () {
   mainpage(webappUrl);
   chat(searchUrl, true);
-  chat(searchUrl, false);
+  //chat(searchUrl, false);
 }

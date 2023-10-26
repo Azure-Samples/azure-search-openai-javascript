@@ -6,9 +6,10 @@ export const thresholdsSettings = {
 };
 
 export const standardWorkload = {
-  executor: 'constant-vus',
+  executor: 'per-vu-iterations',
   vus: 50,
-  duration: '50s',
+  iterations: 50,
+  maxDuration: '50s',
 };
 
 export const heavyWorkload = {
