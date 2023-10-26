@@ -1,10 +1,10 @@
 import { mainpage } from './mainpage.js';
 import { chat } from './chat.js';
-import { thresholdsSettings, stagedWorkload } from './config.js';
+import { thresholdsSettings, standardWorkload } from './config.js';
 
 export const options = {
   scenarios: {
-    staged: stagedWorkload,
+    staged: standardWorkload,
   },
   thresholds: thresholdsSettings,
 };

@@ -5,7 +5,13 @@ export const thresholdsSettings = {
   'http_req_duration{type:content}': ['p(99)<500'], // 99% of the content requests must complete below 500ms
 };
 
-export const stagedWorkload = {
+export const standardWorkload = {
+  executor: 'constant-vus',
+  vus: 50,
+  duration: '50s',
+};
+
+export const heavyWorkload = {
   executor: 'ramping-vus',
   stages: [
     { duration: '10s', target: 20 },
