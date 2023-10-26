@@ -20,3 +20,6 @@ dist/
 
 # misc
 TODO
+/test-results/
+/playwright-report/
+/playwright/.cache/

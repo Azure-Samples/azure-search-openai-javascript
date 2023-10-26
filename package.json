@@ -12,6 +12,7 @@
     "start:search": "npm run dev --workspace=search",
     "start:indexer": "npm run dev --workspace=indexer",
     "test": "npm run test -ws --if-present",
+    "test:playwright": "npx playwright test",
     "build": "npm run build -ws --if-present",
     "clean": "npm run clean -ws --if-present",
     "docker:build": "npm run docker:build -ws --if-present",
@@ -19,7 +20,8 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "prepare": "simple-git-hooks || echo 'simple-git-hooks install skipped'"
+    "prepare": "simple-git-hooks || echo 'simple-git-hooks install skipped'",
+    "install:playwright": "npx playwright install --with-deps"
   },
   "keywords": [],
   "author": "Microsoft",
@@ -28,7 +30,9 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@playwright/test": "^1.39.0",
     "@tapjs/nock": "^3.1.13",
+    "@types/node": "^18.15.3",
     "concurrently": "^8.2.1",
     "eslint-config-shared": "^1.0.0",
     "lint-staged": "^14.0.1",
