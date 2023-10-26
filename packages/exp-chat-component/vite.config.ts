@@ -15,4 +15,11 @@ export default defineConfig({
       fileName: 'azc-chat',
     },
   },
+  server: {
+    proxy: {
+      '/ask': 'http://127.0.0.1:3000',
+      '/chat': 'http://127.0.0.1:3000',
+      '/content': 'http://127.0.0.1:3000',
+    },
+  },
 });
