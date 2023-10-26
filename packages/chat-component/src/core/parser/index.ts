@@ -41,7 +41,9 @@ export async function parseStreamedMessages({
 
     // we use numeric values to identify the beginning of a step
     // if we match a number, store it in the buffer and move on to the next iteration
-    const LIST_ITEM_NUMBER = /(\d+)/;
+    const LIST_ITEM_NUMBER: RegExp = /(\d+)/;
+    const FOLLOW_UP_QUESTION_END: RegExp = /<<|>|>\?|>>/g;
+    // const FOLLOW_UP_QUESTION_START: RegExp = /<<|Next/;
     let matchedStepIndex = chunkValue.match(LIST_ITEM_NUMBER)?.[0];
     if (matchedStepIndex) {
       stepsBuffer.push(matchedStepIndex);
@@ -50,18 +52,39 @@ export async function parseStreamedMessages({
 
     // followup questions are marked either with the word 'Next Questions:' or '<<text>>' or both at the same time
     // these markers may be split across multiple chunks, so we need to buffer them!
-    // TODO: support followup questions wrapped in <<text>> markers
-    const matchedFollowupQuestionMarker = !isFollowupQuestion && chunkValue.includes('Next');
-    if (matchedFollowupQuestionMarker) {
-      followupQuestionsBuffer.push(chunkValue);
-      continue;
-    } else if (followupQuestionsBuffer.length > 0 && chunkValue.includes('Question')) {
-      isFollowupQuestion = true;
-      followupQuestionsBuffer.push(chunkValue);
-      continue;
-    } else if (isFollowupQuestion) {
-      isFollowupQuestion = true;
-      chunkValue = chunkValue.replace(/:?\n/, '');
+    // TODO: remove all this logic from the frontend!
+    const matchFollowUpCase1 = !isFollowupQuestion && chunkValue.includes('Next');
+    const matchFollowUpCase2 = !isFollowupQuestion && chunkValue.includes('<<');
+    if (followupQuestionsBuffer.length === 0) {
+      if (matchFollowUpCase1) {
+        chunkValue = chunkValue.replace('Next Questions:', '');
+        followupQuestionsBuffer.push(chunkValue);
+        continue;
+      }
+      if (matchFollowUpCase2) {
+        followupQuestionsBuffer.push(chunkValue);
+        isFollowupQuestion = true;
+        chunkValue = chunkValue.replace('<<', '');
+        continue;
+      }
+    } else {
+      if (chunkValue.includes('Question')) {
+        isFollowupQuestion = true;
+        followupQuestionsBuffer.push(chunkValue);
+        continue;
+      }
+      if (isFollowupQuestion) {
+        if (
+          chunkValue.includes('<<') ||
+          chunkValue.includes('>') ||
+          chunkValue.includes('?>') ||
+          chunkValue.includes('>>')
+        ) {
+          chunkValue = chunkValue.replaceAll(FOLLOW_UP_QUESTION_END, '');
+        }
+        isFollowupQuestion = true;
+        chunkValue = chunkValue.replace(/:?\n/, '');
+      }
     }
 
     // if we are here, it means we have previously matched a number, followed by a dot (in current chunk)
@@ -136,7 +159,7 @@ export function updateCitationsEntry({
   const updateCitationReference = (match, capture) => {
     const citation = citations.find((citation) => citation.text === capture);
     if (citation) {
-      return `<sup>[${citation.ref}]</sup>`;
+      return `<sup class="citation">${citation.ref}</sup>`;
     }
     return match;
   };
