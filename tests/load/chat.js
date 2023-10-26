@@ -2,7 +2,8 @@ import http from 'k6/http';
 import { Trend } from 'k6/metrics';
 import { group, sleep } from 'k6';
 
-const chatLatency = new Trend('chat_duration');
+const chatStreamLatency = new Trend('chat_stream_duration');
+const chatNoStreamLatency = new Trend('chat_nostream_duration');
 
 function choose(list) {
   return list[Math.floor(Math.random() * list.length)];
@@ -47,7 +48,9 @@ export function chat(baseUrl, stream = true) {
     const response = http.post(`${baseUrl}/chat`, payload, parameters);
 
     // add duration property to metric
-    chatLatency.add(response.timings.duration, { type: 'API' });
+    const latencyMetric = stream ? chatStreamLatency : chatNoStreamLatency;
+    latencyMetric.add(response.timings.duration, { type: 'API' });
+
     sleep(1);
   });
 }

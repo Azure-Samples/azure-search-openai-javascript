@@ -1,5 +1,6 @@
 export const thresholdsSettings = {
-  http_req_failed: [{ threshold: 'rate<0.01' }], // less than 1% failed requests
+  'http_req_failed{type:API}': [{ threshold: 'rate<0.01' }], // less than 1% failed requests
+  'http_req_failed{type:content}': [{ threshold: 'rate<0.01' }], // less than 1% failed requests
   'http_req_duration{type:API}': ['p(95)<30000'], // 95% of the API requests must complete below 30s
   'http_req_duration{type:content}': ['p(99)<500'], // 99% of the content requests must complete below 500ms
 };
