@@ -16,6 +16,7 @@ import iconDoubleCheck from '../public/svg/doublecheck-icon.svg?inline';
 import iconCopyToClipboard from '../public/svg/copy-icon.svg?inline';
 import iconSend from '../public/svg/send-icon.svg?inline';
 import iconClose from '../public/svg/close-icon.svg?inline';
+import iconQuestion from '../public/svg/question-icon.svg?inline';
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -385,20 +386,29 @@ export class ChatComponent extends LitElement {
     // render followup questions
     if (followupQuestions && followupQuestions.length > 0) {
       return html`
-        <ul class="items__list followup">
-          ${followupQuestions.map(
-            (followupQuestion) => html`
-              <li class="items__listItem--followup">
-                <a
-                  class="items__link"
-                  href="#"
-                  @click="${(event: Event) => this.handleDefaultPromptClick(followupQuestion, event)}"
-                  >${followupQuestion}</a
-                >
-              </li>
-            `,
-          )}
-        </ul>
+        <div class="items__listWrapper">
+          <img
+            class="icon"
+            src="${iconQuestion}"
+            alt="${globalConfig.FOLLOW_UP_QUESTIONS_LABEL_TEXT}"
+            width="35"
+            height="35"
+          />
+          <ul class="items__list followup">
+            ${followupQuestions.map(
+              (followupQuestion) => html`
+                <li class="items__listItem--followup">
+                  <a
+                    class="items__link"
+                    href="#"
+                    @click="${(event: Event) => this.handleDefaultPromptClick(followupQuestion, event)}"
+                    >${followupQuestion}</a
+                  >
+                </li>
+              `,
+            )}
+          </ul>
+        </div>
       `;
     }
 

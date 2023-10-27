@@ -9,12 +9,13 @@ export const mainStyle = css`
     --text-color: #123f58;
     --primary-color: rgba(241, 255, 165, 0.6);
     --white: #fff;
+    --black: #111111;
     --light-gray: #e3e3e3;
     --dark-gray: #4e5288;
-    --accent-high: #0040ff;
+    --accent-high: #b200ff;
     --accent-dark: #002b23;
     --accent-light: #e6fbf7;
-    --accent-lighter: rgba(140, 222, 242, 0.4);
+    --accent-lighter: rgba(242, 140, 241, 0.4);
     --error-color: #8a0000;
   }
   :host(.dark) {
@@ -73,8 +74,8 @@ export const mainStyle = css`
     display: flex;
     width: 100%;
     height: 0;
-    background: var(--accent-dark);
-    z-index: 1;
+    background: var(--black);
+    z-index: 2;
     opacity: 0.8;
     transition: all 0.3s ease-in-out;
   }
@@ -147,7 +148,7 @@ export const mainStyle = css`
     .aside {
       top: 30px;
       left: auto;
-      z-index: 2;
+      z-index: 3;
       background: var(--white);
       display: block;
       padding: 20px;
@@ -164,7 +165,10 @@ export const mainStyle = css`
     position: sticky;
     bottom: 0;
     z-index: 1;
+    border-radius: 10px;
     background: var(--secondary-color);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 15px 10px 50px;
   }
   .form__label {
     display: block;
@@ -185,7 +189,7 @@ export const mainStyle = css`
     border-bottom: 4px solid var(--accent-high);
   }
   .aside__link:not(.active):hover {
-    border-bottom: 4px solid var(--accent-light);
+    border-bottom: 4px solid var(--accent-lighter);
     cursor: pointer;
   }
   .aside__link {
@@ -338,23 +342,30 @@ export const mainStyle = css`
   .user-message .chat__txt--info {
     text-align: right;
   }
+  .items__listWrapper {
+    border-top: 1px dotted var(--light-gray);
+    display: flex;
+  }
+  .items__listWrapper .icon {
+    padding-top: 35px;
+    opacity: 0.3;
+  }
   .items__list.followup {
     display: flex;
     flex-direction: row;
     padding: 20px;
     list-style-type: none;
     flex-wrap: wrap;
-    border-top: 1px dotted var(--light-gray);
   }
   .items__list {
-    margin-top: 10px;
+    margin: 10px 0;
     display: block;
   }
   .items__listItem--followup {
     cursor: pointer;
-    padding: 0 5px;
-    border-radius: 5px;
-    border: 1px solid var(--accent-high);
+    padding: 0 15px;
+    border-radius: 15px;
+    border: 2px solid var(--accent-high);
     margin: 5px;
   }
   .items__listItem--citation {
@@ -387,6 +398,7 @@ export const mainStyle = css`
     text-decoration: none;
     color: var(--text-color);
     display: block;
+    font-size: 1.2rem;
   }
   .defaults__list {
     list-style-type: none;
@@ -424,6 +436,7 @@ export const mainStyle = css`
     transition: all 0.3s ease-in-out;
   }
   .defaults__span {
+    color: var(--accent-high);
     font-weight: bold;
     display: block;
     margin-top: 20px;
