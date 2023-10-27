@@ -17,6 +17,7 @@ export async function parseStreamedMessages({
   let isProcessingStep = false;
   let isLastStep = false;
   let isFollowupQuestion = false;
+  let followUpQuestionIndex = 0;
   let stepIndex = 0;
   let textBlockIndex = 0;
   const result = {
@@ -42,7 +43,7 @@ export async function parseStreamedMessages({
     // we use numeric values to identify the beginning of a step
     // if we match a number, store it in the buffer and move on to the next iteration
     const LIST_ITEM_NUMBER: RegExp = /(\d+)/;
-    const FOLLOW_UP_QUESTION_END: RegExp = /<<|>|>\?|>>/g;
+    const FOLLOW_UP_QUESTION: RegExp = /<<|>|>\?|>>/g;
     // const FOLLOW_UP_QUESTION_START: RegExp = /<<|Next/;
     let matchedStepIndex = chunkValue.match(LIST_ITEM_NUMBER)?.[0];
     if (matchedStepIndex) {
@@ -53,38 +54,28 @@ export async function parseStreamedMessages({
     // followup questions are marked either with the word 'Next Questions:' or '<<text>>' or both at the same time
     // these markers may be split across multiple chunks, so we need to buffer them!
     // TODO: remove all this logic from the frontend!
-    const matchFollowUpCase1 = !isFollowupQuestion && chunkValue.includes('Next');
-    const matchFollowUpCase2 = !isFollowupQuestion && chunkValue.includes('<<');
-    if (followupQuestionsBuffer.length === 0) {
-      if (matchFollowUpCase1) {
-        chunkValue = chunkValue.replace('Next Questions:', '');
-        followupQuestionsBuffer.push(chunkValue);
-        continue;
-      }
-      if (matchFollowUpCase2) {
-        followupQuestionsBuffer.push(chunkValue);
-        isFollowupQuestion = true;
-        chunkValue = chunkValue.replace('<<', '');
-        continue;
-      }
-    } else {
-      if (chunkValue.includes('Question')) {
-        isFollowupQuestion = true;
-        followupQuestionsBuffer.push(chunkValue);
-        continue;
-      }
-      if (isFollowupQuestion) {
-        if (
-          chunkValue.includes('<<') ||
-          chunkValue.includes('>') ||
-          chunkValue.includes('?>') ||
-          chunkValue.includes('>>')
-        ) {
-          chunkValue = chunkValue.replaceAll(FOLLOW_UP_QUESTION_END, '');
-        }
-        isFollowupQuestion = true;
-        chunkValue = chunkValue.replace(/:?\n/, '');
-      }
+
+    const matchedFollowupQuestionMarker =
+      (!isFollowupQuestion && chunkValue.includes('Next')) || chunkValue.includes('<<');
+    if (matchedFollowupQuestionMarker) {
+      followupQuestionsBuffer.push(chunkValue);
+      continue;
+    } else if (followupQuestionsBuffer.length > 0 && chunkValue.includes('Question')) {
+      isFollowupQuestion = true;
+      followupQuestionsBuffer.push(chunkValue);
+      continue;
+    } else if (chunkValue.includes('<<') && isFollowupQuestion) {
+      isFollowupQuestion = true;
+      chunkValue = chunkValue.replaceAll(FOLLOW_UP_QUESTION, '');
+      continue;
+    } else if (chunkValue.includes('?>') || chunkValue.includes('>')) {
+      followUpQuestionIndex = followUpQuestionIndex + 1;
+      isFollowupQuestion = true;
+      chunkValue = chunkValue.replaceAll(FOLLOW_UP_QUESTION, '');
+      continue;
+    } else if (isFollowupQuestion) {
+      isFollowupQuestion = true;
+      chunkValue = chunkValue.replace(/:?\n/, '');
     }
 
     // if we are here, it means we have previously matched a number, followed by a dot (in current chunk)
@@ -110,11 +101,10 @@ export async function parseStreamedMessages({
 
     // if we are at the beginning of a step, we need to remove the step number and dot from the chunk value
     // we simply clear the current chunk value
-    if (matchedStepIndex || isProcessingStep) {
+    if (matchedStepIndex || isProcessingStep || isFollowupQuestion) {
       if (matchedStepIndex) {
         chunkValue = '';
       }
-
       // set the step index that is needed to update the correct step entry
       stepIndex = matchedStepIndex ? Number(matchedStepIndex) - 1 : stepIndex;
       updateFollowingStepOrFollowupQuestionEntry({
@@ -122,6 +112,7 @@ export async function parseStreamedMessages({
         textBlockIndex,
         stepIndex,
         isFollowupQuestion,
+        followUpQuestionIndex,
         chatThread,
       });
 
@@ -225,18 +216,20 @@ export function updateFollowingStepOrFollowupQuestionEntry({
   textBlockIndex,
   stepIndex,
   isFollowupQuestion,
+  followUpQuestionIndex,
   chatThread,
 }: {
   chunkValue: string;
   textBlockIndex: number;
   stepIndex: number;
   isFollowupQuestion: boolean;
+  followUpQuestionIndex: number;
   chatThread: ChatThreadEntry[];
 }) {
   // following steps and followup questions are treated the same way. They are just stored in different arrays
   const { followupQuestions, text: lastChatMessageTextEntry } = chatThread.at(-1) as ChatThreadEntry;
   if (isFollowupQuestion && followupQuestions) {
-    followupQuestions[stepIndex] = (followupQuestions[stepIndex] || '') + chunkValue;
+    followupQuestions[followUpQuestionIndex] = (followupQuestions[followUpQuestionIndex] || '') + chunkValue;
     return;
   }
 
