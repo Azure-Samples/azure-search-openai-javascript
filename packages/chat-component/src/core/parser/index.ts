@@ -52,9 +52,10 @@ export async function parseStreamedMessages({
     // followup questions are marked either with the word 'Next Questions:' or '<<text>>' or both at the same time
     // these markers may be split across multiple chunks, so we need to buffer them!
     // TODO: remove all this logic from the frontend and implement a solution on the backend or with TypeChat
-
+    // we start by creating a buffer when we match the first marker
     const matchedFollowupQuestionMarker =
       (!isFollowupQuestion && chunkValue.includes('Next')) || chunkValue.includes('<<');
+    // once we do, we can assume that we are processing a followup question and set the flag to true
     if (matchedFollowupQuestionMarker) {
       isFollowupQuestion = true;
       followupQuestionsBuffer.push(chunkValue);
@@ -63,13 +64,18 @@ export async function parseStreamedMessages({
       isFollowupQuestion = true;
       followupQuestionsBuffer.push(chunkValue);
       continue;
+      // if we're already processing questions, we don't need to check for the marker again
+      // but we need to check if we reached the end of the followup questions
     } else if (chunkValue.includes('<<') && isFollowupQuestion) {
       isFollowupQuestion = true;
       continue;
+      // this updates the index, so we add each question to a different array entry
+      // to simplify styling
     } else if (chunkValue.includes('?>') || chunkValue.includes('>')) {
       followUpQuestionIndex = followUpQuestionIndex + 1;
       isFollowupQuestion = true;
       continue;
+      // additional returns need to be removed, but only after we have processed the whole set of chunks
     } else if (isFollowupQuestion) {
       isFollowupQuestion = true;
       chunkValue = chunkValue.replace(/:?\n/, '');
