@@ -4,11 +4,20 @@ import { map } from 'lit/directives/map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
-import { type ChatRequestOptions, type ChatResponse, type ChatMessage, type ChatResponseChunk } from '../models.js';
+import {
+  type ChatRequestOptions,
+  type ChatResponse,
+  type ChatMessage,
+  type ChatResponseChunk,
+  ChatDebugDetails,
+  ChatMessageContext,
+} from '../models.js';
 import { getCitationUrl, getCompletion } from '../api.js';
 import { type ParsedMessage, parseMessageIntoHtml } from '../message-parser.js';
 import sendSvg from '../../assets/send.svg?raw';
 import questionSvg from '../../assets/question.svg?raw';
+import lightbulbSvg from '../../assets/lightbulb.svg?raw';
+import './debug';
 
 export type ChatComponentState = {
   hasError: boolean;
@@ -25,6 +34,10 @@ export type ChatComponentOptions = ChatRequestOptions & {
     promptSuggestionsTitle: string;
     citationsTitle: string;
     followUpQuestionsTitle: string;
+    showThoughtProcessTitle: string;
+    closeTitle: string;
+    thoughtsTitle: string;
+    supportingContentTitle: string;
     chatInputPlaceholder: string;
     chatInputButtonLabel: string;
     assistant: string;
@@ -53,6 +66,10 @@ export const defaultOptions: ChatComponentOptions = {
     promptSuggestionsTitle: 'Ask anything or try an example',
     citationsTitle: 'Citations:',
     followUpQuestionsTitle: 'Follow-up questions:',
+    showThoughtProcessTitle: 'Show thought process',
+    closeTitle: 'Close',
+    thoughtsTitle: 'Thought process',
+    supportingContentTitle: 'Supporting Content',
     chatInputPlaceholder: 'Ask me anything...',
     chatInputButtonLabel: 'Send question',
     assistant: 'Support Assistant',
@@ -86,6 +103,7 @@ export class ChatComponent extends LitElement {
   @state() protected hasError = false;
   @state() protected isLoading = false;
   @state() protected isStreaming = false;
+  @state() protected debugDetails?: ChatDebugDetails;
   @query('.messages') protected messagesElement;
   @query('.chat-input') protected chatInputElement;
 
@@ -104,6 +122,13 @@ export class ChatComponent extends LitElement {
       event.preventDefault();
       this.onSendClicked();
     }
+  }
+
+  onShowDebugClicked(context: ChatMessageContext = {}) {
+    this.debugDetails = {
+      thoughts: context.thoughts ?? '',
+      dataPoints: context.data_points ?? [],
+    };
   }
 
   async onSendClicked(isRetry = false) {
@@ -228,7 +253,19 @@ export class ChatComponent extends LitElement {
   protected renderMessage = (message: ParsedMessage) => {
     return html`
       <div class="message ${message.role} animation">
-        ${message.role === 'assistant' ? html`<slot name="message-header"></slot>` : nothing}
+        ${message.role === 'assistant'
+          ? html`<slot name="message-header">
+              <div class="debug-buttons">
+                <button
+                  class="button"
+                  @click=${() => this.onShowDebugClicked(message.context)}
+                  title=${this.options.strings.showThoughtProcessTitle}
+                >
+                  ${unsafeSVG(lightbulbSvg)}
+                </button>
+              </div>
+            </slot>`
+          : nothing}
         <div class="message-body">
           <div class="content">${message.html}</div>
           ${message.citations.length > 0
@@ -331,6 +368,20 @@ export class ChatComponent extends LitElement {
         </div>
         ${this.renderChatInput()}
       </section>
+      ${this.debugDetails
+        ? html`<section class="debug-details">
+            <azc-debug .details=${this.debugDetails} .options=${this.options}>
+              <button
+                slot="close-button"
+                class="button close-button"
+                @click=${() => (this.debugDetails = undefined)}
+                title=${this.options.strings.closeTitle}
+              >
+                X
+              </button>
+            </azc-debug>
+          </section>`
+        : nothing}
     `;
   }
 
@@ -351,6 +402,7 @@ export class ChatComponent extends LitElement {
       --space-xxs: var(--azc-space-xs, calc(var(--space-md) / 4));
       --border-radius: var(--azc-border-radius, 16px);
       --focus-outline: var(--azc-focus-outline, 2px solid);
+      --overlay-color: var(--azc-overlay-color, rgba(0 0 0 / 40%));
 
       /* Component-specific properties */
       --error-color: var(--azc-error-color, var(--error));
@@ -534,11 +586,23 @@ export class ChatComponent extends LitElement {
         background: color-mix(in srgb, var(--card-bg), var(--primary) 5%);
       }
     }
+    .debug-buttons {
+      display: flex;
+      justify-content: right;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    .debug-details {
+      position: fixed;
+      inset: 0;
+      background: var(--overlay-color);
+    }
+    .button,
     .submit-button {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 48px;
+      padding: var(--space-xs);
       border: var(--button-border);
       background: var(--submit-button-bg);
       color: var(--submit-button-color);
@@ -547,6 +611,20 @@ export class ChatComponent extends LitElement {
       }
       &:hover:not(:disabled) {
         background: var(--submit-button-bg-hover);
+      }
+    }
+    .submit-button {
+      padding: 0;
+      width: 48px;
+    }
+    .close-button {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      width: auto;
+      padding: var(--space-md);
+      &:hover:not(:disabled) {
+        background: var(--card-bg);
       }
     }
     .error {
