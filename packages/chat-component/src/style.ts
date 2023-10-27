@@ -345,6 +345,10 @@ export const mainStyle = css`
     list-style-type: none;
     flex-wrap: wrap;
   }
+  .items__list.followup {
+    margin-top: 10px;
+    border-top: 1px dotted var(--light-gray);
+  }
   .items__list.steps {
     display: block;
   }

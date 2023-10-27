@@ -360,8 +360,7 @@ export class ChatComponent extends LitElement {
     // render citations
     if (citations && citations.length > 0) {
       return html`
-        <h3 class="subheadline--small">Citations</h3>
-        <ol class="items__list">
+        <ol class="items__list citations">
           ${citations.map(
             (citation) => html`
               <li class="items__listItem--citation">
@@ -386,7 +385,6 @@ export class ChatComponent extends LitElement {
     // render followup questions
     if (followupQuestions && followupQuestions.length > 0) {
       return html`
-        <h3 class="subheadline--small">You may also want to ask...</h3>
         <ul class="items__list followup">
           ${followupQuestions.map(
             (followupQuestion) => html`
@@ -469,8 +467,8 @@ export class ChatComponent extends LitElement {
                                 </button>
                               </div>`}
                           ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
-                          ${this.renderFollowupQuestions(message.followupQuestions)}
                           ${this.renderCitation(message.citations)}
+                          ${this.renderFollowupQuestions(message.followupQuestions)}
                         </div>
                         <p class="chat__txt--info">
                           <span class="timestamp">${message.timestamp}</span>,
