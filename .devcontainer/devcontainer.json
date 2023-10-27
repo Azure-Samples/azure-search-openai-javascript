@@ -20,7 +20,8 @@
       "version": "latest",
       "installBicep": true
     },
-    "ghcr.io/azure/azure-dev/azd:latest": {}
+    "ghcr.io/azure/azure-dev/azd:latest": {},
+    "ghcr.io/devcontainers-contrib/features/k6:1": {}
   },
 
   // Configure tool-specific properties.

@@ -1,4 +1,7 @@
 module.exports = {
+  globals: {
+    __ENV: 'readonly',
+  },
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
