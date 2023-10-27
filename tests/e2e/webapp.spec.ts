@@ -29,6 +29,7 @@ test.describe('default', () => {
     await page.routeFromHAR('./tests/e2e/hars/default-chat-response-stream.har', {
       url: '/chat',
       update: false,
+      updateContent: 'embed',
     });
 
     const showThoughtProcess = page.getByTestId('chat-show-thought-process');
@@ -54,6 +55,64 @@ test.describe('default', () => {
     await test.step('Reset chat', async () => {
       await page.getByTestId('chat-reset-button').click();
       await expect(userMessage).toHaveCount(0);
+      await expect(defaultQuestions).toHaveCount(3);
+    });
+  });
+
+  test('ask interaction', async ({ page }) => {
+    await page.goto('/');
+    const chatLink = page.getByRole('link', { name: 'Chat' });
+    const askLink = page.getByRole('link', { name: 'Ask a question' });
+
+    await expect(chatLink).toHaveAttribute('aria-current', 'page');
+    await expect(askLink).not.toHaveAttribute('aria-current');
+    await askLink.click();
+    await expect(chatLink).not.toHaveAttribute('aria-current');
+    await expect(askLink).toHaveAttribute('aria-current', 'page');
+
+    const defaultQuestions = page.getByTestId('default-question');
+
+    // expect there to be at least 3 default question buttons on page load
+    await test.step('Get default questions', async () => {
+      await expect(defaultQuestions).toHaveCount(3);
+    });
+
+    const chatInput = page.getByTestId('question-input');
+    const firstQuestionButton = defaultQuestions.nth(0);
+    const firstQuestionText = ((await firstQuestionButton.textContent()) ?? '').replace('Ask now', '').trim();
+
+    // should not have any text at the start
+    await test.step('Use default question', async () => {
+      await expect(chatInput).toHaveValue('');
+
+      await firstQuestionButton.click();
+      await expect(chatInput).toHaveValue(firstQuestionText);
+    });
+
+    // Set to replay the response for a local route (will not be used for the official)
+    await page.routeFromHAR('./tests/e2e/hars/default-ask-response.har', {
+      url: '/ask',
+      update: false,
+      updateContent: 'embed',
+    });
+
+    const showThoughtProcess = page.getByTestId('chat-show-thought-process');
+    await test.step('Get answer', async () => {
+      await expect(showThoughtProcess).not.toBeVisible();
+
+      await page.getByTestId('submit-question-button').click();
+
+      // wait for the thought process button to be enabled.
+      await expect(showThoughtProcess).toBeEnabled({ timeout: 30_000 });
+
+      // expect some response
+      await expect(page.locator('.chat__txt--entry')).not.toHaveText('');
+      await expect(defaultQuestions).toHaveCount(0);
+    });
+
+    await test.step('Reset chat', async () => {
+      await page.getByTestId('chat-reset-button').click();
+      await expect(page.locator('.chat__txt--entry')).not.toBeVisible();
       await expect(defaultQuestions).toHaveCount(3);
     });
   });
