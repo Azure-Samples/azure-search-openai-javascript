@@ -43,7 +43,6 @@ export async function parseStreamedMessages({
     // we use numeric values to identify the beginning of a step
     // if we match a number, store it in the buffer and move on to the next iteration
     const LIST_ITEM_NUMBER: RegExp = /(\d+)/;
-    const FOLLOW_UP_QUESTION: RegExp = /<<|>|>\?|>>/g;
     let matchedStepIndex = chunkValue.match(LIST_ITEM_NUMBER)?.[0];
     if (matchedStepIndex) {
       stepsBuffer.push(matchedStepIndex);
@@ -66,12 +65,10 @@ export async function parseStreamedMessages({
       continue;
     } else if (chunkValue.includes('<<') && isFollowupQuestion) {
       isFollowupQuestion = true;
-      chunkValue = chunkValue.replaceAll(FOLLOW_UP_QUESTION, '');
       continue;
     } else if (chunkValue.includes('?>') || chunkValue.includes('>')) {
       followUpQuestionIndex = followUpQuestionIndex + 1;
       isFollowupQuestion = true;
-      chunkValue = chunkValue.replaceAll(FOLLOW_UP_QUESTION, '');
       continue;
     } else if (isFollowupQuestion) {
       isFollowupQuestion = true;
