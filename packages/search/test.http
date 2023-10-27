@@ -16,7 +16,7 @@ Content-Type: application/json
 
 {
   "messages": [{
-    "content": "What happens if a rental doesn't fit the description?",
+    "content": "How to search and book rentals?",
     "role": "user"
   }],
   "context": {
@@ -37,7 +37,7 @@ Content-Type: application/json
 
 {
   "messages": [{
-    "content": "What happens if a rental doesn't fit the description?",
+    "content": "How to search and book rentals?",
     "role": "user"
   }],
   "stream": true,
@@ -47,7 +47,7 @@ Content-Type: application/json
     "semantic_ranker": true,
     "semantic_captions": false,
     "top": 3,
-    "suggest_followup_questions": false
+    "suggest_followup_questions": true
   }
 }
 
