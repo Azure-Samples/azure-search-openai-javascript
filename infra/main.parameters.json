@@ -69,7 +69,7 @@
       "value": "${AZURE_USE_APPLICATION_INSIGHTS=false}"
     },
     "allowedOrigin": {
-      "value": "${ALLOWED_ORIGIN}"
+      "value": "${ALLOWED_ORIGIN=''}"
     },
     "aliasTag": {
       "value": "${AZURE_ALIAS}"
