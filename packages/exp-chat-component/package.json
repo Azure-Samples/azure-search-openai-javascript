@@ -19,7 +19,8 @@
     "build": "vite build && tsc",
     "watch": "vite build --watch --minify false",
     "lint": "lit-analyzer",
-    "clean": "rimraf dist *.tgz"
+    "clean": "rimraf dist *.tgz",
+    "postinstall": "npm run build"
   },
   "author": "Microsoft",
   "license": "MIT",
