@@ -10,6 +10,12 @@ import { type ParsedMessage, parseMessageIntoHtml } from '../message-parser.js';
 import sendSvg from '../../assets/send.svg?raw';
 import questionSvg from '../../assets/question.svg?raw';
 
+export type ChatComponentState = {
+  hasError: boolean;
+  isLoading: boolean;
+  isStreaming: boolean;
+};
+
 export type ChatComponentOptions = ChatRequestOptions & {
   oneShot: boolean;
   enablePromptSuggestions: boolean;
@@ -65,6 +71,7 @@ export const defaultOptions: ChatComponentOptions = {
  * Labels and other aspects are configurable via the `option` property.
  * @element azc-chat
  * @fires messagesUpdated - Fired when the message thread is updated
+ * @fires stateChanged - Fired when the state of the component changes
  * */
 @customElement('azc-chat')
 export class ChatComponent extends LitElement {
@@ -147,17 +154,35 @@ export class ChatComponent extends LitElement {
 
       this.isLoading = false;
       this.isStreaming = false;
-      const messagesUpdatedEvent = new CustomEvent('messagesUpdated', {
-        detail: { messages: this.messages },
-        bubbles: true,
-      });
-      this.dispatchEvent(messagesUpdatedEvent);
     } catch (error) {
       this.hasError = true;
       this.isLoading = false;
       this.isStreaming = false;
       console.error(error);
     }
+  }
+
+  override requestUpdate(name?: string, oldValue?: any) {
+    if (name === 'messages') {
+      const messagesUpdatedEvent = new CustomEvent('messagesUpdated', {
+        detail: { messages: this.messages },
+        bubbles: true,
+      });
+      this.dispatchEvent(messagesUpdatedEvent);
+    } else if (name === 'hasError' || name === 'isLoading' || name === 'isStreaming') {
+      const state = {
+        hasError: this.hasError,
+        isLoading: this.isLoading,
+        isStreaming: this.isStreaming,
+      };
+      const stateUpdatedEvent = new CustomEvent('stateChanged', {
+        detail: { state },
+        bubbles: true,
+      });
+      this.dispatchEvent(stateUpdatedEvent);
+    }
+
+    return super.requestUpdate(name, oldValue);
   }
 
   protected scrollToLastMessage() {
