@@ -1,15 +1,16 @@
 import { type HTMLTemplateResult, html, nothing } from 'lit';
-import { type Message } from './models.js';
+import { ChatMessage, type ChatMessageContext } from './models.js';
 
 export type ParsedMessage = {
   html: HTMLTemplateResult;
   citations: string[];
   followupQuestions: string[];
   role: string;
+  context?: ChatMessageContext;
 };
 
 export function parseMessageIntoHtml(
-  message: Message,
+  message: ChatMessage,
   renderCitationReference: (citation: string, index: number) => HTMLTemplateResult,
 ): ParsedMessage {
   if (message.role === 'user') {
@@ -18,6 +19,7 @@ export function parseMessageIntoHtml(
       citations: [],
       followupQuestions: [],
       role: message.role,
+      context: message.context,
     };
   }
 
@@ -58,5 +60,6 @@ export function parseMessageIntoHtml(
     citations,
     followupQuestions,
     role: message.role,
+    context: message.context,
   };
 }
