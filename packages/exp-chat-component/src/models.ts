@@ -36,6 +36,7 @@ export type ChatRequestOptions = {
   approach: Approaches;
   suggestFollowupQuestions: boolean;
   chunkIntervalMs: number;
+  apiUrl: string;
 } & ChatRequestOverrides;
 
 export type ChatRequestOverrides = {

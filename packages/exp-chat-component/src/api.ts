@@ -3,7 +3,8 @@ import { type ChatResponse, type ChatRequestOptions, type ChatResponseChunk } fr
 export const apiBaseUrl = import.meta.env.VITE_CHAT_API_URI || '';
 
 export async function getCompletion(options: ChatRequestOptions, oneShot = false) {
-  const response = await fetch(`${apiBaseUrl}/${oneShot ? 'ask' : 'chat'}`, {
+  const apiUrl = options.apiUrl || apiBaseUrl;
+  const response = await fetch(`${apiUrl}/${oneShot ? 'ask' : 'chat'}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
