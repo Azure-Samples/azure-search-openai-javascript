@@ -4,16 +4,17 @@ import { map } from 'lit/directives/map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
-import { type ChatRequestOptions, type ChatResponse, type ChatMessage, type ChatResponseChunk } from './models.js';
-import { getCitationUrl, getCompletion } from './api.js';
-import { type ParsedMessage, parseMessageIntoHtml } from './message-parser.js';
-import sendSvg from '../assets/send.svg?raw';
-import questionSvg from '../assets/question.svg?raw';
+import { type ChatRequestOptions, type ChatResponse, type ChatMessage, type ChatResponseChunk } from '../models.js';
+import { getCitationUrl, getCompletion } from '../api.js';
+import { type ParsedMessage, parseMessageIntoHtml } from '../message-parser.js';
+import sendSvg from '../../assets/send.svg?raw';
+import questionSvg from '../../assets/question.svg?raw';
 
 export type ChatComponentOptions = ChatRequestOptions & {
   oneShot: boolean;
   enablePromptSuggestions: boolean;
   promptSuggestions: string[];
+  apiUrl?: string;
   strings: {
     promptSuggestionsTitle: string;
     citationsTitle: string;
@@ -34,6 +35,7 @@ export const defaultOptions: ChatComponentOptions = {
   oneShot: false,
   stream: true,
   chunkIntervalMs: 30,
+  apiUrl: '',
   enablePromptSuggestions: true,
   promptSuggestions: [
     'How to search and book rentals?',
