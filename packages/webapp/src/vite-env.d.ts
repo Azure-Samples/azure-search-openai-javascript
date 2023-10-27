@@ -1,10 +1,14 @@
 /// <reference types="vite/client" />
 
-import type * as React from 'react';
+import { type DOMAttributes } from 'react';
+import { type ChatComponent } from '@azure/chat';
+
+type CustomElement<T> = Partial<T & DOMAttributes<T> & { children: any } & HTMLElement & HTMLAttributes<HTMLElement>>;
+
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      ['chat-component']: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+      ['azc-chat']: CustomElement<ChatComponent>;
     }
   }
 }

@@ -1,10 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
 import { RetrievalMode, apiBaseUrl } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
 import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
 import 'chat-component';
+import { ClearChatButton } from '../../components/ClearChatButton/index.js';
+import { type ChatComponentOptions, type ChatComponent, defaultOptions, type ChatMessage } from '@azure/chat';
+
+const baseChatOption: ChatComponentOptions = {
+  ...defaultOptions,
+  apiUrl: apiBaseUrl,
+};
 
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -14,24 +21,27 @@ const Chat = () => {
   const [useSemanticRanker, setUseSemanticRanker] = useState<boolean>(true);
   const [useStream, setUseStream] = useState<boolean>(true);
   const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(false);
-  const [excludeCategory, setExcludeCategory] = useState<string>('');
+  const [, setExcludeCategory] = useState<string>('');
   const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(true);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [chatOptions, setChatOptions] = useState<ChatComponentOptions>(baseChatOption);
 
-  const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [isLoading] = useState<boolean>(false);
-
-  useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' }), [isLoading]);
+  const chatElement = useRef<ChatComponent>();
 
   const onPromptTemplateChange = (
     _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-    newValue?: string,
+    newValue: string = '',
   ) => {
-    setPromptTemplate(newValue || '');
+    setPromptTemplate(newValue);
+    setChatOptions({ ...chatOptions, promptTemplate: newValue });
   };
 
   const onRetrieveCountChange = (_event?: React.SyntheticEvent<HTMLElement, Event>, newValue?: string) => {
-    setRetrieveCount(Number.parseInt(newValue || '3'));
+    const value = Number.parseInt(newValue || '3');
+    setRetrieveCount(value);
+    setChatOptions({ ...chatOptions, top: value });
   };
 
   const onRetrievalModeChange = (
@@ -39,61 +49,82 @@ const Chat = () => {
     option?: IDropdownOption<RetrievalMode> | undefined,
     _index?: number | undefined,
   ) => {
-    setRetrievalMode(option?.data || RetrievalMode.Hybrid);
+    const value = option?.data || RetrievalMode.Hybrid;
+    setRetrievalMode(value);
+    setChatOptions({ ...chatOptions, retrievalMode: value });
   };
 
   const onUseSemanticRankerChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setUseSemanticRanker(!!checked);
+    const value = !!checked;
+    setUseSemanticRanker(value);
+    setChatOptions({ ...chatOptions, semanticRanker: value });
   };
 
   const onUseSemanticCaptionsChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setUseSemanticCaptions(!!checked);
+    const value = !!checked;
+    setUseSemanticCaptions(value);
+    setChatOptions({ ...chatOptions, semanticCaptions: value });
   };
 
   const onUseStreamChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    setUseStream(!!checked);
+    const value = !!checked;
+    setUseStream(value);
+    setChatOptions({ ...chatOptions, stream: value });
   };
 
-  const onExcludeCategoryChanged = (_event?: React.FormEvent, newValue?: string) => {
-    setExcludeCategory(newValue || '');
+  const onExcludeCategoryChanged = (_event?: React.FormEvent, newValue: string = '') => {
+    setExcludeCategory(newValue);
+    setChatOptions({ ...chatOptions, excludeCategory: newValue });
   };
 
   const onUseSuggestFollowupQuestionsChange = (
     _event?: React.FormEvent<HTMLElement | HTMLInputElement>,
     checked?: boolean,
   ) => {
-    setUseSuggestFollowupQuestions(!!checked);
+    const value = !!checked;
+    setUseSuggestFollowupQuestions(value);
+    setChatOptions({ ...chatOptions, suggestFollowupQuestions: value });
   };
 
-  const overrides = {
-    retrievalMode,
-    top: retrieveCount,
-    useSemanticRanker,
-    useSemanticCaptions,
-    excludeCategory,
-    promptTemplate,
-    promptTemplatePrefix: '',
-    promptTemplateSuffix: '',
-    suggestFollowupQuestions: useSuggestFollowupQuestions,
+  const onMessagesUpdated = (event: Event) => {
+    const customEvent = event as CustomEvent;
+    setMessages(customEvent.detail.messages);
   };
+
+  const onStateChanged = (event: Event) => {
+    const customEvent = event as CustomEvent;
+    setIsLoading(customEvent.detail.state.isLoading);
+  };
+
+  const clearChat = () => {
+    setMessages([]);
+  };
+
+  useLayoutEffect(() => {
+    // Register event handlers for web component
+    const { current } = chatElement;
+    current?.addEventListener('messagesUpdated', onMessagesUpdated);
+    current?.addEventListener('stateChanged', onStateChanged);
+
+    return () => {
+      current?.removeEventListener('messagesUpdated', onStateChanged);
+      current?.removeEventListener('stateChanged', onStateChanged);
+    };
+  }, [chatElement]);
 
   return (
     <div className={styles.container}>
       <div className={styles.commandsContainer}>
+        <ClearChatButton className={styles.commandButton} onClick={clearChat} disabled={isLoading} />
         <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
       </div>
       <div className={styles.chatRoot}>
-        <div className={styles.chatEmptyState}>
-          <chat-component
-            title="Ask anything or try an example"
-            data-input-position="sticky"
-            data-interaction-model="chat"
-            data-api-url={apiBaseUrl}
-            data-use-stream={useStream}
-            data-approach="rrr"
-            data-overrides={JSON.stringify(overrides)}
-          ></chat-component>
-        </div>
+        <azc-chat
+          class={styles.chatComponent}
+          ref={chatElement}
+          options={JSON.stringify(chatOptions) as any}
+          messages={JSON.stringify(messages) as any}
+        ></azc-chat>
       </div>
 
       <Panel
