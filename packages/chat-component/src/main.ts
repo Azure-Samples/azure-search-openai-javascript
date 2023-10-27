@@ -343,7 +343,7 @@ export class ChatComponent extends LitElement {
   }
   // Render text entries in bubbles
   renderTextEntry(textEntry: ChatMessageText) {
-    const entries = [html`<p>${unsafeHTML(textEntry.value)}</p>`];
+    const entries = [html`<p class="chat__txt--entry">${unsafeHTML(textEntry.value)}</p>`];
 
     // render steps
     if (textEntry.followingSteps && textEntry.followingSteps.length > 0) {
