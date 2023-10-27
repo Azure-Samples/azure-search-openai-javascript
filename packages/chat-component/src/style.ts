@@ -344,12 +344,10 @@ export const mainStyle = css`
     padding: 20px;
     list-style-type: none;
     flex-wrap: wrap;
-  }
-  .items__list.followup {
-    margin-top: 10px;
     border-top: 1px dotted var(--light-gray);
   }
-  .items__list.steps {
+  .items__list {
+    margin-top: 10px;
     display: block;
   }
   .items__listItem--followup {
