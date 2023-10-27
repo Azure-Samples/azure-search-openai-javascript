@@ -10,7 +10,8 @@
   "exports": {
     ".": {
       "import": "./dist/azc-chat.js",
-      "require": "./dist/azc-chat.umd.cjs"
+      "require": "./dist/azc-chat.umd.cjs",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
