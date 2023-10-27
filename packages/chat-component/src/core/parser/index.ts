@@ -44,7 +44,6 @@ export async function parseStreamedMessages({
     // if we match a number, store it in the buffer and move on to the next iteration
     const LIST_ITEM_NUMBER: RegExp = /(\d+)/;
     const FOLLOW_UP_QUESTION: RegExp = /<<|>|>\?|>>/g;
-    // const FOLLOW_UP_QUESTION_START: RegExp = /<<|Next/;
     let matchedStepIndex = chunkValue.match(LIST_ITEM_NUMBER)?.[0];
     if (matchedStepIndex) {
       stepsBuffer.push(matchedStepIndex);
