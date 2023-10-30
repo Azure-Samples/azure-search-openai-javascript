@@ -118,6 +118,7 @@ export const mainStyle = css`
   }
   .chat__container {
     min-width: 100%;
+    min-height: 400px;
     transition: width 0.3s ease-in-out;
     max-height: 100vh;
   }

@@ -54,7 +54,7 @@ export function processText(inputText: string, arrays: Array<Array<string> | Arr
   // from the response answer
   const stepsIndex = replacedText.indexOf('s:');
   // eslint-disable-next-line unicorn/no-negated-condition, unicorn/prefer-string-slice
-  replacedText = stepsIndex !== -1 ? inputText.substring(0, stepsIndex + 4) : inputText;
+  replacedText = stepsIndex !== -1 ? inputText.substring(0, stepsIndex + 6) : inputText;
 
   arrays[2] = nextQuestions;
   return { replacedText, arrays };
