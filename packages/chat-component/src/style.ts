@@ -253,10 +253,18 @@ export const mainStyle = css`
     opacity: 0.5;
     cursor: not-allowed;
   }
+  .chatbox__button svg {
+    fill: var(--accent-high);
+    width: 25px;
+  }
   .chat__header--span {
     margin-right: 5px;
     text-align: left;
     font-size: smaller;
+  }
+  .chat__header--button svg {
+    fill: currentColor;
+    width: 12px;
   }
   .chatbox__container {
     position: relative;
@@ -272,10 +280,15 @@ export const mainStyle = css`
     margin-left: 8px;
     width: 80px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease-in-out;
   }
   .chatbox__button:hover,
   .chatbox__button:focus {
     background: var(--secondary-color);
+  }
+  .chatbox__button:hover svg,
+  .chatbox__button:focus svg {
+    opacity: 0.8;
   }
   .chatbox__button--reset {
     position: absolute;
@@ -351,9 +364,13 @@ export const mainStyle = css`
     border-top: 1px dotted var(--light-gray);
     display: flex;
   }
-  .items__listWrapper .icon {
-    padding-top: 35px;
-    opacity: 0.3;
+  .items__listWrapper svg {
+    fill: var(--accent-high);
+    width: 40px;
+    margin-left: 25px;
+  }
+  svg {
+    height: auto;
   }
   .items__list.followup {
     display: flex;
@@ -365,6 +382,9 @@ export const mainStyle = css`
   .items__list {
     margin: 10px 0;
     display: block;
+  }
+  svg {
+    fill: var(--text-color);
   }
   .items__listItem--followup {
     cursor: pointer;

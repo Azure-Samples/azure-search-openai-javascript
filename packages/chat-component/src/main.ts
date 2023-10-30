@@ -8,15 +8,17 @@ import { getAPIResponse } from './core/http/index.js';
 import { parseStreamedMessages } from './core/parser/index.js';
 import { mainStyle } from './style.js';
 import { getTimestamp, processText } from './utils/index.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 // TODO: allow host applications to customize these icons
-import iconLightBulb from '../public/svg/lightbulb-icon.svg?inline';
-import iconDelete from '../public/svg/delete-icon.svg?inline';
-import iconDoubleCheck from '../public/svg/doublecheck-icon.svg?inline';
-import iconCopyToClipboard from '../public/svg/copy-icon.svg?inline';
-import iconSend from '../public/svg/send-icon.svg?inline';
-import iconClose from '../public/svg/close-icon.svg?inline';
-import iconQuestion from '../public/svg/question-icon.svg?inline';
+
+import iconLightBulb from '../public/svg/lightbulb-icon.svg?raw';
+import iconDelete from '../public/svg/delete-icon.svg?raw';
+import iconSuccess from '../public/svg/success-icon.svg?raw';
+import iconCopyToClipboard from '../public/svg/copy-icon.svg?raw';
+import iconSend from '../public/svg/send-icon.svg?raw';
+import iconClose from '../public/svg/close-icon.svg?raw';
+import iconQuestion from '../public/svg/question-icon.svg?raw';
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -387,13 +389,7 @@ export class ChatComponent extends LitElement {
     if (followupQuestions && followupQuestions.length > 0) {
       return html`
         <div class="items__listWrapper">
-          <img
-            class="icon"
-            src="${iconQuestion}"
-            alt="${globalConfig.FOLLOW_UP_QUESTIONS_LABEL_TEXT}"
-            width="35"
-            height="35"
-          />
+          ${unsafeSVG(iconQuestion)}
           <ul class="items__list followup">
             ${followupQuestions.map(
               (followupQuestion) => html`
@@ -430,7 +426,7 @@ export class ChatComponent extends LitElement {
                     @click="${this.resetCurrentChat}"
                   >
                     <span class="chat__header--span">${globalConfig.RESET_CHAT_BUTTON_TITLE}</span>
-                    <img src="${iconDelete}" alt="${globalConfig.RESET_CHAT_BUTTON_TITLE}" width="12" height="12" />
+                    ${unsafeSVG(iconDelete)}
                   </button>
                 </div>
                 <ul class="chat__list" aria-live="assertive">
@@ -450,12 +446,8 @@ export class ChatComponent extends LitElement {
                                   <span class="chat__header--span"
                                     >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
                                   >
-                                  <img
-                                    src="${iconLightBulb}"
-                                    alt="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                                    width="12"
-                                    height="12"
-                                  />
+
+                                  ${unsafeSVG(iconLightBulb)}
                                 </button>
                                 <button
                                   title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
@@ -468,12 +460,7 @@ export class ChatComponent extends LitElement {
                                       ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
                                       : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
                                   >
-                                  <img
-                                    src="${this.isResponseCopied ? iconDoubleCheck : iconCopyToClipboard}"
-                                    alt="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-                                    width="12"
-                                    height="12"
-                                  />
+                                  ${this.isResponseCopied ? unsafeSVG(iconSuccess) : unsafeSVG(iconCopyToClipboard)}
                                 </button>
                               </div>`}
                           ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
@@ -566,7 +553,7 @@ export class ChatComponent extends LitElement {
                 title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
                 ?disabled="${this.isDisabled}"
               >
-                <img src="${iconSend}" alt="${globalConfig.CHAT_BUTTON_LABEL_TEXT}" width="25" height="25" />
+                ${unsafeSVG(iconSend)}
               </button>
               <button
                 title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
@@ -600,12 +587,7 @@ export class ChatComponent extends LitElement {
                     @click="${this.hideThoughtProcess}"
                   >
                     <span class="chat__header--span">${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span>
-                    <img
-                      src="${iconClose}"
-                      alt="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                      width="12"
-                      height="12"
-                    />
+                    ${unsafeSVG(iconClose)}
                   </button>
                 </div>
                 <nav class="aside__nav">
