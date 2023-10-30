@@ -166,7 +166,12 @@ export const mainStyle = css`
     bottom: 0;
     z-index: 1;
     border-radius: 10px;
-    background: var(--secondary-color);
+    background: linear-gradient(
+      0deg,
+      rgba(245, 245, 245, 1) 0%,
+      rgba(245, 245, 245, 0.6) 35%,
+      rgba(245, 245, 245, 0.2) 100%
+    );
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 15px 10px 50px;
   }
@@ -374,6 +379,7 @@ export const mainStyle = css`
     border-radius: 5px;
     text-decoration: none;
     padding: 5px;
+    margin-top: 5px;
     font-size: small;
   }
   .items__listItem--citation:not(first-child) {
@@ -446,6 +452,7 @@ export const mainStyle = css`
     background-color: var(--accent-lighter);
     border-radius: 3px;
     padding: 3px;
+    margin-left: 3px;
   }
   .loading-skeleton {
     display: flex;
