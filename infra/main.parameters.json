@@ -79,6 +79,9 @@
     },
     "aliasTag": {
       "value": "${AZURE_ALIAS}"
+    },
+    "isContinuousDeployment": {
+      "value": "${CI=false}"
     }
   }
 }

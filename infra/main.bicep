@@ -80,6 +80,8 @@ param allowedOrigin string
 
 // Only needed for CD due to internal policies restrictions
 param aliasTag string = ''
+// Differentiates between automated and manual deployments
+param isContinuousDeployment bool = false
 
 var abbrs = loadJsonContent('abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
@@ -371,7 +373,7 @@ module storage 'core/storage/storage-account.bicep' = {
 }
 
 // USER ROLES
-module openAiRoleUser 'core/security/role.bicep' = {
+module openAiRoleUser 'core/security/role.bicep' = if (!isContinuousDeployment) {
   scope: openAiResourceGroup
   name: 'openai-role-user'
   params: {
@@ -382,7 +384,7 @@ module openAiRoleUser 'core/security/role.bicep' = {
   }
 }
 
-module formRecognizerRoleUser 'core/security/role.bicep' = {
+module formRecognizerRoleUser 'core/security/role.bicep' = if (!isContinuousDeployment) {
   scope: formRecognizerResourceGroup
   name: 'formrecognizer-role-user'
   params: {
@@ -393,7 +395,7 @@ module formRecognizerRoleUser 'core/security/role.bicep' = {
   }
 }
 
-module storageContribRoleUser 'core/security/role.bicep' = {
+module storageContribRoleUser 'core/security/role.bicep' = if (!isContinuousDeployment) {
   scope: storageResourceGroup
   name: 'storage-contribrole-user'
   params: {
@@ -404,7 +406,7 @@ module storageContribRoleUser 'core/security/role.bicep' = {
   }
 }
 
-module searchContribRoleUser 'core/security/role.bicep' = {
+module searchContribRoleUser 'core/security/role.bicep' = if (!isContinuousDeployment) {
   scope: searchServiceResourceGroup
   name: 'search-contrib-role-user'
   params: {
@@ -415,7 +417,7 @@ module searchContribRoleUser 'core/security/role.bicep' = {
   }
 }
 
-module searchSvcContribRoleUser 'core/security/role.bicep' = {
+module searchSvcContribRoleUser 'core/security/role.bicep' = if (!isContinuousDeployment) {
   scope: searchServiceResourceGroup
   name: 'search-svccontrib-role-user'
   params: {
