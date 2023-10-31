@@ -17,6 +17,7 @@ export async function parseStreamedMessages({
   let isProcessingStep = false;
   let isLastStep = false;
   let isFollowupQuestion = false;
+  let followUpQuestionIndex = 0;
   let stepIndex = 0;
   let textBlockIndex = 0;
   const result = {
@@ -41,7 +42,7 @@ export async function parseStreamedMessages({
 
     // we use numeric values to identify the beginning of a step
     // if we match a number, store it in the buffer and move on to the next iteration
-    const LIST_ITEM_NUMBER = /(\d+)/;
+    const LIST_ITEM_NUMBER: RegExp = /(\d+)/;
     let matchedStepIndex = chunkValue.match(LIST_ITEM_NUMBER)?.[0];
     if (matchedStepIndex) {
       stepsBuffer.push(matchedStepIndex);
@@ -50,15 +51,31 @@ export async function parseStreamedMessages({
 
     // followup questions are marked either with the word 'Next Questions:' or '<<text>>' or both at the same time
     // these markers may be split across multiple chunks, so we need to buffer them!
-    // TODO: support followup questions wrapped in <<text>> markers
-    const matchedFollowupQuestionMarker = !isFollowupQuestion && chunkValue.includes('Next');
+    // TODO: remove all this logic from the frontend and implement a solution on the backend or with TypeChat
+    // we start by creating a buffer when we match the first marker
+    const matchedFollowupQuestionMarker =
+      (!isFollowupQuestion && chunkValue.includes('Next')) || chunkValue.includes('<<');
+    // once we do, we can assume that we are processing a followup question and set the flag to true
     if (matchedFollowupQuestionMarker) {
+      isFollowupQuestion = true;
       followupQuestionsBuffer.push(chunkValue);
       continue;
     } else if (followupQuestionsBuffer.length > 0 && chunkValue.includes('Question')) {
       isFollowupQuestion = true;
       followupQuestionsBuffer.push(chunkValue);
       continue;
+      // if we're already processing questions, we don't need to check for the marker again
+      // but we need to check if we reached the end of the followup questions
+    } else if (chunkValue.includes('<<') && isFollowupQuestion) {
+      isFollowupQuestion = true;
+      continue;
+      // this updates the index, so we add each question to a different array entry
+      // to simplify styling
+    } else if (chunkValue.includes('?>') || chunkValue.includes('>')) {
+      followUpQuestionIndex = followUpQuestionIndex + 1;
+      isFollowupQuestion = true;
+      continue;
+      // additional returns need to be removed, but only after we have processed the whole set of chunks
     } else if (isFollowupQuestion) {
       isFollowupQuestion = true;
       chunkValue = chunkValue.replace(/:?\n/, '');
@@ -87,11 +104,10 @@ export async function parseStreamedMessages({
 
     // if we are at the beginning of a step, we need to remove the step number and dot from the chunk value
     // we simply clear the current chunk value
-    if (matchedStepIndex || isProcessingStep) {
+    if (matchedStepIndex || isProcessingStep || isFollowupQuestion) {
       if (matchedStepIndex) {
         chunkValue = '';
       }
-
       // set the step index that is needed to update the correct step entry
       stepIndex = matchedStepIndex ? Number(matchedStepIndex) - 1 : stepIndex;
       updateFollowingStepOrFollowupQuestionEntry({
@@ -99,6 +115,7 @@ export async function parseStreamedMessages({
         textBlockIndex,
         stepIndex,
         isFollowupQuestion,
+        followUpQuestionIndex,
         chatThread,
       });
 
@@ -136,7 +153,7 @@ export function updateCitationsEntry({
   const updateCitationReference = (match, capture) => {
     const citation = citations.find((citation) => citation.text === capture);
     if (citation) {
-      return `<sup>[${citation.ref}]</sup>`;
+      return `<sup class="citation">${citation.ref}</sup>`;
     }
     return match;
   };
@@ -202,18 +219,20 @@ export function updateFollowingStepOrFollowupQuestionEntry({
   textBlockIndex,
   stepIndex,
   isFollowupQuestion,
+  followUpQuestionIndex,
   chatThread,
 }: {
   chunkValue: string;
   textBlockIndex: number;
   stepIndex: number;
   isFollowupQuestion: boolean;
+  followUpQuestionIndex: number;
   chatThread: ChatThreadEntry[];
 }) {
   // following steps and followup questions are treated the same way. They are just stored in different arrays
   const { followupQuestions, text: lastChatMessageTextEntry } = chatThread.at(-1) as ChatThreadEntry;
   if (isFollowupQuestion && followupQuestions) {
-    followupQuestions[stepIndex] = (followupQuestions[stepIndex] || '') + chunkValue;
+    followupQuestions[followUpQuestionIndex] = (followupQuestions[followUpQuestionIndex] || '') + chunkValue;
     return;
   }
 

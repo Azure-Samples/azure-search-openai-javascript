@@ -17,13 +17,15 @@ const globalConfig = {
   // This are the labels for the chat button and input
   CHAT_BUTTON_LABEL_TEXT: 'Ask Support',
   CHAT_INPUT_PLACEHOLDER: 'Type your question, eg. "How to search and book rentals?"',
-  USER_IS_BOT: 'Support Bot',
+  USER_IS_BOT: 'Support Assistant',
   RESET_BUTTON_LABEL_TEXT: 'X',
   RESET_BUTTON_TITLE_TEXT: 'Reset current question',
   RESET_CHAT_BUTTON_TITLE: 'Reset chat',
   // Copy response to clipboard
   COPY_RESPONSE_BUTTON_LABEL_TEXT: 'Copy Response',
   COPIED_SUCCESSFULLY_MESSAGE: 'Response copied!',
+  // Follow up questions text
+  FOLLOW_UP_QUESTIONS_LABEL_TEXT: 'You can also ask...',
   SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT: 'Show thought process',
   HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT: 'Hide thought process',
   LOADING_INDICATOR_TEXT: 'Please wait. We are searching for an answer...',

@@ -5,16 +5,17 @@ export const mainStyle = css`
     width: 100vw;
     display: block;
     padding: 16px;
-    --secondary-color: #f8fffd;
+    --secondary-color: #f5f5f5;
     --text-color: #123f58;
     --primary-color: rgba(241, 255, 165, 0.6);
     --white: #fff;
+    --black: #111111;
     --light-gray: #e3e3e3;
     --dark-gray: #4e5288;
-    --accent-high: #8cdef2;
+    --accent-high: #b200ff;
     --accent-dark: #002b23;
     --accent-light: #e6fbf7;
-    --accent-lighter: rgba(140, 222, 242, 0.4);
+    --accent-lighter: rgba(242, 140, 241, 0.4);
     --error-color: #8a0000;
   }
   :host(.dark) {
@@ -73,8 +74,8 @@ export const mainStyle = css`
     display: flex;
     width: 100%;
     height: 0;
-    background: var(--accent-dark);
-    z-index: 1;
+    background: var(--black);
+    z-index: 2;
     opacity: 0.8;
     transition: all 0.3s ease-in-out;
   }
@@ -102,7 +103,7 @@ export const mainStyle = css`
     color: var(--text-color);
     font-size: 1.5rem;
     padding: 0;
-    margin: 0;
+    margin: 10px 0;
   }
   .subheadline {
     color: var(--text-color);
@@ -117,6 +118,7 @@ export const mainStyle = css`
   }
   .chat__container {
     min-width: 100%;
+    min-height: 400px;
     transition: width 0.3s ease-in-out;
     max-height: 100vh;
   }
@@ -147,7 +149,7 @@ export const mainStyle = css`
     .aside {
       top: 30px;
       left: auto;
-      z-index: 2;
+      z-index: 3;
       background: var(--white);
       display: block;
       padding: 20px;
@@ -164,7 +166,15 @@ export const mainStyle = css`
     position: sticky;
     bottom: 0;
     z-index: 1;
-    background: var(--accent-light);
+    border-radius: 10px;
+    background: linear-gradient(
+      0deg,
+      rgba(245, 245, 245, 1) 0%,
+      rgba(245, 245, 245, 0.6) 35%,
+      rgba(245, 245, 245, 0.2) 100%
+    );
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 15px 10px 50px;
   }
   .form__label {
     display: block;
@@ -185,7 +195,7 @@ export const mainStyle = css`
     border-bottom: 4px solid var(--accent-high);
   }
   .aside__link:not(.active):hover {
-    border-bottom: 4px solid var(--accent-light);
+    border-bottom: 4px solid var(--accent-lighter);
     cursor: pointer;
   }
   .aside__link {
@@ -244,17 +254,25 @@ export const mainStyle = css`
     opacity: 0.5;
     cursor: not-allowed;
   }
+  .chatbox__button svg {
+    fill: var(--accent-high);
+    width: 25px;
+  }
   .chat__header--span {
     margin-right: 5px;
     text-align: left;
     font-size: smaller;
+  }
+  .chat__header--button svg {
+    fill: currentColor;
+    width: 12px;
   }
   .chatbox__container {
     position: relative;
     height: 50px;
   }
   .chatbox__button {
-    background: var(--accent-high);
+    background: var(--white);
     border: none;
     color: var(--text-color);
     font-weight: bold;
@@ -262,6 +280,16 @@ export const mainStyle = css`
     border-radius: 4px;
     margin-left: 8px;
     width: 80px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease-in-out;
+  }
+  .chatbox__button:hover,
+  .chatbox__button:focus {
+    background: var(--secondary-color);
+  }
+  .chatbox__button:hover svg,
+  .chatbox__button:focus svg {
+    opacity: 0.8;
   }
   .chatbox__button--reset {
     position: absolute;
@@ -273,13 +301,12 @@ export const mainStyle = css`
     background: var(--accent-dark);
     border-radius: 50%;
     color: var(--white);
-    font-weight: bold;
+    font-wdafaeight: bold;
     height: 20px;
     width: 20px;
     cursor: pointer;
   }
   .chatbox__input {
-    border: 1px solid var(--accent-high);
     background: var(--white);
     color: var(--text-color);
     border-radius: 4px;
@@ -311,13 +338,16 @@ export const mainStyle = css`
     word-wrap: break-word;
     margin-block-end: 0;
     position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
   .chat__txt.error {
-    background-color: var(--error-color);
-    color: var(--white);
+    border: 3px solid var(--error-color);
+    color: var(--error-color);
   }
   .chat__txt.user-message {
     background-color: var(--accent-high);
+    color: var(--white);
+    font-weight: bold;
   }
   .chat__listItem.user-message {
     align-self: flex-end;
@@ -331,17 +361,38 @@ export const mainStyle = css`
   .user-message .chat__txt--info {
     text-align: right;
   }
+  .items__listWrapper {
+    border-top: 1px dotted var(--light-gray);
+    display: flex;
+  }
+  .items__listWrapper svg {
+    fill: var(--accent-high);
+    width: 40px;
+    margin-left: 25px;
+  }
+  svg {
+    height: auto;
+  }
   .items__list.followup {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     padding: 20px;
+    list-style-type: none;
+    flex-wrap: wrap;
   }
-  .items__list.steps {
+  .items__list {
+    margin: 10px 0;
     display: block;
+  }
+  svg {
+    fill: var(--text-color);
   }
   .items__listItem--followup {
     cursor: pointer;
-    color: var(--dark-gray);
+    padding: 0 15px;
+    border-radius: 15px;
+    border: 2px solid var(--accent-high);
+    margin: 5px;
   }
   .items__listItem--citation {
     display: inline-block;
@@ -349,6 +400,7 @@ export const mainStyle = css`
     border-radius: 5px;
     text-decoration: none;
     padding: 5px;
+    margin-top: 5px;
     font-size: small;
   }
   .items__listItem--citation:not(first-child) {
@@ -363,15 +415,17 @@ export const mainStyle = css`
     border-bottom: 1px solid var(--light-gray);
   }
   .followup .items__link {
-    color: var(--dark-gray);
+    color: var(--accent-high);
     display: block;
     padding: 5px 0;
     border-bottom: 1px solid var(--light-gray);
+    font-size: small;
   }
   .defaults__button {
     text-decoration: none;
     color: var(--text-color);
     display: block;
+    font-size: 1.2rem;
   }
   .defaults__list {
     list-style-type: none;
@@ -379,6 +433,7 @@ export const mainStyle = css`
     text-align: center;
     display: flex;
     flex-direction: column;
+    justify-content: center;
   }
   .defaults__list.always-row {
     text-align: left;
@@ -391,11 +446,11 @@ export const mainStyle = css`
   .defaults__listItem {
     padding: 10px;
     border-radius: 10px;
-    border: 1px solid var(--accent-high);
-    background: var(--secondary-color);
+    background: var(--white);
     margin: 4px;
     color: var(--text-color);
     justify-content: space-evenly;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
     @media (min-width: 768px) {
       min-height: 100px;
@@ -404,14 +459,21 @@ export const mainStyle = css`
   .defaults__listItem:hover,
   .defaults__listItem:focus {
     color: var(--accent-dark);
-    background: var(--accent-light);
+    background: var(--secondary-color);
     transition: all 0.3s ease-in-out;
   }
   .defaults__span {
+    color: var(--accent-high);
     font-weight: bold;
     display: block;
     margin-top: 20px;
     text-decoration: underline;
+  }
+  .citation {
+    background-color: var(--accent-lighter);
+    border-radius: 3px;
+    padding: 3px;
+    margin-left: 3px;
   }
   .loading-skeleton {
     display: flex;
@@ -421,7 +483,7 @@ export const mainStyle = css`
     width: 10px;
     height: 10px;
     margin: 0 5px;
-    background-color: var(--accent-high);
+    background-color: var(--accent-lighter);
     border-radius: 50%;
     animation: chatloadinganimation 1.5s infinite;
   }
