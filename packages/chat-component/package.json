@@ -23,7 +23,8 @@
   "license": "MIT",
   "dependencies": {
     "dompurify": "^3.0.6",
-    "lit": "^2.8.0"
+    "lit": "^2.8.0",
+    "markdown-it": "^13.0.2"
   },
   "devDependencies": {
     "@types/dompurify": "^3.0.3",
