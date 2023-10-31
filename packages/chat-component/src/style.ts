@@ -403,6 +403,13 @@ export const mainStyle = css`
     margin-top: 5px;
     font-size: small;
   }
+  .items__listItem--citation.active {
+    background-color: var(--accent-high);
+
+    .items__link {
+      color: var(--white);
+    }
+  }
   .items__listItem--citation:not(first-child) {
     margin-left: 5px;
   }

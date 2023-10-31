@@ -206,6 +206,29 @@ export class ChatComponent extends LitElement {
 
       const response = await fetch(sourceUrl);
       if (response.ok) {
+        // highlight the clicked citation to make it clear which is being previewed
+        const citationsList = this.shadowRoot?.querySelectorAll(
+          '.aside .items__list.citations .items__listItem--citation',
+        );
+
+        if (citationsList) {
+          const citationsArray = [...citationsList];
+          const clickedIndex = citationsArray.findIndex((citation) => {
+            const link = citation.querySelector('a');
+            return link?.href === sourceUrl;
+          });
+
+          for (const citation of citationsList) {
+            const index = citationsArray.indexOf(citation);
+            if (index === clickedIndex) {
+              citation.classList.add('active');
+            } else {
+              citation.classList.remove('active');
+            }
+          }
+        }
+
+        // update the markdown previewer with the content of the clicked citation
         const previewer = this.shadowRoot?.querySelector('#citation-previewer');
         if (previewer) {
           const markdownContent = await response.text();
