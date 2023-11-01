@@ -46,7 +46,7 @@ export function processText(inputText: string, arrays: Array<Array<string> | Arr
 
   // Determine which regex to use, depending if the indicator is present
   const nextRegex = hasNextQuestions ? findNextQuestions : findQuestionsbyDoubleArrow;
-  const nextQuestionsMatch = replacedText.match(nextRegex);
+  const nextQuestionsMatch = replacedText.match(nextRegex) ?? [];
   let nextQuestions: string[] = [];
   nextQuestions = cleanUpFollowUp([...(nextQuestionsMatch as string[])]);
 
