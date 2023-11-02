@@ -185,7 +185,6 @@ export class ChatComponent extends LitElement {
   // and we're rendering a teaser list component
   // TODO: move to utils
   handleOnTeaserClick(event): void {
-    console.log('teaser clicked', event.detail.question);
     this.questionInput.value = DOMPurify.sanitize(event?.detail.question || '');
     this.currentQuestion = this.questionInput.value;
   }
