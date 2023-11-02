@@ -200,8 +200,9 @@ export class ChatComponent extends LitElement {
         this.isDefaultPromptsEnabled = false;
         // Disable the input field and submit button while waiting for the API response
         this.isDisabled = true;
+        // clear out errors
+        this.hasAPIError = false;
         // Show loading indicator while waiting for the API response
-
         this.isAwaitingResponse = true;
         if (type === 'chat') {
           this.processApiResponse({ message: question, isUserMessage: true });
@@ -242,8 +243,28 @@ export class ChatComponent extends LitElement {
           message: this.useStream ? '' : response.choices[0].message.content,
           isUserMessage: false,
         });
-      } catch (error) {
-        console.error(error);
+      } catch (error_: Error) {
+        console.error(error_);
+
+        const chatError = {
+          message: error_?.code === 400 ? globalConfig.INVALID_REQUEST_ERROR : globalConfig.API_ERROR_MESSAGE,
+        };
+
+        if (this.isProcessingResponse) {
+          const processingThread = this.chatThread.at(-1);
+          processingThread.error = chatError;
+        } else {
+          this.chatThread = [
+            ...this.chatThread,
+            {
+              error: chatError,
+              text: [],
+              timestamp: getTimestamp(),
+              isUserMessage: false,
+            },
+          ];
+        }
+
         this.handleAPIError();
       }
     }
@@ -283,6 +304,8 @@ export class ChatComponent extends LitElement {
   handleAPIError(): void {
     this.hasAPIError = true;
     this.isDisabled = false;
+    this.isAwaitingResponse = false;
+    this.isProcessingResponse = false;
   }
 
   // Copy response to clipboard
@@ -412,6 +435,10 @@ export class ChatComponent extends LitElement {
     return '';
   }
 
+  renderError(error: { message: string }) {
+    return html`<p class="chat__txt error">${error.message}</p>`;
+  }
+
   // Render the chat component as a web component
   override render() {
     return html`
@@ -470,6 +497,7 @@ export class ChatComponent extends LitElement {
                             ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
                             ${this.renderCitation(message.citations)}
                             ${this.renderFollowupQuestions(message.followupQuestions)}
+                            ${message.error ? this.renderError(message.error) : ''}
                           </div>
                           <p class="chat__txt--info">
                             <span class="timestamp">${message.timestamp}</span>,
