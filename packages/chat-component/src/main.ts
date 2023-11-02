@@ -2,7 +2,7 @@
 /* eslint-disable unicorn/template-indent */
 import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { chatHttpOptions, globalConfig, requestOptions } from './config/global-config.js';
 import { getAPIResponse } from './core/http/index.js';
@@ -71,17 +71,17 @@ export class ChatComponent extends LitElement {
   chatFooter!: HTMLElement;
 
   // Default prompts to display in the chat
-  @property({ type: Boolean })
+  @state()
   isDisabled = false;
 
-  @property({ type: Boolean })
+  @state()
   isChatStarted = false;
 
-  @property({ type: Boolean })
+  @state()
   isResetInput = false;
 
   // The program is awaiting response from API
-  @property({ type: Boolean })
+  @state()
   isAwaitingResponse = false;
 
   // Show error message to the end-user, if API call fails
@@ -89,14 +89,14 @@ export class ChatComponent extends LitElement {
   hasAPIError = false;
 
   // Has the response been copied to the clipboard
-  @property({ type: Boolean })
+  @state()
   isResponseCopied = false;
 
   // Is showing thought process panel
-  @property({ type: Boolean })
+  @state()
   isShowingThoughtProcess = false;
 
-  @property({ type: Boolean })
+  @state()
   canShowThoughtProcess = false;
 
   // some browsers may not support SpeechRecognition https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition#browser_compatibility
@@ -108,11 +108,13 @@ export class ChatComponent extends LitElement {
 
   speechRecognition = undefined;
 
+  @state()
+  hasDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
+
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
   chatThread: ChatThreadEntry[] = [];
-  hasDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
