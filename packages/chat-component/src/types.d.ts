@@ -28,6 +28,12 @@ declare interface ProcessTextReturn {
   arrays: Array<Array<string> | Array<Citation>>;
 }
 
+declare interface Teaser {
+  title?: string;
+  description: string;
+  icon?: string;
+}
+
 declare interface ChatRequestOptions {
   approach: string;
   overrides: RequestOverrides;
