@@ -4,10 +4,11 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   build: {
+    emptyOutDir: true,
     lib: {
-      // eslint-disable-next-line unicorn/prefer-module
-      entry: resolve(__dirname, 'src/main.ts'),
-      name: 'ChatComponent',
+      // eslint-disable-next-line unicorn/prefer-module, no-undef
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'chat-component',
       fileName: 'chat-component',
     },
   },
