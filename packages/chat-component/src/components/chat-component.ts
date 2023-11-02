@@ -181,9 +181,12 @@ export class ChatComponent extends LitElement {
     }
   }
 
-  handleDefaultPromptClick(question: string, event?: Event): void {
-    event?.preventDefault();
-    this.questionInput.value = DOMPurify.sanitize(question);
+  // This function is only necessary when default prompts are enabled
+  // and we're rendering a teaser list component
+  // TODO: move to utils
+  handleOnTeaserClick(event): void {
+    console.log('teaser clicked', event.detail.question);
+    this.questionInput.value = DOMPurify.sanitize(event?.detail.question || '');
     this.currentQuestion = this.questionInput.value;
   }
 
@@ -387,6 +390,7 @@ export class ChatComponent extends LitElement {
 
   renderFollowupQuestions(followupQuestions: string[] | undefined) {
     // render followup questions
+    // need to fix first after decoupling of teaserlist
     if (followupQuestions && followupQuestions.length > 0) {
       return html`
         <div class="items__listWrapper">
@@ -395,10 +399,7 @@ export class ChatComponent extends LitElement {
             ${followupQuestions.map(
               (followupQuestion) => html`
                 <li class="items__listItem--followup">
-                  <a
-                    class="items__link"
-                    href="#"
-                    @click="${(event: Event) => this.handleDefaultPromptClick(followupQuestion, event)}"
+                  <a class="items__link" href="#" @click="${(event) => this.handleOnTeaserClick(event)}"
                     >${followupQuestion}</a
                   >
                 </li>
@@ -509,7 +510,12 @@ export class ChatComponent extends LitElement {
           <!-- Conditionally render default prompts based on isDefaultPromptsEnabled -->
           ${
             this.isDefaultPromptsEnabled
-              ? html` <teaser-list-component .interactionModel="${this.interactionModel}"></teaser-list-component> `
+              ? html`
+                  <teaser-list-component
+                    @teaser-click="${this.handleOnTeaserClick}"
+                    .interactionModel="${this.interactionModel}"
+                  ></teaser-list-component>
+                `
               : ''
           }
           <form
