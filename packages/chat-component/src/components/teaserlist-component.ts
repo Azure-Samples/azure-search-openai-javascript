@@ -17,7 +17,16 @@ export class TeaserListComponent extends LitElement {
   // Handle the click on a default prompt
   handleTeaserClick(question: string, event?: Event): void {
     event?.preventDefault();
-    this.question = question;
+    console.log('Teaser clicked from teaserlist', question);
+    const teaserClickEvent = new CustomEvent('teaser-click', {
+      detail: {
+        question,
+      },
+      bubbles: true,
+      composed: true,
+    });
+    console.log('Teaser click event details', { teaserClickEvent });
+    this.dispatchEvent(teaserClickEvent);
   }
 
   static override styles = [teaserListStyle];
