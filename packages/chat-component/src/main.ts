@@ -399,7 +399,7 @@ export class ChatComponent extends LitElement {
                     class="items__link"
                     href="#"
                     @click="${(event: Event) => this.handleDefaultPromptClick(followupQuestion, event)}"
-                    >${followupQuestion}</a
+                    >${followupQuestion}?</a
                   >
                 </li>
               `,
