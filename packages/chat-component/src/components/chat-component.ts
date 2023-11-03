@@ -295,7 +295,7 @@ export class ChatComponent extends LitElement {
   }
 
   // show thought process aside
-  showThoughtProcess(event: Event): void {
+  expandAside(event: Event): void {
     event.preventDefault();
     this.isShowingThoughtProcess = true;
     this.shadowRoot?.querySelector('#overlay')?.classList.add('active');
@@ -410,7 +410,7 @@ export class ChatComponent extends LitElement {
                                     title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                                     class="button chat__header--button"
                                     data-testid="chat-show-thought-process"
-                                    @click="${this.showThoughtProcess}"
+                                    @click="${this.expandAside}"
                                     ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
                                   >
                                     <span class="chat__header--span"
