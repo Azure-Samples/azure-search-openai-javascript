@@ -77,6 +77,13 @@ export function getTimestamp() {
   });
 }
 
+// Define needs scroll event
+// custom-events.js
+export const mustScrollEvent = new CustomEvent('must-scroll', {
+  bubbles: true,
+  composed: true,
+});
+
 // Scroll to last message
 export function scrollToFooter(element: HTMLElement): void {
   element.scrollIntoView({ behavior: 'smooth', block: 'end' });

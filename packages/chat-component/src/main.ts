@@ -7,7 +7,7 @@ import { chatHttpOptions, globalConfig, requestOptions } from './config/global-c
 import { getAPIResponse } from './core/http/index.js';
 import { parseStreamedMessages } from './core/parser/index.js';
 import { mainStyle } from './style.js';
-import { getTimestamp, processText, scrollToFooter } from './utils/index.js';
+import { getTimestamp, processText, mustScrollEvent, scrollToFooter } from './utils/index.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 // TODO: allow host applications to customize these icons
@@ -105,6 +105,17 @@ export class ChatComponent extends LitElement {
 
   static override styles = [mainStyle];
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+
+    // add event listener to know when to scroll chat list footer into view
+    this.addEventListener('must-scroll', () => {
+      const footer = this.shadowRoot?.querySelector('#chat-list-footer') as HTMLElement;
+      if (footer) {
+        scrollToFooter(footer);
+      }
+    });
+  }
   // Send the question to the Open AI API and render the answer in the chat
 
   // Add a message to the chat, when the user or the API sends a message
@@ -140,7 +151,6 @@ export class ChatComponent extends LitElement {
         this.chatThoughts = result.thoughts;
         this.chatDataPoints = result.data_points;
         this.canShowThoughtProcess = true;
-        scrollToFooter(this.shadowRoot?.getElementById('chat-list-footer') as HTMLElement);
         return true;
       }
 
@@ -239,6 +249,7 @@ export class ChatComponent extends LitElement {
           this.chatThoughts = response.choices[0].message.context?.thoughts ?? '';
           this.chatDataPoints = response.choices[0].message.context?.data_points ?? [];
           this.canShowThoughtProcess = true;
+          this.dispatchEvent(mustScrollEvent);
         }
         await this.processApiResponse({
           message: this.useStream ? '' : response.choices[0].message.content,
@@ -357,7 +368,7 @@ export class ChatComponent extends LitElement {
         </ol>`,
       );
     }
-
+    this.dispatchEvent(mustScrollEvent);
     return entries;
   }
 
@@ -383,7 +394,7 @@ export class ChatComponent extends LitElement {
         </ol>
       `;
     }
-
+    this.dispatchEvent(mustScrollEvent);
     return '';
   }
 
@@ -410,7 +421,7 @@ export class ChatComponent extends LitElement {
         </div>
       `;
     }
-    // eslint-disable-next-line no-debugger
+    this.dispatchEvent(mustScrollEvent);
     return '';
   }
 
