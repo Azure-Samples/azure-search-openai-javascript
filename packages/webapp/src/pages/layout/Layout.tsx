@@ -31,11 +31,16 @@ const Layout = () => {
                 </NavLink>
               </li>
               <li className={styles.headerNavLeftMargin}>
-                <a href="https://aka.ms/entgptsearch" target={'_blank'} title="Github repository link" rel="noreferrer">
+                <a
+                  href="https://aka.ms/azureopenai/javascript"
+                  target={'_blank'}
+                  title="Github repository link"
+                  rel="noreferrer"
+                >
                   <img
                     src={github}
                     alt="Github logo"
-                    aria-label="Link to github repository"
+                    aria-label="Azure OpenAI JavaScript Github repository link"
                     width="20px"
                     height="20px"
                     className={styles.githubLogo}
