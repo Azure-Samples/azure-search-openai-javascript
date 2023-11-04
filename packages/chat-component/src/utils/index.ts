@@ -77,8 +77,7 @@ export function getTimestamp() {
   });
 }
 
-// Define needs scroll event
-// custom-events.js
+// Define must scroll event
 export const mustScrollEvent = new CustomEvent('must-scroll', {
   bubbles: true,
   composed: true,
