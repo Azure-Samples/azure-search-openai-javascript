@@ -7,7 +7,7 @@ import styles from './Layout.module.css';
 const Layout = () => {
   return (
     <div className={styles.layout}>
-      <header className={styles.header} role={'banner'}>
+      <header className={styles.header}>
         <div className={styles.headerContainer}>
           <Link to="/" className={styles.headerTitleContainer}>
             <h3 className={styles.headerTitle}>GPT + Enterprise data | Sample</h3>
