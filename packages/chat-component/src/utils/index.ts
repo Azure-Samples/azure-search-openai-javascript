@@ -76,3 +76,8 @@ export function getTimestamp() {
     hour12: true,
   });
 }
+
+// Scroll to last message
+export function scrollToFooter(element: HTMLElement): void {
+  element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
