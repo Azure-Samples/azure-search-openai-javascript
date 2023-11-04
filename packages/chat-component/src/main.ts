@@ -113,7 +113,15 @@ export class ChatComponent extends LitElement {
       this.handleOnMustScroll();
     });
   }
-
+  // debounce dispatching must-scroll event
+  debounceDispatchMustScrollEvent(): void {
+    let timeout: any = 0;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      this.dispatchEvent(mustScrollEvent);
+    }, 500);
+  }
+  // handle must scroll event
   handleOnMustScroll(): void {
     const footer = this.shadowRoot?.querySelector('#chat-list-footer') as HTMLElement;
     if (footer) {
@@ -370,7 +378,7 @@ export class ChatComponent extends LitElement {
         </ol>`,
       );
     }
-    this.dispatchEvent(mustScrollEvent);
+    this.debounceDispatchMustScrollEvent();
     return entries;
   }
 
@@ -396,7 +404,6 @@ export class ChatComponent extends LitElement {
         </ol>
       `;
     }
-    this.dispatchEvent(mustScrollEvent);
     return '';
   }
 
@@ -423,7 +430,6 @@ export class ChatComponent extends LitElement {
         </div>
       `;
     }
-    this.dispatchEvent(mustScrollEvent);
     return '';
   }
 
