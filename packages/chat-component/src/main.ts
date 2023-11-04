@@ -110,14 +110,17 @@ export class ChatComponent extends LitElement {
 
     // add event listener to know when to scroll chat list footer into view
     this.addEventListener('must-scroll', () => {
-      const footer = this.shadowRoot?.querySelector('#chat-list-footer') as HTMLElement;
-      if (footer) {
-        scrollToFooter(footer);
-      }
+      this.handleOnMustScroll();
     });
   }
-  // Send the question to the Open AI API and render the answer in the chat
 
+  handleOnMustScroll(): void {
+    const footer = this.shadowRoot?.querySelector('#chat-list-footer') as HTMLElement;
+    if (footer) {
+      scrollToFooter(footer);
+    }
+  }
+  // Send the question to the Open AI API and render the answer in the chat
   // Add a message to the chat, when the user or the API sends a message
   async processApiResponse({ message, isUserMessage }: { message: string; isUserMessage: boolean }) {
     const citations: Citation[] = [];
@@ -249,7 +252,6 @@ export class ChatComponent extends LitElement {
           this.chatThoughts = response.choices[0].message.context?.thoughts ?? '';
           this.chatDataPoints = response.choices[0].message.context?.data_points ?? [];
           this.canShowThoughtProcess = true;
-          this.dispatchEvent(mustScrollEvent);
         }
         await this.processApiResponse({
           message: this.useStream ? '' : response.choices[0].message.content,
@@ -498,7 +500,7 @@ export class ChatComponent extends LitElement {
                       `
                     : ''}
                 </ul>
-                <div id="chat-list-footer"></div>
+                <div class="chat__footer" id="chat-list-footer"></div>
               `
             : ''}
           ${this.isAwaitingResponse && !this.hasAPIError

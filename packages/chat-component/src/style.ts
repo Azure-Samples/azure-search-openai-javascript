@@ -320,9 +320,10 @@ export const mainStyle = css`
     color: var(--text-color);
     display: flex;
     flex-direction: column;
-    padding: 0;
-    margin-bottom: 50px;
-    padding-bottom: 120px;
+  }
+  .chat__footer {
+    width: 100%;
+    height: 70px;
   }
   .chat__listItem {
     max-width: 80%;

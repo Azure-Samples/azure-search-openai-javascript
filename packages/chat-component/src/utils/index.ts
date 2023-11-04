@@ -86,5 +86,5 @@ export const mustScrollEvent = new CustomEvent('must-scroll', {
 
 // Scroll to last message
 export function scrollToFooter(element: HTMLElement): void {
-  element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
