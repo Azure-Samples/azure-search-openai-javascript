@@ -76,14 +76,3 @@ export function getTimestamp() {
     hour12: true,
   });
 }
-
-// Define must scroll event
-export const mustScrollEvent = new CustomEvent('must-scroll', {
-  bubbles: true,
-  composed: true,
-});
-
-// Scroll to last message
-export function scrollToFooter(element: HTMLElement): void {
-  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}

@@ -7,7 +7,7 @@ import { chatHttpOptions, globalConfig, requestOptions } from './config/global-c
 import { getAPIResponse } from './core/http/index.js';
 import { parseStreamedMessages } from './core/parser/index.js';
 import { mainStyle } from './style.js';
-import { getTimestamp, processText, mustScrollEvent, scrollToFooter } from './utils/index.js';
+import { getTimestamp, processText } from './utils/index.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 // TODO: allow host applications to customize these icons
@@ -108,27 +108,21 @@ export class ChatComponent extends LitElement {
 
   static override styles = [mainStyle];
 
-  override connectedCallback(): void {
+  /*   override connectedCallback(): void {
     super.connectedCallback();
 
     // add event listener to know when to scroll chat list footer into view
     this.addEventListener('must-scroll', () => {
       this.handleOnMustScroll();
     });
-  }
+  } */
   // debounce dispatching must-scroll event
-  debounceDispatchMustScrollEvent(): void {
+  debounceScrollIntoView(): void {
     let timeout: any = 0;
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-      this.dispatchEvent(mustScrollEvent);
+      this.chatFooter.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 500);
-  }
-  // handle must scroll event
-  handleOnMustScroll(): void {
-    if (this.chatFooter) {
-      scrollToFooter(this.chatFooter);
-    }
   }
   // Send the question to the Open AI API and render the answer in the chat
   // Add a message to the chat, when the user or the API sends a message
@@ -380,7 +374,7 @@ export class ChatComponent extends LitElement {
         </ol>`,
       );
     }
-    this.debounceDispatchMustScrollEvent();
+    this.debounceScrollIntoView();
     return entries;
   }
 
