@@ -108,14 +108,6 @@ export class ChatComponent extends LitElement {
 
   static override styles = [mainStyle];
 
-  /*   override connectedCallback(): void {
-    super.connectedCallback();
-
-    // add event listener to know when to scroll chat list footer into view
-    this.addEventListener('must-scroll', () => {
-      this.handleOnMustScroll();
-    });
-  } */
   // debounce dispatching must-scroll event
   debounceScrollIntoView(): void {
     let timeout: any = 0;
