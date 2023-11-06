@@ -113,7 +113,9 @@ export class ChatComponent extends LitElement {
     let timeout: any = 0;
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-      this.chatFooter.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (this.chatFooter) {
+        this.chatFooter.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }, 500);
   }
   // Send the question to the Open AI API and render the answer in the chat
