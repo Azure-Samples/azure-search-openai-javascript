@@ -33,6 +33,9 @@ export const mainStyle = css`
     --accent-lighter: rgba(140, 222, 242, 0.4);
     --error-color: #8a0000;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   ul {
     margin-block-start: 0;
     margin-block-end: 0;
@@ -118,7 +121,6 @@ export const mainStyle = css`
   }
   .chat__container {
     min-width: 100%;
-    min-height: 400px;
     transition: width 0.3s ease-in-out;
     max-height: 100vh;
   }
@@ -170,8 +172,8 @@ export const mainStyle = css`
     background: linear-gradient(
       0deg,
       rgba(245, 245, 245, 1) 0%,
-      rgba(245, 245, 245, 0.6) 35%,
-      rgba(245, 245, 245, 0.2) 100%
+      rgba(245, 245, 245, 0.8) 75%,
+      rgba(245, 245, 245, 0.5) 100%
     );
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 15px 10px 50px;
@@ -318,8 +320,10 @@ export const mainStyle = css`
     color: var(--text-color);
     display: flex;
     flex-direction: column;
-    padding: 0;
-    margin-bottom: 50px;
+  }
+  .chat__footer {
+    width: 100%;
+    height: 70px;
   }
   .chat__listItem {
     max-width: 80%;
