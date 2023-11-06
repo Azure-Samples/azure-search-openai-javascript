@@ -170,7 +170,6 @@ export class ChatComponent extends LitElement {
           isUserMessage,
         },
       ];
-      // scroll to the bottom of the chat
       return true;
     };
 
@@ -368,6 +367,7 @@ export class ChatComponent extends LitElement {
         </ol>`,
       );
     }
+    // scroll to the bottom of the chat
     this.debounceScrollIntoView();
     return entries;
   }
