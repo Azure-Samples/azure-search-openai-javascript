@@ -60,6 +60,9 @@ export class ChatComponent extends LitElement {
   @query('#question-input')
   questionInput!: HTMLInputElement;
 
+  @query('#chat-list-footer')
+  chatFooter!: HTMLElement;
+
   // Default prompts to display in the chat
   @property({ type: Boolean })
   isDisabled = false;
@@ -123,9 +126,8 @@ export class ChatComponent extends LitElement {
   }
   // handle must scroll event
   handleOnMustScroll(): void {
-    const footer = this.shadowRoot?.querySelector('#chat-list-footer') as HTMLElement;
-    if (footer) {
-      scrollToFooter(footer);
+    if (this.chatFooter) {
+      scrollToFooter(this.chatFooter);
     }
   }
   // Send the question to the Open AI API and render the answer in the chat
