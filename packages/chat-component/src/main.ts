@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/template-indent */
 import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, queryAll } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { chatHttpOptions, globalConfig, requestOptions } from './config/global-config.js';
 import { getAPIResponse } from './core/http/index.js';
@@ -64,6 +64,12 @@ export class ChatComponent extends LitElement {
 
   @query('#chat-list-footer')
   chatFooter!: HTMLElement;
+
+  @queryAll('.debugButton')
+  debugButtonList!: NodeListOf<HTMLButtonElement>;
+
+  @queryAll('.copyButton')
+  copyButtonList!: NodeListOf<HTMLButtonElement>;
 
   // Default prompts to display in the chat
   @property({ type: Boolean })
@@ -156,6 +162,18 @@ export class ChatComponent extends LitElement {
         this.chatThoughts = result.thoughts;
         this.chatDataPoints = result.data_points;
         this.canShowThoughtProcess = true;
+        // this is a temporary fix until we have chat history and can use the corresponding
+        // datapoints from the history
+        // TODO: remove this once we have chat history
+        const buttons = [this.debugButtonList, this.copyButtonList];
+        for (const buttonList of buttons) {
+          if (buttonList && buttonList.length >= 2) {
+            for (const button of buttonList) {
+              button.disabled = true;
+              buttonList[buttonList.length - 1].disabled = false;
+            }
+          }
+        }
         return true;
       }
 
@@ -200,6 +218,7 @@ export class ChatComponent extends LitElement {
   handleDefaultPromptClick(question: string, event?: Event): void {
     event?.preventDefault();
     this.questionInput.value = DOMPurify.sanitize(question);
+    this.hideThoughtProcess(event!);
     this.currentQuestion = this.questionInput.value;
   }
 
@@ -508,7 +527,7 @@ export class ChatComponent extends LitElement {
                             : html` <div class="chat__header">
                                 <button
                                   title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                                  class="button chat__header--button"
+                                  class="button chat__header--button debugButton"
                                   data-testid="chat-show-thought-process"
                                   @click="${this.handleShowThoughtProcess}"
                                   ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
@@ -521,7 +540,7 @@ export class ChatComponent extends LitElement {
                                 </button>
                                 <button
                                   title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-                                  class="button chat__header--button"
+                                  class="button chat__header--button copyButton"
                                   @click="${this.copyResponseToClipboard}"
                                   ?disabled="${this.isDisabled}"
                                 >

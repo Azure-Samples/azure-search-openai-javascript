@@ -16,6 +16,7 @@ export const mainStyle = css`
     --accent-dark: #002b23;
     --accent-light: #e6fbf7;
     --accent-lighter: #f6d0d0;
+    --accent-contrast: #7d3c71;
     --error-color: #8a0000;
   }
   :host([data-theme='dark']]) {
@@ -31,6 +32,7 @@ export const mainStyle = css`
     --accent-dark: #b4e2ee;
     --accent-light: #e6fbf7;
     --accent-lighter: #f6d0d0;
+    --accent-contrast: #7d3c71;
     --error-color: #8a0000;
   }
   html {
@@ -209,7 +211,7 @@ export const mainStyle = css`
     text-align: center;
   }
   .aside__link.active {
-    background: var(--accent-high);
+    background: linear-gradient(to left, var(--accent-contrast), var(--accent-high));
     color: var(--white);
   }
   .aside__link:not(.active):hover {
@@ -413,7 +415,7 @@ export const mainStyle = css`
     padding: 20px;
   }
   .chat__txt.user-message {
-    background: linear-gradient(to left, #7d3c71, #692b61);
+    background: linear-gradient(to left, var(--accent-contrast), var(--accent-high));
     color: var(--white);
     border: 1px solid var(--accent-lighter);
   }
