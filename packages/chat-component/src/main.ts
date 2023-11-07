@@ -18,7 +18,8 @@ import iconSuccess from '../public/svg/success-icon.svg?raw';
 import iconCopyToClipboard from '../public/svg/copy-icon.svg?raw';
 import iconSend from '../public/svg/send-icon.svg?raw';
 import iconClose from '../public/svg/close-icon.svg?raw';
-import iconQuestion from '../public/svg/question-icon.svg?raw';
+import iconQuestion from '../public/svg/bubblequestion-icon.svg?raw';
+import iconSpinner from '../public/svg/spinner-icon.svg?raw';
 import { marked } from 'marked';
 
 /**
@@ -412,11 +413,11 @@ export class ChatComponent extends LitElement {
     // render steps
     if (textEntry.followingSteps && textEntry.followingSteps.length > 0) {
       entries.push(
-        html` <ol class="items__list steps">
+        html` <ul class="items__list steps">
           ${textEntry.followingSteps.map(
             (followingStep) => html` <li class="items__listItem--step">${unsafeHTML(followingStep)}</li> `,
           )}
-        </ol>`,
+        </ul>`,
       );
     }
     // scroll to the bottom of the chat
@@ -429,6 +430,7 @@ export class ChatComponent extends LitElement {
     if (citations && citations.length > 0) {
       return html`
         <ol class="items__list citations">
+          <h3 class="subheadline--small">${globalConfig.CITATIONS_LABEL}</h3>
           ${citations.map(
             (citation) => html`
               <li class="items__listItem--citation">
@@ -550,7 +552,9 @@ export class ChatComponent extends LitElement {
                       `
                     : ''}
                 </ul>
-                <div class="chat__footer" id="chat-list-footer"></div>
+                <div class="chat__footer" id="chat-list-footer">
+                  <!-- Do not delete this element. It is used for auto-scrolling -->
+                </div>
               `
             : ''}
           ${this.isAwaitingResponse && !this.hasAPIError
@@ -564,6 +568,12 @@ export class ChatComponent extends LitElement {
                   <div class="dot"></div>
                   <div class="dot"></div>
                 </div>
+                <p class="loading-text" aria-label="${globalConfig.LOADING_INDICATOR_TEXT}">
+                  <span class="loading-icon">${unsafeSVG(iconSpinner)}</span>
+                  <span class="loading-label">${globalConfig.LOADING_INDICATOR_TEXT}</span>
+                </p>
+
+                <p></p>
               `
             : ''}
           <!-- Default prompts: use the variables above to edit the heading -->
@@ -589,7 +599,7 @@ export class ChatComponent extends LitElement {
                               @click="${(event: Event) => this.handleDefaultPromptClick(prompt, event)}"
                             >
                               ${prompt}
-                              <span class="defaults__span">Ask now</span>
+                              <span class="defaults__span">${globalConfig.DEFAULT_PROMPTS_HEADING_ASK}</span>
                             </a>
                           </li>
                         `,
