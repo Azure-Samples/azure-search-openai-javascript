@@ -11,6 +11,15 @@ In the project directory, you can run:
 To start the app in dev mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
+To target the deployed resources you need to create an `.env` file in the package.
+You can create and populate the .env file using
+
+```
+azd env get-values > .env
+```
+
+You will also need to authenticate to Azure using `az login` before calling the APIs.
+
 ### `npm start`
 
 For production mode

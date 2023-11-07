@@ -76,3 +76,13 @@ export function getTimestamp() {
     hour12: true,
   });
 }
+
+// Creates a new chat message error
+export class ChatResponseError extends Error {
+  statusCode?: number;
+
+  constructor(message: string, statusCode?: number) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}

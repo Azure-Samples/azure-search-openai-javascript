@@ -1,3 +1,5 @@
+import { ChatResponseError } from '../../utils/index.js';
+
 export async function callHttpApi(
   { question, type, approach, overrides }: ChatRequestOptions,
   { method, url, stream, signal }: ChatHttpOptions,
@@ -37,7 +39,7 @@ export async function getAPIResponse(
   }
   const parsedResponse: BotResponse = await response.json();
   if (response.status > 299 || !response.ok) {
-    throw new Error(response.statusText) || 'API Response Error';
+    throw new ChatResponseError(response.statusText, response.status) || 'API Response Error';
   }
   return parsedResponse;
 }

@@ -8,7 +8,7 @@ import { chatHttpOptions, globalConfig, requestOptions } from './config/global-c
 import { getAPIResponse } from './core/http/index.js';
 import { parseStreamedMessages } from './core/parser/index.js';
 import { mainStyle } from './style.js';
-import { getTimestamp, processText } from './utils/index.js';
+import { type ChatResponseError, getTimestamp, processText } from './utils/index.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 // TODO: allow host applications to customize these icons
@@ -328,7 +328,7 @@ export class ChatComponent extends LitElement {
         // Disable the input field and submit button while waiting for the API response
         this.isDisabled = true;
         // Show loading indicator while waiting for the API response
-
+        this.hasAPIError = false;
         this.isAwaitingResponse = true;
         if (type === 'chat') {
           this.processApiResponse({ message: question, isUserMessage: true });
@@ -369,9 +369,22 @@ export class ChatComponent extends LitElement {
           message: this.useStream ? '' : response.choices[0].message.content,
           isUserMessage: false,
         });
-      } catch (error) {
-        console.error(error);
+      } catch (error_) {
+        const chatError = (error_ as ChatResponseError) ?? (error_ as Error);
+        console.error(chatError);
         this.handleAPIError();
+        this.chatThread = [
+          ...this.chatThread,
+          {
+            error: {
+              message:
+                chatError?.statusCode === 400 ? globalConfig.API_BAD_REQUEST_ERROR : globalConfig.API_ERROR_MESSAGE,
+            },
+            text: [],
+            timestamp: getTimestamp(),
+            isUserMessage: false,
+          },
+        ];
       }
     }
   }
@@ -411,6 +424,7 @@ export class ChatComponent extends LitElement {
   handleAPIError(): void {
     this.hasAPIError = true;
     this.isDisabled = false;
+    this.isAwaitingResponse = false;
   }
 
   // Copy response to clipboard
@@ -560,6 +574,10 @@ export class ChatComponent extends LitElement {
     return '';
   }
 
+  renderError(error: { message: string }) {
+    return html`<p class="chat__txt error">${error.message}</p>`;
+  }
+
   renderChatOrCancelButton() {
     const submitChatButton = html`<button
       class="chatbox__button"
@@ -606,55 +624,52 @@ export class ChatComponent extends LitElement {
                   ${this.chatThread.map(
                     (message) => html`
                       <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
-                        <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
-                          ${message.isUserMessage
-                            ? ''
-                            : html` <div class="chat__header">
-                                <button
-                                  title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                                  class="button chat__header--button"
-                                  data-testid="chat-show-thought-process"
-                                  @click="${this.handleShowThoughtProcess}"
-                                  ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
-                                >
-                                  <span class="chat__header--span"
-                                    >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
-                                  >
+                        ${message.error
+                          ? this.renderError(message.error)
+                          : html` <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
+                                ${message.isUserMessage
+                                  ? ''
+                                  : html` <div class="chat__header">
+                                      <button
+                                        title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
+                                        class="button chat__header--button"
+                                        data-testid="chat-show-thought-process"
+                                        @click="${this.handleShowThoughtProcess}"
+                                        ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
+                                      >
+                                        <span class="chat__header--span"
+                                          >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
+                                        >
 
-                                  ${unsafeSVG(iconLightBulb)}
-                                </button>
-                                <button
-                                  title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-                                  class="button chat__header--button"
-                                  @click="${this.copyResponseToClipboard}"
-                                  ?disabled="${this.isDisabled}"
-                                >
-                                  <span class="chat__header--span"
-                                    >${this.isResponseCopied
-                                      ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-                                      : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
-                                  >
-                                  ${this.isResponseCopied ? unsafeSVG(iconSuccess) : unsafeSVG(iconCopyToClipboard)}
-                                </button>
-                              </div>`}
-                          ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
-                          ${this.renderCitation(message.citations)}
-                          ${this.renderFollowupQuestions(message.followupQuestions)}
-                        </div>
-                        <p class="chat__txt--info">
-                          <span class="timestamp">${message.timestamp}</span>,
-                          <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
-                        </p>
+                                        ${unsafeSVG(iconLightBulb)}
+                                      </button>
+                                      <button
+                                        title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+                                        class="button chat__header--button"
+                                        @click="${this.copyResponseToClipboard}"
+                                        ?disabled="${this.isDisabled}"
+                                      >
+                                        <span class="chat__header--span"
+                                          >${this.isResponseCopied
+                                            ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
+                                            : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
+                                        >
+                                        ${this.isResponseCopied
+                                          ? unsafeSVG(iconSuccess)
+                                          : unsafeSVG(iconCopyToClipboard)}
+                                      </button>
+                                    </div>`}
+                                ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
+                                ${this.renderCitation(message.citations)}
+                                ${this.renderFollowupQuestions(message.followupQuestions)}
+                              </div>
+                              <p class="chat__txt--info">
+                                <span class="timestamp">${message.timestamp}</span>,
+                                <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
+                              </p>`}
                       </li>
                     `,
                   )}
-                  ${this.hasAPIError
-                    ? html`
-                        <li class="chat__listItem">
-                          <p class="chat__txt error">${globalConfig.API_ERROR_MESSAGE}</p>
-                        </li>
-                      `
-                    : ''}
                 </ul>
                 <div class="chat__footer" id="chat-list-footer">
                   <!-- Do not delete this element. It is used for auto-scrolling -->
