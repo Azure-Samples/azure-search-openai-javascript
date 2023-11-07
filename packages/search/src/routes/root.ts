@@ -102,7 +102,11 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       } catch (_error: unknown) {
         const error = _error as Error & { status?: number };
         fastify.log.error(error);
-        return error.status === 400 ? reply.badRequest(error.message) : reply.internalServerError(error.message);
+        if (error.status) {
+          return reply.code(error.status).send(error);
+        }
+
+        return reply.internalServerError(error.message);
       }
     },
   });
@@ -145,7 +149,11 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       } catch (_error: unknown) {
         const error = _error as Error & { status?: number };
         fastify.log.error(error);
-        return error.status === 400 ? reply.badRequest(error.message) : reply.internalServerError(error.message);
+        if (error.status) {
+          return reply.code(error.status).send(error);
+        }
+
+        return reply.internalServerError(error.message);
       }
     },
   });

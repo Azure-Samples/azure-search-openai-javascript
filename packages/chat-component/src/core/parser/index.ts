@@ -15,7 +15,7 @@ export async function parseStreamedMessages({
   onCancel: () => void;
 }) {
   const reader = createReader(apiResponseBody);
-  const chunks = readStream<BotResponseChunk>(reader);
+  const chunks = readStream<BotResponseChunk | BotResponseError>(reader);
 
   const streamedMessageRaw: string[] = [];
   const stepsBuffer: string[] = [];
@@ -38,8 +38,9 @@ export async function parseStreamedMessages({
     }
 
     if (chunk.statusCode && chunk.statusCode > 299) {
-      throw new ChatResponseError('API chunk has an error', chunk.statusCode);
+      throw new ChatResponseError(chunk.message, chunk.statusCode);
     }
+
     const { content, context } = chunk.choices[0].delta;
     if (context?.data_points) {
       result.data_points = context.data_points ?? [];

@@ -76,7 +76,6 @@ declare interface BotResponse {
 }
 
 declare interface BotResponseChunk {
-  statusCode?: number;
   choices: Array<{
     index: number;
     delta: Partial<BotResponseMessage>;
@@ -92,3 +91,9 @@ declare type BotResponseMessage = Message & {
   };
   session_state?: Record<string, any>;
 };
+
+declare interface BotResponseError {
+  error?: string;
+  statusCode?: number;
+  message?: string;
+}
