@@ -188,6 +188,19 @@ test.describe('generate answer', () => {
     await expect(citations.nth(0)).toBeEnabled();
     await expect(citations.nth(0)).toContainText('support.md');
     expect(await citations.nth(0).getAttribute('href')).toContain('/content/support.md');
+
+    await page.routeFromHAR('./tests/e2e/hars/citation-content.har', {
+      url: '/content/support.md',
+      update: false,
+      updateContent: 'embed',
+    });
+
+    await citations.nth(0).click();
+    // the thought process should be visible on the citation tab with citations visible
+    await expect(page.getByTestId('aside-thought-process').getByTestId('citation')).toBeVisible();
+
+    // markdown converted to html
+    await expect(page.getByRole('heading', { name: 'Contoso Real Estate Customer Support Guide' })).toBeVisible();
   });
 });
 

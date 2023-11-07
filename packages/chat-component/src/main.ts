@@ -19,6 +19,7 @@ import iconCopyToClipboard from '../public/svg/copy-icon.svg?raw';
 import iconSend from '../public/svg/send-icon.svg?raw';
 import iconClose from '../public/svg/close-icon.svg?raw';
 import iconQuestion from '../public/svg/question-icon.svg?raw';
+import { marked } from 'marked';
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -105,6 +106,8 @@ export class ChatComponent extends LitElement {
 
   chatRequestOptions: ChatRequestOptions = requestOptions;
   chatHttpOptions: ChatHttpOptions = chatHttpOptions;
+
+  selectedAsideTab: 'tab-thought-process' | 'tab-support-context' | 'tab-citations' = 'tab-thought-process';
 
   static override styles = [mainStyle];
 
@@ -197,6 +200,49 @@ export class ChatComponent extends LitElement {
     event?.preventDefault();
     this.questionInput.value = DOMPurify.sanitize(question);
     this.currentQuestion = this.questionInput.value;
+  }
+
+  async handleCitationClick(sourceUrl: string, event: Event): Promise<void> {
+    if (sourceUrl?.endsWith('.md')) {
+      event?.preventDefault();
+
+      if (!this.isShowingThoughtProcess) {
+        this.selectedAsideTab = 'tab-citations';
+        this.showThoughtProcess();
+      }
+
+      const response = await fetch(sourceUrl);
+      if (response.ok) {
+        // highlight the clicked citation to make it clear which is being previewed
+        const citationsList = this.shadowRoot?.querySelectorAll(
+          '.aside .items__list.citations .items__listItem--citation',
+        );
+
+        if (citationsList) {
+          const citationsArray = [...citationsList];
+          const clickedIndex = citationsArray.findIndex((citation) => {
+            const link = citation.querySelector('a');
+            return link?.href === sourceUrl;
+          });
+
+          for (const citation of citationsList) {
+            const index = citationsArray.indexOf(citation);
+            if (index === clickedIndex) {
+              citation.classList.add('active');
+            } else {
+              citation.classList.remove('active');
+            }
+          }
+        }
+
+        // update the markdown previewer with the content of the clicked citation
+        const previewer = this.shadowRoot?.querySelector('#citation-previewer');
+        if (previewer) {
+          const markdownContent = await response.text();
+          previewer.innerHTML = DOMPurify.sanitize(marked.parse(markdownContent));
+        }
+      }
+    }
   }
 
   // Handle the click on the chat button and send the question to the API
@@ -304,13 +350,19 @@ export class ChatComponent extends LitElement {
     this.isResponseCopied = true;
   }
 
+  handleShowThoughtProcess(event: Event): void {
+    event?.preventDefault();
+    this.selectedAsideTab = 'tab-thought-process';
+    this.showThoughtProcess();
+  }
+
   // show thought process aside
-  showThoughtProcess(event: Event): void {
-    event.preventDefault();
+  showThoughtProcess(): void {
     this.isShowingThoughtProcess = true;
     this.shadowRoot?.querySelector('#overlay')?.classList.add('active');
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.add('aside-open');
   }
+
   // hide thought process aside
   hideThoughtProcess(event: Event): void {
     event.preventDefault();
@@ -386,6 +438,8 @@ export class ChatComponent extends LitElement {
                   data-testid="citation"
                   target="_blank"
                   rel="noopener noreferrer"
+                  @click="${(event: Event) =>
+                    this.handleCitationClick(`${this.apiUrl}/content/${citation.text}`, event)}"
                   >${citation.ref}. ${citation.text}</a
                 >
               </li>
@@ -454,7 +508,7 @@ export class ChatComponent extends LitElement {
                                   title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                                   class="button chat__header--button"
                                   data-testid="chat-show-thought-process"
-                                  @click="${this.showThoughtProcess}"
+                                  @click="${this.handleShowThoughtProcess}"
                                   ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
                                 >
                                   <span class="chat__header--span"
@@ -613,12 +667,12 @@ export class ChatComponent extends LitElement {
                   <ul class="aside__list" role="tablist">
                     <li class="aside__listItem">
                       <a
-                        id="tab-1"
-                        class="aside__link active"
+                        id="tab-thought-process"
+                        class="aside__link${this.selectedAsideTab === 'tab-thought-process' ? ' active' : ''}"
                         role="tab"
                         href="#"
-                        aria-selected="true"
-                        aria-hidden="false"
+                        aria-selected="${this.selectedAsideTab === 'tab-thought-process'}"
+                        aria-hidden="${this.selectedAsideTab !== 'tab-thought-process'}"
                         aria-controls="tabpanel-1"
                         @click="${(event: Event) => this.activateTab(event)}"
                         title="${globalConfig.THOUGHT_PROCESS_LABEL}"
@@ -628,12 +682,12 @@ export class ChatComponent extends LitElement {
                     </li>
                     <li class="aside__listItem">
                       <a 
-                        id="tab-2"
-                        class="aside__link"
+                        id="tab-support-context"
+                        class="aside__link${this.selectedAsideTab === 'tab-support-context' ? ' active' : ''}"
                         role="tab"
                         href="#"
-                        aria-selected="false"
-                        aria-hidden="true"
+                        aria-selected="${this.selectedAsideTab === 'tab-support-context'}"
+                        aria-hidden="${this.selectedAsideTab !== 'tab-support-context'}"
                         aria-controls="tabpanel-2"
                         @click="${(event: Event) => this.activateTab(event)}"
                         title="${globalConfig.SUPPORT_CONTEXT_LABEL}"
@@ -643,12 +697,12 @@ export class ChatComponent extends LitElement {
                     </li>
                     <li class="aside__listItem">
                       <a
-                        id="tab-3"
-                        class="aside__link"
+                        id="tab-citations"
+                        class="aside__link${this.selectedAsideTab === 'tab-citations' ? ' active' : ''}"
                         role="tab"
                         href="#"
-                        aria-selected="false"
-                        aria-hidden="true"
+                        aria-selected="${this.selectedAsideTab === 'tab-citations'}"
+                        aria-hidden="${this.selectedAsideTab !== 'tab-citations'}"
                         aria-controls="tabpanel-3"
                         @click="${(event: Event) => this.activateTab(event)}"
                         title="${globalConfig.CITATIONS_LABEL}"
@@ -659,13 +713,21 @@ export class ChatComponent extends LitElement {
                   </ul>
                 </nav>
                 <div class="aside__content">
-                  <div id="tabpanel-1" class="aside__tab active" role="tabpanel" tabindex="0" aria-labelledby="tab-1">
+                  <div id="tabpanel-1" class="aside__tab${
+                    this.selectedAsideTab === 'tab-thought-process' ? ' active' : ''
+                  }" role="tabpanel" tabindex="${
+                    this.selectedAsideTab === 'tab-thought-process' ? 0 : -1
+                  }" aria-labelledby="tab-thought-process">
                     <h3 class="subheadline--small">${globalConfig.THOUGHT_PROCESS_LABEL}</h3>
                     <div class="aside__innerContainer">
                     ${this.chatThoughts ? html` <p class="aside__paragraph">${unsafeHTML(this.chatThoughts)}</p> ` : ''}
                     </div> 
                   </div>
-                  <div id="tabpanel-2" class="aside__tab" role="tabpanel" aria-labelledby="tab-2" tabindex="-1">
+                  <div id="tabpanel-2" class="aside__tab${
+                    this.selectedAsideTab === 'tab-support-context' ? ' active' : ''
+                  }" role="tabpanel" aria-labelledby="tab-support-context" tabindex="${
+                    this.selectedAsideTab === 'tab-support-context' ? 0 : -1
+                  }">
                     <h3 class="subheadline--small">${globalConfig.SUPPORT_CONTEXT_LABEL}</h3>
                     <ul class="defaults__list always-row">
                       ${this.chatDataPoints.map(
@@ -673,8 +735,13 @@ export class ChatComponent extends LitElement {
                       )}
                     </ul>
                   </div>
-                  <div id="tabpanel-3" class="aside__tab" role="tabpanel" tabindex="-1" aria-labelledby="tab-3">
+                  <div id="tabpanel-3" class="aside__tab${
+                    this.selectedAsideTab === 'tab-citations' ? ' active' : ''
+                  }" role="tabpanel" tabindex="${
+                    this.selectedAsideTab === 'tab-citations' ? 0 : -1
+                  }" aria-labelledby="tab-citations">
                       ${this.renderCitation(this.chatThread.at(-1)?.citations)}
+                      <div id="citation-previewer"></div>
                   </div>
                 </div>
               </div>

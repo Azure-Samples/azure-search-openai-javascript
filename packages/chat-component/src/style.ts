@@ -407,12 +407,18 @@ export const mainStyle = css`
     margin-top: 5px;
     font-size: small;
   }
+  .items__listItem--citation.active {
+    background-color: var(--accent-high);
+  }
   .items__listItem--citation:not(first-child) {
     margin-left: 5px;
   }
   .items__link {
     text-decoration: none;
     color: var(--text-color);
+  }
+  .items__listItem--citation.active .items__link {
+    color: var(--white);
   }
   .steps .items__listItem--step {
     padding: 5px 0;
