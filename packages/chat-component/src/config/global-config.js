@@ -11,7 +11,7 @@ const globalConfig = {
     'How to contact a representative?',
   ],
   DEFAULT_PROMPTS_HEADING_CHAT: 'Chat with our support team',
-  DEFAULT_PROMPTS_HEADING_ASK: 'Ask a question',
+  DEFAULT_PROMPTS_HEADING_ASK: 'Ask now',
   // This are the chat bubbles that will be displayed in the chat
   CHAT_MESSAGES: [],
   // This are the labels for the chat button and input
@@ -28,13 +28,13 @@ const globalConfig = {
   FOLLOW_UP_QUESTIONS_LABEL_TEXT: 'You can also ask...',
   SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT: 'Show thought process',
   HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT: 'Hide thought process',
-  LOADING_INDICATOR_TEXT: 'Please wait. We are searching for an answer...',
+  LOADING_INDICATOR_TEXT: 'Please wait. We are searching and generating an answer...',
   // API ERROR HANDLING IN UI
   API_ERROR_MESSAGE: 'Sorry, we are having some problems. Please try again later.',
   // Config pertaining the response format
   THOUGHT_PROCESS_LABEL: 'Thought Process',
   SUPPORT_CONTEXT_LABEL: 'Support Context',
-  CITATIONS_LABEL: 'Citations',
+  CITATIONS_LABEL: 'Learn More:',
 };
 
 const NEXT_QUESTION_INDICATOR = 'Next Questions:';
