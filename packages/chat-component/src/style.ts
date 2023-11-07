@@ -405,10 +405,6 @@ export const mainStyle = css`
   }
   .items__listItem--citation.active {
     background-color: var(--accent-high);
-
-    .items__link {
-      color: var(--white);
-    }
   }
   .items__listItem--citation:not(first-child) {
     margin-left: 5px;
@@ -416,6 +412,9 @@ export const mainStyle = css`
   .items__link {
     text-decoration: none;
     color: var(--text-color);
+  }
+  .items__listItem--citation.active .items__link {
+    color: var(--white);
   }
   .steps .items__listItem--step {
     padding: 5px 0;

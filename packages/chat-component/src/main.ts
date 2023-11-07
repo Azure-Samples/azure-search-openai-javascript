@@ -9,7 +9,6 @@ import { parseStreamedMessages } from './core/parser/index.js';
 import { mainStyle } from './style.js';
 import { getTimestamp, processText } from './utils/index.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
-import markdownIt from 'markdown-it';
 
 // TODO: allow host applications to customize these icons
 
@@ -20,6 +19,7 @@ import iconCopyToClipboard from '../public/svg/copy-icon.svg?raw';
 import iconSend from '../public/svg/send-icon.svg?raw';
 import iconClose from '../public/svg/close-icon.svg?raw';
 import iconQuestion from '../public/svg/question-icon.svg?raw';
+import { marked } from 'marked';
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -31,11 +31,6 @@ import iconQuestion from '../public/svg/question-icon.svg?raw';
  * @fires chat-component#questionSubmitted - Fired when the user submits a question
  * @fires chat-component#defaultQuestionClicked - Fired when the user clicks on a default question
  * */
-
-const md = markdownIt({
-  html: true,
-  linkify: true,
-});
 
 @customElement('chat-component')
 export class ChatComponent extends LitElement {
@@ -232,7 +227,7 @@ export class ChatComponent extends LitElement {
         const previewer = this.shadowRoot?.querySelector('#citation-previewer');
         if (previewer) {
           const markdownContent = await response.text();
-          previewer.innerHTML = DOMPurify.sanitize(md.render(markdownContent));
+          previewer.innerHTML = DOMPurify.sanitize(marked.parse(markdownContent));
         }
       }
     }
