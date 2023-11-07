@@ -57,17 +57,6 @@ export const mainStyle = css`
       top: 0px;
     }
   }
-  @keyframes chatloadinganimation {
-    0% {
-      opacity: 0.5;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0.5;
-    }
-  }
   @keyframes spinneranimation {
     0% {
       transform: rotate(0deg);
@@ -207,12 +196,17 @@ export const mainStyle = css`
   }
   .aside__list {
     list-style-type: none;
-    padding: 20px 0px;
-    margin: 0px auto;
-    width: 80%;
     display: flex;
-    justify-content: space-around;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 10px;
+    border-radius: 10px;
+    padding: 3px;
+    width: 450px;
+    margin: 0 auto;
+    justify-content: space-evenly;
+  }
+  .aside__listItem {
+    width: 33%;
+    text-align: center;
   }
   .aside__link.active {
     background: var(--accent-high);
@@ -235,6 +229,9 @@ export const mainStyle = css`
   }
   .aside__content {
     position: relative;
+  }
+  .aside__content .items__list.citations {
+    border-top: 0;
   }
   .aside__tab {
     position: absolute;
@@ -408,6 +405,7 @@ export const mainStyle = css`
     margin-block-end: 0;
     position: relative;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--light-gray);
   }
   .chat__txt.error {
     border: 3px solid var(--error-color);
@@ -415,8 +413,9 @@ export const mainStyle = css`
     padding: 20px;
   }
   .chat__txt.user-message {
-    background-color: var(--accent-high);
+    background: linear-gradient(to left, #7d3c71, #692b61);
     color: var(--white);
+    border: 1px solid var(--accent-lighter);
   }
   .chat__listItem.user-message {
     align-self: flex-end;
@@ -476,10 +475,11 @@ export const mainStyle = css`
     border-radius: 10px;
     border: 1px solid var(--accent-high);
     margin: 5px;
+    transition: background-color 0.3s ease-in-out;
   }
-  .item__listItem--followup:hover,
-  .item__listItem--followup:focus {
-    background: var(--accent-lighter);
+  .items__listItem--followup:hover,
+  .items__listItem--followup:focus {
+    background-color: var(--accent-lighter);
     cursor: pointer;
   }
   .items__listItem--citation {
@@ -586,19 +586,5 @@ export const mainStyle = css`
     fill: var(--accent-lighter);
     animation: spinneranimation 1s linear infinite;
     margin-right: 10px;
-  }
-  .dot {
-    width: 10px;
-    height: 10px;
-    margin: 0 5px;
-    background-color: var(--accent-lighter);
-    border-radius: 50%;
-    animation: chatloadinganimation 1.5s infinite;
-  }
-  .dot:nth-child(2) {
-    animation-delay: 0.5s;
-  }
-  .dot:nth-child(3) {
-    animation-delay: 1s;
   }
 `;

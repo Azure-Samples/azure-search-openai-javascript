@@ -559,21 +559,10 @@ export class ChatComponent extends LitElement {
             : ''}
           ${this.isAwaitingResponse && !this.hasAPIError
             ? html`
-                <div
-                  id="loading-indicator"
-                  class="loading-skeleton"
-                  aria-label="${globalConfig.LOADING_INDICATOR_TEXT}"
-                >
-                  <div class="dot"></div>
-                  <div class="dot"></div>
-                  <div class="dot"></div>
-                </div>
                 <p class="loading-text" aria-label="${globalConfig.LOADING_INDICATOR_TEXT}">
                   <span class="loading-icon">${unsafeSVG(iconSpinner)}</span>
                   <span class="loading-label">${globalConfig.LOADING_INDICATOR_TEXT}</span>
                 </p>
-
-                <p></p>
               `
             : ''}
           <!-- Default prompts: use the variables above to edit the heading -->
@@ -715,9 +704,9 @@ export class ChatComponent extends LitElement {
                         aria-hidden="${this.selectedAsideTab !== 'tab-citations'}"
                         aria-controls="tabpanel-3"
                         @click="${(event: Event) => this.activateTab(event)}"
-                        title="${globalConfig.CITATIONS_LABEL}"
+                        title="${globalConfig.CITATIONS_TAB_LABEL}"
                       >
-                      ${globalConfig.CITATIONS_LABEL}
+                      ${globalConfig.CITATIONS_TAB_LABEL}
                       </a>
                     </li>
                   </ul>
