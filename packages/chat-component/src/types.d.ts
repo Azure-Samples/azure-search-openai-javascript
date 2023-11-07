@@ -17,6 +17,9 @@ declare interface ChatThreadEntry {
   followupQuestions?: string[];
   isUserMessage: boolean;
   timestamp: string;
+  error?: {
+    message: string;
+  };
 }
 
 declare interface Citation {
@@ -73,6 +76,7 @@ declare interface BotResponse {
 }
 
 declare interface BotResponseChunk {
+  statusCode?: number;
   choices: Array<{
     index: number;
     delta: Partial<BotResponseMessage>;

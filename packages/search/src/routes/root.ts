@@ -100,9 +100,9 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
           return await chatApproach.run(messages, (context as any) ?? {});
         }
       } catch (_error: unknown) {
-        const error = _error as Error;
+        const error = _error as Error & { status?: number };
         fastify.log.error(error);
-        return reply.internalServerError(error.message);
+        return error.status === 400 ? reply.badRequest(error.message) : reply.internalServerError(error.message);
       }
     },
   });
@@ -143,9 +143,9 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
           return await askApproach.run(messages[0].content, (context as any) ?? {});
         }
       } catch (_error: unknown) {
-        const error = _error as Error;
+        const error = _error as Error & { status?: number };
         fastify.log.error(error);
-        return reply.internalServerError(error.message);
+        return error.status === 400 ? reply.badRequest(error.message) : reply.internalServerError(error.message);
       }
     },
   });
