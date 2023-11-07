@@ -181,6 +181,26 @@ test.describe('errors', () => {
     await expect(page.locator('.chat__txt.error')).toContainText('Please modify your question and try again');
   });
 
+  test('stream: content filter during stream', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('default-question').nth(0).click();
+
+    await page.routeFromHAR('./tests/e2e/hars/error-chat-response-stream.har', {
+      url: '/chat',
+      update: false,
+    });
+
+    await page.getByTestId('submit-question-button').click();
+    await expect(page.locator('.chat__txt.error')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('.chat__txt.error')).toContainText('Please modify your question and try again');
+
+    // make sure the content is there for all text entries including some of the streamed content
+    const chatContent = page.locator('.chat__txt--entry');
+    await expect(chatContent).toHaveCount(2);
+    await expect(chatContent.nth(0)).not.toHaveText('');
+    await expect(chatContent.nth(1)).not.toHaveText('');
+  });
+
   test('no stream: on server failure', async ({ page }) => {
     await page.goto('/');
     await page.getByTestId('default-question').nth(0).click();
