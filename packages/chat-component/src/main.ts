@@ -377,10 +377,7 @@ export class ChatComponent extends LitElement {
           ...this.chatThread,
           {
             error: {
-              message:
-                chatError?.code === 'content_filter' || chatError?.code === 400
-                  ? globalConfig.INVALID_REQUEST_ERROR
-                  : globalConfig.API_ERROR_MESSAGE,
+              message: chatError?.code === 400 ? globalConfig.INVALID_REQUEST_ERROR : globalConfig.API_ERROR_MESSAGE,
             },
             text: [],
             timestamp: getTimestamp(),

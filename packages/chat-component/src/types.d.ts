@@ -93,6 +93,7 @@ declare type BotResponseMessage = Message & {
 };
 
 declare interface BotResponseError {
+  statusCode: number;
   error: string;
   code: string;
   message: string;

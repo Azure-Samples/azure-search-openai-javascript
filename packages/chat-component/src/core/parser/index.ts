@@ -38,13 +38,13 @@ export async function parseStreamedMessages({
     }
 
     if (chunk.error) {
-      throw new ChatResponseError(chunk.message, chunk.code);
+      throw new ChatResponseError(chunk.message, chunk.statusCode);
     }
 
     // content is filtered during the output streaming
     // https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/content-filter?tabs=javascrit
     if (chunk.choices[0].finish_reason === 'content_filter') {
-      throw new ChatResponseError('Content filter triggered', 'content_filter');
+      throw new ChatResponseError('Content filtered', 400);
     }
 
     const { content, context } = chunk.choices[0].delta;
