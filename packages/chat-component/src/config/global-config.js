@@ -35,6 +35,7 @@ const globalConfig = {
   THOUGHT_PROCESS_LABEL: 'Thought Process',
   SUPPORT_CONTEXT_LABEL: 'Support Context',
   CITATIONS_LABEL: 'Learn More:',
+  CITATIONS_TAB_LABEL: 'Citations',
 };
 
 const NEXT_QUESTION_INDICATOR = 'Next Questions:';
