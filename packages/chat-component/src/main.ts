@@ -378,7 +378,9 @@ export class ChatComponent extends LitElement {
           {
             error: {
               message:
-                chatError?.statusCode === 400 ? globalConfig.API_BAD_REQUEST_ERROR : globalConfig.API_ERROR_MESSAGE,
+                chatError?.code === 'content_filter' || chatError?.code === 400
+                  ? globalConfig.INVALID_REQUEST_ERROR
+                  : globalConfig.API_ERROR_MESSAGE,
             },
             text: [],
             timestamp: getTimestamp(),

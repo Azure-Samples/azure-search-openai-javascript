@@ -100,10 +100,10 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
           return await chatApproach.run(messages, (context as any) ?? {});
         }
       } catch (_error: unknown) {
-        const error = _error as Error & { status?: number };
+        const error = _error as Error & { error?: any; status?: number };
         fastify.log.error(error);
-        if (error.status) {
-          return reply.code(error.status).send(error);
+        if (error.error) {
+          return reply.code(error.status ?? 500).send(error);
         }
 
         return reply.internalServerError(error.message);
@@ -147,10 +147,10 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
           return await askApproach.run(messages[0].content, (context as any) ?? {});
         }
       } catch (_error: unknown) {
-        const error = _error as Error & { status?: number };
+        const error = _error as Error & { error?: any; status?: number };
         fastify.log.error(error);
-        if (error.status) {
-          return reply.code(error.status).send(error);
+        if (error.error) {
+          return reply.code(error.status ?? 500).send(error);
         }
 
         return reply.internalServerError(error.message);
