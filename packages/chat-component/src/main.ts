@@ -156,9 +156,6 @@ export class ChatComponent extends LitElement {
         this.chatThoughts = result.thoughts;
         this.chatDataPoints = result.data_points;
         this.canShowThoughtProcess = true;
-        // this is a temporary fix until we have chat history and can use the corresponding
-        // datapoints from the history
-        // TODO: remove this once we have chat history
 
         return true;
       }
