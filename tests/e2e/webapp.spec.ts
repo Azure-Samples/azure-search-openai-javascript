@@ -127,9 +127,9 @@ test.describe('default', () => {
       }),
     );
 
-    await expect(page.locator('.loading-skeleton')).not.toBeVisible();
+    await expect(page.locator('.loading-text')).not.toBeVisible();
     await page.getByTestId('submit-question-button').click();
-    await expect(page.locator('.loading-skeleton')).toBeVisible();
+    await expect(page.locator('.loading-text')).toBeVisible();
     await expect(page.getByTestId('question-input')).not.toBeEnabled();
   });
 });
