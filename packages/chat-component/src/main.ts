@@ -668,7 +668,7 @@ export class ChatComponent extends LitElement {
                       title="${this.enableVoiceListening
                         ? globalConfig.CHAT_VOICE_REC_BUTTON_LABEL_TEXT
                         : globalConfig.CHAT_VOICE_BUTTON_LABEL_TEXT}"
-                      class="chatbox__button no-shadow ${this.enableVoiceListening ? 'recording' : 'not-recording'}"
+                      class="chatbox__button voice__input ${this.enableVoiceListening ? 'recording' : 'not-recording'}"
                       ?disabled="${!this.showVoiceInput}"
                       @click="${this.handleVoiceInput}"
                     >
