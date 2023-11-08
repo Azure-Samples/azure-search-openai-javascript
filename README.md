@@ -239,7 +239,8 @@ You can only run locally **after** having successfully run the `azd up` command.
 
 1. Run `azd auth login`
 2. Run `azd env get-values > .env` to get the environment variables for the app
-3. Run `npm start` or run the "VS Code Task: Start App" to start the project locally.
+3. Run `az login`
+4. Run `npm start` or run the "VS Code Task: Start App" to start the project locally.
 
 ## Using the app
 
