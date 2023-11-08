@@ -648,32 +648,34 @@ export class ChatComponent extends LitElement {
             class="form__container ${this.inputPosition === 'sticky' ? 'form__container-sticky' : ''}"
           >
             <div class="chatbox__container container-col container-row">
-              <input
-                class="chatbox__input"
-                data-testid="question-input"
-                id="question-input"
-                placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}"
-                aria-labelledby="chatbox-label"
-                id="chatbox"
-                name="chatbox"
-                type="text"
-                :value=""
-                ?disabled="${this.isDisabled}"
-                autocomplete="off"
-                @keyup="${this.handleOnInputChange}"
-              />
-              ${this.showVoiceInput
-                ? html` <button
-                    title="${this.enableVoiceListening
-                      ? globalConfig.CHAT_VOICE_REC_BUTTON_LABEL_TEXT
-                      : globalConfig.CHAT_VOICE_BUTTON_LABEL_TEXT}"
-                    class="chatbox__button ${this.enableVoiceListening ? 'recording' : 'not-recording'}"
-                    ?disabled="${!this.showVoiceInput}"
-                    @click="${this.handleVoiceInput}"
-                  >
-                    ${this.enableVoiceListening ? unsafeSVG(iconMicOn) : unsafeSVG(iconMicOff)}
-                  </button>`
-                : ''}
+              <div class="chatbox__input-container display-flex-grow container-row">
+                <input
+                  class="chatbox__input display-flex-grow"
+                  data-testid="question-input"
+                  id="question-input"
+                  placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}"
+                  aria-labelledby="chatbox-label"
+                  id="chatbox"
+                  name="chatbox"
+                  type="text"
+                  :value=""
+                  ?disabled="${this.isDisabled}"
+                  autocomplete="off"
+                  @keyup="${this.handleOnInputChange}"
+                />
+                ${this.showVoiceInput
+                  ? html` <button
+                      title="${this.enableVoiceListening
+                        ? globalConfig.CHAT_VOICE_REC_BUTTON_LABEL_TEXT
+                        : globalConfig.CHAT_VOICE_BUTTON_LABEL_TEXT}"
+                      class="chatbox__button no-shadow ${this.enableVoiceListening ? 'recording' : 'not-recording'}"
+                      ?disabled="${!this.showVoiceInput}"
+                      @click="${this.handleVoiceInput}"
+                    >
+                      ${this.enableVoiceListening ? unsafeSVG(iconMicOn) : unsafeSVG(iconMicOff)}
+                    </button>`
+                  : ''}
+              </div>
               <button
                 class="chatbox__button"
                 data-testid="submit-question-button"
