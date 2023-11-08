@@ -1,5 +1,5 @@
 $scriptPath = $MyInvocation.MyCommand.Path
-cd $scriptPath/..
+cd $scriptPath/../..
 
 Write-Host "Loading azd .env file from current environment"
 $output = azd env get-values
@@ -19,4 +19,5 @@ npm ci
 npm run build --workspace=indexer
 
 Write-Host 'Running "index-files" CLI tool'
-npx index-files --wait --indexer-url "$env:INDEXER_API_URI" --index-name "$env:AZURE_SEARCH_INDEX" ./data/*.md
+$files = Get-Item "data/*.pdf"
+npx index-files --wait --indexer-url "$env:INDEXER_API_URI" --index-name "$env:AZURE_SEARCH_INDEX" $files
