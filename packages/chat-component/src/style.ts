@@ -367,8 +367,12 @@ export const mainStyle = css`
     width: 20px;
     cursor: pointer;
   }
-  .no-shadow {
+  .voice__input {
     box-shadow: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 50px;
   }
   .chatbox__input-container {
     display: flex;
