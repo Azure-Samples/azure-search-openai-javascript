@@ -10,6 +10,7 @@ export const mainStyle = css`
     --primary-color: rgba(241, 255, 165, 0.6);
     --white: #fff;
     --black: #111111;
+    --red: #ff0000;
     --light-gray: #e3e3e3;
     --dark-gray: #4e5288;
     --accent-high: #692b61;
@@ -588,5 +589,11 @@ export const mainStyle = css`
     fill: var(--accent-lighter);
     animation: spinneranimation 1s linear infinite;
     margin-right: 10px;
+  }
+  .not-recording svg {
+    fill: var(--black);
+  }
+  .recording svg {
+    fill: var(--red);
   }
 `;
