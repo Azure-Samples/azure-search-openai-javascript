@@ -226,10 +226,10 @@ export class ChatComponent extends LitElement {
         this.currentQuestion = this.questionInput.value;
       };
 
-      this.speechRecognition.error = (event) => {
-        console.error(event);
+      this.speechRecognition.addEventListener('error', (event) => {
         this.speechRecognition.stop();
-      };
+        console.log(`Speech recognition error detected: ${event.error} - ${event.message}`);
+      });
     }
 
     this.enableVoiceListening = !this.enableVoiceListening;
