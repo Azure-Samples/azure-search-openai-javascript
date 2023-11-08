@@ -91,8 +91,8 @@ export const mainStyle = css`
     display: none;
     visibility: hidden;
   }
-  .display-flex {
-    display: flex;
+  .display-flex-grow {
+    flex-grow: 1;
   }
   .container-col {
     display: flex;
@@ -362,18 +362,33 @@ export const mainStyle = css`
     background: var(--accent-dark);
     border-radius: 50%;
     color: var(--white);
-    font-wdafaeight: bold;
+    font-weight: bold;
     height: 20px;
     width: 20px;
     cursor: pointer;
   }
-  .chatbox__input {
+  .no-shadow {
+    box-shadow: none;
+  }
+  .chatbox__input-container {
+    display: flex;
+    border: 1px solid var(--black);
     background: var(--white);
-    color: var(--text-color);
     border-radius: 4px;
+  }
+  .chatbox__input-container:focus-within {
+    outline: -webkit-focus-ring-color auto 1px;
+  }
+  .chatbox__input {
+    background: transparent;
+    color: var(--text-color);
+    border: none;
     padding: 8px;
     flex: 1 1 auto;
     font-size: 1rem;
+  }
+  .chatbox__input:focus-visible {
+    outline: none;
   }
   .chat__list {
     color: var(--text-color);
