@@ -120,7 +120,7 @@ A similar option to Codespaces is VS Code Remote Containers, that will open the 
 #### Local environment
 
 - [Azure Developer CLI](https://aka.ms/azure-dev/install)
-- [Node.js 18+](https://nodejs.org/en/download/)
+- [Node.js LTS](https://nodejs.org/en/download/)
 - [Docker for Desktop](https://www.docker.com/products/docker-desktop/)
 - [Git](https://git-scm.com/downloads)
 - [Powershell 7+ (pwsh)](https://github.com/powershell/powershell) - For Windows users only.
