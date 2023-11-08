@@ -87,3 +87,9 @@ declare type BotResponseMessage = Message & {
   };
   session_state?: Record<string, any>;
 };
+
+declare interface ChatAside {
+  chatThoughts?: string;
+  chatDataPoints?: string[];
+  chatCitations?: Citation[];
+}

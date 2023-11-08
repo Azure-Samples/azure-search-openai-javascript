@@ -102,8 +102,10 @@ export class ChatComponent extends LitElement {
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
-  chatThoughts: string | null = '';
-  chatDataPoints: string[] = [];
+  // aside data
+  chatAside: ChatAside = {};
+  chatAsideHistory: ChatAside[] = [];
+  currentChatAside: ChatAside = {};
 
   chatRequestOptions: ChatRequestOptions = requestOptions;
   chatHttpOptions: ChatHttpOptions = chatHttpOptions;
@@ -153,10 +155,13 @@ export class ChatComponent extends LitElement {
           },
           // this will be processing thought process only with streaming enabled
         });
-        this.chatThoughts = result.thoughts;
-        this.chatDataPoints = result.data_points;
+        this.chatAside = {
+          chatThoughts: result.thoughts,
+          chatDataPoints: result.data_points,
+          chatCitations: [...new Set(citations)],
+        };
+        this.chatAsideHistory.push(this.chatAside);
         this.canShowThoughtProcess = true;
-
         return true;
       }
 
@@ -295,8 +300,12 @@ export class ChatComponent extends LitElement {
         const response = this.apiResponse as BotResponse;
         // adds thought process support when streaming is disabled
         if (!this.useStream) {
-          this.chatThoughts = response.choices[0].message.context?.thoughts ?? '';
-          this.chatDataPoints = response.choices[0].message.context?.data_points ?? [];
+          this.chatAside = {
+            chatThoughts: response.choices[0].message.context?.thoughts ?? '',
+            chatDataPoints: response.choices[0].message.context?.data_points ?? [],
+            chatCitations: this.chatThread.at(-1)?.citations ?? [],
+          };
+          this.chatAsideHistory.push(this.chatAside);
           this.canShowThoughtProcess = true;
         }
         await this.processApiResponse({
@@ -353,8 +362,9 @@ export class ChatComponent extends LitElement {
     this.isResponseCopied = true;
   }
 
-  handleShowThoughtProcess(event: Event): void {
+  handleShowThoughtProcess(index, event?: Event): void {
     event?.preventDefault();
+    this.currentChatAside = this.chatAsideHistory[(index - 1) / 2];
     this.selectedAsideTab = 'tab-thought-process';
     this.showThoughtProcess();
   }
@@ -502,17 +512,18 @@ export class ChatComponent extends LitElement {
                 </div>
                 <ul class="chat__list" id="chat-list" aria-live="assertive">
                   ${this.chatThread.map(
-                    (message) => html`
+                    (message, index) => html`
                       <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
                         <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
                           ${message.isUserMessage
                             ? ''
                             : html` <div class="chat__header">
                                 <button
+                                  id=${index}
                                   title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                                   class="button chat__header--button"
                                   data-testid="chat-show-thought-process"
-                                  @click="${this.handleShowThoughtProcess}"
+                                  @click="${() => this.handleShowThoughtProcess(index)}"
                                   ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
                                 >
                                   <span class="chat__header--span"
@@ -721,7 +732,11 @@ export class ChatComponent extends LitElement {
                   }" aria-labelledby="tab-thought-process">
                     <h3 class="subheadline--small">${globalConfig.THOUGHT_PROCESS_LABEL}</h3>
                     <div class="aside__innerContainer">
-                    ${this.chatThoughts ? html` <p class="aside__paragraph">${unsafeHTML(this.chatThoughts)}</p> ` : ''}
+                    ${
+                      this.currentChatAside
+                        ? html` <p class="aside__paragraph">${unsafeHTML(this.currentChatAside.chatThoughts)}</p> `
+                        : ''
+                    }
                     </div> 
                   </div>
                   <div id="tabpanel-2" class="aside__tab${
@@ -731,7 +746,7 @@ export class ChatComponent extends LitElement {
                   }">
                     <h3 class="subheadline--small">${globalConfig.SUPPORT_CONTEXT_LABEL}</h3>
                     <ul class="defaults__list always-row">
-                      ${this.chatDataPoints.map(
+                      ${this.currentChatAside?.chatDataPoints?.map(
                         (dataPoint) => html` <li class="defaults__listItem">${dataPoint}</li> `,
                       )}
                     </ul>
