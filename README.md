@@ -96,7 +96,7 @@ You may try the [Azure pricing calculator](https://azure.com/e/8ffbe5b1919c4c72a
 - Azure Monitor: Pay-as-you-go tier. Costs based on data ingested. [Pricing](https://azure.microsoft.com/pricing/details/monitor/)
 
 ⚠️ To avoid unnecessary costs, remember to take down your app if it's no longer in use,
-either by deleting the resource group in the Portal or running `azd down`.
+either by deleting the resource group in the Portal or running `azd down --purge`.
 
 ### Project setup
 
@@ -321,7 +321,7 @@ For more details, read [Azure OpenAI Landing Zone reference architecture](https:
 
 To clean up all the resources created by this sample:
 
-1. Run `azd down`
+1. Run `azd down --purge`
 2. When asked if you are sure you want to continue, enter `y`
 3. When asked if you want to permanently delete the resources, enter `y`
 
@@ -384,9 +384,11 @@ Technology comparison:
 <summary>How do you use GPT-4 with this sample?</summary>
 
 Run these commands:
+
 ```bash
 azd env set AZURE_OPENAI_CHATGPT_MODEL gpt-4
 ```
+
 You may also need to adjust the capacity in `infra/main.bicep` file, depending on how much TPM your account is allowed.
 
 </details>
