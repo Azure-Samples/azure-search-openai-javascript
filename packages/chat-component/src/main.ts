@@ -104,9 +104,7 @@ export class ChatComponent extends LitElement {
   @property({ type: Boolean })
   enableVoiceListening = false;
 
-  speechRecognition = this.showVoiceInput
-    ? new (window.SpeechRecognition || window.webkitSpeechRecognition)()
-    : undefined;
+  speechRecognition = undefined;
 
   // api response
   apiResponse = {} as BotResponse | Response;
@@ -213,22 +211,30 @@ export class ChatComponent extends LitElement {
 
   handleVoiceInput(event: Event): void {
     event.preventDefault();
-    this.enableVoiceListening = !this.enableVoiceListening;
-    if (this.enableVoiceListening) {
+    if (!this.speechRecognition) {
+      this.speechRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
       this.speechRecognition.continous = true;
       this.speechRecognition.lang = 'en-US';
 
-      this.speechRecognition.start();
       this.speechRecognition.onresult = (event) => {
         let input = '';
-        // iterate through speech recognition results
         for (const result of event.results) {
-          // Print the transcription to the console
           input += `${result[0].transcript}`;
         }
         this.questionInput.value = DOMPurify.sanitize(input);
         this.currentQuestion = this.questionInput.value;
       };
+
+      this.speechRecognition.error = (event) => {
+        console.error(event);
+        this.speechRecognition.stop();
+      };
+    }
+
+    this.enableVoiceListening = !this.enableVoiceListening;
+    if (this.enableVoiceListening) {
+      this.speechRecognition.start();
     } else {
       this.speechRecognition.stop();
     }
