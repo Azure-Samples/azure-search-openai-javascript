@@ -65,8 +65,26 @@ export class ChatComponent extends LitElement {
   @query('#chat-list-footer')
   chatFooter!: HTMLElement;
 
+  @query('#overlay')
+  overlay!: HTMLElement;
+
+  @query('#chat__containerWrapper')
+  chatContainerWrapper!: HTMLElement;
+
+  @query('#citation-previewer')
+  previewer!: HTMLElement;
+
   @queryAll('.copyButton')
   copyButtonList!: NodeListOf<HTMLButtonElement>;
+
+  @queryAll('.aside__link')
+  linksNodeList!: NodeListOf<HTMLElement>;
+
+  @queryAll('.aside__tab')
+  tabsNodeList!: NodeListOf<HTMLElement>;
+
+  @queryAll('.aside .items__list.citations .items__listItem--citation')
+  citationsList!: NodeListOf<HTMLElement>;
 
   // Default prompts to display in the chat
   @property({ type: Boolean })
@@ -224,18 +242,15 @@ export class ChatComponent extends LitElement {
       const response = await fetch(sourceUrl);
       if (response.ok) {
         // highlight the clicked citation to make it clear which is being previewed
-        const citationsList = this.shadowRoot?.querySelectorAll(
-          '.aside .items__list.citations .items__listItem--citation',
-        );
 
-        if (citationsList) {
-          const citationsArray = [...citationsList];
+        if (this.citationsList) {
+          const citationsArray = [...this.citationsList];
           const clickedIndex = citationsArray.findIndex((citation) => {
             const link = citation.querySelector('a');
             return link?.href === sourceUrl;
           });
 
-          for (const citation of citationsList) {
+          for (const citation of this.citationsList) {
             const index = citationsArray.indexOf(citation);
             if (index === clickedIndex) {
               citation.classList.add('active');
@@ -246,10 +261,9 @@ export class ChatComponent extends LitElement {
         }
 
         // update the markdown previewer with the content of the clicked citation
-        const previewer = this.shadowRoot?.querySelector('#citation-previewer');
-        if (previewer) {
+        if (this.previewer) {
           const markdownContent = await response.text();
-          previewer.innerHTML = DOMPurify.sanitize(marked.parse(markdownContent));
+          this.previewer.innerHTML = DOMPurify.sanitize(marked.parse(markdownContent));
         }
       }
     }
@@ -383,16 +397,16 @@ export class ChatComponent extends LitElement {
   // show thought process aside
   showThoughtProcess(): void {
     this.isShowingThoughtProcess = true;
-    this.shadowRoot?.querySelector('#overlay')?.classList.add('active');
-    this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.add('aside-open');
+    this.overlay.classList.add('active');
+    this.chatContainerWrapper.classList.add('aside-open');
   }
 
   // hide thought process aside
   hideThoughtProcess(event: Event): void {
     event.preventDefault();
     this.isShowingThoughtProcess = false;
-    this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.remove('aside-open');
-    this.shadowRoot?.querySelector('#overlay')?.classList.remove('active');
+    this.chatContainerWrapper.classList.remove('aside-open');
+    this.overlay.classList.remove('active');
   }
   // display active tab content
   // this is basically a tab component
@@ -400,15 +414,13 @@ export class ChatComponent extends LitElement {
   activateTab(event: Event): void {
     event.preventDefault();
     const clickedLink = event.target as HTMLElement;
-    const linksNodeList = this.shadowRoot?.querySelectorAll('.aside__link');
 
-    if (linksNodeList) {
-      const linksArray = [...linksNodeList];
+    if (this.linksNodeList) {
+      const linksArray = [...this.linksNodeList];
       const clickedIndex = linksArray.indexOf(clickedLink);
-      const tabsNodeList = this.shadowRoot?.querySelectorAll('.aside__tab');
 
-      if (tabsNodeList) {
-        const tabsArray = [...tabsNodeList] as HTMLElement[];
+      if (this.tabsNodeList) {
+        const tabsArray = [...this.tabsNodeList] as HTMLElement[];
 
         for (const [index, tab] of tabsArray.entries()) {
           if (index === clickedIndex) {
