@@ -19,6 +19,7 @@ export const mainStyle = css`
     --accent-lighter: #f6d0d0;
     --accent-contrast: #7d3c71;
     --error-color: #8a0000;
+    --error-color-background: rgb(253, 231, 233);
   }
   :host([data-theme='dark']]) {
     display: block;
@@ -34,7 +35,8 @@ export const mainStyle = css`
     --accent-light: #e6fbf7;
     --accent-lighter: #f6d0d0;
     --accent-contrast: #7d3c71;
-    --error-color: #8a0000;
+    --error-color: rgb(243, 242, 241);
+    --error-color-background: rgb(68, 39, 38);
   }
   html {
     scroll-behavior: smooth;
@@ -433,6 +435,7 @@ export const mainStyle = css`
     border: 3px solid var(--error-color);
     color: var(--error-color);
     padding: 20px;
+    background: var(--error-color-background);
   }
   .chat__txt.user-message {
     background: linear-gradient(to left, var(--accent-contrast), var(--accent-high));
