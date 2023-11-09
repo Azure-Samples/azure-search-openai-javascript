@@ -36,6 +36,7 @@ const globalConfig = {
   SUPPORT_CONTEXT_LABEL: 'Support Context',
   CITATIONS_LABEL: 'Learn More:',
   CITATIONS_TAB_LABEL: 'Citations',
+  NO_DATA_POINTS_MESSAGE: 'No data points to display',
 };
 
 const NEXT_QUESTION_INDICATOR = 'Next Questions:';

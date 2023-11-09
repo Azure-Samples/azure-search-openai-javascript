@@ -535,6 +535,24 @@ export class ChatComponent extends LitElement {
     `;
   }
 
+  // render the show thought ptocess button
+  renderShowThoughtProcessButton(index: number) {
+    return html`
+      <button
+        id="showButton-${index}"
+        title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
+        class="button chat__header--button"
+        data-testid="chat-show-thought-process"
+        @click="${() => this.handleShowThoughtProcess(index)}"
+        ?disabled="${this.chatAsideHistory.length === 0 || !this.chatAsideHistory[(index - 1) / 2]}"
+      >
+        <span class="chat__header--span">${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span>
+
+        ${unsafeSVG(iconLightBulb)}
+      </button>
+    `;
+  }
+
   // Render the chat component as a web component
   override render() {
     return html`
@@ -562,20 +580,7 @@ export class ChatComponent extends LitElement {
                           ${message.isUserMessage
                             ? ''
                             : html` <div class="chat__header">
-                                <button
-                                  id="showButton-${index}"
-                                  title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                                  class="button chat__header--button"
-                                  data-testid="chat-show-thought-process"
-                                  @click="${() => this.handleShowThoughtProcess(index)}"
-                                  ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
-                                >
-                                  <span class="chat__header--span"
-                                    >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
-                                  >
-
-                                  ${unsafeSVG(iconLightBulb)}
-                                </button>
+                                ${this.renderShowThoughtProcessButton(index)}
                                 ${this.renderCopyButton(message.text?.at(-1) as ChatMessageText, index)}
                               </div>`}
                           ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
