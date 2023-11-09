@@ -41,7 +41,7 @@ urlFragment: azure-search-openai-javascript
   - [FAQ](#faq)
   - [Troubleshooting](#troubleshooting)
 
-[![Open in GitHub Codespaces](https://img.shields.io/static/v1?style=for-the-badge&label=GitHub+Codespaces&message=Open&color=brightgreen&logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=599293758&machine=standardLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestUs2)
+[![Open in GitHub Codespaces](https://img.shields.io/static/v1?style=for-the-badge&label=GitHub+Codespaces&message=Open&color=brightgreen&logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=684521881&machine=standardLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestUs2)
 [![Open in Remote - Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/azure-search-openai-javascript)
 
 This sample demonstrates a few approaches for creating ChatGPT-like experiences over your own data using the Retrieval Augmented Generation pattern. It uses Azure OpenAI Service to access the ChatGPT model (gpt-35-turbo), and Azure Cognitive Search for data indexing and retrieval.
@@ -96,7 +96,7 @@ You may try the [Azure pricing calculator](https://azure.com/e/8ffbe5b1919c4c72a
 - Azure Monitor: Pay-as-you-go tier. Costs based on data ingested. [Pricing](https://azure.microsoft.com/pricing/details/monitor/)
 
 ⚠️ To avoid unnecessary costs, remember to take down your app if it's no longer in use,
-either by deleting the resource group in the Portal or running `azd down`.
+either by deleting the resource group in the Portal or running `azd down --purge`.
 
 ### Project setup
 
@@ -109,7 +109,7 @@ Alternatively you can [set up your local environment](#local-environment) follwi
 
 You can run this repo virtually by using GitHub Codespaces, which will open a web-based VS Code in your browser:
 
-[![Open in GitHub Codespaces](https://img.shields.io/static/v1?style=for-the-badge&label=GitHub+Codespaces&message=Open&color=brightgreen&logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=599293758&machine=standardLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestUs2)
+[![Open in GitHub Codespaces](https://img.shields.io/static/v1?style=for-the-badge&label=GitHub+Codespaces&message=Open&color=brightgreen&logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=684521881&machine=standardLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestUs2)
 
 #### VS Code Remote Containers
 
@@ -120,7 +120,7 @@ A similar option to Codespaces is VS Code Remote Containers, that will open the 
 #### Local environment
 
 - [Azure Developer CLI](https://aka.ms/azure-dev/install)
-- [Node.js 18+](https://nodejs.org/en/download/)
+- [Node.js LTS](https://nodejs.org/en/download/)
 - [Docker for Desktop](https://www.docker.com/products/docker-desktop/)
 - [Git](https://git-scm.com/downloads)
 - [Powershell 7+ (pwsh)](https://github.com/powershell/powershell) - For Windows users only.
@@ -163,7 +163,7 @@ If you already have existing Azure resources, you can re-use those by setting `a
 1. Run `azd env set AZURE_OPENAI_SERVICE {Name of existing OpenAI service}`
 1. Run `azd env set AZURE_OPENAI_RESOURCE_GROUP {Name of existing resource group that OpenAI service is provisioned to}`
 1. Run `azd env set AZURE_OPENAI_CHATGPT_DEPLOYMENT {Name of existing ChatGPT deployment}`. Only needed if your ChatGPT deployment is not the default 'chat'.
-1. Run `azd env set AZURE_OPENAI_EMB_DEPLOYMENT {Name of existing GPT embedding deployment}`. Only needed if your embeddings deployment is not the default 'embedding'.
+1. Run `azd env set AZURE_OPENAI_EMBEDDING_DEPLOYMENT {Name of existing GPT embedding deployment}`. Only needed if your embeddings deployment is not the default 'embedding'.
 
 #### Existing Azure Cognitive Search resource
 
@@ -239,7 +239,8 @@ You can only run locally **after** having successfully run the `azd up` command.
 
 1. Run `azd auth login`
 2. Run `azd env get-values > .env` to get the environment variables for the app
-3. Run `npm start` or run the "VS Code Task: Start App" to start the project locally.
+3. Run `az login`
+4. Run `npm start` or run the "VS Code Task: Start App" to start the project locally.
 
 ## Using the app
 
@@ -321,7 +322,7 @@ For more details, read [Azure OpenAI Landing Zone reference architecture](https:
 
 To clean up all the resources created by this sample:
 
-1. Run `azd down`
+1. Run `azd down --purge`
 2. When asked if you are sure you want to continue, enter `y`
 3. When asked if you want to permanently delete the resources, enter `y`
 
@@ -384,9 +385,11 @@ Technology comparison:
 <summary>How do you use GPT-4 with this sample?</summary>
 
 Run these commands:
+
 ```bash
 azd env set AZURE_OPENAI_CHATGPT_MODEL gpt-4
 ```
+
 You may also need to adjust the capacity in `infra/main.bicep` file, depending on how much TPM your account is allowed.
 
 </details>

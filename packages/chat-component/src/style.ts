@@ -10,6 +10,7 @@ export const mainStyle = css`
     --primary-color: rgba(241, 255, 165, 0.6);
     --white: #fff;
     --black: #111111;
+    --red: #ff0000;
     --light-gray: #e3e3e3;
     --dark-gray: #4e5288;
     --accent-high: #692b61;
@@ -90,8 +91,8 @@ export const mainStyle = css`
     display: none;
     visibility: hidden;
   }
-  .display-flex {
-    display: flex;
+  .display-flex-grow {
+    flex-grow: 1;
   }
   .container-col {
     display: flex;
@@ -361,18 +362,37 @@ export const mainStyle = css`
     background: var(--accent-dark);
     border-radius: 50%;
     color: var(--white);
-    font-wdafaeight: bold;
+    font-weight: bold;
     height: 20px;
     width: 20px;
     cursor: pointer;
   }
-  .chatbox__input {
+  .voice__input {
+    box-shadow: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 50px;
+  }
+  .chatbox__input-container {
+    display: flex;
+    border: 1px solid var(--black);
     background: var(--white);
-    color: var(--text-color);
     border-radius: 4px;
+  }
+  .chatbox__input-container:focus-within {
+    outline: -webkit-focus-ring-color auto 1px;
+  }
+  .chatbox__input {
+    background: transparent;
+    color: var(--text-color);
+    border: none;
     padding: 8px;
     flex: 1 1 auto;
     font-size: 1rem;
+  }
+  .chatbox__input:focus-visible {
+    outline: none;
   }
   .chat__list {
     color: var(--text-color);
@@ -588,5 +608,11 @@ export const mainStyle = css`
     fill: var(--accent-lighter);
     animation: spinneranimation 1s linear infinite;
     margin-right: 10px;
+  }
+  .not-recording svg {
+    fill: var(--black);
+  }
+  .recording svg {
+    fill: var(--red);
   }
 `;

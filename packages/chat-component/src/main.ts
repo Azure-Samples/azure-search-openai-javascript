@@ -20,6 +20,9 @@ import iconSend from '../public/svg/send-icon.svg?raw';
 import iconClose from '../public/svg/close-icon.svg?raw';
 import iconQuestion from '../public/svg/bubblequestion-icon.svg?raw';
 import iconSpinner from '../public/svg/spinner-icon.svg?raw';
+import iconMicOff from '../public/svg/mic-icon.svg?raw';
+import iconMicOn from '../public/svg/mic-record-on-icon.svg?raw';
+
 import { marked } from 'marked';
 
 /**
@@ -115,6 +118,15 @@ export class ChatComponent extends LitElement {
   @property({ type: Boolean })
   canShowThoughtProcess = false;
 
+  // some browsers may not support SpeechRecognition https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition#browser_compatibility
+  @property({ type: Boolean })
+  showVoiceInput = (window.SpeechRecognition || window.webkitSpeechRecognition) !== undefined;
+
+  @property({ type: Boolean })
+  enableVoiceListening = false;
+
+  speechRecognition = undefined;
+
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
@@ -182,6 +194,7 @@ export class ChatComponent extends LitElement {
         };
         this.chatAsideHistory.push(chatAside);
         this.canShowThoughtProcess = true;
+
         return true;
       }
 
@@ -219,6 +232,37 @@ export class ChatComponent extends LitElement {
         followupQuestions.push(...(processedText.arrays[2] as string[]));
         updateChatWithMessageOrChunk(message, false);
       }
+    }
+  }
+
+  handleVoiceInput(event: Event): void {
+    event.preventDefault();
+    if (!this.speechRecognition) {
+      this.speechRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+      this.speechRecognition.continous = true;
+      this.speechRecognition.lang = 'en-US';
+
+      this.speechRecognition.onresult = (event) => {
+        let input = '';
+        for (const result of event.results) {
+          input += `${result[0].transcript}`;
+        }
+        this.questionInput.value = DOMPurify.sanitize(input);
+        this.currentQuestion = this.questionInput.value;
+      };
+
+      this.speechRecognition.addEventListener('error', (event) => {
+        this.speechRecognition.stop();
+        console.log(`Speech recognition error detected: ${event.error} - ${event.message}`);
+      });
+    }
+
+    this.enableVoiceListening = !this.enableVoiceListening;
+    if (this.enableVoiceListening) {
+      this.speechRecognition.start();
+    } else {
+      this.speechRecognition.stop();
     }
   }
 
@@ -653,20 +697,34 @@ export class ChatComponent extends LitElement {
             class="form__container ${this.inputPosition === 'sticky' ? 'form__container-sticky' : ''}"
           >
             <div class="chatbox__container container-col container-row">
-              <input
-                class="chatbox__input"
-                data-testid="question-input"
-                id="question-input"
-                placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}"
-                aria-labelledby="chatbox-label"
-                id="chatbox"
-                name="chatbox"
-                type="text"
-                :value=""
-                ?disabled="${this.isDisabled}"
-                autocomplete="off"
-                @keyup="${this.handleOnInputChange}"
-              />
+              <div class="chatbox__input-container display-flex-grow container-row">
+                <input
+                  class="chatbox__input display-flex-grow"
+                  data-testid="question-input"
+                  id="question-input"
+                  placeholder="${globalConfig.CHAT_INPUT_PLACEHOLDER}"
+                  aria-labelledby="chatbox-label"
+                  id="chatbox"
+                  name="chatbox"
+                  type="text"
+                  :value=""
+                  ?disabled="${this.isDisabled}"
+                  autocomplete="off"
+                  @keyup="${this.handleOnInputChange}"
+                />
+                ${this.showVoiceInput
+                  ? html` <button
+                      title="${this.enableVoiceListening
+                        ? globalConfig.CHAT_VOICE_REC_BUTTON_LABEL_TEXT
+                        : globalConfig.CHAT_VOICE_BUTTON_LABEL_TEXT}"
+                      class="chatbox__button voice__input ${this.enableVoiceListening ? 'recording' : 'not-recording'}"
+                      ?disabled="${!this.showVoiceInput}"
+                      @click="${this.handleVoiceInput}"
+                    >
+                      ${this.enableVoiceListening ? unsafeSVG(iconMicOn) : unsafeSVG(iconMicOff)}
+                    </button>`
+                  : ''}
+              </div>
               <button
                 class="chatbox__button"
                 data-testid="submit-question-button"
