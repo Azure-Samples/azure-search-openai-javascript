@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/template-indent */
 import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, queryAll } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { chatHttpOptions, globalConfig, requestOptions } from './config/global-config.js';
 import { getAPIResponse } from './core/http/index.js';
@@ -65,6 +65,9 @@ export class ChatComponent extends LitElement {
   @query('#chat-list-footer')
   chatFooter!: HTMLElement;
 
+  @queryAll('.copyButton')
+  copyButtonList!: NodeListOf<HTMLButtonElement>;
+
   // Default prompts to display in the chat
   @property({ type: Boolean })
   isDisabled = false;
@@ -83,9 +86,9 @@ export class ChatComponent extends LitElement {
   @property({ type: Boolean })
   hasAPIError = false;
 
-  // Has the response been copied to the clipboard
-  @property({ type: Boolean })
-  isResponseCopied = false;
+  // Responses copied to clipboard
+  @property()
+  isResponseCopiedArray: boolean[] = [];
 
   // Is showing thought process panel
   @property({ type: Boolean })
@@ -103,7 +106,6 @@ export class ChatComponent extends LitElement {
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   // aside data
-  chatAside: ChatAside = {};
   chatAsideHistory: ChatAside[] = [];
   currentChatAside: ChatAside = {};
 
@@ -155,12 +157,12 @@ export class ChatComponent extends LitElement {
           },
           // this will be processing thought process only with streaming enabled
         });
-        this.chatAside = {
+        const chatAside: ChatAside = {
           chatThoughts: result.thoughts,
           chatDataPoints: result.data_points,
           chatCitations: [...new Set(citations)],
         };
-        this.chatAsideHistory.push(this.chatAside);
+        this.chatAsideHistory.push(chatAside);
         this.canShowThoughtProcess = true;
         return true;
       }
@@ -300,12 +302,12 @@ export class ChatComponent extends LitElement {
         const response = this.apiResponse as BotResponse;
         // adds thought process support when streaming is disabled
         if (!this.useStream) {
-          this.chatAside = {
+          const chatAside: ChatAside = {
             chatThoughts: response.choices[0].message.context?.thoughts ?? '',
             chatDataPoints: response.choices[0].message.context?.data_points ?? [],
             chatCitations: this.chatThread.at(-1)?.citations ?? [],
           };
-          this.chatAsideHistory.push(this.chatAside);
+          this.chatAsideHistory.push(chatAside);
           this.canShowThoughtProcess = true;
         }
         await this.processApiResponse({
@@ -333,7 +335,7 @@ export class ChatComponent extends LitElement {
     this.chatThread = [];
     this.isDisabled = false;
     this.hasDefaultPromptsEnabled = true;
-    this.isResponseCopied = false;
+    this.isResponseCopiedArray = [];
     this.hideThoughtProcess(event);
   }
 
@@ -356,14 +358,23 @@ export class ChatComponent extends LitElement {
   }
 
   // Copy response to clipboard
-  copyResponseToClipboard(): void {
-    const response = this.chatThread.at(-1)?.text.at(-1)?.value as string;
-    navigator.clipboard.writeText(response);
-    this.isResponseCopied = true;
+  handleCopyResponseToClipboard(response: ChatMessageText, index: number): void {
+    // to get all the message and get it cleaned up
+    const cleanText = response.value.replaceAll(/<[^>]*>/g, '');
+    navigator.clipboard.writeText(cleanText);
+    this.isResponseCopiedArray[index] = true;
+
+    setTimeout(() => {
+      this.isResponseCopiedArray[index] = false;
+      this.requestUpdate('isResponseCopiedArray');
+    }, 3000);
+
+    this.requestUpdate('isResponseCopiedArray');
   }
 
   handleShowThoughtProcess(index, event?: Event): void {
     event?.preventDefault();
+    // we need to subtract 1 from the index because the chat thread chat messages, are odd numbers, while the chat aside is sequential
     this.currentChatAside = this.chatAsideHistory[(index - 1) / 2];
     this.selectedAsideTab = 'tab-thought-process';
     this.showThoughtProcess();
@@ -491,6 +502,27 @@ export class ChatComponent extends LitElement {
     return '';
   }
 
+  // render copy button
+  renderCopyButton(response: ChatMessageText, index: number) {
+    // render copy button
+    return html`
+      <button
+        id="copy-${index}"
+        title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+        class="button chat__header--button copyButton"
+        @click="${() => this.handleCopyResponseToClipboard(response, index)}"
+        ?disabled="${this.isDisabled}"
+      >
+        <span class="chat__header--span">
+          ${this.isResponseCopiedArray[index]
+            ? html`${globalConfig.COPIED_SUCCESSFULLY_MESSAGE}`
+            : html`${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}`}
+        </span>
+        ${this.isResponseCopiedArray[index] ? html`${unsafeSVG(iconSuccess)}` : html`${unsafeSVG(iconCopyToClipboard)}`}
+      </button>
+    `;
+  }
+
   // Render the chat component as a web component
   override render() {
     return html`
@@ -519,7 +551,7 @@ export class ChatComponent extends LitElement {
                             ? ''
                             : html` <div class="chat__header">
                                 <button
-                                  id=${index}
+                                  id="showButton-${index}"
                                   title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
                                   class="button chat__header--button"
                                   data-testid="chat-show-thought-process"
@@ -532,19 +564,7 @@ export class ChatComponent extends LitElement {
 
                                   ${unsafeSVG(iconLightBulb)}
                                 </button>
-                                <button
-                                  title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-                                  class="button chat__header--button"
-                                  @click="${this.copyResponseToClipboard}"
-                                  ?disabled="${this.isDisabled}"
-                                >
-                                  <span class="chat__header--span"
-                                    >${this.isResponseCopied
-                                      ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-                                      : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
-                                  >
-                                  ${this.isResponseCopied ? unsafeSVG(iconSuccess) : unsafeSVG(iconCopyToClipboard)}
-                                </button>
+                                ${this.renderCopyButton(message.text?.at(-1) as ChatMessageText, index)}
                               </div>`}
                           ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
                           ${this.renderCitation(message.citations)}
