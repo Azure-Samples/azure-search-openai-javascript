@@ -663,7 +663,7 @@ export class ChatComponent extends LitElement {
                   autocomplete="off"
                   @keyup="${this.handleOnInputChange}"
                 />
-                ${this.showVoiceInput
+                ${this.showVoiceInput && !this.isResetInput
                   ? html` <button
                       title="${this.enableVoiceListening
                         ? globalConfig.CHAT_VOICE_REC_BUTTON_LABEL_TEXT
