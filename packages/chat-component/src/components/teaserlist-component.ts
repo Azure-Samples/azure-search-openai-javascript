@@ -32,9 +32,9 @@ export class TeaserListComponent extends LitElement {
   override render() {
     return html`
       <div class="teaser-list__container">
-        <h2 class="headline">
+        <h1 class="headline">
           ${this.interactionModel === 'chat' ? teaserListTexts.HEADING_CHAT : teaserListTexts.HEADING_ASK}
-        </h2>
+        </h1>
         <ul class="teaser-list__list">
           ${this.teasers.map(
             (prompt) => html`
