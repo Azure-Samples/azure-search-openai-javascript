@@ -2,6 +2,7 @@ declare interface ChatHttpOptions {
   method: string;
   url: string;
   stream: boolean;
+  signal: AbortSignal;
 }
 declare interface ChatMessageText {
   value: string;

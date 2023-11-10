@@ -1,4 +1,4 @@
-import { readStream } from '../stream/index.js';
+import { createReader, readStream } from '../stream/index.js';
 
 export async function parseStreamedMessages({
   chatThread,
@@ -9,7 +9,8 @@ export async function parseStreamedMessages({
   apiResponseBody: ReadableStream<Uint8Array> | null;
   visit: () => void;
 }) {
-  const chunks = readStream<BotResponseChunk>(apiResponseBody);
+  const reader = createReader(apiResponseBody);
+  const chunks = readStream<BotResponseChunk>(reader);
 
   const streamedMessageRaw: string[] = [];
   const stepsBuffer: string[] = [];
@@ -138,7 +139,10 @@ export async function parseStreamedMessages({
 
     visit();
   }
-  return result;
+  return {
+    result,
+    reader,
+  };
 }
 
 // update the citations entry and wrap the citations in a sup tag

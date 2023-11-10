@@ -1,12 +1,13 @@
 export async function callHttpApi(
   { question, type, approach, overrides }: ChatRequestOptions,
-  { method, url, stream }: ChatHttpOptions,
+  { method, url, stream, signal }: ChatHttpOptions,
 ) {
   return await fetch(`${url}/${type}`, {
     method: method,
     headers: {
       'Content-Type': 'application/json',
     },
+    signal,
     body: JSON.stringify({
       messages: [
         {
