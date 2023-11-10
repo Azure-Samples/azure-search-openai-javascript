@@ -6,20 +6,30 @@ export const tabStyle = css`
     justify-content: end;
   }
   .tab-component__list {
-    display: flex;
-    justify-content: space-around;
     list-style-type: none;
-    padding: 20px 0;
+    display: flex;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 10px;
+    border-radius: 10px;
+    padding: 3px;
+    width: 450px;
+    margin: 0 auto;
+    justify-content: space-evenly;
+  }
+  .tab-component__listItem {
+    width: 33%;
+    text-align: center;
   }
   .tab-component__link.active {
-    border-bottom: 4px solid var(--accent-high);
+    background: linear-gradient(to left, var(--accent-contrast), var(--accent-high));
+    color: var(--white);
   }
   .tab-component__link:not(.active):hover {
-    border-bottom: 4px solid var(--accent-lighter);
+    background: var(--light-gray);
     cursor: pointer;
   }
   .tab-component__link {
     border-bottom: 4px solid transparent;
+    border-radius: 5px;
     text-decoration: none;
     color: var(--text-color);
     font-weight: bold;
@@ -30,6 +40,9 @@ export const tabStyle = css`
   }
   .tab-component__content {
     position: relative;
+  }
+  .tab-component__content .items__list.citations {
+    border-top: 0;
   }
   .tab-component__tab {
     position: absolute;
@@ -48,7 +61,7 @@ export const tabStyle = css`
   .tab-component__paragraph {
     font-family: monospace;
     font-size: large;
-    border: 1px solid var(--accent-light);
+    border: 1px solid var(--light-gray);
     padding: 20px;
     border-radius: 25px;
   }
