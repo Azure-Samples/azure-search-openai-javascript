@@ -16,6 +16,7 @@ const globalConfig = {
   CHAT_MESSAGES: [],
   // This are the labels for the chat button and input
   CHAT_BUTTON_LABEL_TEXT: 'Ask Support',
+  CHAT_CANCEL_BUTTON_LABEL_TEXT: 'Cancel Generation',
   CHAT_VOICE_BUTTON_LABEL_TEXT: 'Voice input',
   CHAT_VOICE_REC_BUTTON_LABEL_TEXT: 'Listening to voice input',
   CHAT_INPUT_PLACEHOLDER: 'Type your question, eg. "How to search and book rentals?"',

@@ -19,6 +19,7 @@ import iconSuccess from '../public/svg/success-icon.svg?raw';
 import iconCopyToClipboard from '../public/svg/copy-icon.svg?raw';
 import iconSend from '../public/svg/send-icon.svg?raw';
 import iconClose from '../public/svg/close-icon.svg?raw';
+import iconCancel from '../public/svg/cancel-icon.svg?raw';
 import iconQuestion from '../public/svg/bubblequestion-icon.svg?raw';
 import iconSpinner from '../public/svg/spinner-icon.svg?raw';
 import iconMicOff from '../public/svg/mic-icon.svg?raw';
@@ -120,12 +121,15 @@ export class ChatComponent extends LitElement {
 
   abortController: AbortController = new AbortController();
   // eslint-disable-next-line unicorn/no-abusive-eslint-disable
-  streamReader: ReadableStreamDefaultReader<JSON> | null | undefined = null; // eslint-disable-line
 
   chatRequestOptions: ChatRequestOptions = requestOptions;
   chatHttpOptions: ChatHttpOptions = chatHttpOptions;
 
   selectedAsideTab: 'tab-thought-process' | 'tab-support-context' | 'tab-citations' = 'tab-thought-process';
+
+  // Is currently processing the response from the API
+  // This is used to show the cancel button
+  isProcessingResponse = false;
 
   static override styles = [mainStyle];
 
@@ -161,19 +165,32 @@ export class ChatComponent extends LitElement {
           },
         ];
 
-        const { result, reader } = await parseStreamedMessages({
+        this.isProcessingResponse = true;
+
+        const result = await parseStreamedMessages({
           chatThread: this.chatThread,
+          signal: this.abortController.signal,
           apiResponseBody: (this.apiResponse as Response).body,
-          visit: () => {
+          onChunkRead: () => {
             // NOTE: this function is called whenever we mutate sub-properties of the array
+            // so we need to trigger a re-render
             this.requestUpdate('chatThread');
           },
-          // this will be processing thought process only with streaming enabled
+          onCancel: () => {
+            this.isProcessingResponse = false;
+            // TODO: show a message to the user that the response has been cancelled
+          },
         });
-        this.streamReader = reader;
+
+        // this will be processing thought process only with streaming enabled
         this.chatThoughts = result.thoughts;
         this.chatDataPoints = result.data_points;
         this.canShowThoughtProcess = true;
+
+        this.isProcessingResponse = false;
+        // NOTE: for whatever reason, Lit doesn't re-render when we update isProcessingResponse property
+        // so we need to trigger a re-render manually
+        this.requestUpdate('isProcessingResponse');
 
         return true;
       }
@@ -375,6 +392,7 @@ export class ChatComponent extends LitElement {
     this.hasDefaultPromptsEnabled = true;
     this.isResponseCopied = false;
     this.hideThoughtProcess(event);
+    this.handleUserChatCancel(event);
   }
 
   // Show the default prompts when enabled
@@ -403,12 +421,13 @@ export class ChatComponent extends LitElement {
   }
 
   // Stop generation
-  stopResponseGeneration(): any {
-    console.log('Stopping response generation');
-    this.isStreamCancelled = true;
-    this.streamReader?.cancel();
+  handleUserChatCancel(event: Event): any {
+    event?.preventDefault();
+    this.isProcessingResponse = false;
     this.abortController.abort();
-    return false;
+
+    // we have to reset the abort controller so that we can use it again
+    this.abortController = new AbortController();
   }
 
   handleShowThoughtProcess(event: Event): void {
@@ -481,7 +500,9 @@ export class ChatComponent extends LitElement {
       );
     }
     // scroll to the bottom of the chat
-    this.debounceScrollIntoView();
+    if (this.isProcessingResponse) {
+      this.debounceScrollIntoView();
+    }
     return entries;
   }
 
@@ -537,6 +558,29 @@ export class ChatComponent extends LitElement {
       `;
     }
     return '';
+  }
+
+  renderChatOrCancelButton() {
+    const submitChatButton = html`<button
+      class="chatbox__button"
+      data-testid="submit-question-button"
+      @click="${this.handleUserChatSubmit}"
+      title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
+      ?disabled="${this.isDisabled}"
+    >
+      ${unsafeSVG(iconSend)}
+    </button>`;
+    const cancelChatButton = html`<button
+      <button
+        class="chatbox__button"
+        data-testid="cancel-question-button"
+        @click="${this.handleUserChatCancel}"
+        title="${globalConfig.CHAT_CANCEL_BUTTON_LABEL_TEXT}"
+      >
+        ${unsafeSVG(iconCancel)}
+      </button>`;
+
+    return this.isProcessingResponse ? cancelChatButton : submitChatButton;
   }
 
   // Render the chat component as a web component
@@ -663,9 +707,6 @@ export class ChatComponent extends LitElement {
             id="chat-form"
             class="form__container ${this.inputPosition === 'sticky' ? 'form__container-sticky' : ''}"
           >
-            <button type="button" class="button chat__button" @click="${this.stopResponseGeneration}">
-              Stop Response
-            </button>
             <div class="chatbox__container container-col container-row">
               <div class="chatbox__input-container display-flex-grow container-row">
                 <input
@@ -695,15 +736,7 @@ export class ChatComponent extends LitElement {
                     </button>`
                   : ''}
               </div>
-              <button
-                class="chatbox__button"
-                data-testid="submit-question-button"
-                @click="${this.handleUserChatSubmit}"
-                title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
-                ?disabled="${this.isDisabled}"
-              >
-                ${unsafeSVG(iconSend)}
-              </button>
+              ${this.renderChatOrCancelButton()}
               <button
                 title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
                 class="chatbox__button--reset"

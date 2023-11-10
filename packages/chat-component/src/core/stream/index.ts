@@ -1,5 +1,5 @@
 import { NdJsonParserStream } from './data-format/ndjson.js';
-// import { globalConfig } from '../../config/global-config.js';
+import { globalConfig } from '../../config/global-config.js';
 
 export function createReader(responseBody: ReadableStream<Uint8Array> | null) {
   return responseBody?.pipeThrough(new TextDecoderStream()).pipeThrough(new NdJsonParserStream()).getReader();
@@ -14,10 +14,9 @@ export async function* readStream<T>(reader: any): AsyncGenerator<T, void> {
   let done: boolean;
   while ((({ value, done } = await reader.read()), !done)) {
     yield new Promise<T>((resolve) => {
-      resolve(value as T);
-      /* setTimeout(() => {
-       
-      }, globalConfig.BOT_TYPING_EFFECT_INTERVAL); */
+      setTimeout(() => {
+        resolve(value as T);
+      }, globalConfig.BOT_TYPING_EFFECT_INTERVAL);
     });
   }
 }
