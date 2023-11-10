@@ -641,13 +641,6 @@ export class ChatComponent extends LitElement {
                         </li>
                       `,
                     )}
-                    ${this.hasAPIError
-                      ? html`
-                          <li class="chat__listItem">
-                            <p class="chat__txt error">${globalConfig.API_ERROR_MESSAGE}</p>
-                          </li>
-                        `
-                      : ''}
                   </ul>
                   <div class="chat__footer" id="chat-list-footer">
                     <!-- Do not delete this element. It is used for auto-scrolling -->
