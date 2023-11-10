@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-abusive-eslint-disable */
 /* eslint-disable unicorn/template-indent */
 import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
@@ -117,6 +118,10 @@ export class ChatComponent extends LitElement {
   chatThoughts: string | null = '';
   chatDataPoints: string[] = [];
 
+  abortController: AbortController = new AbortController();
+  // eslint-disable-next-line unicorn/no-abusive-eslint-disable
+  streamReader: ReadableStreamDefaultReader<JSON> | null | undefined = null; // eslint-disable-line
+
   chatRequestOptions: ChatRequestOptions = requestOptions;
   chatHttpOptions: ChatHttpOptions = chatHttpOptions;
 
@@ -156,7 +161,7 @@ export class ChatComponent extends LitElement {
           },
         ];
 
-        const result = await parseStreamedMessages({
+        const { result, reader } = await parseStreamedMessages({
           chatThread: this.chatThread,
           apiResponseBody: (this.apiResponse as Response).body,
           visit: () => {
@@ -165,6 +170,7 @@ export class ChatComponent extends LitElement {
           },
           // this will be processing thought process only with streaming enabled
         });
+        this.streamReader = reader;
         this.chatThoughts = result.thoughts;
         this.chatDataPoints = result.data_points;
         this.canShowThoughtProcess = true;
@@ -394,6 +400,15 @@ export class ChatComponent extends LitElement {
     const response = this.chatThread.at(-1)?.text.at(-1)?.value as string;
     navigator.clipboard.writeText(response);
     this.isResponseCopied = true;
+  }
+
+  // Stop generation
+  stopResponseGeneration(): any {
+    console.log('Stopping response generation');
+    this.isStreamCancelled = true;
+    this.streamReader?.cancel();
+    this.abortController.abort();
+    return false;
   }
 
   handleShowThoughtProcess(event: Event): void {
@@ -643,10 +658,14 @@ export class ChatComponent extends LitElement {
                 `
               : ''}
           </div>
+          <div class="chat__container"></div>
           <form
             id="chat-form"
             class="form__container ${this.inputPosition === 'sticky' ? 'form__container-sticky' : ''}"
           >
+            <button type="button" class="button chat__button" @click="${this.stopResponseGeneration}">
+              Stop Response
+            </button>
             <div class="chatbox__container container-col container-row">
               <div class="chatbox__input-container display-flex-grow container-row">
                 <input
