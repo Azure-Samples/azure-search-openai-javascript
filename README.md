@@ -6,7 +6,7 @@ languages:
   - nodejs
 products:
   - azure
-  - azure-cognitive-services
+  - ai-services
   - azure-openai
 urlFragment: azure-search-openai-javascript
 ---
