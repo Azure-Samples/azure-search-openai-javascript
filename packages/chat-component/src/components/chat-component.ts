@@ -31,6 +31,7 @@ declare global {
     webkitSpeechRecognition: any;
   }
 }
+
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
  * The component also displays default prompts that the user can click on to ask a question.
