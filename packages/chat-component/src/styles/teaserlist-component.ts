@@ -1,6 +1,17 @@
 import { css } from 'lit';
 
 export const teaserListStyle = css`
+  .headline {
+    color: var(--text-color);
+    font-size: 5vw;
+    padding: 0;
+    margin: 10px 0 30px;
+
+    @media (min-width: 1024px) {
+      font-size: 3vw;
+      text-align: center;
+    }
+  }
   .teaser-list__button {
     text-decoration: none;
     color: var(--text-color);
@@ -19,7 +30,7 @@ export const teaserListStyle = css`
     text-align: left;
   }
   .teaser-list__list:not(.always-row) {
-    @media (min-width: 1200px) {
+    @media (min-width: 1024px) {
       flex-direction: row;
     }
   }
@@ -31,6 +42,7 @@ export const teaserListStyle = css`
     color: var(--text-color);
     justify-content: space-evenly;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 3px solid transparent;
 
     @media (min-width: 768px) {
       min-height: 100px;
@@ -41,6 +53,7 @@ export const teaserListStyle = css`
     color: var(--accent-dark);
     background: var(--secondary-color);
     transition: all 0.3s ease-in-out;
+    border-color: var(--accent-high);
   }
   .teaser-list__span {
     color: var(--accent-high);
