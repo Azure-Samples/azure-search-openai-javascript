@@ -2,6 +2,7 @@ declare interface ChatHttpOptions {
   method: string;
   url: string;
   stream: boolean;
+  signal: AbortSignal;
 }
 declare interface ChatMessageText {
   value: string;
@@ -26,12 +27,6 @@ declare interface Citation {
 declare interface ProcessTextReturn {
   replacedText: string;
   arrays: Array<Array<string> | Array<Citation>>;
-}
-
-declare interface Teaser {
-  title?: string;
-  description: string;
-  icon?: string;
 }
 
 declare interface ChatRequestOptions {

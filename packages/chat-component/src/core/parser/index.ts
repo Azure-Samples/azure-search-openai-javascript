@@ -1,15 +1,20 @@
-import { readStream } from '../stream/index.js';
+import { createReader, readStream } from '../stream/index.js';
 
 export async function parseStreamedMessages({
   chatThread,
   apiResponseBody,
-  visit,
+  signal,
+  onChunkRead: onVisit,
+  onCancel,
 }: {
   chatThread: ChatThreadEntry[];
   apiResponseBody: ReadableStream<Uint8Array> | null;
-  visit: () => void;
+  signal: AbortSignal;
+  onChunkRead: () => void;
+  onCancel: () => void;
 }) {
-  const chunks = readStream<BotResponseChunk>(apiResponseBody);
+  const reader = createReader(apiResponseBody);
+  const chunks = readStream<BotResponseChunk>(reader);
 
   const streamedMessageRaw: string[] = [];
   const stepsBuffer: string[] = [];
@@ -26,6 +31,11 @@ export async function parseStreamedMessages({
   };
 
   for await (const chunk of chunks) {
+    if (signal.aborted) {
+      onCancel();
+      return result;
+    }
+
     const { content, context } = chunk.choices[0].delta;
     if (context?.data_points) {
       result.data_points = context.data_points ?? [];
@@ -136,7 +146,7 @@ export async function parseStreamedMessages({
     const citations = parseCitations(streamedMessageRaw.join(''));
     updateCitationsEntry({ citations, chatThread });
 
-    visit();
+    onVisit();
   }
   return result;
 }
