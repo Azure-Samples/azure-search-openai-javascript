@@ -127,8 +127,6 @@ export class ChatComponent extends LitElement {
 
   speechRecognition = undefined;
 
-  chatAsideContent: ChatAside = {};
-
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
@@ -137,9 +135,9 @@ export class ChatComponent extends LitElement {
   defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
   defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
+
   // aside data
-  chatAsideHistory: ChatAside[] = [];
-  currentChatAside: ChatAside = {};
+  currentChatAside: ChatAside | undefined = {};
 
   chatRequestOptions: ChatRequestOptions = requestOptions;
   chatHttpOptions: ChatHttpOptions = chatHttpOptions;
@@ -158,6 +156,7 @@ export class ChatComponent extends LitElement {
       }
     }, 500);
   }
+
   // Send the question to the Open AI API and render the answer in the chat
   // Add a message to the chat, when the user or the API sends a message
   async processApiResponse({ message, isUserMessage }: { message: string; isUserMessage: boolean }) {
@@ -176,6 +175,7 @@ export class ChatComponent extends LitElement {
             followupQuestions: [],
             citations: [],
             timestamp: timestamp,
+            chatAsideContent: {},
             isUserMessage,
           },
         ];
@@ -194,9 +194,11 @@ export class ChatComponent extends LitElement {
           chatDataPoints: result.data_points,
           chatCitations: [...new Set(citations)],
         };
-        this.chatAsideContent = chatAside;
-        console.log(this.chatAsideContent, '####chat aside content');
-        this.chatAsideHistory.push(chatAside);
+
+        // append the chat aside to the last chat message (the one from the bot)
+        if (this.chatThread.length > 0) {
+          this.chatThread[this.chatThread.length - 1].chatAsideContent = chatAside;
+        }
         this.canShowThoughtProcess = true;
 
         return true;
@@ -213,7 +215,7 @@ export class ChatComponent extends LitElement {
           ],
           followupQuestions,
           citations: [...new Set(citations)],
-          chatAsideContent: this.chatAsideContent,
+          chatAsideContent: {},
           timestamp: timestamp,
           isUserMessage,
         },
@@ -370,7 +372,8 @@ export class ChatComponent extends LitElement {
             chatDataPoints: response.choices[0].message.context?.data_points ?? [],
             chatCitations: this.chatThread.at(-1)?.citations ?? [],
           };
-          this.chatAsideHistory.push(chatAside);
+
+          this.chatThread[this.chatThread.length - 1].chatAsideContent = chatAside;
           this.canShowThoughtProcess = true;
         }
         await this.processApiResponse({
@@ -437,17 +440,13 @@ export class ChatComponent extends LitElement {
 
   handleShowThoughtProcess(index, event?: Event): void {
     event?.preventDefault();
-    // we need to subtract 1 from the index because the chat thread chat messages, are odd numbers, while the chat aside is sequential
-    this.currentChatAside = this.chatAsideHistory[(index - 1) / 2];
+    this.currentChatAside = this.chatThread[index]?.chatAsideContent;
     this.selectedAsideTab = 'tab-thought-process';
     this.showThoughtProcess();
   }
 
   // show thought process aside
   showThoughtProcess(): void {
-    // eslint-disable-next-line no-debugger
-    debugger;
-    console.log(this.chatThread[1].chatAsideContent, '####chat thread');
     this.isShowingThoughtProcess = true;
     this.overlay.classList.add('active');
     this.chatContainerWrapper.classList.add('aside-open');
@@ -567,7 +566,7 @@ export class ChatComponent extends LitElement {
   }
 
   // render copy button
-  renderCopyButton(response: ChatMessageText, index: number) {
+  renderCopyButton(response: ChatThreadEntry, index: number) {
     // render copy button
     return html`
       <button
@@ -632,8 +631,7 @@ export class ChatComponent extends LitElement {
                           ${message.isUserMessage
                             ? ''
                             : html` <div class="chat__header">
-                                ${this.renderShowThoughtProcessButton(index)}
-                                ${this.renderCopyButton(message.text?.at(-1) as ChatMessageText, index)}
+                                ${this.renderShowThoughtProcessButton(index)} ${this.renderCopyButton(message, index)}
                               </div>`}
                           ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
                           ${this.renderCitation(message.citations)}
