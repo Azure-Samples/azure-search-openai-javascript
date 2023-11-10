@@ -171,6 +171,7 @@ export class ChatComponent extends LitElement {
         this.chatThread = [
           ...this.chatThread,
           {
+            textRaw: '',
             text: [{ value: '', followingSteps: [] }],
             followupQuestions: [],
             citations: [],
@@ -207,6 +208,7 @@ export class ChatComponent extends LitElement {
       this.chatThread = [
         ...this.chatThread,
         {
+          textRaw: message,
           text: [
             {
               value: part,
@@ -424,9 +426,10 @@ export class ChatComponent extends LitElement {
   }
 
   // Copy response to clipboard
-  handleCopyResponseToClipboard(response: ChatMessageText, index: number): void {
+  handleCopyResponseToClipboard(message: ChatThreadEntry, index: number): void {
+    const response = message.textRaw;
     // to get all the message and get it cleaned up
-    const cleanText = response.value.replaceAll(/<[^>]*>/g, '');
+    const cleanText = response.replaceAll('<<', '').replaceAll('>>', '');
     navigator.clipboard.writeText(cleanText);
     this.isResponseCopiedArray[index] = true;
 

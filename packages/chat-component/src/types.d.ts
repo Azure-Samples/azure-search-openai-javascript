@@ -11,6 +11,7 @@ declare interface ChatMessageText {
 // We declare a simple interface for the chat messages
 // and the citations
 declare interface ChatThreadEntry {
+  textRaw: string;
   text: ChatMessageText[];
   citations?: Citation[];
   followupQuestions?: string[];

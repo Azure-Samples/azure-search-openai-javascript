@@ -136,6 +136,7 @@ export async function parseStreamedMessages({
     const citations = parseCitations(streamedMessageRaw.join(''));
     updateCitationsEntry({ citations, chatThread });
 
+    chatThread[chatThread.length - 1].textRaw = streamedMessageRaw.join('');
     visit();
   }
   return result;
