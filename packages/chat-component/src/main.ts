@@ -118,7 +118,6 @@ export class ChatComponent extends LitElement {
   chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
   chatThoughts: string | null = '';
   chatDataPoints: string[] = [];
-  processingThread: ChatThreadEntry | undefined = undefined;
 
   abortController: AbortController = new AbortController();
   // eslint-disable-next-line unicorn/no-abusive-eslint-disable
@@ -167,7 +166,6 @@ export class ChatComponent extends LitElement {
         ];
 
         this.isProcessingResponse = true;
-        this.processingThread = this.chatThread.at(-1);
 
         const result = await parseStreamedMessages({
           chatThread: this.chatThread,
@@ -193,7 +191,6 @@ export class ChatComponent extends LitElement {
         // NOTE: for whatever reason, Lit doesn't re-render when we update isProcessingResponse property
         // so we need to trigger a re-render manually
         this.requestUpdate('isProcessingResponse');
-        this.processingThread = undefined; // we are done processing
         return true;
       }
 
@@ -374,15 +371,14 @@ export class ChatComponent extends LitElement {
         });
       } catch (error_: Error) {
         console.error(error_);
-        this.handleAPIError();
 
         const chatError = {
           message: error_?.code === 400 ? globalConfig.INVALID_REQUEST_ERROR : globalConfig.API_ERROR_MESSAGE,
         };
 
-        if (this.processingThread) {
-          this.processingThread.error = chatError;
-          this.processingThread = undefined;
+        if (this.isProcessingResponse) {
+          const processingThread = this.chatThread.at(-1);
+          processingThread.error = chatError;
         } else {
           this.chatThread = [
             ...this.chatThread,
@@ -394,6 +390,8 @@ export class ChatComponent extends LitElement {
             },
           ];
         }
+
+        this.handleAPIError();
       }
     }
   }
@@ -434,6 +432,7 @@ export class ChatComponent extends LitElement {
     this.hasAPIError = true;
     this.isDisabled = false;
     this.isAwaitingResponse = false;
+    this.isProcessingResponse = false;
   }
 
   // Copy response to clipboard
