@@ -127,6 +127,8 @@ export class ChatComponent extends LitElement {
 
   speechRecognition = undefined;
 
+  chatAsideContent: ChatAside = {};
+
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
@@ -192,6 +194,8 @@ export class ChatComponent extends LitElement {
           chatDataPoints: result.data_points,
           chatCitations: [...new Set(citations)],
         };
+        this.chatAsideContent = chatAside;
+        console.log(this.chatAsideContent, '####chat aside content');
         this.chatAsideHistory.push(chatAside);
         this.canShowThoughtProcess = true;
 
@@ -209,6 +213,7 @@ export class ChatComponent extends LitElement {
           ],
           followupQuestions,
           citations: [...new Set(citations)],
+          chatAsideContent: this.chatAsideContent,
           timestamp: timestamp,
           isUserMessage,
         },
@@ -440,6 +445,9 @@ export class ChatComponent extends LitElement {
 
   // show thought process aside
   showThoughtProcess(): void {
+    // eslint-disable-next-line no-debugger
+    debugger;
+    console.log(this.chatThread[1].chatAsideContent, '####chat thread');
     this.isShowingThoughtProcess = true;
     this.overlay.classList.add('active');
     this.chatContainerWrapper.classList.add('aside-open');
@@ -588,7 +596,7 @@ export class ChatComponent extends LitElement {
         class="button chat__header--button"
         data-testid="chat-show-thought-process"
         @click="${() => this.handleShowThoughtProcess(index)}"
-        ?disabled="${this.chatAsideHistory.length === 0 || !this.chatAsideHistory[(index - 1) / 2]}"
+        ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
       >
         <span class="chat__header--span">${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span>
 
