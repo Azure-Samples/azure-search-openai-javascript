@@ -19,5 +19,5 @@ npm ci
 npm run build --workspace=indexer
 
 Write-Host 'Running "index-files" CLI tool'
-$files = Get-Item "data/*.pdf"
+$files = Get-Item "data/*.md"
 npx index-files --wait --indexer-url "$env:INDEXER_API_URI" --index-name "$env:AZURE_SEARCH_INDEX" $files
