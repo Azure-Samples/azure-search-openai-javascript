@@ -309,12 +309,24 @@ export const mainStyle = css`
     cursor: pointer;
   }
   .chatbox__input {
-    background: var(--white);
+    background: transparent;
     color: var(--text-color);
-    border-radius: 4px;
+    border: none;
     padding: 8px;
     flex: 1 1 auto;
     font-size: 1rem;
+  }
+  .chatbox__input-container {
+    display: flex;
+    border: 1px solid var(--black);
+    background: var(--white);
+    border-radius: 4px;
+  }
+  .chatbox__input-container:focus-within {
+    outline: -webkit-focus-ring-color auto 1px;
+  }
+  .chatbox__input:focus-visible {
+    outline: none;
   }
   .chat__list {
     color: var(--text-color);
@@ -478,22 +490,17 @@ export const mainStyle = css`
     padding: 3px;
     margin-left: 3px;
   }
-  .loading-skeleton {
-    display: flex;
-    margin-bottom: 50px;
+  .voice__input {
+    box-shadow: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 50px;
   }
-  .dot {
-    width: 10px;
-    height: 10px;
-    margin: 0 5px;
-    background-color: var(--accent-lighter);
-    border-radius: 50%;
-    animation: chatloadinganimation 1.5s infinite;
+  .not-recording svg {
+    fill: var(--black);
   }
-  .dot:nth-child(2) {
-    animation-delay: 0.5s;
-  }
-  .dot:nth-child(3) {
-    animation-delay: 1s;
+  .recording svg {
+    fill: var(--red);
   }
 `;
