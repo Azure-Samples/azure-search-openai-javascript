@@ -1,0 +1,11 @@
+.ms-style-picker {
+  display: grid;
+  margin-top: 10px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.ms-style-picker > input,
+.ms-style-picker > label {
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
