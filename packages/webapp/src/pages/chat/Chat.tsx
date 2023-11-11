@@ -69,9 +69,9 @@ const Chat = () => {
   };
 
   const [customStyles, setCustomStyles] = useState<CustomStylesState>({
-    AccentHigh: '#ff0000',
-    AccentLighter: '#ff0000',
-    AccentContrast: '#ff0000',
+    AccentHigh: '#692b61',
+    AccentLighter: '#f6d5f2',
+    AccentContrast: '#5e3c7d',
   });
 
   const handleCustomStylesChange = (newStyles: CustomStylesState) => {

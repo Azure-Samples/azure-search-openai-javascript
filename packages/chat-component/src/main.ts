@@ -135,6 +135,15 @@ export class ChatComponent extends LitElement {
 
   static override styles = [mainStyle];
 
+  override updated(changedProperties: Map<string | number | symbol, unknown>) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('customStyles')) {
+      this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
+      this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLighter);
+      this.style.setProperty('--c-accent-contrast', this.customStyles.AccentContrast);
+    }
+  }
   // debounce dispatching must-scroll event
   debounceScrollIntoView(): void {
     let timeout: any = 0;
