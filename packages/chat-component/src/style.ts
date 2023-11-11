@@ -25,6 +25,7 @@ export const mainStyle = css`
     --font-rel-base: 1.2rem;
     --font-small: small;
     --font-large: large;
+    --font-larger: x-large;
     --border-thick: 3px;
     --border-thin: 1px;
     --radius-small: 5px;
@@ -466,7 +467,7 @@ export const mainStyle = css`
     align-self: flex-end;
   }
   .chat__txt--entry {
-    padding: 0 var(--d-base);
+    padding: var(--d-small) var(--d-base);
   }
   .chat__txt--info {
     font-size: var(--font-small);
@@ -565,7 +566,7 @@ export const mainStyle = css`
     text-decoration: none;
     color: var(--c-text);
     display: block;
-    font-size: var(--font-large);
+    font-size: var(--font-larger);
   }
   .defaults__list {
     list-style-type: none;
