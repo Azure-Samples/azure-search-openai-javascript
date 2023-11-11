@@ -143,7 +143,7 @@ export const mainStyle = css`
     margin: 0;
   }
   .subheadline--small {
-    font-size: var(--font-r-small);
+    font-size: var(--font-small);
     display: inline-block;
   }
   .chat__container {
@@ -154,7 +154,6 @@ export const mainStyle = css`
   .chat__containerWrapper.aside-open {
     .chat__listItem {
       max-width: var(--width-wide);
-      min-width: var(--width-base);
     }
   }
   .chat__containerWrapper {
@@ -436,8 +435,8 @@ export const mainStyle = css`
     height: auto;
 
     @media (min-width: 768px) {
-      max-width: cal(var(--width-base) + var(--d-base));
-      min-width: var(--width-base);
+      min-width: var(--width-narrow);
+      max-width: var(--width-base);
     }
   }
   .chat__txt {
