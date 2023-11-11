@@ -59,6 +59,8 @@ export class ChatComponent extends LitElement {
   @property({ type: String, attribute: 'data-overrides', converter: (value) => JSON.parse(value || '{}') })
   overrides: RequestOverrides = {};
 
+  @property({ type: String, attribute: 'data-custom-styles', converter: (value) => JSON.parse(value || '{}') })
+  customStyles: any = {};
   //--
 
   @property({ type: String })
