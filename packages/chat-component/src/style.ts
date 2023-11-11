@@ -44,6 +44,8 @@ export const mainStyle = css`
     --error-color: rgb(243, 242, 241);
     --error-color-background: rgb(68, 39, 38);
     --success-color: rgb(243, 242, 241);
+    --bubble-width-wide: 80%;
+    --bubble-width-narrow: 50%;
   }
   html {
     scroll-behavior: smooth;
