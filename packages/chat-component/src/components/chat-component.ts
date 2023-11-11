@@ -7,7 +7,7 @@ import { chatHttpOptions, globalConfig, requestOptions } from '../config/global-
 import { getAPIResponse } from '../core/http/index.js';
 import { parseStreamedMessages } from '../core/parser/index.js';
 import { chatStyle } from '../styles/chat-component.js';
-import { getTimestamp, processText } from '../utils/index.js';
+import { type ChatResponseError, getTimestamp, processText } from '../utils/index.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 // TODO: allow host applications to customize these icons
 
@@ -24,13 +24,6 @@ import iconMicOff from '../../public/svg/mic-icon.svg?raw';
 import iconMicOn from '../../public/svg/mic-record-on-icon.svg?raw';
 
 import { marked } from 'marked';
-
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-}
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -111,7 +104,7 @@ export class ChatComponent extends LitElement {
   @property({ type: Boolean })
   enableVoiceListening = false;
 
-  speechRecognition = undefined;
+  speechRecognition: SpeechRecognition | undefined = undefined;
 
   @state()
   isDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
@@ -241,10 +234,14 @@ export class ChatComponent extends LitElement {
 
   handleVoiceInput(event: Event): void {
     event.preventDefault();
-    if (!this.speechRecognition) {
+    if (!this.speechRecognition && this.showVoiceInput) {
       this.speechRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 
-      this.speechRecognition.continous = true;
+      if (!this.speechRecognition) {
+        return; // no speech support found so do nothing
+      }
+
+      this.speechRecognition.continuous = true;
       this.speechRecognition.lang = 'en-US';
 
       this.speechRecognition.onresult = (event) => {
@@ -257,16 +254,20 @@ export class ChatComponent extends LitElement {
       };
 
       this.speechRecognition.addEventListener('error', (event) => {
-        this.speechRecognition.stop();
-        console.log(`Speech recognition error detected: ${event.error} - ${event.message}`);
+        if (this.speechRecognition) {
+          this.speechRecognition.stop();
+          console.log(`Speech recognition error detected: ${event.error} - ${event.message}`);
+        }
       });
     }
 
-    this.enableVoiceListening = !this.enableVoiceListening;
-    if (this.enableVoiceListening) {
-      this.speechRecognition.start();
-    } else {
-      this.speechRecognition.stop();
+    if (this.speechRecognition) {
+      this.enableVoiceListening = !this.enableVoiceListening;
+      if (this.enableVoiceListening) {
+        this.speechRecognition.start();
+      } else {
+        this.speechRecognition.stop();
+      }
     }
   }
 
@@ -377,16 +378,19 @@ export class ChatComponent extends LitElement {
           message: this.useStream ? '' : response.choices[0].message.content,
           isUserMessage: false,
         });
-      } catch (error_: Error) {
+      } catch (error_: any) {
         console.error(error_);
 
+        const error = error_ as ChatResponseError;
         const chatError = {
-          message: error_?.code === 400 ? globalConfig.INVALID_REQUEST_ERROR : globalConfig.API_ERROR_MESSAGE,
+          message: error?.code === 400 ? globalConfig.INVALID_REQUEST_ERROR : globalConfig.API_ERROR_MESSAGE,
         };
 
-        if (this.isProcessingResponse) {
+        if (this.isProcessingResponse && this.chatThread.at(-1)) {
           const processingThread = this.chatThread.at(-1);
-          processingThread.error = chatError;
+          if (processingThread) {
+            processingThread.error = chatError;
+          }
         } else {
           this.chatThread = [
             ...this.chatThread,
