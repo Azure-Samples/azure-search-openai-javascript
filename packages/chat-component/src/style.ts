@@ -20,6 +20,12 @@ export const mainStyle = css`
     --accent-contrast: #7d3c71;
     --error-color: #8a0000;
     --error-color-background: rgb(253, 231, 233);
+    --success-color: rgb(243, 242, 241);
+    --border-thick: 3px;
+    --border-thin: 1px;
+    --radius-small: 5px;
+    --radius-medium: 10px;
+    --radius-large: 25px;
   }
   :host([data-theme='dark']]) {
     display: block;
@@ -37,6 +43,7 @@ export const mainStyle = css`
     --accent-contrast: #7d3c71;
     --error-color: rgb(243, 242, 241);
     --error-color-background: rgb(68, 39, 38);
+    --success-color: rgb(243, 242, 241);
   }
   html {
     scroll-behavior: smooth;
