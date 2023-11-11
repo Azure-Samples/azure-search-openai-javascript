@@ -13,11 +13,18 @@ export const mainStyle = css`
     --c-accent-high: #692b61;
     --c-accent-dark: #250721;
     --c-accent-light: #e6b7e0;
-    --c-accent-lighter: #f8bcf1;
-    --c-accent-contrast: #3c7d7b;
+    --c-accent-lighter: #f6d5f2;
+    --c-accent-contrast: #5e3c7d;
     --c-error: #8a0000;
     --c-error-background: rgb(253, 231, 233);
     --c-success: #26b32b;
+    --font-r-small: 1vw;
+    --font-r-base: 3vw;
+    --font-r-large: 5vw;
+    --font-base: 14px;
+    --font-rel-base: 1.2rem;
+    --font-small: small;
+    --font-large: large;
     --border-thick: 3px;
     --border-thin: 1px;
     --radius-small: 5px;
@@ -119,23 +126,23 @@ export const mainStyle = css`
   }
   .headline {
     color: var(--c-text);
-    font-size: 5vw;
+    font-size: var(--font-r-large);
     padding: 0;
     margin: var(--d-small) 0 var(--d-large);
 
     @media (min-width: 1024px) {
-      font-size: 3vw;
+      font-size: var(--font-r-base);
       text-align: center;
     }
   }
   .subheadline {
     color: var(--c-text);
-    font-size: 2vw;
+    font-size: var(--font-r-base);
     padding: 0;
     margin: 0;
   }
   .subheadline--small {
-    font-size: 1vw;
+    font-size: var(--font-r-small);
     display: inline-block;
   }
   .chat__container {
@@ -206,7 +213,7 @@ export const mainStyle = css`
   .form__label {
     display: block;
     padding: var(-d-xsmall) 0;
-    font-size: small;
+    font-size: var(--font-small);
   }
   .aside__header {
     display: flex;
@@ -240,7 +247,7 @@ export const mainStyle = css`
     text-decoration: none;
     color: var(--c-text);
     font-weight: bold;
-    font-size: small;
+    font-size: var(--font-small);
     cursor: pointer;
     display: block;
     padding: var(--d-small);
@@ -267,7 +274,7 @@ export const mainStyle = css`
   }
   .aside__paragraph {
     font-family: monospace;
-    font-size: large;
+    font-size: var(--font-large);
     border: var(--border-thin) solid var(--c-light-gray);
     padding: var(--d-base);
     border-radius: var(--radius-large);
@@ -288,7 +295,7 @@ export const mainStyle = css`
     opacity: 1;
     padding: var(--d-xsmall);
     transition: all 0.3s ease-in-out;
-    height: calc(var(--d-base) + var(--d-small));
+    height: calc(var(--d-base) + var(--d-large));
     position: relative;
   }
   .chat__header--button:disabled,
@@ -302,7 +309,7 @@ export const mainStyle = css`
     width: var(--d-large);
   }
   .chat__header--span {
-    font-size: smaller;
+    font-size: var(--font-small);
     transition: all 0.3s ease-out 0s;
     position: absolute;
     text-align: right;
@@ -355,7 +362,7 @@ export const mainStyle = css`
     cursor: pointer;
     border-radius: var(--radius-small);
     margin-left: var(--d-small);
-    width: calc(var(--d-large) + var(--d-xslarge));
+    width: calc(var(--d-large) + var(--d-xlarge));
     box-shadow: 0 0 var(--d-small) rgba(0, 0, 0, 0.1);
     transition: background 0.3s ease-in-out;
   }
@@ -404,7 +411,7 @@ export const mainStyle = css`
     border: none;
     padding: var(--d-small);
     flex: 1 1 auto;
-    font-size: 1rem;
+    font-size: var(--font-rel-base);
   }
   .chatbox__input:focus-visible {
     outline: none;
@@ -462,7 +469,7 @@ export const mainStyle = css`
     padding: 0 var(--d-base);
   }
   .chat__txt--info {
-    font-size: smaller;
+    font-size: var(--font-small);
     font-style: italic;
     margin: 0;
     margin-top: 1px;
@@ -527,7 +534,7 @@ export const mainStyle = css`
     text-decoration: none;
     padding: var(--d-xsmall);
     margin-top: var(--d-xsmall);
-    font-size: small;
+    font-size: var(--font-small);
   }
   .items__listItem--citation.active {
     background-color: var(--c-accent-high);
@@ -544,7 +551,7 @@ export const mainStyle = css`
   }
   .steps .items__listItem--step {
     padding: var(--d-xsmall) 0;
-    font-size: 14px;
+    font-size: var(--font-base);
     line-heigth: 1;
   }
   .followup .items__link {
@@ -552,13 +559,13 @@ export const mainStyle = css`
     display: block;
     padding: var(--d-xsmall) 0;
     border-bottom: 1px solid var(--c-light-gray);
-    font-size: small;
+    font-size: var(--font-small);
   }
   .defaults__button {
     text-decoration: none;
     color: var(--c-text);
     display: block;
-    font-size: 1.2rem;
+    font-size: var(--font-large);
   }
   .defaults__list {
     list-style-type: none;
