@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
 import { RetrievalMode, apiBaseUrl } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
-import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField, TooltipHost } from '@fluentui/react';
+import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField, TooltipHost, Toggle } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
 import 'chat-component';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
@@ -78,6 +78,8 @@ const Chat = () => {
     setCustomStyles(newStyles);
   };
 
+  const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);
+
   const overrides = {
     retrievalMode,
     top: retrieveCount,
@@ -111,7 +113,7 @@ const Chat = () => {
       </div>
 
       <Panel
-        headerText="Configure your ChatGPT component styles and answer generation"
+        headerText="Configure answer generation"
         isOpen={isConfigPanelOpen}
         isBlocking={false}
         onDismiss={() => setIsConfigPanelOpen(false)}
@@ -119,9 +121,6 @@ const Chat = () => {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
-        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
-          <SettingsStyles onChange={handleCustomStylesChange}></SettingsStyles>
-        </TooltipHost>
         <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
           <TextField
             className={styles.chatSettingsSeparator}
@@ -206,6 +205,20 @@ const Chat = () => {
             onChange={onUseStreamChange}
           />
         </TooltipHost>
+        <div>
+          <Toggle
+            label="Customize chat styles"
+            checked={isChatStylesAccordionOpen}
+            onChange={() => setIsChatStylesAccordionOpen(!isChatStylesAccordionOpen)}
+          />
+          {isChatStylesAccordionOpen && (
+            <>
+              <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
+                <SettingsStyles onChange={handleCustomStylesChange}></SettingsStyles>
+              </TooltipHost>
+            </>
+          )}
+        </div>
       </Panel>
     </div>
   );
