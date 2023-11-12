@@ -2,18 +2,17 @@ import { css } from 'lit';
 
 export const mainStyle = css`
   :host {
-    --c-primary: rgba(241, 255, 165, 0.6);
+    --c-primary: #123f58;
     --c-secondary: #f5f5f5;
-    --c-text: #123f58;
+    --c-text: var(--c-primary);
     --c-white: #fff;
     --c-black: #111111;
     --c-red: #ff0000;
     --c-light-gray: #e3e3e3;
     --c-dark-gray: #4e5288;
     --c-accent-high: #692b61;
-    --c-accent-dark: #250721;
-    --c-accent-light: #e6b7e0;
-    --c-accent-lighter: #f6d5f2;
+    --c-accent-dark: var(--c-secondary);
+    --c-accent-light: #f6d5f2;
     --c-accent-contrast: #5e3c7d;
     --c-error: #8a0000;
     --c-error-background: rgb(253, 231, 233);
@@ -43,21 +42,24 @@ export const mainStyle = css`
     width: 100vw;
     display: block;
     padding: var(--d-base);
+    color: var(--c-text);
   }
   :host([data-theme='dark']]) {
-    --c-primary: rgba(241, 255, 165, 0.6);
+    --c-primary: #123f58;
     --c-secondary: #f5f5f5;
-    --c-text: #123f58;
+    --c-text: var(--c-primary);
     --c-white: #fff;
     --c-black: #111111;
     --c-red: #ff0000;
     --c-light-gray: #e3e3e3;
     --c-dark-gray: #4e5288;
     --c-accent-high: #692b61;
-    --c-accent-dark: #250721;
-    --c-accent-light: #e6b7e0;
-    --c-accent-lighter: #f8bcf1;
-    --c-accent-contrast: #3c7d7b;
+    --c-accent-dark: var(--c-secondary);
+    --c-accent-light: #f6d5f2;
+    --c-accent-contrast: #5e3c7d;
+    --c-error: #8a0000;
+    --c-error-background: rgb(253, 231, 233);
+    --c-success: #26b32b;
   }
   html {
     scroll-behavior: smooth;
@@ -460,7 +462,7 @@ export const mainStyle = css`
   .chat__txt.user-message {
     background: linear-gradient(to left, var(--c-accent-contrast), var(--c-accent-high));
     color: var(--c-white);
-    border: var(--border-thin) solid var(--c-accent-lighter);
+    border: var(--border-thin) solid var(--c-accent-light);
   }
   .chat__listItem.user-message {
     align-self: flex-end;
@@ -524,12 +526,12 @@ export const mainStyle = css`
   }
   .items__listItem--followup:hover,
   .items__listItem--followup:focus {
-    background-color: var(--c-accent-lighter);
+    background-color: var(--c-accent-light);
     cursor: pointer;
   }
   .items__listItem--citation {
     display: inline-block;
-    background-color: var(--c-accent-lighter);
+    background-color: var(--c-accent-light);
     border-radius: var(--radius-small);
     text-decoration: none;
     padding: var(--d-xsmall);
@@ -612,7 +614,7 @@ export const mainStyle = css`
     text-decoration: underline;
   }
   .citation {
-    background-color: var(--c-accent-lighter);
+    background-color: var(--c-accent-light);
     border-radius: var(--radius-small);
     padding: var(--d-xsmall);
     margin-left: var(--d-xsmall);
@@ -628,7 +630,7 @@ export const mainStyle = css`
   .loading-icon svg {
     width: var(--d-large);
     height: var(--d-large);
-    fill: var(--c-accent-lighter);
+    fill: var(--c-accent-light);
     animation: spinneranimation 1s linear infinite;
     margin-right: var(--d-small);
   }
