@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SettingsStyles.css';
 
 type CustomStylesState = {
@@ -14,21 +14,29 @@ interface Props {
 export const SettingsStyles = ({ onChange }: Props) => {
   const defaultColors = ['#692b61', '#f6d5f2', '#5e3c7d'];
 
-  const [customStyles, setStyles] = useState<CustomStylesState>({
-    AccentHigh: defaultColors[0],
-    AccentLighter: defaultColors[1],
-    AccentContrast: defaultColors[2],
-  });
+  const getInitialStyles = (): CustomStylesState => {
+    const storedStyles = localStorage.getItem('customStyles');
+    return storedStyles
+      ? JSON.parse(storedStyles)
+      : {
+          AccentHigh: defaultColors[0],
+          AccentLighter: defaultColors[1],
+          AccentContrast: defaultColors[2],
+        };
+  };
+
+  const [customStyles, setStyles] = useState<CustomStylesState>(getInitialStyles);
+
+  useEffect(() => {
+    // Update the Chat.txs state when the custom styles change
+    onChange(customStyles);
+  }, [customStyles, onChange]);
 
   const handleInputChange = (key: keyof CustomStylesState, value: string) => {
     setStyles((previousStyles) => ({
       ...previousStyles,
       [key]: value,
     }));
-    onChange({
-      ...customStyles,
-      [key]: value,
-    });
   };
 
   return (

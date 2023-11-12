@@ -68,15 +68,43 @@ const Chat = () => {
     setUseSuggestFollowupQuestions(!!checked);
   };
 
-  const [customStyles, setCustomStyles] = useState<CustomStylesState>({
-    AccentHigh: '#692b61',
-    AccentLighter: '#f6d5f2',
-    AccentContrast: '#5e3c7d',
+  const [customStyles, setCustomStyles] = useState(() => {
+    const storedStyles = localStorage.getItem('customStyles');
+    return storedStyles
+      ? JSON.parse(storedStyles)
+      : {
+          AccentHigh: '#692b61',
+          AccentLighter: '#f6d5f2',
+          AccentContrast: '#5e3c7d',
+        };
   });
 
   const handleCustomStylesChange = (newStyles: CustomStylesState) => {
     setCustomStyles(newStyles);
   };
+
+  useEffect(() => {
+    // Update the state when local storage changes
+    const handleStorageChange = () => {
+      const storedStyles = localStorage.getItem('customStyles');
+      if (storedStyles) {
+        setCustomStyles(JSON.parse(storedStyles));
+      }
+    };
+
+    // Attach the event listener
+    window.addEventListener('storage', handleStorageChange);
+
+    // Clean up the event listener when the component is unmounted
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Store customStyles in local storage whenever it changes
+    localStorage.setItem('customStyles', JSON.stringify(customStyles));
+  }, [customStyles]);
 
   const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);
 
