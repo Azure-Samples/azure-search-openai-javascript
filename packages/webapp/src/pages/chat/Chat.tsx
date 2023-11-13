@@ -24,7 +24,10 @@ const Chat = () => {
 
   const [isLoading] = useState<boolean>(false);
 
-  useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' }), [isLoading]);
+  const [enableBranding, setEnableBranding] = useState(() => {
+    const storedBranding = localStorage.getItem('enableBranding');
+    return storedBranding ? JSON.parse(storedBranding) : false;
+  });
 
   const onPromptTemplateChange = (
     _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -59,6 +62,10 @@ const Chat = () => {
 
   const onExcludeCategoryChanged = (_event?: React.FormEvent, newValue?: string) => {
     setExcludeCategory(newValue || '');
+  };
+
+  const onEnableBrandingChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+    setEnableBranding(!!checked);
   };
 
   const onUseSuggestFollowupQuestionsChange = (
@@ -97,21 +104,30 @@ const Chat = () => {
       if (storedStyles) {
         setCustomStyles(JSON.parse(storedStyles));
       }
+
+      const storedBranding = localStorage.getItem('enableBranding');
+      if (storedBranding) {
+        setEnableBranding(JSON.parse(storedBranding));
+      }
     };
 
     // Attach the event listener
     window.addEventListener('storage', handleStorageChange);
 
+    // Store customStyles in local storage whenever it changes
+    localStorage.setItem('customStyles', JSON.stringify(customStyles));
+
+    // Store enableBranding in local storage whenever it changes
+    localStorage.setItem('enableBranding', JSON.stringify(enableBranding));
+
+    // Scroll into view when isLoading changes
+    chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' });
+
     // Clean up the event listener when the component is unmounted
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, []);
-
-  useEffect(() => {
-    // Store customStyles in local storage whenever it changes
-    localStorage.setItem('customStyles', JSON.stringify(customStyles));
-  }, [customStyles]);
+  }, [customStyles, enableBranding, isLoading]);
 
   const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);
 
@@ -143,6 +159,7 @@ const Chat = () => {
             data-approach="rrr"
             data-overrides={JSON.stringify(overrides)}
             data-custom-styles={JSON.stringify(customStyles)}
+            data-custom-branding={JSON.stringify(enableBranding)}
           ></chat-component>
         </div>
       </div>
@@ -250,6 +267,9 @@ const Chat = () => {
             <>
               <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
                 <SettingsStyles onChange={handleCustomStylesChange}></SettingsStyles>
+              </TooltipHost>
+              <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
+                <Toggle label="Enable Branding" checked={enableBranding} onChange={onEnableBrandingChange} />
               </TooltipHost>
             </>
           )}
