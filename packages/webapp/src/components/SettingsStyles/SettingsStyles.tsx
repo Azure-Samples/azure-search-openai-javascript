@@ -27,9 +27,9 @@ export const SettingsStyles = ({ onChange }: Props) => {
     TextColorDefault: '#123f58',
     BackgroundColorDefault: '#e3e3e3',
     FormBackgroundColorDefault: '#f5f5f5',
-    BorderRadiusDefault: 25,
-    BorderWidthDefault: 3,
-    FontBaseSizeDefault: 14,
+    BorderRadiusDefault: '10px',
+    BorderWidthDefault: '3px',
+    FontBaseSizeDefault: '14px',
   };
 
   const getInitialStyles = (): CustomStylesState => {
@@ -90,7 +90,7 @@ export const SettingsStyles = ({ onChange }: Props) => {
       <div className="ms-style-picker sliders">
         {/* Sliders */}
         {[
-          { label: 'Border Radius', name: 'BorderRadius', min: 0, max: 35 },
+          { label: 'Border Radius', name: 'BorderRadius', min: 0, max: 25 },
           { label: 'Border Width', name: 'BorderWidth', min: 1, max: 5 },
           { label: 'Font Base Size', name: 'FontBaseSize', min: 12, max: 20 },
         ].map((slider) => (
@@ -105,7 +105,7 @@ export const SettingsStyles = ({ onChange }: Props) => {
                 placeholder={`Slider for ${slider.name.toLowerCase()}`}
                 value={customStyles[slider.name as keyof CustomStylesState]}
                 onChange={(event) =>
-                  handleInputChange(slider.name as keyof CustomStylesState, Number(event.target.value))
+                  handleInputChange(slider.name as keyof CustomStylesState, `${event.target.value}px`)
                 }
               />
               <span className="ms-setting-value">{customStyles[slider.name as keyof CustomStylesState]}</span>

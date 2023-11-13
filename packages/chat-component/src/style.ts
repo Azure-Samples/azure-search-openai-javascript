@@ -24,7 +24,7 @@ export const mainStyle = css`
     --font-small: small;
     --font-large: large;
     --font-larger: x-large;
-    --border-thick: 3px;
+    --border-base: 3px;
     --border-thin: 1px;
     --radius-small: 5px;
     --radius-base: 10px;
@@ -452,7 +452,7 @@ export const mainStyle = css`
     border: 1px solid var(--c-light-gray);
   }
   .chat__txt.error {
-    border: var(--border-thick) solid var(--c-error);
+    border: var(--border-base) solid var(--c-error);
     color: var(--c-error);
     padding: var(--d-base);
     background: var(--c-error-background);
@@ -591,7 +591,7 @@ export const mainStyle = css`
     color: var(--c-text);
     justify-content: space-evenly;
     box-shadow: 0 0 var(--d-small) rgba(0, 0, 0, 0.1);
-    border: var(--border-thick) solid transparent;
+    border: var(--border-base) solid transparent;
 
     @media (min-width: 768px) {
       min-height: calc(var(--d-xlarge) * 2);

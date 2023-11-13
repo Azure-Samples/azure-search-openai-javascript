@@ -135,18 +135,24 @@ export class ChatComponent extends LitElement {
 
   static override styles = [mainStyle];
 
+  // This is only necessary when you want to override the component from settings in the outside.
+  // Remove this block when not needed.
   override updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
 
     if (changedProperties.has('customStyles')) {
       this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
-      this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLighter);
-      this.style.setProperty('--c-accent-contrast', this.customStyles.AccentContrast);
-      this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
-      this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLighter);
-      this.style.setProperty('--c-accent-contrast', this.customStyles.AccentContrast);
+      this.style.setProperty('--c-accent-light', this.customStyles.AccentLight);
+      this.style.setProperty('--c-accent-dark', this.customStyles.AccentDark);
+      this.style.setProperty('--c-text-color', this.customStyles.TextColor);
+      this.style.setProperty('--c-light-gray', this.customStyles.BackgroundColor);
+      this.style.setProperty('--c-dark-gray', this.customStyles.FormBackgroundColor);
+      this.style.setProperty('--radius-base', this.customStyles.BorderRadius);
+      this.style.setProperty('--border-base', this.customStyles.BorderWidth);
+      this.style.setProperty('--font-base', this.customStyles.FontBaseSize);
     }
   }
+
   // debounce dispatching must-scroll event
   debounceScrollIntoView(): void {
     let timeout: any = 0;
