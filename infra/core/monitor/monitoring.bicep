@@ -6,6 +6,8 @@ param location string = resourceGroup().location
 param tags object = {}
 param includeDashboard bool = true
 
+var useApplicationInsights = !empty(applicationInsightsName)
+
 module logAnalytics 'loganalytics.bicep' = {
   name: 'loganalytics'
   params: {
@@ -15,7 +17,7 @@ module logAnalytics 'loganalytics.bicep' = {
   }
 }
 
-module applicationInsights 'applicationinsights.bicep' = {
+module applicationInsights 'applicationinsights.bicep' = if (useApplicationInsights) {
   name: 'applicationinsights'
   params: {
     name: applicationInsightsName
@@ -27,8 +29,8 @@ module applicationInsights 'applicationinsights.bicep' = {
   }
 }
 
-output applicationInsightsConnectionString string = applicationInsights.outputs.connectionString
-output applicationInsightsInstrumentationKey string = applicationInsights.outputs.instrumentationKey
-output applicationInsightsName string = applicationInsights.outputs.name
+output applicationInsightsConnectionString string = useApplicationInsights ? applicationInsights.outputs.connectionString : ''
+output applicationInsightsInstrumentationKey string = useApplicationInsights ? applicationInsights.outputs.instrumentationKey : ''
+output applicationInsightsName string = useApplicationInsights ? applicationInsights.outputs.name : ''
 output logAnalyticsWorkspaceId string = logAnalytics.outputs.id
 output logAnalyticsWorkspaceName string = logAnalytics.outputs.name
