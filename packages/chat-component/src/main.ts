@@ -25,6 +25,9 @@ import iconSpinner from '../public/svg/spinner-icon.svg?raw';
 import iconMicOff from '../public/svg/mic-icon.svg?raw';
 import iconMicOn from '../public/svg/mic-record-on-icon.svg?raw';
 
+// Branding
+import iconLogo from '../public/branding/brand-logo.svg?raw';
+
 import { marked } from 'marked';
 
 /**
@@ -55,6 +58,9 @@ export class ChatComponent extends LitElement {
 
   @property({ type: String, attribute: 'data-use-stream', converter: (value) => value?.toLowerCase() === 'true' })
   useStream: boolean = chatHttpOptions.stream;
+
+  @property({ type: String, attribute: 'data-custom-branding', converter: (value) => value?.toLowerCase() === 'true' })
+  isCustomBranding: boolean = globalConfig.IS_CUSTOM_BRANDING;
 
   @property({ type: String, attribute: 'data-overrides', converter: (value) => JSON.parse(value || '{}') })
   overrides: RequestOverrides = {};
@@ -147,7 +153,8 @@ export class ChatComponent extends LitElement {
       this.style.setProperty('--c-accent-dark', this.customStyles.AccentDark);
       this.style.setProperty('--c-text-color', this.customStyles.TextColor);
       this.style.setProperty('--c-light-gray', this.customStyles.BackgroundColor);
-      this.style.setProperty('--c-dark-gray', this.customStyles.FormBackgroundColor);
+      this.style.setProperty('--c-dark-gray', this.customStyles.ForegroundColor);
+      this.style.setProperty('--c-base-gray', this.customStyles.FormBackgroundColor);
       this.style.setProperty('--radius-base', this.customStyles.BorderRadius);
       this.style.setProperty('--border-base', this.customStyles.BorderWidth);
       this.style.setProperty('--font-base', this.customStyles.FontBaseSize);
@@ -630,6 +637,33 @@ export class ChatComponent extends LitElement {
     return this.isProcessingResponse ? cancelChatButton : submitChatButton;
   }
 
+  // Render Branding if custom branding is enabled
+  renderBrandingBanner() {
+    if (this.isCustomBranding) {
+      return html`
+        <header class="branding__banner">
+          <a class="branding__link" href="${globalConfig.BRANDING_URL}" target="_blank" rel="noopener noreferrer">
+            ${unsafeSVG(iconLogo)}
+          </a>
+          <h1 class="branding__hl">${globalConfig.BRANDING_HEADLINE}</h1>
+        </header>
+      `;
+    }
+    return '';
+  }
+
+  // Render assistant logo as per branding
+  renderBrandingAvatar() {
+    if (this.isCustomBranding) {
+      return html`
+        <a class="branding__link" href="${globalConfig.BRANDING_URL}" target="_blank" rel="noopener noreferrer">
+          ${unsafeSVG(iconLogo)}
+        </a>
+      `;
+    }
+    return '';
+  }
+
   // Render the chat component as a web component
   override render() {
     return html`
@@ -657,32 +691,35 @@ export class ChatComponent extends LitElement {
                           ${message.isUserMessage
                             ? ''
                             : html` <div class="chat__header">
-                                <button
-                                  title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                                  class="button chat__header--button"
-                                  data-testid="chat-show-thought-process"
-                                  @click="${this.handleShowThoughtProcess}"
-                                  ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
-                                >
-                                  <span class="chat__header--span"
-                                    >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
+                                <div class="chat__header--avatar">${this.renderBrandingAvatar()}</div>
+                                <div class="chat__header--buttons">
+                                  <button
+                                    title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
+                                    class="button chat__header--button"
+                                    data-testid="chat-show-thought-process"
+                                    @click="${this.handleShowThoughtProcess}"
+                                    ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
                                   >
+                                    <span class="chat__header--span"
+                                      >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
+                                    >
 
-                                  ${unsafeSVG(iconLightBulb)}
-                                </button>
-                                <button
-                                  title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-                                  class="button chat__header--button"
-                                  @click="${this.copyResponseToClipboard}"
-                                  ?disabled="${this.isDisabled}"
-                                >
-                                  <span class="chat__header--span"
-                                    >${this.isResponseCopied
-                                      ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-                                      : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
+                                    ${unsafeSVG(iconLightBulb)}
+                                  </button>
+                                  <button
+                                    title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+                                    class="button chat__header--button"
+                                    @click="${this.copyResponseToClipboard}"
+                                    ?disabled="${this.isDisabled}"
                                   >
-                                  ${this.isResponseCopied ? unsafeSVG(iconSuccess) : unsafeSVG(iconCopyToClipboard)}
-                                </button>
+                                    <span class="chat__header--span"
+                                      >${this.isResponseCopied
+                                        ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
+                                        : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
+                                    >
+                                    ${this.isResponseCopied ? unsafeSVG(iconSuccess) : unsafeSVG(iconCopyToClipboard)}
+                                  </button>
+                                </div>
                               </div>`}
                           ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
                           ${this.renderCitation(message.citations)}
@@ -715,6 +752,7 @@ export class ChatComponent extends LitElement {
             <!-- Conditionally render default prompts based on hasDefaultPromptsEnabled -->
             ${this.hasDefaultPromptsEnabled
               ? html`
+                  ${this.renderBrandingBanner()}
                   <div class="defaults__container">
                     <h1 class="headline">
                       ${this.interactionModel === 'chat'

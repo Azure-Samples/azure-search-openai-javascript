@@ -74,10 +74,11 @@ const Chat = () => {
       ? JSON.parse(storedStyles)
       : {
           AccentHigh: '#692b61',
-          AccentLighter: '#f6d5f2',
-          AccentContrast: '#5e3c7d',
+          AccentLight: '#f6d5f2',
+          AccentDark: '#5e3c7d',
           TextColor: '#123f58',
           BackgroundColor: '#e3e3e3',
+          ForegroundColor: '#4e5288',
           FormBackgroundColor: '#f5f5f5',
           BorderRadius: '10px',
           BorderWidth: '3px',

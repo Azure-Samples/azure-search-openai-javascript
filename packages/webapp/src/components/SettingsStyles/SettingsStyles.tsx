@@ -2,18 +2,6 @@ import React, { useState, useEffect } from 'react';
 import type { CustomStylesState } from '../../api/models.js';
 import './SettingsStyles.css';
 
-/* type CustomStylesState = {
-  AccentHigh: string;
-  AccentLight: string;
-  AccentDark: string;
-  TextColor: string;
-  BackgroundColor: string;
-  FormBackgroundColor: string;
-  BorderRadius: number;
-  BorderWidth: number;
-  FontBaseSize: number;
-}; */
-
 interface Props {
   onChange: (newStyles: CustomStylesState) => void;
 }
@@ -26,6 +14,7 @@ export const SettingsStyles = ({ onChange }: Props) => {
     AccentDarkDefault: '#5e3c7d',
     TextColorDefault: '#123f58',
     BackgroundColorDefault: '#e3e3e3',
+    ForegroundColorDefault: '#4e5288',
     FormBackgroundColorDefault: '#f5f5f5',
     BorderRadiusDefault: '10px',
     BorderWidthDefault: '3px',
@@ -42,6 +31,7 @@ export const SettingsStyles = ({ onChange }: Props) => {
           AccentDark: styleDefaults.AccentDarkDefault,
           TextColor: styleDefaults.TextColorDefault,
           BackgroundColor: styleDefaults.BackgroundColorDefault,
+          ForegroundColor: styleDefaults.ForegroundColorDefault,
           FormBackgroundColor: styleDefaults.FormBackgroundColorDefault,
           BorderRadius: styleDefaults.BorderRadiusDefault,
           BorderWidth: styleDefaults.BorderWidthDefault,
@@ -69,10 +59,11 @@ export const SettingsStyles = ({ onChange }: Props) => {
       <div className="ms-style-picker colors">
         {[
           { label: 'Accent High', name: 'AccentHigh', placeholder: 'Accent high' },
-          { label: 'Accent Lighter', name: 'AccentLighter', placeholder: 'Accent lighter' },
-          { label: 'Accent Contrast', name: 'AccentContrast', placeholder: 'Accent contrast' },
+          { label: 'Accent Light', name: 'AccentLight', placeholder: 'Accent light' },
+          { label: 'Accent Dark', name: 'AccentDark', placeholder: 'Accent dark' },
           { label: 'Text Color', name: 'TextColor', placeholder: 'Text color' },
           { label: 'Background Color', name: 'BackgroundColor', placeholder: 'Background color' },
+          { label: 'Foreground Color', name: 'ForegroundColor', placeholder: 'Foreground color' },
           { label: 'Form background', name: 'FormBackgroundColor', placeholder: 'Form Background color' },
         ].map((input) => (
           <React.Fragment key={input.name}>

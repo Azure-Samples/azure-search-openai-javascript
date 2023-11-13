@@ -16,6 +16,7 @@ export type CustomStylesState = {
   AccentDark: string;
   TextColor: string;
   BackgroundColor: string;
+  ForegroundColor: string;
   FormBackgroundColor: string;
   BorderRadius: string;
   BorderWidth: string;
@@ -28,6 +29,7 @@ export const enum CustomStyles {
   AccentDark = 'AccentDark',
   TextColor = 'TextColor',
   BackgroundColor = 'BackgroundColor',
+  ForegroundColor = 'ForegroundColor',
   FormBackgroundColor = 'FormBackgroundColor',
   BorderRadius = 'BorderRadius',
   BorderWidth = 'BorderWidth',

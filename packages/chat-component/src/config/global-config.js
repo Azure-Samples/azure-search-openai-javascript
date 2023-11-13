@@ -12,6 +12,14 @@ const globalConfig = {
   ],
   DEFAULT_PROMPTS_HEADING_CHAT: 'Chat with our support team',
   DEFAULT_PROMPTS_HEADING_ASK: 'Ask now',
+  // Custom Branding
+  IS_CUSTOM_BRANDING: true,
+  // Custom Branding details
+  // All these should come from persistence config
+  BRANDING_URL: '#',
+  BRANDING_LOGO_PATH: '../public/branding/brand-logo.svg',
+  BRANDING_LOGO_ALT: 'Brand Logo',
+  BRANDING_HEADLINE: 'Welcome to the Support Assistant of our Brand',
   // This are the chat bubbles that will be displayed in the chat
   CHAT_MESSAGES: [],
   // This are the labels for the chat button and input

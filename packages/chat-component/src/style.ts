@@ -9,6 +9,7 @@ export const mainStyle = css`
     --c-black: #111111;
     --c-red: #ff0000;
     --c-light-gray: #e3e3e3;
+    --c-base-gray: var(--c-secondary);
     --c-dark-gray: #4e5288;
     --c-accent-high: #692b61;
     --c-accent-dark: #5e3c7d;
@@ -26,6 +27,7 @@ export const mainStyle = css`
     --font-larger: x-large;
     --border-base: 3px;
     --border-thin: 1px;
+    --border-thicker: 8px;
     --radius-small: 5px;
     --radius-base: 10px;
     --radius-large: 25px;
@@ -146,6 +148,49 @@ export const mainStyle = css`
     font-size: var(--font-small);
     display: inline-block;
   }
+  .branding__banner {
+    display: flex;
+    width: var(--width-base);
+    margin: 0 auto var(--d-large);
+    justify-content: center;
+    align-items: center;
+
+    @media (min-width: 1024px) {
+      width: var(--width-narrow);
+    }
+  }
+  .branding__link svg {
+    width: calc(var(--width-base) - var(--d-small));
+    height: calc(var(--width-base) - var(--d-small));
+    position: relative;
+    z-index: 1;
+  }
+  .branding__link {
+    flex-shrink: 0;
+    border-radius: calc(var(--radius-large) * 3);
+    border: var(--border-thicker) solid transparent;
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    background-size: cover;
+    background-image: linear-gradient(to right, var(--c-accent-light), var(--c-accent-high));
+    width: calc(var(--d-xlarge) * 2);
+    height: calc(var(--d-xlarge) * 2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--d-large);
+    overflow: hidden;
+    padding: var(--d-small);
+    position: relative;
+  }
+  .branding__link::after {
+    content: '';
+    border-radius: calc(var(--radius-large) * 3);
+    width: calc(var(--width-base) - var(--d-small));
+    height: calc(var(--width-base) - var(--d-small));
+    position: absolute;
+    background-color: var(--c-secondary);
+  }
   .chat__container {
     min-width: 100%;
     transition: width 0.3s ease-in-out;
@@ -201,12 +246,7 @@ export const mainStyle = css`
     bottom: 0;
     z-index: 1;
     border-radius: var(--radius-base);
-    background: linear-gradient(
-      0deg,
-      rgba(245, 245, 245, 1) 0%,
-      rgba(245, 245, 245, 0.8) 75%,
-      rgba(245, 245, 245, 0.5) 100%
-    );
+    background: linear-gradient(0deg, var(--c-base-gray) 0%, var(--c-base-gray) 75%, var(--c-base-gray) 100%);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: var(--d-small) var(--d-small) var(--d-large);
   }
@@ -282,7 +322,24 @@ export const mainStyle = css`
   .chat__header {
     display: flex;
     justify-content: flex-end;
+  }
+  .chat__txt .chat__header {
+    display: flex;
+    justify-content: space-between;
     padding: var(--d-base);
+  }
+  .chat__header .branding__link {
+    width: calc(var(--d-base) + var(--d-xlarge));
+    height: calc(var(--d-base) + var(--d-xlarge));
+    padding: calc(var(--d-small) + var(--d-xsmall));
+  }
+  .chat__header .branding__link::after {
+    width: calc(var(--width-base) - var(--d-base));
+    height: calc(var(--width-base) - var(--d-base));
+  }
+  .chat__header--buttons {
+    display: flex;
+    align-items: center;
   }
   .chat__header--button {
     border: 1px solid var(--c-accent-dark);
