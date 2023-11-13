@@ -142,6 +142,9 @@ export class ChatComponent extends LitElement {
       this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
       this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLighter);
       this.style.setProperty('--c-accent-contrast', this.customStyles.AccentContrast);
+      this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
+      this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLighter);
+      this.style.setProperty('--c-accent-contrast', this.customStyles.AccentContrast);
     }
   }
   // debounce dispatching must-scroll event
