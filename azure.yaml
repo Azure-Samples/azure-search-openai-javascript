@@ -14,7 +14,7 @@ services:
       predeploy:
         windows:
           shell: pwsh
-          run: Export-ModuleMember -Variable SEARCH_API_URI && npm run build
+          run: npm run build
           interactive: true
           continueOnError: false
         posix:
