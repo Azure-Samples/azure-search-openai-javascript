@@ -74,8 +74,7 @@ export class ChatComponent extends LitElement {
   @query('#chat__containerWrapper')
   chatContainerWrapper!: HTMLElement;
 
-  @query('#citation-previewer')
-  previewer!: HTMLElement;
+  citationPreview = '';
 
   @queryAll('.copyButton')
   copyButtonList!: NodeListOf<HTMLButtonElement>;
@@ -191,7 +190,7 @@ export class ChatComponent extends LitElement {
           // this will be processing thought process only with streaming enabled
         });
         const chatAside: ChatAside = {
-          chatThoughts: result.thoughts,
+          chatThoughts: DOMPurify.sanitize(marked.parse(result.thoughts)),
           chatDataPoints: result.data_points,
           chatCitations: [...new Set(citations)],
         };
@@ -314,10 +313,9 @@ export class ChatComponent extends LitElement {
         }
 
         // update the markdown previewer with the content of the clicked citation
-        if (this.previewer) {
-          const markdownContent = await response.text();
-          this.previewer.innerHTML = DOMPurify.sanitize(marked.parse(markdownContent));
-        }
+        const markdownContent = await response.text();
+        this.citationPreview = DOMPurify.sanitize(marked.parse(markdownContent));
+        this.requestUpdate('citationPreview');
       }
     }
   }
@@ -861,7 +859,9 @@ export class ChatComponent extends LitElement {
                     this.selectedAsideTab === 'tab-citations' ? 0 : -1
                   }" aria-labelledby="tab-citations">
                       ${this.renderCitation(this.chatThread.at(-1)?.citations)}
-                      <div id="citation-previewer"></div>
+                      <div>
+                        ${unsafeHTML(this.citationPreview)}
+                      </div>
                   </div>
                 </div>
               </div>
