@@ -103,6 +103,23 @@ const Chat = () => {
     setCustomStyles(newStyles);
   };
 
+  const handleThemeToggle = (newIsDarkTheme: boolean) => {
+    // Get the ChatComponent instance (modify this according to how you manage your components)
+    const chatComponent = document.querySelector('chat-component');
+    if (chatComponent) {
+      // Remove existing style attributes
+      chatComponent.removeAttribute('style');
+      // eslint-disable-next-line unicorn/prefer-dom-node-dataset
+      chatComponent.setAttribute('data-theme', newIsDarkTheme ? 'dark' : '');
+    }
+    // Update the body class and html data-theme
+    document.body.classList.toggle('dark', newIsDarkTheme);
+    document.documentElement.dataset.theme = newIsDarkTheme ? 'dark' : '';
+
+    // Update the state
+    setIsDarkTheme(newIsDarkTheme);
+  };
+
   useEffect(() => {
     // Update the state when local storage changes
     const handleStorageChange = () => {
@@ -189,7 +206,7 @@ const Chat = () => {
         isFooterAtBottom={true}
       >
         <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
-          <ThemeSwitch onToggle={() => setIsDarkTheme(!isDarkTheme)} isDarkTheme={isDarkTheme} />
+          <ThemeSwitch onToggle={handleThemeToggle} isDarkTheme={isDarkTheme} />
         </TooltipHost>
         <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
           <TextField

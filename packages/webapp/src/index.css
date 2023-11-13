@@ -7,11 +7,17 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  color: #323130;
+}
+
+body.dark {
+  background: #1e1e1e;
+  color: #fff;
 }
 
 html {
   background: #f2f2f2;
-
+  color: #323130;
   font-family:
     'Segoe UI',
     -apple-system,
@@ -26,6 +32,15 @@ html {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html[data-theme='dark'] {
+  background: #1e1e1e;
+  color: #fff;
+}
+
+body.dark .css-109 {
+  color: #fff;
 }
 
 button {

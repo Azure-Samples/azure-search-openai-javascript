@@ -50,13 +50,13 @@ export const mainStyle = css`
     --c-secondary: #32343e;
     --c-text: var(--c-primary);
     --c-white: var(--c-secondary);
-    --c-black: #111111;
+    --c-black: var(--c-primary);
     --c-red: #ff0000;
-    --c-light-gray: #4e5288;
+    --c-light-gray: #636d9c;
     --c-dark-gray: #e3e3e3;
     --c-base-gray: var(--c-secondary);
-    --c-accent-high: #00131c;
-    --c-accent-dark: #00131c;
+    --c-accent-high: #dcdef8;
+    --c-accent-dark: var(--c-primary);
     --c-accent-light: #032219;
     --c-error: #8a0000;
     --c-error-background: rgb(253, 231, 233);
@@ -426,7 +426,7 @@ export const mainStyle = css`
   }
   .chatbox__button:hover,
   .chatbox__button:focus {
-    background: var(--c-secondary);
+    background: var(--c-light-gray);
   }
   .chatbox__button:hover svg,
   .chatbox__button:focus svg {
@@ -435,17 +435,17 @@ export const mainStyle = css`
   .chatbox__button--reset {
     position: absolute;
     right: calc(var(--d-xlarge) * 2);
-    top: var(--d-base);
+    top: calc(var(--d-small) + var(--d-xsmall));
     background: transparent;
     border: none;
-    color: gray;
-    background: var(--c-accent-dark);
+    background: var(--c-primary);
     border-radius: 50%;
     color: var(--c-white);
     font-weight: bold;
     height: var(--d-base);
     width: var(--d-base);
     cursor: pointer;
+    margin-right: var(--d-small);
   }
   .voice__input {
     box-shadow: none;
@@ -456,6 +456,7 @@ export const mainStyle = css`
   }
   .chatbox__input-container {
     display: flex;
+    color: var(--c-text);
     border: var(--border-thin) solid var(--c-black);
     background: var(--c-white);
     border-radius: var(--radius-small);
@@ -616,7 +617,6 @@ export const mainStyle = css`
     color: var(--c-accent-high);
     display: block;
     padding: var(--d-xsmall) 0;
-    border-bottom: 1px solid var(--c-light-gray);
     font-size: var(--font-small);
   }
   .defaults__button {
