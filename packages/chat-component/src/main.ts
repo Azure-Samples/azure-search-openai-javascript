@@ -135,8 +135,9 @@ export class ChatComponent extends LitElement {
 
   static override styles = [mainStyle];
 
-  // This is only necessary when you want to override the component from settings in the outside.
-  // Remove this block when not needed.
+  // The following block is only necessary when you want to override the component from settings in the outside.
+  // Remove this block when not needed, considering that updated() is a LitElement lifecycle method
+  // that may be used by other components if you update this code.
   override updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
 
