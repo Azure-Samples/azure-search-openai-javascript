@@ -78,6 +78,7 @@ const Chat = () => {
           AccentContrast: '#5e3c7d',
           TextColor: '#123f58',
           BackgroundColor: '#e3e3e3',
+          FormBackgroundColor: '#f5f5f5',
           BorderRadius: '25px',
           BorderWidth: '3px',
           FontBaseSize: '14px',

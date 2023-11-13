@@ -17,7 +17,7 @@ interface Props {
 }
 
 export const SettingsStyles = ({ onChange }: Props) => {
-  const defaultColors = ['#692b61', '#f6d5f2', '#5e3c7d', '#123f58', '#e3e3e3', '#f5f5f5', '#ffffff'];
+  const defaultColors = ['#692b61', '#f6d5f2', '#5e3c7d', '#123f58', '#e3e3e3', '#f5f5f5'];
   const defaultDimensions = [25, 3, 14]; // Updated default dimensions to be numbers
 
   const getInitialStyles = (): CustomStylesState => {
@@ -83,19 +83,21 @@ export const SettingsStyles = ({ onChange }: Props) => {
           { label: 'Font Base Size', name: 'FontBaseSize', min: 12, max: 20 },
         ].map((slider) => (
           <React.Fragment key={slider.name}>
-            <label htmlFor={`slider-${slider.name.toLowerCase()}`}>{slider.label}</label>
-            <input
-              name={`slider-${slider.name.toLowerCase()}`}
-              type="range"
-              min={slider.min}
-              max={slider.max}
-              placeholder={`Slider for ${slider.name.toLowerCase()}`}
-              value={customStyles[slider.name as keyof CustomStylesState]}
-              onChange={(event) =>
-                handleInputChange(slider.name as keyof CustomStylesState, Number(event.target.value))
-              }
-            />
-            <span>{customStyles[slider.name as keyof CustomStylesState]}</span>
+            <div className="ms-settings-input-slider">
+              <label htmlFor={`slider-${slider.name.toLowerCase()}`}>{slider.label}</label>
+              <input
+                name={`slider-${slider.name.toLowerCase()}`}
+                type="range"
+                min={slider.min}
+                max={slider.max}
+                placeholder={`Slider for ${slider.name.toLowerCase()}`}
+                value={customStyles[slider.name as keyof CustomStylesState]}
+                onChange={(event) =>
+                  handleInputChange(slider.name as keyof CustomStylesState, Number(event.target.value))
+                }
+              />
+              <span className="ms-setting-value">{customStyles[slider.name as keyof CustomStylesState]}</span>
+            </div>
           </React.Fragment>
         ))}
       </div>
