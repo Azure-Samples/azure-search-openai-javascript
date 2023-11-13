@@ -8,6 +8,7 @@ import 'chat-component';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 import { SettingsStyles } from '../../components/SettingsStyles/SettingsStyles.js';
 import type { CustomStylesState } from '../../api/models.js';
+import { ThemeSwitch } from '../../components/ThemeSwitch/ThemeSwitch.js';
 
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -24,8 +25,8 @@ const Chat = () => {
 
   const [isLoading] = useState<boolean>(false);
 
-  const [enableBranding, setEnableBranding] = useState(() => {
-    const storedBranding = localStorage.getItem('enableBranding');
+  const [isBrandingEnabled, setEnableBranding] = useState(() => {
+    const storedBranding = localStorage.getItem('isBrandingEnabled');
     return storedBranding ? JSON.parse(storedBranding) : false;
   });
 
@@ -93,6 +94,11 @@ const Chat = () => {
         };
   });
 
+  const [isDarkTheme, setIsDarkTheme] = useState(() => {
+    const storedTheme = localStorage.getItem('isDarkTheme');
+    return storedTheme ? JSON.parse(storedTheme) : false;
+  });
+
   const handleCustomStylesChange = (newStyles: CustomStylesState) => {
     setCustomStyles(newStyles);
   };
@@ -105,9 +111,14 @@ const Chat = () => {
         setCustomStyles(JSON.parse(storedStyles));
       }
 
-      const storedBranding = localStorage.getItem('enableBranding');
+      const storedBranding = localStorage.getItem('isBrandingEnabled');
       if (storedBranding) {
         setEnableBranding(JSON.parse(storedBranding));
+      }
+
+      const storedTheme = localStorage.getItem('isDarkTheme');
+      if (storedTheme) {
+        setIsDarkTheme(JSON.parse(storedTheme));
       }
     };
 
@@ -117,8 +128,11 @@ const Chat = () => {
     // Store customStyles in local storage whenever it changes
     localStorage.setItem('customStyles', JSON.stringify(customStyles));
 
-    // Store enableBranding in local storage whenever it changes
-    localStorage.setItem('enableBranding', JSON.stringify(enableBranding));
+    // Store isBrandingEnabled in local storage whenever it changes
+    localStorage.setItem('isBrandingEnabled', JSON.stringify(isBrandingEnabled));
+
+    // Store isDarkTheme in local storage whenever it changes
+    localStorage.setItem('isDarkTheme', JSON.stringify(isDarkTheme));
 
     // Scroll into view when isLoading changes
     chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' });
@@ -127,7 +141,7 @@ const Chat = () => {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [customStyles, enableBranding, isLoading]);
+  }, [customStyles, isBrandingEnabled, isDarkTheme, isLoading]);
 
   const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);
 
@@ -159,7 +173,8 @@ const Chat = () => {
             data-approach="rrr"
             data-overrides={JSON.stringify(overrides)}
             data-custom-styles={JSON.stringify(customStyles)}
-            data-custom-branding={JSON.stringify(enableBranding)}
+            data-custom-branding={JSON.stringify(isBrandingEnabled)}
+            data-theme={isDarkTheme ? 'dark' : ''}
           ></chat-component>
         </div>
       </div>
@@ -173,6 +188,9 @@ const Chat = () => {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
+          <ThemeSwitch onToggle={() => setIsDarkTheme(!isDarkTheme)} isDarkTheme={isDarkTheme} />
+        </TooltipHost>
         <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
           <TextField
             className={styles.chatSettingsSeparator}
@@ -271,7 +289,7 @@ const Chat = () => {
             </>
           )}
           <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
-            <Toggle label="Enable Branding" checked={enableBranding} onChange={onEnableBrandingChange} />
+            <Toggle label="Enable Branding" checked={isBrandingEnabled} onChange={onEnableBrandingChange} />
           </TooltipHost>
         </div>
       </Panel>

@@ -45,18 +45,19 @@ export const mainStyle = css`
     padding: var(--d-base);
     color: var(--c-text);
   }
-  :host([data-theme='dark']]) {
-    --c-primary: #123f58;
-    --c-secondary: #f5f5f5;
+  :host([data-theme='dark']) {
+    --c-primary: #fdfeff;
+    --c-secondary: #32343e;
     --c-text: var(--c-primary);
-    --c-white: #fff;
+    --c-white: var(--c-secondary);
     --c-black: #111111;
     --c-red: #ff0000;
-    --c-light-gray: #e3e3e3;
-    --c-dark-gray: #4e5288;
-    --c-accent-high: #692b61;
-    --c-accent-dark: #5e3c7d;
-    --c-accent-light: #f6d5f2;
+    --c-light-gray: #4e5288;
+    --c-dark-gray: #e3e3e3;
+    --c-base-gray: var(--c-secondary);
+    --c-accent-high: #00131c;
+    --c-accent-dark: #00131c;
+    --c-accent-light: #032219;
     --c-error: #8a0000;
     --c-error-background: rgb(253, 231, 233);
     --c-success: #26b32b;
