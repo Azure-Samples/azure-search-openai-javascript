@@ -1,6 +1,10 @@
-.ms-style-picker {
+.ms-style-picker.colors,
+.ms-style-picker.sliders {
   display: grid;
   margin-top: 10px;
+}
+
+.ms-style-picker.colors {
   grid-template-columns: repeat(4, 1fr);
 }
 

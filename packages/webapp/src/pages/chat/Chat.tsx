@@ -76,6 +76,11 @@ const Chat = () => {
           AccentHigh: '#692b61',
           AccentLighter: '#f6d5f2',
           AccentContrast: '#5e3c7d',
+          TextColor: '#123f58',
+          BackgroundColor: '#e3e3e3',
+          BorderRadius: '25px',
+          BorderWidth: '3px',
+          FontBaseSize: '14px',
         };
   });
 

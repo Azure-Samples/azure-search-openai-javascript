@@ -20,6 +20,11 @@ export const enum CustomStyles {
   AccentHigh = 'AccentHigh',
   AccentLighter = 'AccentLighter',
   AccentContrast = 'AccentContrast',
+  TextColor = 'TextColor',
+  BackgroundColor = 'BackgroundColor',
+  BorderRadius = 'BorderRadius',
+  BorderWidth = 'BorderWidth',
+  FontBaseSize = 'FontBaseSize',
 }
 
 export type AskRequestOverrides = {

@@ -11,9 +11,8 @@ export const mainStyle = css`
     --c-light-gray: #e3e3e3;
     --c-dark-gray: #4e5288;
     --c-accent-high: #692b61;
-    --c-accent-dark: var(--c-secondary);
+    --c-accent-dark: #5e3c7d;
     --c-accent-light: #f6d5f2;
-    --c-accent-contrast: #5e3c7d;
     --c-error: #8a0000;
     --c-error-background: rgb(253, 231, 233);
     --c-success: #26b32b;
@@ -54,9 +53,8 @@ export const mainStyle = css`
     --c-light-gray: #e3e3e3;
     --c-dark-gray: #4e5288;
     --c-accent-high: #692b61;
-    --c-accent-dark: var(--c-secondary);
+    --c-accent-dark: #5e3c7d;
     --c-accent-light: #f6d5f2;
-    --c-accent-contrast: #5e3c7d;
     --c-error: #8a0000;
     --c-error-background: rgb(253, 231, 233);
     --c-success: #26b32b;
@@ -236,7 +234,7 @@ export const mainStyle = css`
     text-align: center;
   }
   .aside__link.active {
-    background: linear-gradient(to left, var(--c-accent-contrast), var(--c-accent-high));
+    background: linear-gradient(to left, var(--c-accent-dark), var(--c-accent-high));
     color: var(--c-white);
   }
   .aside__link:not(.active):hover {
@@ -460,7 +458,7 @@ export const mainStyle = css`
     background: var(--c-error-background);
   }
   .chat__txt.user-message {
-    background: linear-gradient(to left, var(--c-accent-contrast), var(--c-accent-high));
+    background: linear-gradient(to left, var(--c-accent-dark), var(--c-accent-high));
     color: var(--c-white);
     border: var(--border-thin) solid var(--c-accent-light);
   }
