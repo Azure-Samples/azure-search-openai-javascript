@@ -268,11 +268,11 @@ const Chat = () => {
               <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
                 <SettingsStyles onChange={handleCustomStylesChange}></SettingsStyles>
               </TooltipHost>
-              <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
-                <Toggle label="Enable Branding" checked={enableBranding} onChange={onEnableBrandingChange} />
-              </TooltipHost>
             </>
           )}
+          <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
+            <Toggle label="Enable Branding" checked={enableBranding} onChange={onEnableBrandingChange} />
+          </TooltipHost>
         </div>
       </Panel>
     </div>
