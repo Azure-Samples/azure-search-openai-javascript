@@ -21,7 +21,7 @@
       "value": "${AZURE_OPENAI_RESOURCE_GROUP}"
     },
     "openAiResourceGroupLocation": {
-      "value": "${AZURE_OPENAI_RESOURCE_GROUP_LOCATION=eastus2}"
+      "value": "${AZURE_OPENAI_RESOURCE_GROUP_LOCATION=eastus}"
     },
     "openAiSkuName": {
       "value": "S0"
