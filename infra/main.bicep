@@ -20,6 +20,7 @@ param indexerApiImageName string = ''
 
 param logAnalyticsName string = ''
 param applicationInsightsName string = ''
+param applicationInsightsDashboardName string = ''
 
 param searchServiceName string = ''
 param searchServiceResourceGroupName string = ''
@@ -113,6 +114,7 @@ module monitoring './core/monitor/monitoring.bicep' = {
     tags: tags
     logAnalyticsName: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
     applicationInsightsName: useApplicationInsights ? (!empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}') : ''
+    applicationInsightsDashboardName: useApplicationInsights ? !empty(applicationInsightsDashboardName) ? applicationInsightsDashboardName : '${abbrs.portalDashboards}${resourceToken}' : ''
   }
 }
 
@@ -151,7 +153,7 @@ module searchApi './core/host/container-app.bicep' = {
     tags: union(tags, { 'azd-service-name': searchApiName })
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
-    managedIdentity: true
+    identityType: 'SystemAssigned'
     allowedOrigins: allowedOrigins
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
@@ -217,7 +219,7 @@ module indexerApi './core/host/container-app.bicep' = {
     tags: union(tags, { 'azd-service-name': indexerApiName })
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
-    managedIdentity: true
+    identityType: 'SystemAssigned'
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
     secrets: useApplicationInsights ? [
