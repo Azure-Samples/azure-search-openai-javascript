@@ -26,7 +26,7 @@ import iconMicOff from '../public/svg/mic-icon.svg?raw';
 import iconMicOn from '../public/svg/mic-record-on-icon.svg?raw';
 
 // Branding
-import iconLogo from '../public/branding/brand-logo.svg?raw';
+import iconLogo from '../public/branding/brand-logo-contoso.svg?raw';
 
 import { marked } from 'marked';
 

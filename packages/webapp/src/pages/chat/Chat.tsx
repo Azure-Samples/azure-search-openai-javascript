@@ -114,6 +114,7 @@ const Chat = () => {
     }
     // Update the body class and html data-theme
     document.body.classList.toggle('dark', newIsDarkTheme);
+    localStorage.removeItem('customStyles');
     document.documentElement.dataset.theme = newIsDarkTheme ? 'dark' : '';
 
     // Update the state
