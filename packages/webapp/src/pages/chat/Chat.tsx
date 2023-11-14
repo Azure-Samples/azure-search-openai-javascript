@@ -161,6 +161,14 @@ const Chat = () => {
     };
   }, [customStyles, isBrandingEnabled, isDarkTheme, isLoading]);
 
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('isDarkTheme');
+    if (storedTheme) {
+      const parsedTheme = JSON.parse(storedTheme);
+      handleThemeToggle(parsedTheme);
+    }
+  }, []); // Run this effect once, when the component mounts
+
   const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);
 
   const overrides = {
@@ -207,7 +215,7 @@ const Chat = () => {
         isFooterAtBottom={true}
       >
         <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
-          <ThemeSwitch onToggle={handleThemeToggle} isDarkTheme={isDarkTheme} />
+          <ThemeSwitch onToggle={handleThemeToggle} isDarkTheme={isDarkTheme} isConfigPanelOpen={isConfigPanelOpen} />
         </TooltipHost>
         <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
           <TextField

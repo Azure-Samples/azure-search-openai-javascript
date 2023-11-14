@@ -6,21 +6,19 @@ import './ThemeSwitch.css';
 interface ThemeSwitchProps {
   onToggle: (isDarkTheme: boolean) => void;
   isDarkTheme: boolean;
+  isConfigPanelOpen: boolean;
 }
 
-export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ onToggle, isDarkTheme }) => {
+export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ onToggle, isDarkTheme, isConfigPanelOpen }) => {
   const handleToggleChange = () => {
     onToggle(!isDarkTheme); // Pass the new theme state to the parent component
   };
 
   useEffect(() => {
-    // Set initial theme based on localStorage
-    const storedTheme = localStorage.getItem('isDarkTheme');
-    if (storedTheme) {
-      const parsedTheme = JSON.parse(storedTheme);
-      onToggle(parsedTheme); // Set the initial theme in the parent component
-    }
-  }, []); // Only run this effect once, when the component mounts
+    // Toggle 'dark' class on the shell app body element based on the isDarkTheme prop and isConfigPanelOpen
+    document.body.classList.toggle('dark', isDarkTheme && isConfigPanelOpen);
+    document.documentElement.dataset.theme = isDarkTheme && isConfigPanelOpen ? 'dark' : '';
+  }, []);
 
   return (
     <>
