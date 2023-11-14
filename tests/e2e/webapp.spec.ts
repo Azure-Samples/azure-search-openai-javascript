@@ -369,20 +369,23 @@ test.describe('generate answer', () => {
     await expect(page.getByRole('heading', { name: 'Contoso Real Estate Customer Support Guide' })).toBeVisible();
   });
 
-  test('follow up question', async ({ page }) => {
+  test('follow up questions', async ({ page }) => {
     const followupQuestions = page.getByTestId('followUpQuestion');
     await expect(followupQuestions).toHaveCount(3);
 
-    await expect(followupQuestions.nth(0)).toBeEnabled();
-    const questionText = await followupQuestions.nth(0).textContent();
-    expect(questionText).not.toBeNull();
-    expect(questionText).not.toBe('');
-
     const chatInput = page.getByTestId('question-input');
     await expect(chatInput).toHaveValue('');
-    await followupQuestions.nth(0).click();
 
-    await expect(chatInput).toHaveValue(questionText!);
+    for (let index = 0; index < 3; index++) {
+      const question = followupQuestions.nth(index);
+      await expect(question).toBeEnabled();
+      const questionText = await question.textContent();
+      expect(questionText).not.toBeNull();
+      expect(questionText).not.toBe('');
+
+      await question.click();
+      await expect(chatInput).toHaveValue(questionText!);
+    }
   });
 });
 
