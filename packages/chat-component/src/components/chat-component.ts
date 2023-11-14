@@ -223,22 +223,28 @@ export class ChatComponent extends LitElement {
     }
   }
 
-  handleVoiceInput(event): void {
-    this.questionInput.value = DOMPurify.sanitize(event?.detail.input || '');
+  setQuestionInputValue(value: string): void {
+    this.questionInput.value = DOMPurify.sanitize(value || '');
     this.currentQuestion = this.questionInput.value;
+  }
+
+  handleVoiceInput(event): void {
+    event?.preventDefault();
+    this.setQuestionInputValue(event?.detail?.input);
   }
 
   // This function is only necessary when default prompts are enabled
   // and we're rendering a teaser list component
   // TODO: move to utils
   handleOnTeaserClick(event): void {
-    this.questionInput.value = DOMPurify.sanitize(event?.detail.question || '');
-    this.currentQuestion = this.questionInput.value;
+    event?.preventDefault();
+    this.setQuestionInputValue(event?.detail?.question);
   }
 
   // Handle the click on the chat button and send the question to the API
   async handleUserChatSubmit(event: Event): Promise<void> {
     event.preventDefault();
+    this.collapseAside(event);
     const question = DOMPurify.sanitize(this.questionInput.value);
     if (question) {
       this.currentQuestion = question;
@@ -463,7 +469,13 @@ export class ChatComponent extends LitElement {
             ${followupQuestions.map(
               (followupQuestion) => html`
                 <li class="items__listItem--followup">
-                  <a class="items__link" href="#" @click="${(event) => this.handleOnTeaserClick(event)}"
+                  <a
+                    class="items__link"
+                    href="#"
+                    @click="${(event) => {
+                      event.preventDefault();
+                      this.setQuestionInputValue(followupQuestion);
+                    }}"
                     >${followupQuestion}</a
                   >
                 </li>
