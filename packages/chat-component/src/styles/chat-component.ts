@@ -461,7 +461,7 @@ export const chatStyle = css`
   .steps .items__listItem--step {
     padding: 5px 0;
     font-size: 14px;
-    line-heigth: 1;
+    line-height: 1;
   }
   .followup .items__link {
     color: var(--accent-high);
@@ -486,5 +486,9 @@ export const chatStyle = css`
     fill: var(--accent-lighter);
     animation: spinneranimation 1s linear infinite;
     margin-right: 10px;
+  }
+  .aside__header {
+    display: flex;
+    justify-content: end;
   }
 `;

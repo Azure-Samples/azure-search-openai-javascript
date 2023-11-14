@@ -21,7 +21,8 @@ import iconClose from '../../public/svg/close-icon.svg?raw';
 import iconQuestion from '../../public/svg/bubblequestion-icon.svg?raw';
 import iconSpinner from '../../public/svg/spinner-icon.svg?raw';
 
-import { marked } from 'marked';
+// import { marked } from 'marked';
+import { type TabContent } from './tab-component.js';
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -98,6 +99,11 @@ export class ChatComponent extends LitElement {
   @state()
   isDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
 
+  @state()
+  selectedCitation: Citation | undefined = undefined;
+
+  selectedAsideTab: 'tab-thought-process' | 'tab-support-context' | 'tab-citations' = 'tab-thought-process';
+
   // api response
   apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
@@ -112,8 +118,6 @@ export class ChatComponent extends LitElement {
 
   chatRequestOptions: ChatRequestOptions = requestOptions;
   chatHttpOptions: ChatHttpOptions = chatHttpOptions;
-
-  selectedAsideTab: 'tab-thought-process' | 'tab-support-context' | 'tab-citations' = 'tab-thought-process';
 
   // Is currently processing the response from the API
   // This is used to show the cancel button
@@ -232,49 +236,6 @@ export class ChatComponent extends LitElement {
   handleOnTeaserClick(event): void {
     this.questionInput.value = DOMPurify.sanitize(event?.detail.question || '');
     this.currentQuestion = this.questionInput.value;
-  }
-
-  async handleCitationClick(sourceUrl: string, event: Event): Promise<void> {
-    if (sourceUrl?.endsWith('.md')) {
-      event?.preventDefault();
-
-      if (!this.isShowingThoughtProcess) {
-        this.selectedAsideTab = 'tab-citations';
-        this.handleExpandAside(event);
-      }
-
-      const response = await fetch(sourceUrl);
-      if (response.ok) {
-        // highlight the clicked citation to make it clear which is being previewed
-        const citationsList = this.shadowRoot?.querySelectorAll(
-          '.aside .items__list.citations .items__listItem--citation',
-        );
-
-        if (citationsList) {
-          const citationsArray = [...citationsList];
-          const clickedIndex = citationsArray.findIndex((citation) => {
-            const link = citation.querySelector('a');
-            return link?.href === sourceUrl;
-          });
-
-          for (const citation of citationsList) {
-            const index = citationsArray.indexOf(citation);
-            if (index === clickedIndex) {
-              citation.classList.add('active');
-            } else {
-              citation.classList.remove('active');
-            }
-          }
-        }
-
-        // update the markdown previewer with the content of the clicked citation
-        const previewer = this.shadowRoot?.querySelector('#citation-previewer');
-        if (previewer) {
-          const markdownContent = await response.text();
-          previewer.innerHTML = DOMPurify.sanitize(marked.parse(markdownContent));
-        }
-      }
-    }
   }
 
   // Handle the click on the chat button and send the question to the API
@@ -420,8 +381,8 @@ export class ChatComponent extends LitElement {
   }
 
   // show thought process aside
-  handleExpandAside(event: Event): void {
-    event.preventDefault();
+  handleExpandAside(event: Event | undefined = undefined): void {
+    event?.preventDefault();
     this.isShowingThoughtProcess = true;
     this.shadowRoot?.querySelector('#overlay')?.classList.add('active');
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.add('aside-open');
@@ -455,6 +416,18 @@ export class ChatComponent extends LitElement {
     return entries;
   }
 
+  handleCitationClick(citation: Citation, event: Event): void {
+    if (citation?.text?.endsWith('.md')) {
+      event?.preventDefault();
+      this.selectedCitation = citation;
+
+      if (!this.isShowingThoughtProcess) {
+        this.selectedAsideTab = 'tab-citations';
+        this.handleExpandAside();
+      }
+    }
+  }
+
   renderCitation(citations: Citation[] | undefined) {
     // render citations
     if (citations && citations.length > 0) {
@@ -469,6 +442,7 @@ export class ChatComponent extends LitElement {
                   data-testid="citation"
                   target="_blank"
                   rel="noopener noreferrer"
+                  @click="${(event: Event) => this.handleCitationClick(citation, event)}"
                   >${citation.ref}. ${citation.text}</a
                 >
               </li>
@@ -477,7 +451,6 @@ export class ChatComponent extends LitElement {
         </ol>
       `;
     }
-
     return '';
   }
 
@@ -517,14 +490,13 @@ export class ChatComponent extends LitElement {
       ${unsafeSVG(iconSend)}
     </button>`;
     const cancelChatButton = html`<button
-      <button
-        class="chatbox__button"
-        data-testid="cancel-question-button"
-        @click="${this.handleUserChatCancel}"
-        title="${globalConfig.CHAT_CANCEL_BUTTON_LABEL_TEXT}"
-      >
-        ${unsafeSVG(iconCancel)}
-      </button>`;
+      class="chatbox__button"
+      data-testid="cancel-question-button"
+      @click="${this.handleUserChatCancel}"
+      title="${globalConfig.CHAT_CANCEL_BUTTON_LABEL_TEXT}"
+    >
+      ${unsafeSVG(iconCancel)}
+    </button>`;
 
     return this.isProcessingResponse ? cancelChatButton : submitChatButton;
   }
@@ -693,9 +665,34 @@ export class ChatComponent extends LitElement {
                     </button>
                   </div>
                   <tab-component
-                    .chatThoughts="${this.chatThoughts}"
-                    .chatDataPoints="${this.chatDataPoints}"
-                    .chatCitations="${this.renderCitation(this.chatThread.at(-1)?.citations)}"
+                    .tabs="${[
+                      {
+                        id: 'tab-thought-process',
+                        label: globalConfig.THOUGHT_PROCESS_LABEL,
+                        render: () =>
+                          html`<div class="tab-component__innerContainer">
+                            ${this.chatThoughts
+                              ? html` <p class="tab-component__paragraph">${unsafeHTML(this.chatThoughts)}</p> `
+                              : ''}
+                          </div>`,
+                      },
+                      {
+                        id: 'tab-support-context',
+                        label: globalConfig.SUPPORT_CONTEXT_LABEL,
+                        render: () =>
+                          html`<ul class="defaults__list always-row">
+                            ${this.chatDataPoints?.map(
+                              (dataPoint) => html` <li class="defaults__listItem">${dataPoint}</li> `,
+                            )}
+                          </ul>`,
+                      },
+                      {
+                        id: 'tab-citations',
+                        label: globalConfig.CITATIONS_LABEL,
+                        render: () => this.renderCitation(this.chatThread.at(-1)?.citations),
+                      },
+                    ] as TabContent[]}"
+                    .selectedTabId="${this.selectedAsideTab}"
                   ></tab-component>
                 </aside>
               `
