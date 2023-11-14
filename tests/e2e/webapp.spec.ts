@@ -368,6 +368,22 @@ test.describe('generate answer', () => {
     // markdown converted to html
     await expect(page.getByRole('heading', { name: 'Contoso Real Estate Customer Support Guide' })).toBeVisible();
   });
+
+  test('follow up question', async ({ page }) => {
+    const followupQuestions = page.getByTestId('followUpQuestion');
+    await expect(followupQuestions).toHaveCount(3);
+
+    await expect(followupQuestions.nth(0)).toBeEnabled();
+    const questionText = await followupQuestions.nth(0).textContent();
+    expect(questionText).not.toBeNull();
+    expect(questionText).not.toBe('');
+
+    const chatInput = page.getByTestId('question-input');
+    await expect(chatInput).toHaveValue('');
+    await followupQuestions.nth(0).click();
+
+    await expect(chatInput).toHaveValue(questionText!);
+  });
 });
 
 test.describe('developer settings', () => {

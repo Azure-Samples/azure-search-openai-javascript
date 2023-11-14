@@ -472,6 +472,7 @@ export class ChatComponent extends LitElement {
                   <a
                     class="items__link"
                     href="#"
+                    data-testid="followUpQuestion"
                     @click="${(event) => {
                       event.preventDefault();
                       this.setQuestionInputValue(followupQuestion);
