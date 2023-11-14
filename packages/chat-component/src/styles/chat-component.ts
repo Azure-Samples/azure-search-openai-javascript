@@ -305,13 +305,6 @@ export const chatStyle = css`
     width: 20px;
     cursor: pointer;
   }
-  .voice__input {
-    box-shadow: none;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    width: 50px;
-  }
   .chatbox__input-container {
     display: flex;
     border: 1px solid var(--black);
@@ -493,11 +486,5 @@ export const chatStyle = css`
     fill: var(--accent-lighter);
     animation: spinneranimation 1s linear infinite;
     margin-right: 10px;
-  }
-  .not-recording svg {
-    fill: var(--black);
-  }
-  .recording svg {
-    fill: var(--red);
   }
 `;

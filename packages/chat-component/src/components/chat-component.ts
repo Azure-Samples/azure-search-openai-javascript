@@ -20,8 +20,6 @@ import iconSend from '../../public/svg/send-icon.svg?raw';
 import iconClose from '../../public/svg/close-icon.svg?raw';
 import iconQuestion from '../../public/svg/bubblequestion-icon.svg?raw';
 import iconSpinner from '../../public/svg/spinner-icon.svg?raw';
-import iconMicOff from '../../public/svg/mic-icon.svg?raw';
-import iconMicOn from '../../public/svg/mic-record-on-icon.svg?raw';
 
 import { marked } from 'marked';
 
@@ -96,15 +94,6 @@ export class ChatComponent extends LitElement {
 
   @state()
   canShowThoughtProcess = false;
-
-  // some browsers may not support SpeechRecognition https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition#browser_compatibility
-  @property({ type: Boolean })
-  showVoiceInput = (window.SpeechRecognition || window.webkitSpeechRecognition) !== undefined;
-
-  @property({ type: Boolean })
-  enableVoiceListening = false;
-
-  speechRecognition: SpeechRecognition | undefined = undefined;
 
   @state()
   isDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
@@ -232,43 +221,9 @@ export class ChatComponent extends LitElement {
     }
   }
 
-  handleVoiceInput(event: Event): void {
-    event.preventDefault();
-    if (!this.speechRecognition && this.showVoiceInput) {
-      this.speechRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-
-      if (!this.speechRecognition) {
-        return; // no speech support found so do nothing
-      }
-
-      this.speechRecognition.continuous = true;
-      this.speechRecognition.lang = 'en-US';
-
-      this.speechRecognition.onresult = (event) => {
-        let input = '';
-        for (const result of event.results) {
-          input += `${result[0].transcript}`;
-        }
-        this.questionInput.value = DOMPurify.sanitize(input);
-        this.currentQuestion = this.questionInput.value;
-      };
-
-      this.speechRecognition.addEventListener('error', (event) => {
-        if (this.speechRecognition) {
-          this.speechRecognition.stop();
-          console.log(`Speech recognition error detected: ${event.error} - ${event.message}`);
-        }
-      });
-    }
-
-    if (this.speechRecognition) {
-      this.enableVoiceListening = !this.enableVoiceListening;
-      if (this.enableVoiceListening) {
-        this.speechRecognition.start();
-      } else {
-        this.speechRecognition.stop();
-      }
-    }
+  handleVoiceInput(event): void {
+    this.questionInput.value = DOMPurify.sanitize(event?.detail.input || '');
+    this.currentQuestion = this.questionInput.value;
   }
 
   // This function is only necessary when default prompts are enabled
@@ -695,22 +650,7 @@ export class ChatComponent extends LitElement {
                   autocomplete="off"
                   @keyup="${this.handleOnInputChange}"
                 />
-                ${
-                  this.showVoiceInput && !this.isResetInput
-                    ? html` <button
-                        title="${this.enableVoiceListening
-                          ? globalConfig.CHAT_VOICE_REC_BUTTON_LABEL_TEXT
-                          : globalConfig.CHAT_VOICE_BUTTON_LABEL_TEXT}"
-                        class="chatbox__button voice__input ${this.enableVoiceListening
-                          ? 'recording'
-                          : 'not-recording'}"
-                        ?disabled="${!this.showVoiceInput}"
-                        @click="${this.handleVoiceInput}"
-                      >
-                        ${this.enableVoiceListening ? unsafeSVG(iconMicOn) : unsafeSVG(iconMicOff)}
-                      </button>`
-                    : ''
-                }
+                ${this.isResetInput ? '' : html`<voice-input-button @on-voice-input="${this.handleVoiceInput}" />`}
             </div>
               ${this.renderChatOrCancelButton()}
               <button
