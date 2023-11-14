@@ -19,9 +19,7 @@ import iconCancel from '../../public/svg/cancel-icon.svg?raw';
 import iconSend from '../../public/svg/send-icon.svg?raw';
 import iconClose from '../../public/svg/close-icon.svg?raw';
 import iconQuestion from '../../public/svg/bubblequestion-icon.svg?raw';
-import iconSpinner from '../../public/svg/spinner-icon.svg?raw';
 
-// import { marked } from 'marked';
 import { type TabContent } from './tab-component.js';
 
 /**
@@ -581,12 +579,7 @@ export class ChatComponent extends LitElement {
           }
           ${
             this.isAwaitingResponse && !this.hasAPIError
-              ? html`
-                  <p class="loading-text" aria-label="${globalConfig.LOADING_INDICATOR_TEXT}">
-                    <span class="loading-icon">${unsafeSVG(iconSpinner)}</span>
-                    <span class="loading-label">${globalConfig.LOADING_INDICATOR_TEXT}</span>
-                  </p>
-                `
+              ? html`<loading-indicator label="${globalConfig.LOADING_INDICATOR_TEXT}"></loading-indicator>`
               : ''
           }
           <!-- Teaser List with Default Prompts -->
@@ -689,7 +682,14 @@ export class ChatComponent extends LitElement {
                       {
                         id: 'tab-citations',
                         label: globalConfig.CITATIONS_LABEL,
-                        render: () => this.renderCitation(this.chatThread.at(-1)?.citations),
+                        render: () => {
+                          return html`${this.renderCitation(this.chatThread.at(-1)?.citations)}
+                          ${this.selectedCitation
+                            ? html`<document-previewer
+                                url="${this.apiUrl}/content/${this.selectedCitation.text}"
+                              ></document-previewer>`
+                            : ''} `;
+                        },
                       },
                     ] as TabContent[]}"
                     .selectedTabId="${this.selectedAsideTab}"

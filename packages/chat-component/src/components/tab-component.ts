@@ -13,6 +13,7 @@ export class TabComponent extends LitElement {
   @property({ type: Array })
   tabs: TabContent[] = [];
 
+  @property({ type: String })
   selectedTabId: string | undefined = undefined;
 
   static override styles = [tabStyle];
@@ -61,13 +62,14 @@ export class TabComponent extends LitElement {
 
   override render() {
     return html`
-          <nav class="tab-component__nav">
-            <ul class="tab-component__list" role="tablist">
-              ${this.tabs.map((tabContent) => this.renderTabListItem(tabContent, tabContent.id === this.selectedTabId))}
-            </ul>
-          </nav>
-          <div class="tab-component__content">
-            ${this.tabs.map((tabContent) => this.renderTabContent(tabContent, tabContent.id === this.selectedTabId))}
+      <div class="tab-component">
+        <nav class="tab-component__nav">
+          <ul class="tab-component__list" role="tablist">
+            ${this.tabs.map((tabContent) => this.renderTabListItem(tabContent, tabContent.id === this.selectedTabId))}
+          </ul>
+        </nav>
+        <div class="tab-component__content">
+          ${this.tabs.map((tabContent) => this.renderTabContent(tabContent, tabContent.id === this.selectedTabId))}
         </div>
       </div>
     `;
