@@ -1,4 +1,4 @@
-export * from './components/teaserlist-component.js';
+export * from './components/teaser-list-component.js';
 export * from './components/tab-component.js';
 export * from './components/chat-component.js';
 export * from './components/voice-input-button.js';
