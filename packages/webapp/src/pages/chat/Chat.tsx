@@ -176,13 +176,13 @@ const Chat = () => {
     };
   }, [customStyles, isBrandingEnabled, isDarkTheme, isLoading]);
 
-  /*   useEffect(() => {
+  useEffect(() => {
     const storedTheme = localStorage.getItem('isDarkTheme');
     if (storedTheme) {
       const parsedTheme = JSON.parse(storedTheme);
       handleThemeToggle(parsedTheme);
     }
-  }, []); */ // Run this effect once, when the component mounts
+  }, []); // Run this effect once, when the component mounts
 
   const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);
 
