@@ -443,6 +443,7 @@ export class ChatComponent extends LitElement {
     if (citations && citations.length > 0) {
       return html`
         <ol class="items__list citations">
+          <h3 class="subheadline--small">${globalConfig.CITATIONS_LABEL}</h3>
           ${citations.map(
             (citation) => html`
               <li class="items__listItem--citation">
@@ -673,38 +674,43 @@ export class ChatComponent extends LitElement {
                     {
                       id: 'tab-thought-process',
                       label: globalConfig.THOUGHT_PROCESS_LABEL,
-                      render: () =>
-                        html`<div class="tab-component__innerContainer">
-                          ${this.chatThoughts
-                            ? html` <p class="tab-component__paragraph">${unsafeHTML(this.chatThoughts)}</p> `
-                            : ''}
-                        </div>`,
                     },
                     {
                       id: 'tab-support-context',
                       label: globalConfig.SUPPORT_CONTEXT_LABEL,
-                      render: () =>
-                        html`<ul class="defaults__list always-row">
-                          ${this.chatDataPoints?.map(
-                            (dataPoint) => html` <li class="defaults__listItem">${dataPoint}</li> `,
-                          )}
-                        </ul>`,
                     },
                     {
                       id: 'tab-citations',
-                      label: globalConfig.CITATIONS_LABEL,
-                      render: () => {
-                        return html`${this.renderCitation(this.chatThread.at(-1)?.citations)}
-                        ${this.selectedCitation
-                          ? html`<document-previewer
-                              url="${this.apiUrl}/content/${this.selectedCitation.text}"
-                            ></document-previewer>`
-                          : ''} `;
-                      },
+                      label: globalConfig.CITATIONS_TAB_LABEL,
                     },
                   ] as TabContent[]}"
                   .selectedTabId="${this.selectedAsideTab}"
-                ></tab-component>
+                >
+                  <div slot="tab-thought-process">
+                    <h3 class="subheadline--small">${globalConfig.THOUGHT_PROCESS_LABEL}</h3>
+                    <div class="tab-component__innerContainer">
+                      ${this.chatThoughts
+                        ? html` <p class="tab-component__paragraph">${unsafeHTML(this.chatThoughts)}</p> `
+                        : ''}
+                    </div>
+                  </div>
+                  <div slot="tab-support-context">
+                    <h3 class="subheadline--small">${globalConfig.SUPPORT_CONTEXT_LABEL}</h3>
+                    <ul class="defaults__list always-row">
+                      ${this.chatDataPoints?.map(
+                        (dataPoint) => html` <li class="defaults__listItem">${dataPoint}</li> `,
+                      )}
+                    </ul>
+                  </div>
+                  <div slot="tab-citations" class="tab-component__content">
+                    ${this.renderCitation(this.chatThread.at(-1)?.citations)}
+                    ${this.selectedCitation
+                      ? html`<document-previewer
+                          url="${this.apiUrl}/content/${this.selectedCitation.text}"
+                        ></document-previewer>`
+                      : ''}
+                  </div>
+                </tab-component>
               </aside>
             `
           : ''}

@@ -32,7 +32,8 @@ const globalConfig = {
   // Config pertaining the response format
   THOUGHT_PROCESS_LABEL: 'Thought Process',
   SUPPORT_CONTEXT_LABEL: 'Support Context',
-  CITATIONS_LABEL: 'Citations',
+  CITATIONS_LABEL: 'Learn More:',
+  CITATIONS_TAB_LABEL: 'Citations',
 };
 
 const teaserListTexts = {
