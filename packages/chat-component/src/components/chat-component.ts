@@ -427,7 +427,7 @@ export class ChatComponent extends LitElement {
   }
 
   handleCitationClick(citation: Citation, event: Event): void {
-    if (citation?.text?.endsWith('.md')) {
+    if (citation?.text?.endsWith('.md') || citation?.text?.endsWith('.pdf')) {
       event?.preventDefault();
       this.selectedCitation = citation;
 
