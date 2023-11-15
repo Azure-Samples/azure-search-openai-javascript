@@ -25,6 +25,7 @@ import './voice-input-button.js';
 import './teaser-list-component.js';
 import './document-previewer.js';
 import './tab-component.js';
+import './citation-list.js';
 import { type TabContent } from './tab-component.js';
 
 /**
@@ -423,45 +424,29 @@ export class ChatComponent extends LitElement {
     if (this.isProcessingResponse) {
       this.debounceScrollIntoView();
     }
-    return entries;
+    return html`<div class="chat_txt--entry-container">${entries}</div>`;
   }
 
-  handleCitationClick(citation: Citation, event: Event): void {
-    if (citation?.text?.endsWith('.md') || citation?.text?.endsWith('.pdf')) {
-      event?.preventDefault();
-      this.selectedCitation = citation;
+  handleCitationClick(citation: Citation): void {
+    this.selectedCitation = citation;
 
-      if (!this.isShowingThoughtProcess) {
-        this.handleExpandAside();
-        this.selectedAsideTab = 'tab-citations';
-      }
+    if (!this.isShowingThoughtProcess) {
+      this.handleExpandAside();
+      this.selectedAsideTab = 'tab-citations';
     }
   }
 
   renderCitation(citations: Citation[] | undefined) {
-    // render citations
     if (citations && citations.length > 0) {
-      return html`
-        <ol class="items__list citations">
-          <h3 class="subheadline--small">${globalConfig.CITATIONS_LABEL}</h3>
-          ${citations.map(
-            (citation) => html`
-              <li class="items__listItem--citation">
-                <a
-                  class="items__link"
-                  href="${this.apiUrl}/content/${citation.text}"
-                  data-testid="citation"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  @click="${(event: Event) => this.handleCitationClick(citation, event)}"
-                  >${citation.ref}. ${citation.text}</a
-                >
-              </li>
-            `,
-          )}
-        </ol>
-      `;
+      return html`<div class="chat__citations">
+        <citation-list
+          .citations="${citations}"
+          .label="${globalConfig.CITATIONS_LABEL}"
+          @on-citation-click="${(event: any) => this.handleCitationClick(event?.detail?.citation)}"
+        ></citation-list>
+      </div>`;
     }
+
     return '';
   }
 
