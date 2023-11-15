@@ -46,7 +46,7 @@ export class DocumentPreviewerComponent extends LitElement {
       return html`
         ${this.previewContent
           ? html` ${unsafeHTML(this.previewContent)}`
-          : html` <iframe title="Preview" src="${this.url}" width="100%" height="850px" />`}
+          : html` <iframe title="Preview" src="${this.url}" width="100%" height="850px" sandbox />`}
       `;
     }
 
