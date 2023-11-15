@@ -480,4 +480,51 @@ export const chatStyle = css`
     display: flex;
     justify-content: end;
   }
+  .tab-component__paragraph {
+    font-family: monospace;
+    font-size: large;
+    border: 1px solid var(--light-gray);
+    padding: 20px;
+    border-radius: 25px;
+  }
+  .tab-component__content .items__list.citations {
+    border-top: 0;
+  }
+  .defaults__list {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .defaults__list.always-row {
+    text-align: left;
+  }
+  .defaults__list:not(.always-row) {
+    @media (min-width: 1024px) {
+      flex-direction: row;
+    }
+  }
+  .defaults__listItem {
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--white);
+    margin: 4px;
+    color: var(--text-color);
+    justify-content: space-evenly;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 3px solid transparent;
+
+    @media (min-width: 768px) {
+      min-height: 100px;
+    }
+  }
+  .defaults__listItem:hover,
+  .defaults__listItem:focus {
+    color: var(--accent-dark);
+    background: var(--secondary-color);
+    transition: all 0.3s ease-in-out;
+    border-color: var(--accent-high);
+  }
 `;

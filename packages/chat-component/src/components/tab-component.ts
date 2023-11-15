@@ -1,11 +1,10 @@
-import { LitElement, type TemplateResult, html } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { tabStyle } from '../styles/tab-component.js';
 
 export interface TabContent {
   id: string;
   label: string;
-  render: () => TemplateResult<1>;
 }
 
 @customElement('tab-component')
@@ -22,7 +21,6 @@ export class TabComponent extends LitElement {
     event.preventDefault();
     const tabId = (event.target as HTMLAnchorElement).id;
     this.selectedTabId = tabId;
-    this.requestUpdate();
   }
 
   renderTabListItem(tabContent: TabContent, isSelected: boolean) {
@@ -54,8 +52,7 @@ export class TabComponent extends LitElement {
         tabindex="${isSelected ? '0' : '-1'}"
         aria-labelledby="${tabContent.id}"
       >
-        <h3 class="subheadline--small">${tabContent.label}</h3>
-        ${tabContent.render()}
+        <slot name="${tabContent.id}"></slot>
       </div>
     `;
   }
