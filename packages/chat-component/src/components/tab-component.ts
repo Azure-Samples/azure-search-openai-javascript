@@ -75,9 +75,3 @@ export class TabComponent extends LitElement {
     `;
   }
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'tab-component': TabComponent;
-  }
-}

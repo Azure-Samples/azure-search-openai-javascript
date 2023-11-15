@@ -57,9 +57,3 @@ export class TeaserListComponent extends LitElement {
     `;
   }
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'teaser-list-component': TeaserListComponent;
-  }
-}

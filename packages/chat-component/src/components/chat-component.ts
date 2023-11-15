@@ -20,6 +20,11 @@ import iconSend from '../../public/svg/send-icon.svg?raw';
 import iconClose from '../../public/svg/close-icon.svg?raw';
 import iconQuestion from '../../public/svg/bubblequestion-icon.svg?raw';
 
+import './loading-indicator.js';
+import './voice-input-button.js';
+import './teaserlist-component.js';
+import './document-previewer.js';
+import './tab-component.js';
 import { type TabContent } from './tab-component.js';
 
 /**
@@ -388,6 +393,7 @@ export class ChatComponent extends LitElement {
   handleExpandAside(event: Event | undefined = undefined): void {
     event?.preventDefault();
     this.isShowingThoughtProcess = true;
+    this.selectedAsideTab = 'tab-thought-process';
     this.shadowRoot?.querySelector('#overlay')?.classList.add('active');
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.add('aside-open');
   }
@@ -426,8 +432,8 @@ export class ChatComponent extends LitElement {
       this.selectedCitation = citation;
 
       if (!this.isShowingThoughtProcess) {
-        this.selectedAsideTab = 'tab-citations';
         this.handleExpandAside();
+        this.selectedAsideTab = 'tab-citations';
       }
     }
   }
@@ -522,92 +528,87 @@ export class ChatComponent extends LitElement {
       <div id="overlay" class="overlay"></div>
       <section id="chat__containerWrapper" class="chat__containerWrapper">
         <section class="chat__container" id="chat-container">
-          ${
-            this.isChatStarted
-              ? html`
-                  <div class="chat__header">
-                    <button
-                      title="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
-                      class="button chat__header--button"
-                      data-testid="chat-reset-button"
-                      @click="${this.resetCurrentChat}"
-                    >
-                      <span class="chat__header--span">${globalConfig.RESET_CHAT_BUTTON_TITLE}</span>
-                      ${unsafeSVG(iconDelete)}
-                    </button>
-                  </div>
-                  <ul class="chat__list" aria-live="assertive">
-                    ${this.chatThread.map(
-                      (message) => html`
-                        <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
-                          <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
-                            ${message.isUserMessage
-                              ? ''
-                              : html` <div class="chat__header">
-                                  <button
-                                    title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                                    class="button chat__header--button"
-                                    data-testid="chat-show-thought-process"
-                                    @click="${this.handleExpandAside}"
-                                    ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
+          ${this.isChatStarted
+            ? html`
+                <div class="chat__header">
+                  <button
+                    title="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
+                    class="button chat__header--button"
+                    data-testid="chat-reset-button"
+                    @click="${this.resetCurrentChat}"
+                  >
+                    <span class="chat__header--span">${globalConfig.RESET_CHAT_BUTTON_TITLE}</span>
+                    ${unsafeSVG(iconDelete)}
+                  </button>
+                </div>
+                <ul class="chat__list" aria-live="assertive">
+                  ${this.chatThread.map(
+                    (message) => html`
+                      <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
+                        <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
+                          ${message.isUserMessage
+                            ? ''
+                            : html` <div class="chat__header">
+                                <button
+                                  title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
+                                  class="button chat__header--button"
+                                  data-testid="chat-show-thought-process"
+                                  @click="${this.handleExpandAside}"
+                                  ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
+                                >
+                                  <span class="chat__header--span"
+                                    >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
                                   >
-                                    <span class="chat__header--span"
-                                      >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
-                                    >
 
-                                    ${unsafeSVG(iconLightBulb)}
-                                  </button>
-                                  <button
-                                    title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-                                    class="button chat__header--button"
-                                    @click="${this.copyResponseToClipboard}"
-                                    ?disabled="${this.isDisabled}"
+                                  ${unsafeSVG(iconLightBulb)}
+                                </button>
+                                <button
+                                  title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+                                  class="button chat__header--button"
+                                  @click="${this.copyResponseToClipboard}"
+                                  ?disabled="${this.isDisabled}"
+                                >
+                                  <span class="chat__header--span"
+                                    >${this.isResponseCopied
+                                      ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
+                                      : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
                                   >
-                                    <span class="chat__header--span"
-                                      >${this.isResponseCopied
-                                        ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-                                        : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
-                                    >
-                                    ${this.isResponseCopied ? unsafeSVG(iconSuccess) : unsafeSVG(iconCopyToClipboard)}
-                                  </button>
-                                </div>`}
-                            ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
-                            ${this.renderCitation(message.citations)}
-                            ${this.renderFollowupQuestions(message.followupQuestions)}
-                            ${message.error ? this.renderError(message.error) : ''}
-                          </div>
-                          <p class="chat__txt--info">
-                            <span class="timestamp">${message.timestamp}</span>,
-                            <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
-                          </p>
-                        </li>
-                      `,
-                    )}
-                  </ul>
-                  <div class="chat__footer" id="chat-list-footer">
-                    <!-- Do not delete this element. It is used for auto-scrolling -->
-                  </div>
-                `
-              : ''
-          }
-          ${
-            this.isAwaitingResponse && !this.hasAPIError
-              ? html`<loading-indicator label="${globalConfig.LOADING_INDICATOR_TEXT}"></loading-indicator>`
-              : ''
-          }
+                                  ${this.isResponseCopied ? unsafeSVG(iconSuccess) : unsafeSVG(iconCopyToClipboard)}
+                                </button>
+                              </div>`}
+                          ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
+                          ${this.renderCitation(message.citations)}
+                          ${this.renderFollowupQuestions(message.followupQuestions)}
+                          ${message.error ? this.renderError(message.error) : ''}
+                        </div>
+                        <p class="chat__txt--info">
+                          <span class="timestamp">${message.timestamp}</span>,
+                          <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
+                        </p>
+                      </li>
+                    `,
+                  )}
+                </ul>
+                <div class="chat__footer" id="chat-list-footer">
+                  <!-- Do not delete this element. It is used for auto-scrolling -->
+                </div>
+              `
+            : ''}
+          ${this.isAwaitingResponse && !this.hasAPIError
+            ? html`<loading-indicator label="${globalConfig.LOADING_INDICATOR_TEXT}"></loading-indicator>`
+            : ''}
           <!-- Teaser List with Default Prompts -->
           <div class="chat__container">
-          <!-- Conditionally render default prompts based on isDefaultPromptsEnabled -->
-          ${
-            this.isDefaultPromptsEnabled
+            <!-- Conditionally render default prompts based on isDefaultPromptsEnabled -->
+            ${this.isDefaultPromptsEnabled
               ? html`
                   <teaser-list-component
                     @teaser-click="${this.handleOnTeaserClick}"
                     .interactionModel="${this.interactionModel}"
                   ></teaser-list-component>
                 `
-              : ''
-          }
+              : ''}
+          </div>
           <form
             id="chat-form"
             class="form__container ${this.inputPosition === 'sticky' ? 'form__container-sticky' : ''}"
@@ -629,7 +630,7 @@ export class ChatComponent extends LitElement {
                   @keyup="${this.handleOnInputChange}"
                 />
                 ${this.isResetInput ? '' : html`<voice-input-button @on-voice-input="${this.handleVoiceInput}" />`}
-            </div>
+              </div>
               ${this.renderChatOrCancelButton()}
               <button
                 title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
@@ -644,73 +645,69 @@ export class ChatComponent extends LitElement {
               </button>
             </div>
 
-            ${
-              this.isDefaultPromptsEnabled
-                ? ''
-                : html`<div class="chat__containerFooter">
-                    <button type="button" @click="${this.showDefaultPrompts}" class="defaults__span button">
-                      ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
-                    </button>
-                  </div>`
-            }
+            ${this.isDefaultPromptsEnabled
+              ? ''
+              : html`<div class="chat__containerFooter">
+                  <button type="button" @click="${this.showDefaultPrompts}" class="defaults__span button">
+                    ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
+                  </button>
+                </div>`}
           </form>
         </section>
-        ${
-          this.isShowingThoughtProcess
-            ? html`
-                <aside class="aside" data-testid="aside-thought-process">
-                  <div class="aside__header">
-                    <button
-                      title="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                      class="button chat__header--button"
-                      data-testid="chat-hide-thought-process"
-                      @click="${this.collapseAside}"
-                    >
-                      <span class="chat__header--span">${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span>
-                      ${unsafeSVG(iconClose)}
-                    </button>
-                  </div>
-                  <tab-component
-                    .tabs="${[
-                      {
-                        id: 'tab-thought-process',
-                        label: globalConfig.THOUGHT_PROCESS_LABEL,
-                        render: () =>
-                          html`<div class="tab-component__innerContainer">
-                            ${this.chatThoughts
-                              ? html` <p class="tab-component__paragraph">${unsafeHTML(this.chatThoughts)}</p> `
-                              : ''}
-                          </div>`,
+        ${this.isShowingThoughtProcess
+          ? html`
+              <aside class="aside" data-testid="aside-thought-process">
+                <div class="aside__header">
+                  <button
+                    title="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
+                    class="button chat__header--button"
+                    data-testid="chat-hide-thought-process"
+                    @click="${this.collapseAside}"
+                  >
+                    <span class="chat__header--span">${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span>
+                    ${unsafeSVG(iconClose)}
+                  </button>
+                </div>
+                <tab-component
+                  .tabs="${[
+                    {
+                      id: 'tab-thought-process',
+                      label: globalConfig.THOUGHT_PROCESS_LABEL,
+                      render: () =>
+                        html`<div class="tab-component__innerContainer">
+                          ${this.chatThoughts
+                            ? html` <p class="tab-component__paragraph">${unsafeHTML(this.chatThoughts)}</p> `
+                            : ''}
+                        </div>`,
+                    },
+                    {
+                      id: 'tab-support-context',
+                      label: globalConfig.SUPPORT_CONTEXT_LABEL,
+                      render: () =>
+                        html`<ul class="defaults__list always-row">
+                          ${this.chatDataPoints?.map(
+                            (dataPoint) => html` <li class="defaults__listItem">${dataPoint}</li> `,
+                          )}
+                        </ul>`,
+                    },
+                    {
+                      id: 'tab-citations',
+                      label: globalConfig.CITATIONS_LABEL,
+                      render: () => {
+                        return html`${this.renderCitation(this.chatThread.at(-1)?.citations)}
+                        ${this.selectedCitation
+                          ? html`<document-previewer
+                              url="${this.apiUrl}/content/${this.selectedCitation.text}"
+                            ></document-previewer>`
+                          : ''} `;
                       },
-                      {
-                        id: 'tab-support-context',
-                        label: globalConfig.SUPPORT_CONTEXT_LABEL,
-                        render: () =>
-                          html`<ul class="defaults__list always-row">
-                            ${this.chatDataPoints?.map(
-                              (dataPoint) => html` <li class="defaults__listItem">${dataPoint}</li> `,
-                            )}
-                          </ul>`,
-                      },
-                      {
-                        id: 'tab-citations',
-                        label: globalConfig.CITATIONS_LABEL,
-                        render: () => {
-                          return html`${this.renderCitation(this.chatThread.at(-1)?.citations)}
-                          ${this.selectedCitation
-                            ? html`<document-previewer
-                                url="${this.apiUrl}/content/${this.selectedCitation.text}"
-                              ></document-previewer>`
-                            : ''} `;
-                        },
-                      },
-                    ] as TabContent[]}"
-                    .selectedTabId="${this.selectedAsideTab}"
-                  ></tab-component>
-                </aside>
-              `
-            : ''
-        }
+                    },
+                  ] as TabContent[]}"
+                  .selectedTabId="${this.selectedAsideTab}"
+                ></tab-component>
+              </aside>
+            `
+          : ''}
       </section>
     `;
   }

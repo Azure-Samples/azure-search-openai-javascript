@@ -20,9 +20,3 @@ export class LoadingIndicatorComponent extends LitElement {
     `;
   }
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'loading-indicator': LoadingIndicatorComponent;
-  }
-}
