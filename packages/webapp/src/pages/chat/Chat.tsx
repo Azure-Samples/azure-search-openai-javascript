@@ -78,20 +78,7 @@ const Chat = () => {
 
   const [customStyles, setCustomStyles] = useState(() => {
     const storedStyles = localStorage.getItem('customStyles');
-    return storedStyles
-      ? JSON.parse(storedStyles)
-      : {
-          AccentHigh: '#692b61',
-          AccentLight: '#f6d5f2',
-          AccentDark: '#5e3c7d',
-          TextColor: '#123f58',
-          BackgroundColor: '#e3e3e3',
-          ForegroundColor: '#4e5288',
-          FormBackgroundColor: '#f5f5f5',
-          BorderRadius: '10px',
-          BorderWidth: '3px',
-          FontBaseSize: '14px',
-        };
+    return storedStyles ? JSON.parse(storedStyles) : '';
   });
 
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
@@ -114,7 +101,6 @@ const Chat = () => {
     }
     // Update the body class and html data-theme
     document.body.classList.toggle('dark', newIsDarkTheme);
-    localStorage.removeItem('customStyles');
     document.documentElement.dataset.theme = newIsDarkTheme ? 'dark' : '';
 
     // Update the state
