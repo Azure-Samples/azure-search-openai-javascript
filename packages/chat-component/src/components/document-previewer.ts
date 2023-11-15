@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { globalConfig } from '../config/global-config.js';
 import { marked } from 'marked';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import './loading-indicator.js';
 
 @customElement('document-previewer')
 export class DocumentPreviewerComponent extends LitElement {
@@ -46,11 +47,5 @@ export class DocumentPreviewerComponent extends LitElement {
         ? html`<loading-indicator label="${globalConfig.LOADING_TEXT}"></loading-indicator>`
         : html` ${unsafeHTML(this.previewContent || '')} `}
     `;
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'document-previewer': DocumentPreviewerComponent;
   }
 }

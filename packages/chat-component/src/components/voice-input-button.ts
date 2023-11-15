@@ -91,9 +91,3 @@ export class VoiceInputButton extends LitElement {
     return this.showVoiceInput ? this.renderVoiceButton() : html``;
   }
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'voice-input-button': VoiceInputButton;
-  }
-}
