@@ -76,14 +76,40 @@ const Chat = () => {
     setUseSuggestFollowupQuestions(!!checked);
   };
 
-  const [customStyles, setCustomStyles] = useState(() => {
-    const storedStyles = localStorage.getItem('customStyles');
-    return storedStyles ? JSON.parse(storedStyles) : '';
-  });
-
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
     const storedTheme = localStorage.getItem('isDarkTheme');
     return storedTheme ? JSON.parse(storedTheme) : false;
+  });
+
+  const [customStyles, setCustomStyles] = useState(() => {
+    const styleDefaultsLight = {
+      AccentHigh: '#692b61',
+      AccentLight: '#f6d5f2',
+      AccentDark: '#5e3c7d',
+      TextColor: '#123f58',
+      BackgroundColor: '#e3e3e3',
+      ForegroundColor: '#4e5288',
+      FormBackgroundColor: '#f5f5f5',
+      BorderRadius: '10px',
+      BorderWidth: '3px',
+      FontBaseSize: '14px',
+    };
+
+    const styleDefaultsDark = {
+      AccentHigh: '#dcdef8',
+      AccentLight: '#032219',
+      AccentDark: '#fdfeff',
+      TextColor: '#fdfeff',
+      BackgroundColor: '#e3e3e3',
+      ForegroundColor: '#4e5288',
+      FormBackgroundColor: '#32343e',
+      BorderRadius: '10px',
+      BorderWidth: '3px',
+      FontBaseSize: '14px',
+    };
+    const defaultStyles = isDarkTheme ? styleDefaultsDark : styleDefaultsLight;
+    const storedStyles = localStorage.getItem('customStyles');
+    return storedStyles ? JSON.parse(storedStyles) : defaultStyles;
   });
 
   const handleCustomStylesChange = (newStyles: CustomStylesState) => {
@@ -100,6 +126,7 @@ const Chat = () => {
       chatComponent.setAttribute('data-theme', newIsDarkTheme ? 'dark' : '');
     }
     // Update the body class and html data-theme
+    localStorage.removeItem('customStyles');
     document.body.classList.toggle('dark', newIsDarkTheme);
     document.documentElement.dataset.theme = newIsDarkTheme ? 'dark' : '';
 
@@ -140,20 +167,22 @@ const Chat = () => {
 
     // Scroll into view when isLoading changes
     chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' });
-
+    // Toggle 'dark' class on the shell app body element based on the isDarkTheme prop and isConfigPanelOpen
+    document.body.classList.toggle('dark', isDarkTheme);
+    document.documentElement.dataset.theme = isDarkTheme ? 'dark' : '';
     // Clean up the event listener when the component is unmounted
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [customStyles, isBrandingEnabled, isDarkTheme, isLoading]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     const storedTheme = localStorage.getItem('isDarkTheme');
     if (storedTheme) {
       const parsedTheme = JSON.parse(storedTheme);
       handleThemeToggle(parsedTheme);
     }
-  }, []); // Run this effect once, when the component mounts
+  }, []); */ // Run this effect once, when the component mounts
 
   const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);
 

@@ -16,7 +16,7 @@ export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ onToggle, isDarkTheme,
 
   useEffect(() => {
     // Toggle 'dark' class on the shell app body element based on the isDarkTheme prop and isConfigPanelOpen
-    document.body.classList.toggle('dark', isDarkTheme && isConfigPanelOpen);
+    document.body.classList.toggle('dark', isDarkTheme);
     document.documentElement.dataset.theme = isDarkTheme && isConfigPanelOpen ? 'dark' : '';
   }, []);
 

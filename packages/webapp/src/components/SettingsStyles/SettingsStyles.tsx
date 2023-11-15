@@ -8,7 +8,7 @@ interface Props {
 
 export const SettingsStyles = ({ onChange }: Props) => {
   // this needs to come from an API call to some config persisted in the DB
-  const styleDefaults = {
+  const styleDefaultsLight = {
     AccentHighDefault: '#692b61',
     AccentLightDefault: '#f6d5f2',
     AccentDarkDefault: '#5e3c7d',
@@ -21,8 +21,26 @@ export const SettingsStyles = ({ onChange }: Props) => {
     FontBaseSizeDefault: '14px',
   };
 
+  const styleDefaultsDark = {
+    AccentHighDefault: '#dcdef8',
+    AccentLightDefault: '#032219',
+    AccentDarkDefault: '#fdfeff',
+    TextColorDefault: '#fdfeff',
+    BackgroundColorDefault: '#e3e3e3',
+    ForegroundColorDefault: '#4e5288',
+    FormBackgroundColorDefault: '#32343e',
+    BorderRadiusDefault: '10px',
+    BorderWidthDefault: '3px',
+    FontBaseSizeDefault: '14px',
+  };
+
   const getInitialStyles = (): CustomStylesState => {
+    const themeStore = localStorage.getItem('isDarkTheme');
+    const styleDefaults = themeStore === 'true' ? styleDefaultsDark : styleDefaultsLight;
     const storedStyles = localStorage.getItem('customStyles');
+    if (storedStyles === '') {
+      localStorage.setItem('customStyles', JSON.stringify(styleDefaults));
+    }
     return storedStyles
       ? JSON.parse(storedStyles)
       : {
