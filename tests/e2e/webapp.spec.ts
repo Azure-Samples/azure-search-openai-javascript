@@ -384,6 +384,48 @@ test.describe('developer settings', () => {
     await expect(page.getByLabel('Retrieval mode')).toContainText('Vectors + Text (Hybrid)');
   });
 
+  test('enable branding toggled', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('button__developer-settings').click();
+    // toggle enable branding
+    await page.locator('label').filter({ hasText: 'Enable branding' }).click();
+    await page.waitForTimeout(1000);
+    // await for brading to be visible
+    await expect(page.getByTestId('chat-branding')).toBeVisible();
+  });
+
+  test('select dark theme', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('button__developer-settings').click();
+    await page.locator('label').filter({ hasText: 'Select theme' }).click();
+    await page.waitForTimeout(1000);
+    // check if the body has the class "dark"
+    const isDarkTheme = await page.evaluate(() => {
+      return document.body.classList.contains('dark');
+    });
+    await expect(isDarkTheme).toBe(true);
+    // check if the HTML element has data-theme="dark"
+    const dataThemeValue = await page.evaluate(() => {
+      return document.documentElement.dataset.theme;
+    });
+    await expect(dataThemeValue).toBe('dark');
+  });
+
+  test('customize chat styles toggled and check localStorage', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('button__developer-settings').click();
+    await page.locator('label').filter({ hasText: 'Customize chat styles' }).click();
+
+    await page.waitForTimeout(1000);
+    // check if localStorage has an item called 'customStyles' and it's not empty
+    const hasCustomStyles = await page.evaluate(() => {
+      const customStyles = localStorage.getItem('customStyles');
+      return customStyles !== null && customStyles.trim() !== '';
+    });
+
+    await expect(hasCustomStyles).toBe(true);
+  });
+
   test('handle no stream parsing', async ({ page }) => {
     await page.goto('/');
     await page.getByTestId('default-question').nth(0).click();

@@ -22,10 +22,9 @@ export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ onToggle, isDarkTheme,
 
   return (
     <>
-      <h3>Select the theme</h3>
       <div className="ms-toggle-wrapper">
         <Toggle
-          label=""
+          label="Select Theme"
           onText="Dark Theme"
           offText="Light Theme"
           checked={isDarkTheme}

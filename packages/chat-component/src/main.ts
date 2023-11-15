@@ -753,7 +753,7 @@ export class ChatComponent extends LitElement {
             ${this.hasDefaultPromptsEnabled
               ? html`
                   ${this.renderBrandingBanner()}
-                  <div class="defaults__container">
+                  <div class="defaults__container" data-testid="chat-branding">
                     <h1 class="headline">
                       ${this.interactionModel === 'chat'
                         ? this.title || globalConfig.DEFAULT_PROMPTS_HEADING_CHAT
