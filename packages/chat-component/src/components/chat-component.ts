@@ -22,7 +22,7 @@ import iconQuestion from '../../public/svg/bubblequestion-icon.svg?raw';
 
 import './loading-indicator.js';
 import './voice-input-button.js';
-import './teaserlist-component.js';
+import './teaser-list-component.js';
 import './document-previewer.js';
 import './tab-component.js';
 import { type TabContent } from './tab-component.js';

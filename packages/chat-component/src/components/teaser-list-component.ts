@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { teaserListTexts } from '../config/global-config.js';
-import { teaserListStyle } from '../styles/teaserlist-component.js';
+import { teaserListStyle } from '../styles/teaser-list-component.js';
 
 @customElement('teaser-list-component')
 export class TeaserListComponent extends LitElement {
