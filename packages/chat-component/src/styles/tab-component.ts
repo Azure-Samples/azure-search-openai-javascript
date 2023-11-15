@@ -49,7 +49,7 @@ export const tabStyle = css`
     top: 0;
     left: 30px;
     display: none;
-
+    width: 100%;
     @media (max-width: 1024px) {
       position: relative;
       left: 0;

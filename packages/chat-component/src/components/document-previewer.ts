@@ -41,11 +41,23 @@ export class DocumentPreviewerComponent extends LitElement {
     }
   }
 
+  renderContent() {
+    if (this.url) {
+      return html`
+        ${this.previewContent
+          ? html` ${unsafeHTML(this.previewContent)}`
+          : html` <iframe title="Preview" src="${this.url}" width="100%" height="850px" />`}
+      `;
+    }
+
+    return html``;
+  }
+
   override render() {
     return html`
       ${this.loading
         ? html`<loading-indicator label="${globalConfig.LOADING_TEXT}"></loading-indicator>`
-        : html` ${unsafeHTML(this.previewContent || '')} `}
+        : this.renderContent()}
     `;
   }
 }
