@@ -34,7 +34,10 @@ export const styles = css`
     height: 40px;
     position: relative;
   }
-  .chat__header--button:disabled,
+  .chat__header--button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
   .chat__header--span {
     font-size: smaller;
     transition: all 0.3s ease-out 0s;
