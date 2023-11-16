@@ -37,6 +37,9 @@ export class ChatThreadComponent extends LitElement {
   @query('#chat-list-footer')
   chatFooter!: HTMLElement;
 
+  @property({ type: Object })
+  selectedCitation: Citation | undefined = undefined;
+
   // Copy response to clipboard
   copyResponseToClipboard(): void {
     const response = this.chatThread.at(-1)?.text.at(-1)?.value as string;
@@ -132,7 +135,11 @@ export class ChatThreadComponent extends LitElement {
     if (citations && citations.length > 0) {
       return html`
         <div class="chat__citations">
-          <citation-list .citations="${citations}" .label="${globalConfig.CITATIONS_LABEL}"></citation-list>
+          <citation-list
+            .citations="${citations}"
+            .label="${globalConfig.CITATIONS_LABEL}"
+            .selectedCitation=${this.selectedCitation}
+          ></citation-list>
         </div>
       `;
     }

@@ -337,6 +337,7 @@ export class ChatComponent extends LitElement {
     this.isDisabled = false;
     this.isDefaultPromptsEnabled = true;
     this.isResponseCopied = false;
+    this.selectedCitation = undefined;
     this.collapseAside(event);
     this.handleUserChatCancel(event);
   }
@@ -445,6 +446,7 @@ export class ChatComponent extends LitElement {
                   ] as any}"
                   .isDisabled="${this.isDisabled}"
                   .isProcessingResponse="${this.isProcessingResponse}"
+                  .selectedCitation="${this.selectedCitation}"
                   @on-action-button-click="${this.handleChatEntryActionButtonClick}"
                   @on-citation-click="${this.handleCitationClick}"
                   @on-followup-click="${this.handleQuestionInputClick}"
@@ -561,6 +563,7 @@ export class ChatComponent extends LitElement {
                     <citation-list
                       .citations="${this.chatThread.at(-1)?.citations}"
                       .label="${globalConfig.CITATIONS_LABEL}"
+                      .selectedCitation="${this.selectedCitation}"
                       @on-citation-click="${this.handleCitationClick}"
                     ></citation-list>
                     ${this.selectedCitation
