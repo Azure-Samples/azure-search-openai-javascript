@@ -1,6 +1,14 @@
 import { css } from 'lit';
 
 export const loadingIndicatorStyles = css`
+  @keyframes spinneranimation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
   .loading-text {
     display: flex;
     align-items: center;

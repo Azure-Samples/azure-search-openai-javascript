@@ -33,10 +33,4 @@ export const styles = css`
   .items__listItem--citation.active .items__link {
     color: var(--white);
   }
-  .citation {
-    background-color: var(--accent-lighter);
-    border-radius: 3px;
-    padding: 3px;
-    margin-left: 3px;
-  }
 `;

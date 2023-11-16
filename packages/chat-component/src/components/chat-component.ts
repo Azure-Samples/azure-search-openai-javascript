@@ -13,12 +13,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import iconLightBulb from '../../public/svg/lightbulb-icon.svg?raw';
 import iconDelete from '../../public/svg/delete-icon.svg?raw';
-import iconSuccess from '../../public/svg/success-icon.svg?raw';
-import iconCopyToClipboard from '../../public/svg/copy-icon.svg?raw';
 import iconCancel from '../../public/svg/cancel-icon.svg?raw';
 import iconSend from '../../public/svg/send-icon.svg?raw';
 import iconClose from '../../public/svg/close-icon.svg?raw';
-import iconQuestion from '../../public/svg/bubblequestion-icon.svg?raw';
 
 import './loading-indicator.js';
 import './voice-input-button.js';
@@ -26,6 +23,7 @@ import './teaser-list-component.js';
 import './document-previewer.js';
 import './tab-component.js';
 import './citation-list.js';
+import './chat-thread-component.js';
 import { type TabContent } from './tab-component.js';
 
 /**
@@ -68,9 +66,6 @@ export class ChatComponent extends LitElement {
   @query('#question-input')
   questionInput!: HTMLInputElement;
 
-  @query('#chat-list-footer')
-  chatFooter!: HTMLElement;
-
   // Default prompts to display in the chat
   @state()
   isDisabled = false;
@@ -104,6 +99,9 @@ export class ChatComponent extends LitElement {
   isDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
 
   @state()
+  isProcessingResponse = false;
+
+  @state()
   selectedCitation: Citation | undefined = undefined;
 
   selectedAsideTab: 'tab-thought-process' | 'tab-support-context' | 'tab-citations' = 'tab-thought-process';
@@ -123,22 +121,7 @@ export class ChatComponent extends LitElement {
   chatRequestOptions: ChatRequestOptions = requestOptions;
   chatHttpOptions: ChatHttpOptions = chatHttpOptions;
 
-  // Is currently processing the response from the API
-  // This is used to show the cancel button
-  isProcessingResponse = false;
-
   static override styles = [chatStyle];
-
-  // debounce dispatching must-scroll event
-  debounceScrollIntoView(): void {
-    let timeout: any = 0;
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      if (this.chatFooter) {
-        this.chatFooter.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 500);
-  }
 
   // Send the question to the Open AI API and render the answer in the chat
 
@@ -185,9 +168,6 @@ export class ChatComponent extends LitElement {
         this.canShowThoughtProcess = true;
 
         this.isProcessingResponse = false;
-        // NOTE: for whatever reason, Lit doesn't re-render when we update isProcessingResponse property
-        // so we need to trigger a re-render manually
-        this.requestUpdate('isProcessingResponse');
 
         return true;
       }
@@ -234,17 +214,24 @@ export class ChatComponent extends LitElement {
     this.currentQuestion = this.questionInput.value;
   }
 
-  handleVoiceInput(event): void {
+  handleVoiceInput(event: CustomEvent): void {
     event?.preventDefault();
     this.setQuestionInputValue(event?.detail?.input);
   }
 
-  // This function is only necessary when default prompts are enabled
-  // and we're rendering a teaser list component
-  // TODO: move to utils
-  handleOnTeaserClick(event): void {
+  handleQuestionInputClick(event: CustomEvent): void {
     event?.preventDefault();
     this.setQuestionInputValue(event?.detail?.question);
+  }
+
+  handleCitationClick(event: CustomEvent): void {
+    event?.preventDefault();
+    this.selectedCitation = event?.detail?.citation;
+
+    if (!this.isShowingThoughtProcess) {
+      this.handleExpandAside();
+      this.selectedAsideTab = 'tab-citations';
+    }
   }
 
   // Handle the click on the chat button and send the question to the API
@@ -373,13 +360,6 @@ export class ChatComponent extends LitElement {
     this.isProcessingResponse = false;
   }
 
-  // Copy response to clipboard
-  copyResponseToClipboard(): void {
-    const response = this.chatThread.at(-1)?.text.at(-1)?.value as string;
-    navigator.clipboard.writeText(response);
-    this.isResponseCopied = true;
-  }
-
   // Stop generation
   handleUserChatCancel(event: Event): any {
     event?.preventDefault();
@@ -407,81 +387,6 @@ export class ChatComponent extends LitElement {
     this.shadowRoot?.querySelector('#overlay')?.classList.remove('active');
   }
 
-  // Render text entries in bubbles
-  renderTextEntry(textEntry: ChatMessageText) {
-    const entries = [html`<p class="chat__txt--entry">${unsafeHTML(textEntry.value)}</p>`];
-
-    // render steps
-    if (textEntry.followingSteps && textEntry.followingSteps.length > 0) {
-      entries.push(
-        html` <ol class="items__list steps">
-          ${textEntry.followingSteps.map(
-            (followingStep) => html` <li class="items__listItem--step">${unsafeHTML(followingStep)}</li> `,
-          )}
-        </ol>`,
-      );
-    }
-    if (this.isProcessingResponse) {
-      this.debounceScrollIntoView();
-    }
-    return html`<div class="chat_txt--entry-container">${entries}</div>`;
-  }
-
-  handleCitationClick(citation: Citation): void {
-    this.selectedCitation = citation;
-
-    if (!this.isShowingThoughtProcess) {
-      this.handleExpandAside();
-      this.selectedAsideTab = 'tab-citations';
-    }
-  }
-
-  renderCitation(citations: Citation[] | undefined) {
-    if (citations && citations.length > 0) {
-      return html`<div class="chat__citations">
-        <citation-list
-          .citations="${citations}"
-          .label="${globalConfig.CITATIONS_LABEL}"
-          @on-citation-click="${(event: any) => this.handleCitationClick(event?.detail?.citation)}"
-        ></citation-list>
-      </div>`;
-    }
-
-    return '';
-  }
-
-  renderFollowupQuestions(followupQuestions: string[] | undefined) {
-    // render followup questions
-    // need to fix first after decoupling of teaserlist
-    if (followupQuestions && followupQuestions.length > 0) {
-      return html`
-        <div class="items__listWrapper">
-          ${unsafeSVG(iconQuestion)}
-          <ul class="items__list followup">
-            ${followupQuestions.map(
-              (followupQuestion) => html`
-                <li class="items__listItem--followup">
-                  <a
-                    class="items__link"
-                    href="#"
-                    data-testid="followUpQuestion"
-                    @click="${(event) => {
-                      event.preventDefault();
-                      this.setQuestionInputValue(followupQuestion);
-                    }}"
-                    >${followupQuestion}</a
-                  >
-                </li>
-              `,
-            )}
-          </ul>
-        </div>
-      `;
-    }
-
-    return '';
-  }
-
   renderChatOrCancelButton() {
     const submitChatButton = html`<button
       class="chatbox__button"
@@ -504,8 +409,10 @@ export class ChatComponent extends LitElement {
     return this.isProcessingResponse ? cancelChatButton : submitChatButton;
   }
 
-  renderError(error: { message: string }) {
-    return html`<p class="chat__txt error">${error.message}</p>`;
+  handleChatEntryActionButtonClick(event: CustomEvent) {
+    if (event.detail?.id === 'thought-process') {
+      this.handleExpandAside(event);
+    }
   }
 
   // Render the chat component as a web component
@@ -527,57 +434,23 @@ export class ChatComponent extends LitElement {
                     ${unsafeSVG(iconDelete)}
                   </button>
                 </div>
-                <ul class="chat__list" aria-live="assertive">
-                  ${this.chatThread.map(
-                    (message) => html`
-                      <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
-                        <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
-                          ${message.isUserMessage
-                            ? ''
-                            : html` <div class="chat__header">
-                                <button
-                                  title="${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                                  class="button chat__header--button"
-                                  data-testid="chat-show-thought-process"
-                                  @click="${this.handleExpandAside}"
-                                  ?disabled="${this.isShowingThoughtProcess || !this.canShowThoughtProcess}"
-                                >
-                                  <span class="chat__header--span"
-                                    >${globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span
-                                  >
-
-                                  ${unsafeSVG(iconLightBulb)}
-                                </button>
-                                <button
-                                  title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-                                  class="button chat__header--button"
-                                  @click="${this.copyResponseToClipboard}"
-                                  ?disabled="${this.isDisabled}"
-                                >
-                                  <span class="chat__header--span"
-                                    >${this.isResponseCopied
-                                      ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-                                      : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
-                                  >
-                                  ${this.isResponseCopied ? unsafeSVG(iconSuccess) : unsafeSVG(iconCopyToClipboard)}
-                                </button>
-                              </div>`}
-                          ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
-                          ${this.renderCitation(message.citations)}
-                          ${this.renderFollowupQuestions(message.followupQuestions)}
-                          ${message.error ? this.renderError(message.error) : ''}
-                        </div>
-                        <p class="chat__txt--info">
-                          <span class="timestamp">${message.timestamp}</span>,
-                          <span class="user">${message.isUserMessage ? 'You' : globalConfig.USER_IS_BOT}</span>
-                        </p>
-                      </li>
-                    `,
-                  )}
-                </ul>
-                <div class="chat__footer" id="chat-list-footer">
-                  <!-- Do not delete this element. It is used for auto-scrolling -->
-                </div>
+                <chat-thread-component
+                  .chatThread="${this.chatThread}"
+                  .actionButtons="${[
+                    {
+                      id: 'thought-process',
+                      label: globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT,
+                      svgIcon: iconLightBulb,
+                      isDisabled: this.isShowingThoughtProcess || !this.canShowThoughtProcess,
+                    },
+                  ] as any}"
+                  .isDisabled="${this.isDisabled}"
+                  .isProcessingResponse="${this.isProcessingResponse}"
+                  @on-action-button-click="${this.handleChatEntryActionButtonClick}"
+                  @on-citation-click="${this.handleCitationClick}"
+                  @on-followup-click="${this.handleQuestionInputClick}"
+                >
+                </chat-thread-component>
               `
             : ''}
           ${this.isAwaitingResponse && !this.hasAPIError
@@ -589,7 +462,7 @@ export class ChatComponent extends LitElement {
             ${this.isDefaultPromptsEnabled
               ? html`
                   <teaser-list-component
-                    @teaser-click="${this.handleOnTeaserClick}"
+                    @teaser-click="${this.handleQuestionInputClick}"
                     .interactionModel="${this.interactionModel}"
                   ></teaser-list-component>
                 `
@@ -688,7 +561,11 @@ export class ChatComponent extends LitElement {
                     </ul>
                   </div>
                   <div slot="tab-citations" class="tab-component__content">
-                    ${this.renderCitation(this.chatThread.at(-1)?.citations)}
+                    <citation-list
+                      .citations="${this.chatThread.at(-1)?.citations}"
+                      .label="${globalConfig.CITATIONS_LABEL}"
+                      @on-citation-click="${this.handleCitationClick}"
+                    ></citation-list>
                     ${this.selectedCitation
                       ? html`<document-previewer
                           url="${this.apiUrl}/content/${this.selectedCitation.text}"
