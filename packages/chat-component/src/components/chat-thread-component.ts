@@ -74,10 +74,6 @@ export class ChatThreadComponent extends LitElement {
     }, 500);
   }
 
-  handleCitationClick(citationClickedEvent: Event) {
-    this.dispatchEvent(citationClickedEvent);
-  }
-
   handleFollowupQuestionClick(question: string, event: Event) {
     event.preventDefault();
     const citationClickedEvent = new CustomEvent('on-followup-click', {
@@ -148,11 +144,7 @@ export class ChatThreadComponent extends LitElement {
     if (citations && citations.length > 0) {
       return html`
         <div class="chat__citations">
-          <citation-list
-            .citations="${citations}"
-            .label="${globalConfig.CITATIONS_LABEL}"
-            @on-citation-click="${this.handleCitationClick}"
-          ></citation-list>
+          <citation-list .citations="${citations}" .label="${globalConfig.CITATIONS_LABEL}"></citation-list>
         </div>
       `;
     }
