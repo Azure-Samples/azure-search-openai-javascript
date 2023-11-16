@@ -12,7 +12,7 @@ export interface ChatActionButton {
 }
 
 @customElement('chat-action-button')
-export class VoiceInputButton extends LitElement {
+export class ChatActionButtonComponent extends LitElement {
   static override styles = [styles];
 
   @property({ type: String })
