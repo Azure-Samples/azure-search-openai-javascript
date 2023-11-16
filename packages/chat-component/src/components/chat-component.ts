@@ -24,6 +24,7 @@ import './document-previewer.js';
 import './tab-component.js';
 import './citation-list.js';
 import './chat-thread-component.js';
+import './chat-action-button.js';
 import { type TabContent } from './tab-component.js';
 
 /**
@@ -410,7 +411,7 @@ export class ChatComponent extends LitElement {
   }
 
   handleChatEntryActionButtonClick(event: CustomEvent) {
-    if (event.detail?.id === 'thought-process') {
+    if (event.detail?.id === 'chat-show-thought-process') {
       this.handleExpandAside(event);
     }
   }
@@ -424,21 +425,19 @@ export class ChatComponent extends LitElement {
           ${this.isChatStarted
             ? html`
                 <div class="chat__header">
-                  <button
-                    title="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
-                    class="button chat__header--button"
-                    data-testid="chat-reset-button"
+                  <chat-action-button
+                    .label="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
+                    actionId="chat-reset-button"
                     @click="${this.resetCurrentChat}"
+                    .svgIcon="${iconDelete}"
                   >
-                    <span class="chat__header--span">${globalConfig.RESET_CHAT_BUTTON_TITLE}</span>
-                    ${unsafeSVG(iconDelete)}
-                  </button>
+                  </chat-action-button>
                 </div>
                 <chat-thread-component
                   .chatThread="${this.chatThread}"
                   .actionButtons="${[
                     {
-                      id: 'thought-process',
+                      id: 'chat-show-thought-process',
                       label: globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT,
                       svgIcon: iconLightBulb,
                       isDisabled: this.isShowingThoughtProcess || !this.canShowThoughtProcess,
@@ -517,15 +516,13 @@ export class ChatComponent extends LitElement {
           ? html`
               <aside class="aside" data-testid="aside-thought-process">
                 <div class="aside__header">
-                  <button
-                    title="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                    class="button chat__header--button"
-                    data-testid="chat-hide-thought-process"
+                  <chat-action-button
+                    .label="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
+                    actionId="chat-hide-thought-process"
                     @click="${this.collapseAside}"
+                    .svgIcon="${iconClose}"
                   >
-                    <span class="chat__header--span">${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}</span>
-                    ${unsafeSVG(iconClose)}
-                  </button>
+                  </chat-action-button>
                 </div>
                 <tab-component
                   .tabs="${[

@@ -5,20 +5,15 @@ import { styles } from '../styles/chat-thread-component.js';
 
 import { globalConfig } from '../config/global-config.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import iconSuccess from '../../public/svg/success-icon.svg?raw';
 import iconCopyToClipboard from '../../public/svg/copy-icon.svg?raw';
 import iconQuestion from '../../public/svg/bubblequestion-icon.svg?raw';
 
 import './citation-list.js';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-
-export interface ChatActionButton {
-  label: string;
-  svgIcon: string;
-  isDisabled: boolean;
-  id: string;
-}
+import './chat-action-button.js';
+import { type ChatActionButton } from './chat-action-button.js';
 
 @customElement('chat-thread-component')
 export class ChatThreadComponent extends LitElement {
@@ -91,32 +86,25 @@ export class ChatThreadComponent extends LitElement {
       <div class="chat__header">
         ${this.actionButtons.map(
           (actionButton) => html`
-            <button
-              title="${actionButton.label}"
-              class="button chat__header--button"
-              data-testid="chat-action-button-${actionButton.id}"
-              @click="${(event: Event) => this.actionButtonClicked(actionButton, entry, event)}"
-              ?disabled="${actionButton.isDisabled}"
-            >
-              <span class="chat__header--span">${actionButton.label}</span>
-              ${unsafeSVG(actionButton.svgIcon)}
-            </button>
+            <chat-action-button
+              .label="${actionButton.label}"
+              .svgIcon="${actionButton.svgIcon}"
+              .isDisabled="${actionButton.isDisabled}"
+              .actionId="${actionButton.id}"
+              @click="${(event) => this.actionButtonClicked(actionButton, entry, event)}"
+            ></chat-action-button>
           `,
         )}
-        <button
-          title="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-          class="button chat__header--button"
-          data-testid="chat-action-button-copy-response"
+        <chat-action-button
+          .label="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+          .svgIcon="${this.isResponseCopied ? iconSuccess : iconCopyToClipboard}"
+          .isDisabled="${this.isDisabled}"
+          actionId="copy-to-clipboard"
+          .tooltip="${this.isResponseCopied
+            ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
+            : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
           @click="${this.copyResponseToClipboard}"
-          ?disabled="${this.isDisabled}"
-        >
-          <span class="chat__header--span"
-            >${this.isResponseCopied
-              ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-              : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}</span
-          >
-          ${this.isResponseCopied ? unsafeSVG(iconSuccess) : unsafeSVG(iconCopyToClipboard)}
-        </button>
+        ></chat-action-button>
       </div>
     `;
   }
