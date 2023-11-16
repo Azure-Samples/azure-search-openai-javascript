@@ -11,10 +11,14 @@ export class CitationListComponent extends LitElement {
   @property({ type: Array })
   citations: Citation[] | undefined = undefined;
 
+  @property({ type: Object })
+  selectedCitation: Citation | undefined = undefined;
+
   static override styles = [styles];
 
   handleCitationClick(citation: Citation, event: Event) {
     event.preventDefault();
+    this.selectedCitation = citation;
     const citationClickEvent = new CustomEvent('on-citation-click', {
       detail: {
         citation,
@@ -25,6 +29,12 @@ export class CitationListComponent extends LitElement {
     this.dispatchEvent(citationClickEvent);
   }
 
+  compareCitation(citationA, citationB) {
+    if (citationA && citationB && citationA.text === citationB.text) {
+      return true;
+    }
+    return false;
+  }
   renderCitation(citations: Citation[] | undefined) {
     // render citations
     if (citations && citations.length > 0) {
@@ -33,7 +43,11 @@ export class CitationListComponent extends LitElement {
           ${this.label ? html`<h3 class="subheadline--small">${this.label}</h3>` : ''}
           ${citations.map(
             (citation) => html`
-              <li class="items__listItem--citation">
+              <li
+                class="items__listItem--citation ${this.compareCitation(citation, this.selectedCitation)
+                  ? 'active'
+                  : ''}"
+              >
                 <a
                   class="items__link"
                   href="#"
