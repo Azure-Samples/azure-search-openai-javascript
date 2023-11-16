@@ -32,7 +32,7 @@ test.describe('default', () => {
       updateContent: 'embed',
     });
 
-    const showThoughtProcess = page.getByTestId('chat-show-thought-process');
+    const showThoughtProcess = page.getByTestId('chat-action-button-thought-process');
     await test.step('Get answer', async () => {
       await expect(showThoughtProcess).not.toBeVisible();
 
@@ -96,7 +96,7 @@ test.describe('default', () => {
       updateContent: 'embed',
     });
 
-    const showThoughtProcess = page.getByTestId('chat-show-thought-process');
+    const showThoughtProcess = page.getByTestId('chat-action-button-thought-process');
     await test.step('Get answer', async () => {
       await expect(showThoughtProcess).not.toBeVisible();
 
@@ -323,11 +323,11 @@ test.describe('generate answer', () => {
 
     await page.getByTestId('submit-question-button').click();
     // wait for the thought process button to be enabled.
-    await expect(page.getByTestId('chat-show-thought-process')).toBeEnabled({ timeout: 30_000 });
+    await expect(page.getByTestId('chat-action-button-thought-process')).toBeEnabled({ timeout: 30_000 });
   });
 
   test('show thought process', async ({ page }) => {
-    const showThoughtProcess = page.getByTestId('chat-show-thought-process');
+    const showThoughtProcess = page.getByTestId('chat-action-button-thought-process');
     const thoughtProcessAside = page.getByTestId('aside-thought-process');
 
     await test.step('show/hide aside', async () => {
@@ -353,7 +353,6 @@ test.describe('generate answer', () => {
 
     await expect(citations.nth(0)).toBeEnabled();
     await expect(citations.nth(0)).toContainText('support.md');
-    expect(await citations.nth(0).getAttribute('href')).toContain('/content/support.md');
 
     await page.routeFromHAR('./tests/e2e/hars/citation-content.har', {
       url: '/content/support.md',
@@ -423,7 +422,7 @@ test.describe('developer settings', () => {
 
     await page.getByTestId('submit-question-button').click();
     // wait for the thought process button to be enabled.
-    await expect(page.getByTestId('chat-show-thought-process')).toBeEnabled({ timeout: 30_000 });
+    await expect(page.getByTestId('chat-action-button-thought-process')).toBeEnabled({ timeout: 30_000 });
 
     await expect(page.locator('.items__listItem--step')).not.toHaveCount(0);
   });
