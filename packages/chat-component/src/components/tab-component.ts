@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { tabStyle } from '../styles/tab-component.js';
+import { styles } from '../styles/tab-component.js';
 
 export interface TabContent {
   id: string;
@@ -9,13 +9,13 @@ export interface TabContent {
 
 @customElement('tab-component')
 export class TabComponent extends LitElement {
+  static override styles = [styles];
+
   @property({ type: Array })
   tabs: TabContent[] = [];
 
   @property({ type: String })
   selectedTabId: string | undefined = undefined;
-
-  static override styles = [tabStyle];
 
   activateTab(event: Event) {
     event.preventDefault();
@@ -60,7 +60,7 @@ export class TabComponent extends LitElement {
   override render() {
     return html`
       <div class="tab-component">
-        <nav class="tab-component__nav">
+        <nav>
           <ul class="tab-component__list" role="tablist">
             ${this.tabs.map((tabContent) => this.renderTabListItem(tabContent, tabContent.id === this.selectedTabId))}
           </ul>

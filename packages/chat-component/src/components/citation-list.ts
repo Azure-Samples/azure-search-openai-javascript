@@ -5,6 +5,8 @@ import { styles } from '../styles/citation-list.js';
 
 @customElement('citation-list')
 export class CitationListComponent extends LitElement {
+  static override styles = [styles];
+
   @property({ type: String })
   label: string | undefined = undefined;
 
@@ -13,8 +15,6 @@ export class CitationListComponent extends LitElement {
 
   @property({ type: Object })
   selectedCitation: Citation | undefined = undefined;
-
-  static override styles = [styles];
 
   handleCitationClick(citation: Citation, event: Event) {
     event.preventDefault();
@@ -39,15 +39,11 @@ export class CitationListComponent extends LitElement {
     // render citations
     if (citations && citations.length > 0) {
       return html`
-        <ol class="items__list citations">
+        <ol class="items__list">
           ${this.label ? html`<h3 class="subheadline--small">${this.label}</h3>` : ''}
           ${citations.map(
             (citation) => html`
-              <li
-                class="items__listItem--citation ${this.compareCitation(citation, this.selectedCitation)
-                  ? 'active'
-                  : ''}"
-              >
+              <li class="items__listItem ${this.compareCitation(citation, this.selectedCitation) ? 'active' : ''}">
                 <a
                   class="items__link"
                   href="#"

@@ -1,7 +1,9 @@
 import { css } from 'lit';
 
 export const styles = css`
-  .chat__header--button {
+  button {
+    color: var(--text-color);
+    text-decoration: underline;
     border: 1px solid var(--accent-dark);
     text-decoration: none;
     border-radius: 5px;
@@ -12,15 +14,14 @@ export const styles = css`
     opacity: 1;
     padding: 5px;
     transition: all 0.3s ease-in-out;
-    height: 40px;
     position: relative;
     cursor: pointer;
   }
-  .chat__header--button:disabled {
+  button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  .chat__header--span {
+  span {
     font-size: smaller;
     transition: all 0.3s ease-out 0s;
     position: absolute;
@@ -35,7 +36,7 @@ export const styles = css`
     font-weight: bold;
     word-wrap: nowrap;
   }
-  .chat__header--span::after {
+  span::after {
     content: '';
     position: absolute;
     width: 0;
@@ -46,18 +47,20 @@ export const styles = css`
     bottom: -8px;
     right: 5px;
   }
-  .chat__header--button svg {
+  svg {
     fill: currentColor;
-    width: 25px;
+    width: 20px;
     padding: 3px;
   }
-  .chat__header--button:hover > span,
-  .chat__header--button:focus > span {
+  button:hover > span,
+  button:focus > span {
     display: inline-block;
     opacity: 1;
   }
-  .chat__header--button:hover > svg,
-  .chat__header--button:focus > svg {
+  button:hover,
+  button:focus,
+  button:hover > svg,
+  button:focus > svg {
     background-color: var(--light-gray);
     border-radius: 5px;
     transition: background 0.3s ease-in-out;

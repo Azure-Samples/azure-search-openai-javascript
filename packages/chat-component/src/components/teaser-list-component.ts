@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { teaserListStyle } from '../styles/teaser-list-component.js';
+import { styles } from '../styles/teaser-list-component.js';
 
 export interface Teaser {
   description: string;
@@ -8,6 +8,8 @@ export interface Teaser {
 
 @customElement('teaser-list-component')
 export class TeaserListComponent extends LitElement {
+  static override styles = [styles];
+
   @property({ type: Array })
   teasers: Teaser[] = [];
 
@@ -30,25 +32,22 @@ export class TeaserListComponent extends LitElement {
     this.dispatchEvent(teaserClickEvent);
   }
 
-  static override styles = [teaserListStyle];
-
   override render() {
     return html`
-      <div class="teaser-list__container">
+      <div class="teaser-list-container">
         <h1 class="headline">${this.title}</h1>
-        <ul class="teaser-list__list">
+        <ul class="teaser-list">
           ${this.teasers.map(
             (teaser) => html`
-              <li class="teaser-list__listItem">
+              <li class="teaser-list-item">
                 <a
                   role="button"
                   href="#"
-                  class="teaser-list__button"
                   data-testid="default-question"
                   @click="${(event: Event) => this.handleTeaserClick(teaser, event)}"
                 >
                   ${teaser.description}
-                  <span class="teaser-list__span">${this.label}</span>
+                  <span>${this.label}</span>
                 </a>
               </li>
             `,

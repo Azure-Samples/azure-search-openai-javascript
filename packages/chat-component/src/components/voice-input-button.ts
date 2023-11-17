@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { voiceInputButtonStyles } from '../styles/voice-input-button.js';
+import { styles } from '../styles/voice-input-button.js';
 import { globalConfig } from '../config/global-config.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
@@ -9,20 +9,22 @@ import iconMicOn from '../../public/svg/mic-record-on-icon.svg?raw';
 
 @customElement('voice-input-button')
 export class VoiceInputButton extends LitElement {
+  static override styles = [styles];
+
+  recognitionSvc = window.SpeechRecognition || window.webkitSpeechRecognition;
+
   // some browsers may not support SpeechRecognition https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition#browser_compatibility
   @state()
-  showVoiceInput = (window.SpeechRecognition || window.webkitSpeechRecognition) !== undefined;
+  showVoiceInput = this.recognitionSvc !== undefined;
 
   @state()
   enableVoiceListening = false;
 
   speechRecognition: SpeechRecognition | undefined = undefined;
 
-  static override styles = [voiceInputButtonStyles];
-
   initializeSpeechRecognition(): void {
-    if (this.showVoiceInput) {
-      this.speechRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    if (this.showVoiceInput && this.recognitionSvc) {
+      this.speechRecognition = new this.recognitionSvc();
 
       if (!this.speechRecognition) {
         return; // no speech support found so do nothing
@@ -79,7 +81,7 @@ export class VoiceInputButton extends LitElement {
         title="${this.enableVoiceListening
           ? globalConfig.CHAT_VOICE_REC_BUTTON_LABEL_TEXT
           : globalConfig.CHAT_VOICE_BUTTON_LABEL_TEXT}"
-        class="voice-input-button ${this.enableVoiceListening ? 'recording' : 'not-recording'}"
+        class="${this.enableVoiceListening ? 'recording' : 'not-recording'}"
         @click="${this.handleVoiceInput}"
       >
         ${this.enableVoiceListening ? unsafeSVG(iconMicOn) : unsafeSVG(iconMicOff)}

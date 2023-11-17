@@ -32,13 +32,8 @@ export class ChatActionButtonComponent extends LitElement {
 
   override render() {
     return html`
-      <button
-        title="${this.label}"
-        class="button chat__header--button"
-        data-testid="${this.actionId}"
-        ?disabled="${this.isDisabled}"
-      >
-        <span class="chat__header--span">${this.tooltip ?? this.label}</span>
+      <button title="${this.label}" data-testid="${this.actionId}" ?disabled="${this.isDisabled}">
+        <span>${this.tooltip ?? this.label}</span>
         ${unsafeSVG(this.svgIcon)}
       </button>
     `;

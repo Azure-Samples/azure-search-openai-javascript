@@ -1,6 +1,6 @@
 import { css } from 'lit';
 
-export const loadingIndicatorStyles = css`
+export const styles = css`
   @keyframes spinneranimation {
     0% {
       transform: rotate(0deg);
@@ -9,11 +9,11 @@ export const loadingIndicatorStyles = css`
       transform: rotate(360deg);
     }
   }
-  .loading-text {
+  p {
     display: flex;
     align-items: center;
   }
-  .loading-icon svg {
+  svg {
     width: 30px;
     height: 30px;
     fill: var(--accent-lighter);
