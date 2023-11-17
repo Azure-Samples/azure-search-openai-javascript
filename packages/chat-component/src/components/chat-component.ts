@@ -3,7 +3,7 @@ import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { chatHttpOptions, globalConfig, requestOptions } from '../config/global-config.js';
+import { chatHttpOptions, globalConfig, teaserListTexts, requestOptions } from '../config/global-config.js';
 import { getAPIResponse } from '../core/http/index.js';
 import { parseStreamedMessages } from '../core/parser/index.js';
 import { chatStyle } from '../styles/chat-component.js';
@@ -463,8 +463,12 @@ export class ChatComponent extends LitElement {
             ${this.isDefaultPromptsEnabled
               ? html`
                   <teaser-list-component
+                    .title="${this.interactionModel === 'chat'
+                      ? teaserListTexts.HEADING_CHAT
+                      : teaserListTexts.HEADING_ASK}"
                     @teaser-click="${this.handleQuestionInputClick}"
-                    .interactionModel="${this.interactionModel}"
+                    .teasers="${teaserListTexts.DEFAULT_PROMPTS}"
+                    .label="${teaserListTexts.TEASER_CTA_LABEL}"
                   ></teaser-list-component>
                 `
               : ''}
