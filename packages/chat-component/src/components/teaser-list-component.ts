@@ -1,25 +1,28 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { teaserListTexts } from '../config/global-config.js';
 import { teaserListStyle } from '../styles/teaser-list-component.js';
+
+export interface Teaser {
+  description: string;
+}
 
 @customElement('teaser-list-component')
 export class TeaserListComponent extends LitElement {
   @property({ type: Array })
-  teasers: Teaser[] = teaserListTexts.DEFAULT_PROMPTS || [];
+  teasers: Teaser[] = [];
 
   @property({ type: String })
-  interactionModel;
+  title: string = '';
 
   @property({ type: String })
-  question;
+  label: string = '';
 
   // Handle the click on a default prompt
-  handleTeaserClick(question: string, event?: Event): void {
+  handleTeaserClick(teaser: Teaser, event?: Event): void {
     event?.preventDefault();
     const teaserClickEvent = new CustomEvent('teaser-click', {
       detail: {
-        question,
+        question: teaser.description,
       },
       bubbles: true,
       composed: true,
@@ -32,22 +35,20 @@ export class TeaserListComponent extends LitElement {
   override render() {
     return html`
       <div class="teaser-list__container">
-        <h1 class="headline">
-          ${this.interactionModel === 'chat' ? teaserListTexts.HEADING_CHAT : teaserListTexts.HEADING_ASK}
-        </h1>
+        <h1 class="headline">${this.title}</h1>
         <ul class="teaser-list__list">
           ${this.teasers.map(
-            (prompt) => html`
+            (teaser) => html`
               <li class="teaser-list__listItem">
                 <a
                   role="button"
                   href="#"
                   class="teaser-list__button"
                   data-testid="default-question"
-                  @click="${(event: Event) => this.handleTeaserClick(prompt.description, event)}"
+                  @click="${(event: Event) => this.handleTeaserClick(teaser, event)}"
                 >
-                  ${prompt.description}
-                  <span class="teaser-list__span">${teaserListTexts.TEASER_CTA_LABEL}</span>
+                  ${teaser.description}
+                  <span class="teaser-list__span">${this.label}</span>
                 </a>
               </li>
             `,
