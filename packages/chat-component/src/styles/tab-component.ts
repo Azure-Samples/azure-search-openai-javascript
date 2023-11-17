@@ -1,10 +1,6 @@
 import { css } from 'lit';
 
-export const tabStyle = css`
-  .tab-component__header {
-    display: flex;
-    justify-content: end;
-  }
+export const styles = css`
   .tab-component__list {
     list-style-type: none;
     display: flex;

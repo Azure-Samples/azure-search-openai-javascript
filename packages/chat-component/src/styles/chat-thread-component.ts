@@ -147,7 +147,7 @@ export const styles = css`
   .citation {
     background-color: var(--accent-lighter);
     border-radius: 3px;
-    padding: 3px;
+    padding: 2px;
     margin-left: 3px;
   }
 `;

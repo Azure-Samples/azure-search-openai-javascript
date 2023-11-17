@@ -5,13 +5,13 @@ export const styles = css`
     font-size: 12px;
     display: inline-block;
   }
-  .items__list.citations {
+  .items__list {
     border-top: none;
     padding: 0px 20px;
     margin: 10px 0;
     display: block;
   }
-  .items__listItem--citation {
+  .items__listItem {
     display: inline-block;
     background-color: var(--accent-lighter);
     border-radius: 5px;
@@ -20,17 +20,17 @@ export const styles = css`
     margin-top: 5px;
     font-size: small;
   }
-  .items__listItem--citation.active {
+  .items__listItem.active {
     background-color: var(--accent-high);
   }
-  .items__listItem--citation:not(first-child) {
+  .items__listItem:not(first-child) {
     margin-left: 5px;
   }
   .items__link {
     text-decoration: none;
     color: var(--text-color);
   }
-  .items__listItem--citation.active .items__link {
+  .items__listItem.active .items__link {
     color: var(--white);
   }
 `;
