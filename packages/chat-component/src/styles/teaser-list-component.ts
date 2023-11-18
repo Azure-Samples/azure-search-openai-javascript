@@ -25,6 +25,11 @@ export const styles = css`
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+  .teaser-list.always-row {
+    text-align: left;
+  }
+  .teaser-list:not(.always-row) {
     @media (min-width: 1024px) {
       flex-direction: row;
     }
@@ -50,7 +55,7 @@ export const styles = css`
     transition: all 0.3s ease-in-out;
     border-color: var(--accent-high);
   }
-  .teaser-list-item span {
+  .teaser-list-item .teaser-click-label {
     color: var(--accent-high);
     font-weight: bold;
     display: block;
