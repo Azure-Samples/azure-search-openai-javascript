@@ -463,12 +463,13 @@ export class ChatComponent extends LitElement {
             ${this.isDefaultPromptsEnabled
               ? html`
                   <teaser-list-component
-                    .title="${this.interactionModel === 'chat'
+                    .heading="${this.interactionModel === 'chat'
                       ? teaserListTexts.HEADING_CHAT
                       : teaserListTexts.HEADING_ASK}"
+                    .clickable="${true}"
+                    .actionLabel="${teaserListTexts.TEASER_CTA_LABEL}"
                     @teaser-click="${this.handleQuestionInputClick}"
                     .teasers="${teaserListTexts.DEFAULT_PROMPTS}"
-                    .label="${teaserListTexts.TEASER_CTA_LABEL}"
                   ></teaser-list-component>
                 `
               : ''}
@@ -547,21 +548,18 @@ export class ChatComponent extends LitElement {
                   ] as TabContent[]}"
                   .selectedTabId="${this.selectedAsideTab}"
                 >
-                  <div slot="tab-thought-process">
-                    <h3 class="subheadline--small">${globalConfig.THOUGHT_PROCESS_LABEL}</h3>
-                    <div class="tab-component__innerContainer">
-                      ${this.chatThoughts
-                        ? html` <p class="tab-component__paragraph">${unsafeHTML(this.chatThoughts)}</p> `
-                        : ''}
-                    </div>
+                  <div slot="tab-thought-process" class="tab-component__content">
+                    ${this.chatThoughts
+                      ? html` <p class="tab-component__paragraph">${unsafeHTML(this.chatThoughts)}</p> `
+                      : ''}
                   </div>
-                  <div slot="tab-support-context">
-                    <h3 class="subheadline--small">${globalConfig.SUPPORT_CONTEXT_LABEL}</h3>
-                    <ul class="defaults__list always-row">
-                      ${this.chatDataPoints?.map(
-                        (dataPoint) => html` <li class="defaults__listItem">${dataPoint}</li> `,
-                      )}
-                    </ul>
+                  <div slot="tab-support-context" class="tab-component__content">
+                    <teaser-list-component
+                      .alwaysRow="${true}"
+                      .teasers="${this.chatDataPoints?.map((d) => {
+                        return { description: d };
+                      })}"
+                    ></teaser-list-component>
                   </div>
                   <div slot="tab-citations" class="tab-component__content">
                     <citation-list

@@ -14,10 +14,16 @@ export class TeaserListComponent extends LitElement {
   teasers: Teaser[] = [];
 
   @property({ type: String })
-  title: string = '';
+  heading: string | undefined = undefined;
 
   @property({ type: String })
-  label: string = '';
+  actionLabel: string | undefined = undefined;
+
+  @property({ type: Boolean })
+  alwaysRow = false;
+
+  @property({ type: Boolean })
+  clickable = false;
 
   // Handle the click on a default prompt
   handleTeaserClick(teaser: Teaser, event?: Event): void {
@@ -32,23 +38,28 @@ export class TeaserListComponent extends LitElement {
     this.dispatchEvent(teaserClickEvent);
   }
 
+  renderClickableTeaser(teaser: Teaser) {
+    return html`
+      <a
+        role="button"
+        href="#"
+        data-testid="default-question"
+        @click="${(event: Event) => this.handleTeaserClick(teaser, event)}"
+      >
+        ${teaser.description}
+        <span class="teaser-click-label">${this.actionLabel}</span>
+      </a>
+    `;
+  }
   override render() {
     return html`
       <div class="teaser-list-container">
-        <h1 class="headline">${this.title}</h1>
-        <ul class="teaser-list">
+        ${this.heading ? html`<h1 class="headline">${this.heading}</h1>` : ''}
+        <ul class="teaser-list ${this.alwaysRow ? 'always-row' : ''}">
           ${this.teasers.map(
             (teaser) => html`
               <li class="teaser-list-item">
-                <a
-                  role="button"
-                  href="#"
-                  data-testid="default-question"
-                  @click="${(event: Event) => this.handleTeaserClick(teaser, event)}"
-                >
-                  ${teaser.description}
-                  <span>${this.label}</span>
-                </a>
+                ${this.clickable ? this.renderClickableTeaser(teaser) : teaser.description}
               </li>
             `,
           )}
