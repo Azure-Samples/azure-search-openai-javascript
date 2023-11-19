@@ -1,15 +1,21 @@
-import { readStream } from '../stream/index.js';
+import { ChatResponseError } from '../../utils/index.js';
+import { createReader, readStream } from '../stream/index.js';
 
 export async function parseStreamedMessages({
   chatThread,
   apiResponseBody,
-  visit,
+  signal,
+  onChunkRead: onVisit,
+  onCancel,
 }: {
   chatThread: ChatThreadEntry[];
   apiResponseBody: ReadableStream<Uint8Array> | null;
-  visit: () => void;
+  signal: AbortSignal;
+  onChunkRead: () => void;
+  onCancel: () => void;
 }) {
-  const chunks = readStream<BotResponseChunk>(apiResponseBody);
+  const reader = createReader(apiResponseBody);
+  const chunks = readStream<BotResponseChunk | BotResponseError>(reader);
 
   const streamedMessageRaw: string[] = [];
   const stepsBuffer: string[] = [];
@@ -26,6 +32,21 @@ export async function parseStreamedMessages({
   };
 
   for await (const chunk of chunks) {
+    if (signal.aborted) {
+      onCancel();
+      return result;
+    }
+
+    if (chunk.error) {
+      throw new ChatResponseError(chunk.message, chunk.statusCode);
+    }
+
+    // content is filtered during the output streaming
+    // https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/content-filter?tabs=javascrit
+    if (chunk.choices[0].finish_reason === 'content_filter') {
+      throw new ChatResponseError('Content filtered', 400);
+    }
+
     const { content, context } = chunk.choices[0].delta;
     if (context?.data_points) {
       result.data_points = context.data_points ?? [];

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-abusive-eslint-disable */
 /* eslint-disable unicorn/template-indent */
 import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
@@ -18,6 +19,7 @@ import iconSuccess from '../public/svg/success-icon.svg?raw';
 import iconCopyToClipboard from '../public/svg/copy-icon.svg?raw';
 import iconSend from '../public/svg/send-icon.svg?raw';
 import iconClose from '../public/svg/close-icon.svg?raw';
+import iconCancel from '../public/svg/cancel-icon.svg?raw';
 import iconQuestion from '../public/svg/bubblequestion-icon.svg?raw';
 import iconSpinner from '../public/svg/spinner-icon.svg?raw';
 import iconMicOff from '../public/svg/mic-icon.svg?raw';
@@ -138,10 +140,17 @@ export class ChatComponent extends LitElement {
   // aside data
   currentChatAside: ChatAside | undefined = {};
 
+  abortController: AbortController = new AbortController();
+  // eslint-disable-next-line unicorn/no-abusive-eslint-disable
+
   chatRequestOptions: ChatRequestOptions = requestOptions;
   chatHttpOptions: ChatHttpOptions = chatHttpOptions;
 
   selectedAsideTab: 'tab-thought-process' | 'tab-support-context' | 'tab-citations' = 'tab-thought-process';
+
+  // Is currently processing the response from the API
+  // This is used to show the cancel button
+  isProcessingResponse = false;
 
   static override styles = [mainStyle];
 
@@ -180,15 +189,23 @@ export class ChatComponent extends LitElement {
           },
         ];
 
+        this.isProcessingResponse = true;
+
         const result = await parseStreamedMessages({
           chatThread: this.chatThread,
+          signal: this.abortController.signal,
           apiResponseBody: (this.apiResponse as Response).body,
-          visit: () => {
+          onChunkRead: () => {
             // NOTE: this function is called whenever we mutate sub-properties of the array
+            // so we need to trigger a re-render
             this.requestUpdate('chatThread');
           },
-          // this will be processing thought process only with streaming enabled
+          onCancel: () => {
+            this.isProcessingResponse = false;
+            // TODO: show a message to the user that the response has been cancelled
+          },
         });
+
         const chatAside: ChatAside = {
           chatThoughts: DOMPurify.sanitize(marked.parse(result.thoughts)),
           chatDataPoints: result.data_points,
@@ -201,6 +218,10 @@ export class ChatComponent extends LitElement {
         }
         this.canShowThoughtProcess = true;
 
+        this.isProcessingResponse = false;
+        // NOTE: for whatever reason, Lit doesn't re-render when we update isProcessingResponse property
+        // so we need to trigger a re-render manually
+        this.requestUpdate('isProcessingResponse');
         return true;
       }
 
@@ -333,8 +354,9 @@ export class ChatComponent extends LitElement {
         this.hasDefaultPromptsEnabled = false;
         // Disable the input field and submit button while waiting for the API response
         this.isDisabled = true;
+        // clear out errors
+        this.hasAPIError = false;
         // Show loading indicator while waiting for the API response
-
         this.isAwaitingResponse = true;
         if (type === 'chat') {
           this.processApiResponse({ message: question, isUserMessage: true });
@@ -380,8 +402,28 @@ export class ChatComponent extends LitElement {
           message: this.useStream ? '' : response.choices[0].message.content,
           isUserMessage: false,
         });
-      } catch (error) {
-        console.error(error);
+      } catch (error_: Error) {
+        console.error(error_);
+
+        const chatError = {
+          message: error_?.code === 400 ? globalConfig.INVALID_REQUEST_ERROR : globalConfig.API_ERROR_MESSAGE,
+        };
+
+        if (this.isProcessingResponse) {
+          const processingThread = this.chatThread.at(-1);
+          processingThread.error = chatError;
+        } else {
+          this.chatThread = [
+            ...this.chatThread,
+            {
+              error: chatError,
+              text: [],
+              timestamp: getTimestamp(),
+              isUserMessage: false,
+            },
+          ];
+        }
+
         this.handleAPIError();
       }
     }
@@ -403,6 +445,7 @@ export class ChatComponent extends LitElement {
     this.hasDefaultPromptsEnabled = true;
     this.isResponseCopiedArray = [];
     this.hideThoughtProcess(event);
+    this.handleUserChatCancel(event);
   }
 
   // Show the default prompts when enabled
@@ -421,6 +464,8 @@ export class ChatComponent extends LitElement {
   handleAPIError(): void {
     this.hasAPIError = true;
     this.isDisabled = false;
+    this.isAwaitingResponse = false;
+    this.isProcessingResponse = false;
   }
 
   // Copy response to clipboard
@@ -437,6 +482,16 @@ export class ChatComponent extends LitElement {
     }, 3000);
 
     this.requestUpdate('isResponseCopiedArray');
+  }
+
+  // Stop generation
+  handleUserChatCancel(event: Event): any {
+    event?.preventDefault();
+    this.isProcessingResponse = false;
+    this.abortController.abort();
+
+    // we have to reset the abort controller so that we can use it again
+    this.abortController = new AbortController();
   }
 
   handleShowThoughtProcess(index, event?: Event): void {
@@ -508,7 +563,9 @@ export class ChatComponent extends LitElement {
       );
     }
     // scroll to the bottom of the chat
-    this.debounceScrollIntoView();
+    if (this.isProcessingResponse) {
+      this.debounceScrollIntoView();
+    }
     return entries;
   }
 
@@ -605,6 +662,33 @@ export class ChatComponent extends LitElement {
     `;
   }
 
+  renderError(error: { message: string }) {
+    return html`<p class="chat__txt error">${error.message}</p>`;
+  }
+
+  renderChatOrCancelButton() {
+    const submitChatButton = html`<button
+      class="chatbox__button"
+      data-testid="submit-question-button"
+      @click="${this.handleUserChatSubmit}"
+      title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
+      ?disabled="${this.isDisabled}"
+    >
+      ${unsafeSVG(iconSend)}
+    </button>`;
+    const cancelChatButton = html`<button
+      <button
+        class="chatbox__button"
+        data-testid="cancel-question-button"
+        @click="${this.handleUserChatCancel}"
+        title="${globalConfig.CHAT_CANCEL_BUTTON_LABEL_TEXT}"
+      >
+        ${unsafeSVG(iconCancel)}
+      </button>`;
+
+    return this.isProcessingResponse ? cancelChatButton : submitChatButton;
+  }
+
   // Render the chat component as a web component
   override render() {
     return html`
@@ -637,6 +721,7 @@ export class ChatComponent extends LitElement {
                           ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
                           ${this.renderCitation(message.citations)}
                           ${this.renderFollowupQuestions(message.followupQuestions)}
+                          ${message.error ? this.renderError(message.error) : ''}
                         </div>
                         <p class="chat__txt--info">
                           <span class="timestamp">${message.timestamp}</span>,
@@ -645,13 +730,6 @@ export class ChatComponent extends LitElement {
                       </li>
                     `,
                   )}
-                  ${this.hasAPIError
-                    ? html`
-                        <li class="chat__listItem">
-                          <p class="chat__txt error">${globalConfig.API_ERROR_MESSAGE}</p>
-                        </li>
-                      `
-                    : ''}
                 </ul>
                 <div class="chat__footer" id="chat-list-footer">
                   <!-- Do not delete this element. It is used for auto-scrolling -->
@@ -699,6 +777,7 @@ export class ChatComponent extends LitElement {
                 `
               : ''}
           </div>
+          <div class="chat__container"></div>
           <form
             id="chat-form"
             class="form__container ${this.inputPosition === 'sticky' ? 'form__container-sticky' : ''}"
@@ -719,7 +798,7 @@ export class ChatComponent extends LitElement {
                   autocomplete="off"
                   @keyup="${this.handleOnInputChange}"
                 />
-                ${this.showVoiceInput
+                ${this.showVoiceInput && !this.isResetInput
                   ? html` <button
                       title="${this.enableVoiceListening
                         ? globalConfig.CHAT_VOICE_REC_BUTTON_LABEL_TEXT
@@ -732,15 +811,7 @@ export class ChatComponent extends LitElement {
                     </button>`
                   : ''}
               </div>
-              <button
-                class="chatbox__button"
-                data-testid="submit-question-button"
-                @click="${this.handleUserChatSubmit}"
-                title="${globalConfig.CHAT_BUTTON_LABEL_TEXT}"
-                ?disabled="${this.isDisabled}"
-              >
-                ${unsafeSVG(iconSend)}
-              </button>
+              ${this.renderChatOrCancelButton()}
               <button
                 title="${globalConfig.RESET_BUTTON_TITLE_TEXT}"
                 class="chatbox__button--reset"

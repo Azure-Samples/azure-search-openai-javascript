@@ -6,7 +6,7 @@ languages:
   - nodejs
 products:
   - azure
-  - azure-cognitive-services
+  - ai-services
   - azure-openai
 urlFragment: azure-search-openai-javascript
 ---
@@ -225,6 +225,10 @@ To see any exceptions and server errors, navigate to the "Investigate -> Failure
 By default, the deployed Azure web app will have no authentication or access restrictions enabled, meaning anyone with routable network access to the web app can chat with your indexed data. You can require authentication to your Azure Active Directory by following the [Add app authentication](https://learn.microsoft.com/training/modules/publish-static-web-app-authentication/) tutorial and set it up against the deployed web app.
 
 To then limit access to a specific set of users or groups, you can follow the steps from [Restrict your Azure AD app to a set of users](https://learn.microsoft.com/azure/active-directory/develop/howto-restrict-your-app-to-a-set-of-users) by changing "Assignment Required?" option under the Enterprise Application, and then assigning users/groups access. Users not granted explicit access will receive the error message -AADSTS50105: Your administrator has configured the application <app_name> to block users unless they are specifically granted ('assigned') access to the application.-
+
+### Additional security considerations
+
+We recommend deploying additional security mechanisms. When applicable, consider setting up a [VNet](https://learn.microsoft.com/azure/virtual-network/virtual-networks-overview) or setting up a [Proxy Policy](https://learn.microsoft.com/en-us/azure/api-management/proxy-policy).
 
 ### Enabling CORS for an alternate frontend
 

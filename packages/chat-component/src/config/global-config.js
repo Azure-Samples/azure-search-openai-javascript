@@ -16,6 +16,7 @@ const globalConfig = {
   CHAT_MESSAGES: [],
   // This are the labels for the chat button and input
   CHAT_BUTTON_LABEL_TEXT: 'Ask Support',
+  CHAT_CANCEL_BUTTON_LABEL_TEXT: 'Cancel Generation',
   CHAT_VOICE_BUTTON_LABEL_TEXT: 'Voice input',
   CHAT_VOICE_REC_BUTTON_LABEL_TEXT: 'Listening to voice input',
   CHAT_INPUT_PLACEHOLDER: 'Type your question, eg. "How to search and book rentals?"',
@@ -33,6 +34,7 @@ const globalConfig = {
   LOADING_INDICATOR_TEXT: 'Please wait. We are searching and generating an answer...',
   // API ERROR HANDLING IN UI
   API_ERROR_MESSAGE: 'Sorry, we are having some problems. Please try again later.',
+  INVALID_REQUEST_ERROR: 'Unable to generate answer for this query. Please modify your question and try again.',
   // Config pertaining the response format
   THOUGHT_PROCESS_LABEL: 'Thought Process',
   SUPPORT_CONTEXT_LABEL: 'Support Context',

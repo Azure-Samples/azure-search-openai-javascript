@@ -2,6 +2,7 @@ declare interface ChatHttpOptions {
   method: string;
   url: string;
   stream: boolean;
+  signal: AbortSignal;
 }
 declare interface ChatMessageText {
   value: string;
@@ -18,6 +19,9 @@ declare interface ChatThreadEntry {
   chatAsideContent?: ChatAside;
   isUserMessage: boolean;
   timestamp: string;
+  error?: {
+    message: string;
+  };
 }
 
 declare interface Citation {
@@ -94,4 +98,11 @@ declare interface ChatAside {
   chatThoughts?: string;
   chatDataPoints?: string[];
   chatCitations?: Citation[];
+}
+
+declare interface BotResponseError {
+  statusCode: number;
+  error: string;
+  code: string;
+  message: string;
 }
