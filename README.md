@@ -11,7 +11,7 @@ products:
 urlFragment: azure-search-openai-javascript
 ---
 
-# ChatGPT + Enterprise data with Azure OpenAI and Cognitive Search
+# ChatGPT + Enterprise data with Azure OpenAI and Azure AI Search
 
 ## Table of Contents
 
@@ -44,7 +44,7 @@ urlFragment: azure-search-openai-javascript
 [![Open in GitHub Codespaces](https://img.shields.io/static/v1?style=for-the-badge&label=GitHub+Codespaces&message=Open&color=brightgreen&logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=684521881&machine=standardLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestUs2)
 [![Open in Remote - Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/azure-search-openai-javascript)
 
-This sample demonstrates a few approaches for creating ChatGPT-like experiences over your own data using the Retrieval Augmented Generation pattern. It uses Azure OpenAI Service to access the ChatGPT model (gpt-35-turbo), and Azure Cognitive Search for data indexing and retrieval.
+This sample demonstrates a few approaches for creating ChatGPT-like experiences over your own data using the Retrieval Augmented Generation pattern. It uses Azure OpenAI Service to access the ChatGPT model (gpt-35-turbo), and Azure AI Search for data indexing and retrieval.
 
 ![Retrieval Augmented Generation Architecture](docs/rag-architecture.png)
 
@@ -62,7 +62,7 @@ The application is made from multiple components, including:
 
 - Chat and Q&A interfaces
 - Explores various options to help users evaluate the trustworthiness of responses with citations, tracking of source content, etc.
-- Shows possible approaches for data preparation, prompt construction, and orchestration of interaction between model (ChatGPT) and retriever (Cognitive Search)
+- Shows possible approaches for data preparation, prompt construction, and orchestration of interaction between model (ChatGPT) and retriever (Azure AI Search)
 - Settings directly in the UX to tweak the behavior and experiment with options
 - Optional performance tracing and monitoring with Application Insights
 
@@ -74,7 +74,7 @@ The application is made from multiple components, including:
 
 **IMPORTANT:** In order to deploy and run this sample, you'll need:
 
-- **Azure account**. If you're new to Azure, [get an Azure account for free](https://azure.microsoft.com/free/cognitive-search/) to get free Azure credits to get started.
+- **Azure account**. If you're new to Azure, [get an Azure account for free](https://learn.microsoft.com/azure/search/search-what-is-azure-search) to get free Azure credits to get started.
 - **Azure subscription with access enabled for the Azure OpenAI service**. You can request access with [this form](https://aka.ms/oaiapply).
 - **Azure account permissions**:
   - Your Azure account must have `Microsoft.Authorization/roleAssignments/write` permissions, such as [Role Based Access Control Administrator](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#role-based-access-control-administrator-preview), [User Access Administrator](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#user-access-administrator), or [Owner](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#owner). If you don't have subscription-level permissions, they must be granted to you with [RBAC](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#role-based-access-control-administrator-preview) for an existing resource group and [deploy to that existing group](#existing-resource-group).
@@ -89,9 +89,9 @@ You may try the [Azure pricing calculator](https://azure.com/e/8ffbe5b1919c4c72a
 
 - Azure Container Apps: Pay-as-you-go tier. Costs based on vCPU and memory used. [Pricing](https://azure.microsoft.com/pricing/details/container-apps/)
 - Azure Static Web Apps: Free Tier. [Pricing](https://azure.microsoft.com/pricing/details/app-service/static/)
-- Azure OpenAI: Standard tier, ChatGPT and Ada models. Pricing per 1K tokens used, and at least 1K tokens are used per question. [Pricing](https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/)
+- Azure OpenAI: Standard tier, ChatGPT and Ada models. Pricing per 1K tokens used, and at least 1K tokens are used per question. [Pricing](https://azure.microsoft.com/pricing/details/search/)
 <!-- - Form Recognizer: SO (Standard) tier using pre-built layout. Pricing per document page, sample documents have 261 pages total. [Pricing](https://azure.microsoft.com/pricing/details/form-recognizer/) -->
-- Azure Cognitive Search: Standard tier, 1 replica, free level of semantic search. Pricing per hour.[Pricing](https://azure.microsoft.com/pricing/details/search/)
+- Azure AI Search: Standard tier, 1 replica, free level of semantic search*. Pricing per hour.[Pricing](https://azure.microsoft.com/pricing/details/search/) (_The pricing may vary or reflect an outdated tier model. Please visit the linked page for more accurate information_)
 - Azure Blob Storage: Standard tier with ZRS (Zone-redundant storage). Pricing per storage and read operations. [Pricing](https://azure.microsoft.com/pricing/details/storage/blobs/)
 - Azure Monitor: Pay-as-you-go tier. Costs based on data ingested. [Pricing](https://azure.microsoft.com/pricing/details/monitor/)
 
@@ -102,7 +102,7 @@ either by deleting the resource group in the Portal or running `azd down --purge
 
 There are multiple ways to successfully setup this project.
 
-The easiest way to get started is with GitHub Codespacesm that provides preconfigurations to setup all the tools for you. [Read more below](#github-codespaces).
+The easiest way to get started is with GitHub Codespaces that provides preconfigurations to setup all the tools for you. [Read more below](#github-codespaces).
 Alternatively you can [set up your local environment](#local-environment) follwing the instructions below.
 
 #### GitHub Codespaces
@@ -139,7 +139,7 @@ Execute the following command, if you don't have any pre-existing Azure services
 
 1. Run `azd up` - This will provision Azure resources and deploy this sample to those resources, including building the search index based on the files found in the `./data` folder.
    - You will be prompted to select a location for the majority of resources, except for the OpenAI and Static Web App resources.
-   - By default, the OpenAI resource will be deployed to `eastus2`. You can set a different location with `azd env set AZURE_OPENAI_RESOURCE_GROUP_LOCATION {location}`. Currently only a short list of locations is accepted. That location list is based on the [OpenAI model availability table](https://learn.microsoft.com/azure/cognitive-services/openai/concepts/models#model-summary-table-and-region-availability) and may become outdated as availability changes.
+   - By default, the OpenAI resource will be deployed to `eastus2`. You can set a different location with `azd env set AZURE_OPENAI_RESOURCE_GROUP_LOCATION {location}`. Currently only a short list of locations is accepted. That location list is based on the [OpenAI model availability table](https://azure.microsoft.com/explore/global-infrastructure/products-by-region/?products=search) and may become outdated as availability changes.
    - By default, the Staic Web App resource will be deployed to `eastus2`. You can set a different location with `azd env set AZURE_WEBAPP_LOCATION {location}`. Currently only a short list of locations is accepted. Note that Static Web App is a global service, and the location you choose will only affect the managed Functions App which is not used in this sample.
 1. After the application has been successfully deployed you will see a URL printed to the console. Click that URL to interact with the application in your browser.
 
@@ -165,9 +165,9 @@ If you already have existing Azure resources, you can re-use those by setting `a
 1. Run `azd env set AZURE_OPENAI_CHATGPT_DEPLOYMENT {Name of existing ChatGPT deployment}`. Only needed if your ChatGPT deployment is not the default 'chat'.
 1. Run `azd env set AZURE_OPENAI_EMBEDDING_DEPLOYMENT {Name of existing GPT embedding deployment}`. Only needed if your embeddings deployment is not the default 'embedding'.
 
-#### Existing Azure Cognitive Search resource
+#### Existing Azure AI Search resource
 
-1. Run `azd env set AZURE_SEARCH_SERVICE {Name of existing Azure Cognitive Search service}`
+1. Run `azd env set AZURE_SEARCH_SERVICE {Name of existing Azure AI Search service}`
 1. Run `azd env set AZURE_SEARCH_SERVICE_RESOURCE_GROUP {Name of existing resource group with ACS service}`
 1. If that resource group is in a different location than the one you'll pick for the `azd up` step,
    then run `azd env set AZURE_SEARCH_SERVICE_LOCATION {Location of existing service}`
@@ -303,7 +303,7 @@ This sample is designed to be a starting point for your own production applicati
   You can also view the Quotas tab in [Azure OpenAI studio](https://oai.azure.com/) to understand how much capacity you have.
 - **Azure Storage**: The default storage account uses the `Standard_LRS` SKU.
   To improve your resiliency, we recommend using `Standard_ZRS` for production deployments, which you can specify using the `sku` property under the `storage` module in `infra/main.bicep`.
-- **Azure Cognitive Search**: The default search service uses the `Standard` SKU with the free semantic search option, which gives you 1000 free queries a month. Assuming your app will experience more than 1000 questions, you should either change `semanticSearch` to "standard" or disable semantic search entirely in the request options. If you see errors about search service capacity being exceeded, you may find it helpful to increase the number of replicas by changing `replicaCount` in `infra/core/search/search-services.bicep` or manually scaling it from the Azure Portal.
+- **Azure AI Search**: The default search service uses the `Standard` SKU with the free semantic search option, which gives you 1000 free queries a month. Assuming your app will experience more than 1000 questions, you should either change `semanticSearch` to "standard" or disable semantic search entirely in the request options. If you see errors about search service capacity being exceeded, you may find it helpful to increase the number of replicas by changing `replicaCount` in `infra/core/search/search-services.bicep` or manually scaling it from the Azure Portal.
 - **Azure Container Apps**: The default container app setup uses 1 vCPU core and 2 GB RAM per container, with autoscaling enabled. The minimum number of replicas is set to 1, and the maximum to 10.
   You can change vCPU and RAM capacity [in the template](https://github.com/Azure-Samples/azure-search-openai-javascript/blob/main/infra/main.bicep#L144-L145), and define your own auto-scaling rules based on load.
   For more details, read [Set scaling rules in Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/scale-app?pivots=azure-resource-manager).
@@ -318,9 +318,10 @@ For more details, read [Azure OpenAI Landing Zone reference architecture](https:
 
 ## Resources
 
-- [Revolutionize your Enterprise Data with ChatGPT: Next-gen Apps w/ Azure OpenAI and Cognitive Search](https://aka.ms/entgptsearchblog)
-- [Azure Cognitive Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search)
+- [Revolutionize your Enterprise Data with ChatGPT: Next-gen Apps w/ Azure OpenAI and AI Search](https://aka.ms/entgptsearchblog)
+- [Azure Cognitive Search](https://learn.microsoft.com/en-us/azure/search/search-what-is-azure-search)
 - [Azure OpenAI Service](https://learn.microsoft.com/azure/cognitive-services/openai/overview)
+- [Building ChatGPT-Like Experiences with Azure: A Guide to Retrieval Augmented Generation for JavaScript applications](https://devblogs.microsoft.com/azure-sdk/building-chatgpt-like-experiences-with-azure-a-guide-to-retrieval-augmented-generation-for-javascript-applications/)
 
 ## Clean up
 
@@ -339,7 +340,7 @@ The resource group and all the resources will be deleted.
 ### FAQ
 
 <details><a id="ingestion-why-chunk"></a>
-<summary>Why do we need to break up the documents into chunks when Azure Cognitive Search supports searching large documents?</summary>
+<summary>Why do we need to break up the documents into chunks when Azure AI Search supports searching large documents?</summary>
 
 Chunking allows us to limit the amount of information we send to OpenAI due to token limits. By breaking up the content, it allows us to easily find potential chunks of text that we can inject into OpenAI. The method of chunking we use leverages a sliding window of text such that sentences that end one chunk will start the next. This allows us to reduce the chance of losing the context of the text.
 
@@ -380,7 +381,7 @@ Technology comparison:
 | ---------- | ------------------------------ | ----------------------- |
 | Frontend   | React/Lit                      | React                   |
 | Backend    | Node.js (Fastify)              | Python (Flask)          |
-| Vector DB  | Azure Cognitive Search         | Azure Cognitive Search  |
+| Vector DB  | Azure AI Search                | Azure AI Search         |
 | Deployment | Azure Developer CLI (azd)      | Azure Portal, az, azd   |
 
 </details>
@@ -413,7 +414,7 @@ The `azd up` command comes from the [Azure Developer CLI](https://learn.microsof
 
 The `azd up` command uses the `azure.yaml` file combined with the infrastructure-as-code `.bicep` files in the `infra/` folder. The `azure.yaml` file for this project declares several "hooks" for the prepackage step and postprovision steps. The `up` command first runs the `prepackage` hook which installs Node dependencies and builds the React.JS-based JavaScript files. It then packages all the code (both frontend and backend services) into a zip file which it will deploy later.
 
-Next, it provisions the resources based on `main.bicep` and `main.parameters.json`. At that point, since there is no default value for the OpenAI resource location, it asks you to pick a location from a short list of available regions. Then it will send requests to Azure to provision all the required resources. With everything provisioned, it runs the `postprovision` hook to process the local data and add it to an Azure Cognitive Search index.
+Next, it provisions the resources based on `main.bicep` and `main.parameters.json`. At that point, since there is no default value for the OpenAI resource location, it asks you to pick a location from a short list of available regions. Then it will send requests to Azure to provision all the required resources. With everything provisioned, it runs the `postprovision` hook to process the local data and add it to an Azure AI Search index.
 
 Finally, it looks at `azure.yaml` to determine the Azure host (Container Apps and Static Web Apps, in this case) and uploads the zip to Azure App Service. The `azd up` command is now complete, but it may take a few minutes for the app to be fully available and working after the initial deploy.
 
@@ -433,5 +434,4 @@ Here are the most common failure scenarios and solutions:
 
 1. You're getting "same resource name not allowed" conflicts. That's likely because you've run the sample multiple times and deleted the resources you've been creating each time, but are forgetting to purge them. Azure keeps resources for 48 hours unless you purge from soft delete. See [this article on purging resources](https://learn.microsoft.com/azure/cognitive-services/manage-resources?tabs=azure-portal#purge-a-deleted-resource).
 
-1. After running `azd up` and visiting the website, you see a '404 Not Found' in the browser. Wait 10 minutes and try again, as it might be still starting up. Then try running `azd deploy` and wait again. If you still encounter errors with the deployed app, consult these [tips for debugging App Service app deployments](http://blog.pamelafox.org/2023/06/tips-for-debugging-flask-deployments-to.html)
-   and file an issue if the error logs don't help you resolve the issue.
+1. After running `azd up` and visiting the website, you see a '404 Not Found' in the browser. Wait 10 minutes and try again, as it might be still starting up. Then try running `azd deploy` and wait again. If you still encounter errors with the deployed app, consult these [tips for debugging App Service app deployments](http://blog.pamelafox.org/2023/06/tips-for-debugging-flask-deployments-to.html) and file an issue if the error logs don't help you resolve the issue.
