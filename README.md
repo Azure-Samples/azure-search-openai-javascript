@@ -228,7 +228,7 @@ To then limit access to a specific set of users or groups, you can follow the st
 
 ### Additional security considerations
 
-We recommend deploying additional security mechanisms. When applicable, consider setting up a [VNet](https://learn.microsoft.com/azure/virtual-network/virtual-networks-overview) or setting up a [Proxy Policy](https://learn.microsoft.com/en-us/azure/api-management/proxy-policy).
+We recommend deploying additional security mechanisms. When applicable, consider setting up a [VNet](https://learn.microsoft.com/azure/virtual-network/virtual-networks-overview) or setting up a [Proxy Policy](https://learn.microsoft.com/azure/api-management/proxy-policy).
 
 ### Enabling CORS for an alternate frontend
 
@@ -306,7 +306,7 @@ This sample is designed to be a starting point for your own production applicati
 - **Azure AI Search**: The default search service uses the `Standard` SKU with the free semantic search option, which gives you 1000 free queries a month. Assuming your app will experience more than 1000 questions, you should either change `semanticSearch` to "standard" or disable semantic search entirely in the request options. If you see errors about search service capacity being exceeded, you may find it helpful to increase the number of replicas by changing `replicaCount` in `infra/core/search/search-services.bicep` or manually scaling it from the Azure Portal.
 - **Azure Container Apps**: The default container app setup uses 1 vCPU core and 2 GB RAM per container, with autoscaling enabled. The minimum number of replicas is set to 1, and the maximum to 10.
   You can change vCPU and RAM capacity [in the template](https://github.com/Azure-Samples/azure-search-openai-javascript/blob/main/infra/main.bicep#L144-L145), and define your own auto-scaling rules based on load.
-  For more details, read [Set scaling rules in Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/scale-app?pivots=azure-resource-manager).
+  For more details, read [Set scaling rules in Azure Container Apps](https://learn.microsoft.com/azure/container-apps/scale-app?pivots=azure-resource-manager).
 - **Authentication**: By default, the deployed app is publicly accessible.
   We recommend restricting access to authenticated users.
   See [Enabling authentication](#enabling-authentication) above for how to enable authentication.
@@ -319,7 +319,7 @@ For more details, read [Azure OpenAI Landing Zone reference architecture](https:
 ## Resources
 
 - [Revolutionize your Enterprise Data with ChatGPT: Next-gen Apps w/ Azure OpenAI and AI Search](https://aka.ms/entgptsearchblog)
-- [Azure Cognitive Search](https://learn.microsoft.com/en-us/azure/search/search-what-is-azure-search)
+- [Azure Cognitive Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search)
 - [Azure OpenAI Service](https://learn.microsoft.com/azure/cognitive-services/openai/overview)
 - [Building ChatGPT-Like Experiences with Azure: A Guide to Retrieval Augmented Generation for JavaScript applications](https://devblogs.microsoft.com/azure-sdk/building-chatgpt-like-experiences-with-azure-a-guide-to-retrieval-augmented-generation-for-javascript-applications/)
 
@@ -410,7 +410,7 @@ There is also another one /ask approach available, [using an agent](https://gith
 <details><a id="azd-up-explanation"></a>
 <summary>What does the `azd up` command do?</summary>
 
-The `azd up` command comes from the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview), and takes care of both provisioning the Azure resources and deploying code to the selected Azure hosts.
+The `azd up` command comes from the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview), and takes care of both provisioning the Azure resources and deploying code to the selected Azure hosts.
 
 The `azd up` command uses the `azure.yaml` file combined with the infrastructure-as-code `.bicep` files in the `infra/` folder. The `azure.yaml` file for this project declares several "hooks" for the prepackage step and postprovision steps. The `up` command first runs the `prepackage` hook which installs Node dependencies and builds the React.JS-based JavaScript files. It then packages all the code (both frontend and backend services) into a zip file which it will deploy later.
 
