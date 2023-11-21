@@ -22,12 +22,12 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@types/dom-speech-recognition": "^0.0.4",
     "dompurify": "^3.0.6",
     "lit": "^2.8.0",
     "marked": "^9.1.5"
   },
   "devDependencies": {
+    "@types/dom-speech-recognition": "^0.0.4",
     "@types/dompurify": "^3.0.3",
     "rimraf": "^5.0.1",
     "typescript": "^5.2.2",
