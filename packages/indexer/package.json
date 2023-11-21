@@ -40,7 +40,8 @@
     "fastify-cli": "^5.7.0",
     "fastify-plugin": "^4.0.0",
     "mime": "^3.0.0",
-    "openai": "^4.4.0"
+    "openai": "^4.4.0",
+    "pdfjs-dist": "^4.0.189"
   },
   "devDependencies": {
     "@types/mime": "^3.0.1",
