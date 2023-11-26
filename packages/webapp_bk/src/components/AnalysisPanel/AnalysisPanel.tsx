@@ -5,7 +5,7 @@ import styles from './AnalysisPanel.module.css';
 
 import { SupportingContent } from '../SupportingContent/index.js';
 import { type Message } from '../../api/index.js';
-import { AnalysisPanelTabs } from './AnalysisPanelTabs.jsx';
+import { AnalysisPanelTabs } from './AnalysisPanelTabs.js';
 
 interface Props {
   className: string;

@@ -1,0 +1,63 @@
+/* You can add global styles to this file, and also import other style files */
+:root {
+  --primary-color: #0251b2;
+  --secondary-color: #889ffa;
+  --tertiary-color: #a4d7f9;
+  --white-color: #ffffff;
+  --black-color: #000000;
+  --grey-color: #f2f2f2;
+  --dark-grey-color: #00142d;
+  --text-color: var(--dark-grey-color);
+  --light-text-color: var(--white-color);
+  --dimension-s: 10px;
+  --dimension-m: 20px;
+  --dimension-l: 50px;
+  --dimension-xl: 100px;
+  --height-bars: 70px;
+  --font-size: 1rem;
+  --font-size-m: 1.2rem;
+  --font-size-l: 1.5rem;
+  --font-size-xl: 2rem;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  font-family: 'Roboto', sans-serif;
+  color: var(--light-text-color);
+}
+
+.header {
+  height: var(--height-bars);
+  background-color: var(--black-color);
+  color: var(--white-color);
+}
+
+.header h1 {
+  font-size: var(--font-size);
+  word-wrap: break-word;
+}
+
+.header__link,
+.header__logo {
+  width: 30px;
+  height: 30px;
+}
+
+.inner-wrapper {
+  padding: var(--dimension-m);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0 var(--dimension-m);
+  max-width: 80%;
+  margin: 0 auto;
+}

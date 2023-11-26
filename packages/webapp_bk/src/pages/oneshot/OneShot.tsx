@@ -15,7 +15,7 @@ import { useState } from 'react';
 import styles from './OneShot.module.css';
 
 import { Approaches, RetrievalMode, apiBaseUrl } from '../../api/index.js';
-import { SettingsButton } from '../../components/SettingsButton/SettingsButton.jsx';
+import { SettingsButton } from '../../components/SettingsButton/SettingsButton.js';
 
 import 'chat-component';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
