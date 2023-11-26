@@ -1,4 +1,4 @@
-.example-container {
+.sidenav__wrapper {
   color: black;
   position: absolute;
   top: var(--height-bars);
@@ -7,9 +7,42 @@
   right: 0;
 }
 
+.sidenav__container {
+  width: calc(var(--dimension-xl) * 3);
+  height: 100%;
+  background-color: var(--grey-color);
+  padding: var(--dimension-m);
+}
+
 .example-events {
   width: 100%;
   height: auto;
   overflow: auto;
   border: 1px solid #555;
+}
+
+.button__button {
+  display: flex;
+  border: none;
+  background-color: transparent;
+  padding: var(--dimension-s);
+  font-size: var(--font-size-m);
+  cursor: pointer;
+  align-items: center;
+  font-size: small;
+  color: var(--text-color);
+}
+
+.button__button.settings {
+  padding: 0;
+}
+
+.button__button:hover,
+.button__button:focus {
+  opacity: 0.8;
+}
+
+.button__button .icon__img {
+  margin-right: calc(var(--dimension-s) / 2);
+  width: calc(var(--dimension-s) * 2);
 }

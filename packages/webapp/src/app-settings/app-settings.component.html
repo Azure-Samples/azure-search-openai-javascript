@@ -1,5 +1,5 @@
 <p>app-settings works!</p>
-<mat-sidenav-container class="example-container">
+<mat-sidenav-container class="sidenav__wrapper">
   <mat-sidenav
     #sidenav
     mode="side"
@@ -7,17 +7,23 @@
     (opened)="events.push('open!')"
     (closed)="events.push('close!')"
   >
-    Sidenav content
+    <div class="sidenav__container">
+      <p><mat-checkbox [(ngModel)]="opened">Stream App</mat-checkbox></p>
+    </div>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <p><mat-checkbox [(ngModel)]="opened">sidenav.opened</mat-checkbox></p>
-    <p><button mat-button (click)="sidenav.toggle()">sidenav.toggle()</button></p>
-    <p>Events:</p>
-    <div class="example-events">
-      @for (e of events; track e) {
-      <div>{{ e }}</div>
-      }
+    <div class="inner-wrapper">
+      <button class="button__button settings" title="Application Settings" (click)="sidenav.toggle()">
+        <img src="./assets/svg/gear-solid.svg?raw" alt="Settings" class="icon__img" />
+        <span>Application Settings</span>
+      </button>
+      <p>Events:</p>
+      <div class="example-events">
+        @for (e of events; track e) {
+        <div>{{ e }}</div>
+        }
+      </div>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
