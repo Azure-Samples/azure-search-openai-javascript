@@ -1,7 +1,11 @@
+import { importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config.js';
-import { AppComponent } from './app/app.component.js';
+import { provideHttpClient } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { MatNativeDateModule } from '@angular/material/core';
+import { AppSettingsComponent } from './app-settings/app-settings.component.js';
 
-bootstrapApplication(AppComponent, appConfig)
+bootstrapApplication(AppSettingsComponent, {
+  providers: [provideAnimations(), provideHttpClient(), importProvidersFrom(MatNativeDateModule)],
   // eslint-disable-next-line unicorn/prefer-top-level-await
-  .catch((error) => console.error(error));
+}).catch((error) => console.error(error));

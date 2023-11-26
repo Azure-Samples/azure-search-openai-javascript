@@ -1,0 +1,15 @@
+.example-container {
+  color: black;
+  position: absolute;
+  top: var(--height-bars);
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.example-events {
+  width: 100%;
+  height: auto;
+  overflow: auto;
+  border: 1px solid #555;
+}
