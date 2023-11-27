@@ -17,9 +17,9 @@
       <div>
         <h3>Retrieval Mode</h3>
         <mat-button-toggle-group #group="matButtonToggleGroup" aria-label="Retrieval Mode">
-          <mat-button-toggle value="{{ retrievalMode.Hybrid }}">{{ retrievalMode.Hybrid }}</mat-button-toggle>
-          <mat-button-toggle value="{{ retrievalMode.Vector }}">{{ retrievalMode.Vector }}</mat-button-toggle>
-          <mat-button-toggle value="{{ retrievalMode.Text }}">{{ retrievalMode.Text }}</mat-button-toggle>
+          <mat-button-toggle value="hybrid">Hybrid</mat-button-toggle>
+          <mat-button-toggle value="vector">Vector</mat-button-toggle>
+          <mat-button-toggle value="text">Text</mat-button-toggle>
         </mat-button-toggle-group>
         <div class="example-selected-value">Selected value: {{ group.value }}</div>
         <!-- <mat-form-field class="example-full-width">
@@ -42,7 +42,7 @@
       <p>
         <mat-form-field class="example-full-width">
           <mat-label>Retrieve this many search results</mat-label>
-          <input matInput placeholder="3" value="3" />
+          <input matNativeControl type="number" min="1" max="20" placeholder="3" value="3" />
         </mat-form-field>
       </p>
       <p>
@@ -79,10 +79,10 @@
         title="Ask anything or try an example"
         data-input-position="sticky"
         data-interaction-model="chat"
-        data-api-url="{apiBaseUrl}"
-        data-use-stream="{useStream}"
+        data-api-url="http://localhost:3000"
+        data-use-stream="true"
         data-approach="rrr"
-        data-overrides=""
+        data-overrides="{}"
       ></chat-component>
     </div>
   </mat-sidenav-content>
