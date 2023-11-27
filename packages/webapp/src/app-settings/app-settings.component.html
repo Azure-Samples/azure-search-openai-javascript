@@ -14,8 +14,15 @@
           <textarea matInput placeholder="Current prompt template"></textarea>
         </mat-form-field>
       </p>
-      <p>
-        <mat-form-field class="example-full-width">
+      <div>
+        <h3>Retrieval Mode</h3>
+        <mat-button-toggle-group #group="matButtonToggleGroup" aria-label="Retrieval Mode">
+          <mat-button-toggle value="{{ retrievalMode.Hybrid }}">{{ retrievalMode.Hybrid }}</mat-button-toggle>
+          <mat-button-toggle value="{{ retrievalMode.Vector }}">{{ retrievalMode.Vector }}</mat-button-toggle>
+          <mat-button-toggle value="{{ retrievalMode.Text }}">{{ retrievalMode.Text }}</mat-button-toggle>
+        </mat-button-toggle-group>
+        <div class="example-selected-value">Selected value: {{ group.value }}</div>
+        <!-- <mat-form-field class="example-full-width">
           <mat-label>Retrieval Mode</mat-label>
           <input
             type="text"
@@ -27,9 +34,21 @@
           />
           <mat-autocomplete #auto="matAutocomplete">
             @for (mode of selectedModes | async; track mode) {
-            <mat-mode [value]="mode">{{ mode }}</mat-mode>
+            <mat-option [value]="mode">{{ mode }}</mat-option>
             }
           </mat-autocomplete>
+        </mat-form-field> -->
+      </div>
+      <p>
+        <mat-form-field class="example-full-width">
+          <mat-label>Retrieve this many search results</mat-label>
+          <input matInput placeholder="3" value="3" />
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-form-field class="example-full-width">
+          <mat-label>Exclude category</mat-label>
+          <input matInput placeholder="Violence" value="Violence" />
         </mat-form-field>
       </p>
       <!-- <p><mat-checkbox [(ngModel)]="opened">Open</mat-checkbox></p> -->

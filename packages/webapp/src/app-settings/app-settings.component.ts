@@ -1,7 +1,5 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, type OnInit } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
-import type { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import 'chat-component';
 import { RetrievalMode, Approaches, type Settings } from '../types/index.js';
 @Component({
@@ -23,6 +22,7 @@ import { RetrievalMode, Approaches, type Settings } from '../types/index.js';
     MatAutocompleteModule,
     MatButtonModule,
     MatInputModule,
+    MatButtonToggleModule,
     ReactiveFormsModule,
     AsyncPipe,
   ],
@@ -30,12 +30,9 @@ import { RetrievalMode, Approaches, type Settings } from '../types/index.js';
   styleUrl: './app-settings.component.css',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class AppSettingsComponent implements OnInit {
+export class AppSettingsComponent {
   events: string[] = [];
   opened: boolean = false;
-  retrievalModes: string[] = [RetrievalMode.Hybrid, RetrievalMode.Vectors, RetrievalMode.Text];
-  approaches: string[] = [Approaches.RetrieveThenRead, Approaches.ReadRetrieveRead, Approaches.ReadDecomposeAsk];
-  selectedModes: Observable<string[]> | undefined;
   settingsDefaults: Settings = {
     panelLabel: 'App Settings',
     panelTitle: 'Configure answer generation',
@@ -48,21 +45,11 @@ export class AppSettingsComponent implements OnInit {
     top: 3,
     temperature: 0.5,
     streaming: true,
-    retrievalMode: this.retrievalModes[0],
-    approach: this.approaches[0],
+    retrievalMode: RetrievalMode.Hybrid,
+    approach: Approaches.RetrieveThenRead,
   };
   retrievalModeControl = new FormControl('');
+  retrievalMode?: RetrievalMode;
   approachControl = new FormControl('');
   darkModeControl = new FormControl('');
-  ngOnInit(): void {
-    this.selectedModes = this.retrievalModeControl.valueChanges.pipe(
-      startWith(''),
-      map((value) => this._filter(value)),
-    );
-  }
-
-  private _filter(value: string | null): string[] {
-    const filterValue = (value ?? '').toLowerCase();
-    return this.retrievalModes.filter((mode) => mode.toLowerCase().includes(filterValue));
-  }
 }
