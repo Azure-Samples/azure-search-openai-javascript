@@ -16,14 +16,22 @@
     <div class="inner-wrapper">
       <button class="button__button settings" title="Application Settings" (click)="sidenav.toggle()">
         <img src="./assets/svg/gear-solid.svg?raw" alt="Settings" class="icon__img" />
-        <span>Application Settings</span>
+        <span>{{ panelLabel }}</span>
       </button>
-      <p>Events:</p>
-      <div class="example-events">
+      <!--       <div class="example-events">
         @for (e of events; track e) {
         <div>{{ e }}</div>
         }
-      </div>
+      </div> -->
+      <chat-component
+        title="Ask anything or try an example"
+        data-input-position="sticky"
+        data-interaction-model="chat"
+        data-api-url="{apiBaseUrl}"
+        data-use-stream="{useStream}"
+        data-approach="rrr"
+        data-overrides=""
+      ></chat-component>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
