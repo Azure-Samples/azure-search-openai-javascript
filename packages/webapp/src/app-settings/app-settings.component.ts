@@ -9,7 +9,6 @@ import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import 'chat-component';
-import { environment } from '../environments/environment.js';
 import { RetrievalMode, Approaches, type Settings } from '../types/index.js';
 @Component({
   selector: 'app-app-settings',
@@ -34,7 +33,6 @@ import { RetrievalMode, Approaches, type Settings } from '../types/index.js';
 export class AppSettingsComponent {
   events: string[] = [];
   opened: boolean = false;
-  apiBaseUrl: string = environment.apiBaseUrl;
   settingsDefaults: Settings = {
     panelLabel: 'App Settings',
     panelTitle: 'Configure answer generation',
@@ -51,7 +49,4 @@ export class AppSettingsComponent {
     approach: Approaches.RetrieveThenRead,
   };
   retrievalModeControl = new FormControl('');
-  retrievalMode?: RetrievalMode;
-  approachControl = new FormControl('');
-  darkModeControl = new FormControl('');
 }

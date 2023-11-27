@@ -48,12 +48,20 @@
 }
 
 .button__button.settings {
-  padding: 0;
+  border: 1px solid grey;
+  padding: 0 20px;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.6);
 }
 
 .button__button:hover,
 .button__button:focus {
   opacity: 0.8;
+}
+
+.button__button:active {
+  opacity: 1;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
 .button__button .icon__img {
