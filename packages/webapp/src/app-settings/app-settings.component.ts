@@ -50,6 +50,7 @@ export class AppSettingsComponent {
   approach: string = Approaches.ReadRetrieveRead;
   interactionModel: string = 'chat';
   streaming: boolean = true;
+  title: string = 'Ask anything or try an example';
 
   settingsDefaults: Settings = {
     panelLabel: 'App Settings',
