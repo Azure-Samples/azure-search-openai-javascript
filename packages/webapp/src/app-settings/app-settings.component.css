@@ -1,0 +1,83 @@
+.sidenav__wrapper {
+  color: black;
+  position: absolute;
+  top: var(--height-bars);
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.sidenav__container {
+  width: calc(var(--dimension-xl) * 3);
+  height: 100%;
+  background-color: var(--grey-color);
+  padding: var(--dimension-m);
+}
+
+.sidenav__hl {
+  padding: var(--dimension-s) 0;
+}
+
+.example-events {
+  width: 100%;
+  height: auto;
+  overflow: auto;
+  border: 1px solid #555;
+}
+
+.button__button {
+  display: flex;
+  border: none;
+  background-color: transparent;
+  padding: var(--dimension-s);
+  font-size: var(--font-size-m);
+  cursor: pointer;
+  align-items: center;
+  font-size: small;
+  color: var(--text-color);
+}
+
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+.button__button.settings {
+  border: 1px solid grey;
+  padding: 0 20px;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.6);
+}
+
+.button__button:hover,
+.button__button:focus {
+  opacity: 0.8;
+}
+
+.button__button:active {
+  opacity: 1;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.button__button .icon__img {
+  margin-right: calc(var(--dimension-s) / 2);
+  width: calc(var(--dimension-s) * 2);
+}
+
+.sidenav__container p {
+  padding: var(--dimension-s) 0;
+  font-size: small;
+}
+
+mat-checkbox .mdc-form-field {
+  align-items: top;
+}
+
+mat-checkbox .mdc-checkbox {
+  margin-right: var(--dimension-s);
+}

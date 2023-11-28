@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap');
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+:root {
+  --primary-color: #0251b2;
+  --secondary-color: #889ffa;
+  --tertiary-color: #a4d7f9;
+  --white-color: #ffffff;
+  --black-color: #000000;
+  --grey-color: #f2f2f2;
+  --dark-grey-color: #00142d;
+  --text-color: var(--dark-grey-color);
+  --light-text-color: var(--white-color);
+  --dimension-s: 10px;
+  --dimension-m: 20px;
+  --dimension-l: 50px;
+  --dimension-xl: 100px;
+  --height-bars: 70px;
+  --font-size: 1rem;
+  --font-size-m: 1.2rem;
+  --font-size-l: 1.5rem;
+  --font-size-xl: 2rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+}
+
+html,
+body {
+  font-family: 'Roboto', sans-serif;
+  color: var(--light-text-color);
+}
+
+.header {
+  height: var(--height-bars);
+  background-color: var(--black-color);
+  color: var(--white-color);
+}
+
+.header h1 {
+  font-size: var(--font-size);
+  word-wrap: break-word;
+}
+
+.header__link,
+.icon__img {
+  width: 30px;
+  height: 30px;
+  display: block;
+}
+
+.inner-wrapper {
+  display: block;
+  height: 100%;
+  padding: 0 var(--dimension-m);
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+.inner-wrapper.flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
