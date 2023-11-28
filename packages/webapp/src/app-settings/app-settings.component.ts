@@ -5,7 +5,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import 'chat-component';
@@ -31,27 +31,7 @@ import { RetrievalMode, Approaches, type Settings, type AskRequestOverrides } fr
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AppSettingsComponent {
-  events: string[] = [];
   opened: boolean = false;
-  // Data attribute bindings
-  inputPosition: string = 'sticky';
-  dataOverrides: AskRequestOverrides = {
-    retrievalMode: RetrievalMode.Hybrid,
-    top: 3,
-    useSemanticRanker: true,
-    useSemanticCaptions: false,
-    excludeCategory: '',
-    promptTemplate: '',
-    promptTemplatePrefix: '',
-    promptTemplateSuffix: '',
-    suggestFollowupQuestions: true,
-  };
-  overrides = JSON.stringify(this.dataOverrides, undefined, 2);
-  approach: string = Approaches.ReadRetrieveRead;
-  interactionModel: string = 'chat';
-  streaming: boolean = true;
-  title: string = 'Ask anything or try an example';
-
   settingsDefaults: Settings = {
     panelLabel: 'App Settings',
     panelTitle: 'Configure answer generation',
@@ -67,5 +47,22 @@ export class AppSettingsComponent {
     retrievalMode: RetrievalMode.Hybrid,
     approach: Approaches.RetrieveThenRead,
   };
-  retrievalModeControl = new FormControl('');
+  // Data attribute bindings
+  inputPosition: string = 'sticky';
+  dataOverrides: AskRequestOverrides = {
+    retrievalMode: this.settingsDefaults.retrievalMode,
+    top: this.settingsDefaults.top,
+    useSemanticRanker: this.settingsDefaults.semanticRanker,
+    useSemanticCaptions: this.settingsDefaults.semanticCaptions,
+    excludeCategory: '',
+    promptTemplate: '',
+    promptTemplatePrefix: '',
+    promptTemplateSuffix: '',
+    suggestFollowupQuestions: this.settingsDefaults.followUpQuestions,
+  };
+  overrides = JSON.stringify(this.dataOverrides, undefined, 2);
+  approach: string = Approaches.ReadRetrieveRead;
+  interactionModel: string = 'chat';
+  streaming: boolean = true;
+  title: string = 'Ask anything or try an example';
 }

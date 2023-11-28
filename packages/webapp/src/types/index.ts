@@ -38,7 +38,7 @@ export type Settings = {
   overridePromptTemplatePrefix?: AskRequestOverrides['promptTemplatePrefix'];
   overridePromptTemplateSuffix?: AskRequestOverrides['promptTemplateSuffix'];
   excludeCategory?: AskRequestOverrides['excludeCategory'];
-  retrievalMode?: string;
+  retrievalMode?: RetrievalMode;
   followUpQuestions?: AskRequestOverrides['suggestFollowupQuestions'];
   semanticRanker?: AskRequestOverrides['useSemanticRanker'];
   semanticCaptions?: AskRequestOverrides['useSemanticCaptions'];
