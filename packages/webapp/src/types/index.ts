@@ -12,14 +12,15 @@ export const enum RetrievalMode {
 
 export type AskRequestOverrides = {
   retrievalMode?: RetrievalMode;
-  semanticRanker?: boolean;
-  semanticCaptions?: boolean;
+  useSemanticRanker?: boolean;
+  useSemanticCaptions?: boolean;
   excludeCategory?: string;
   top?: number;
   temperature?: number;
   promptTemplate?: string;
   promptTemplatePrefix?: string;
   promptTemplateSuffix?: string;
+  suggestFollowupQuestions?: boolean;
 };
 
 export type AskRequest = {
@@ -38,9 +39,9 @@ export type Settings = {
   overridePromptTemplateSuffix?: AskRequestOverrides['promptTemplateSuffix'];
   excludeCategory?: AskRequestOverrides['excludeCategory'];
   retrievalMode?: string;
-  followUpQuestions?: boolean;
-  semanticRanker?: AskRequestOverrides['semanticRanker'];
-  semanticCaptions?: AskRequestOverrides['semanticCaptions'];
+  followUpQuestions?: AskRequestOverrides['suggestFollowupQuestions'];
+  semanticRanker?: AskRequestOverrides['useSemanticRanker'];
+  semanticCaptions?: AskRequestOverrides['useSemanticCaptions'];
   top?: AskRequestOverrides['top'];
   temperature?: AskRequestOverrides['temperature'];
   approach?: string;

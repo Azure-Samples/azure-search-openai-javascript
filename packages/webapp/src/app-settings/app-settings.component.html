@@ -76,13 +76,13 @@
         }
       </div> -->
       <chat-component
-        title="Ask anything or try an example"
-        data-input-position="sticky"
-        data-interaction-model="chat"
-        data-api-url=""
-        data-use-stream="true"
-        data-approach="rrr"
-        data-overrides='{"retrievalMode":"hybrid","top":3,"useSemanticRanker":true,"useSemanticCaptions":false,"excludeCategory":"","promptTemplate":"","promptTemplatePrefix":"","promptTemplateSuffix":"","suggestFollowupQuestions":true}'
+        [title]=""
+        [attr.data-input-position]="inputPosition"
+        [attr.data-interaction-model]="interactionModel"
+        [attr.data-api-url]=""
+        [attr.data-use-stream]="streaming"
+        [attr.data-approach]="approach"
+        [attr.data-overrides]="overrides"
       ></chat-component>
     </div>
   </mat-sidenav-content>

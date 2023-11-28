@@ -9,7 +9,7 @@ import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import 'chat-component';
-import { RetrievalMode, Approaches, type Settings } from '../types/index.js';
+import { RetrievalMode, Approaches, type Settings, type AskRequestOverrides } from '../types/index.js';
 @Component({
   selector: 'app-app-settings',
   standalone: true,
@@ -33,6 +33,24 @@ import { RetrievalMode, Approaches, type Settings } from '../types/index.js';
 export class AppSettingsComponent {
   events: string[] = [];
   opened: boolean = false;
+  // Data attribute bindings
+  inputPosition: string = 'sticky';
+  dataOverrides: AskRequestOverrides = {
+    retrievalMode: RetrievalMode.Hybrid,
+    top: 3,
+    useSemanticRanker: true,
+    useSemanticCaptions: false,
+    excludeCategory: '',
+    promptTemplate: '',
+    promptTemplatePrefix: '',
+    promptTemplateSuffix: '',
+    suggestFollowupQuestions: true,
+  };
+  overrides = JSON.stringify(this.dataOverrides, undefined, 2);
+  approach: string = Approaches.ReadRetrieveRead;
+  interactionModel: string = 'chat';
+  streaming: boolean = true;
+
   settingsDefaults: Settings = {
     panelLabel: 'App Settings',
     panelTitle: 'Configure answer generation',
