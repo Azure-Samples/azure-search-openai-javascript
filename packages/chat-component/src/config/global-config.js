@@ -34,6 +34,9 @@ const globalConfig = {
   SUPPORT_CONTEXT_LABEL: 'Support Context',
   CITATIONS_LABEL: 'Learn More:',
   CITATIONS_TAB_LABEL: 'Citations',
+  SHOW_CHAT_HISTORY_LABEL: 'Show Chat History',
+  HIDE_CHAT_HISTORY_LABEL: 'Hide Chat History',
+  CHAT_HISTORY_FOOTER_TEXT: 'Showing past 5 conversations',
 };
 
 const teaserListTexts = {
