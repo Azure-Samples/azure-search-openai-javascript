@@ -1,17 +1,18 @@
 import { createReader, ChatResponseError } from '../../utils/index.js';
 import { createReader, readStream } from '../stream/index.js';
+import { produce } from 'immer';
 
 export async function parseStreamedMessages({
-  chatThread,
+  chatEntry,
   apiResponseBody,
   signal,
   onChunkRead: onVisit,
   onCancel,
 }: {
-  chatThread: ChatThreadEntry[];
+  chatEntry: ChatThreadEntry;
   apiResponseBody: ReadableStream<Uint8Array> | null;
   signal: AbortSignal;
-  onChunkRead: () => void;
+  onChunkRead: (updated: ChatThreadEntry) => void;
   onCancel: () => void;
 }) {
   const reader = createReader(apiResponseBody);
@@ -26,15 +27,16 @@ export async function parseStreamedMessages({
   let followUpQuestionIndex = 0;
   let stepIndex = 0;
   let textBlockIndex = 0;
-  const result = {
-    data_points: [] as string[],
-    thoughts: '',
+
+  let updatedEntry = chatEntry;
+  const updateEntry = (updater: (entry: ChatThreadEntry) => void) => {
+    updatedEntry = produce(updatedEntry, updater);
   };
 
   for await (const chunk of chunks) {
     if (signal.aborted) {
       onCancel();
-      return result;
+      return;
     }
 
     if (chunk.error) {
@@ -49,8 +51,10 @@ export async function parseStreamedMessages({
 
     const { content, context } = chunk.choices[0].delta;
     if (context?.data_points) {
-      result.data_points = context.data_points ?? [];
-      result.thoughts = context.thoughts ?? '';
+      updateEntry((entry) => {
+        entry.dataPoints = context.data_points ?? [];
+        entry.thoughts = context.thoughts ?? '';
+      });
       continue;
     }
     let chunkValue = content ?? '';
@@ -125,52 +129,48 @@ export async function parseStreamedMessages({
 
     // if we are at the beginning of a step, we need to remove the step number and dot from the chunk value
     // we simply clear the current chunk value
-    if (matchedStepIndex || isProcessingStep || isFollowupQuestion) {
-      if (matchedStepIndex) {
-        chunkValue = '';
+    updateEntry((entry) => {
+      if (matchedStepIndex || isProcessingStep || isFollowupQuestion) {
+        if (matchedStepIndex) {
+          chunkValue = '';
+        }
+        // set the step index that is needed to update the correct step entry
+        stepIndex = matchedStepIndex ? Number(matchedStepIndex) - 1 : stepIndex;
+
+        updateFollowingStepOrFollowupQuestionEntry({
+          chunkValue,
+          textBlockIndex,
+          stepIndex,
+          isFollowupQuestion,
+          followUpQuestionIndex,
+          chatEntry: entry,
+        });
+
+        if (isLastStep) {
+          // we reached the end of the last step. Reset all flags and counters
+          isProcessingStep = false;
+          isLastStep = false;
+          isFollowupQuestion = false;
+          stepIndex = 0;
+
+          // when we reach the end of a series of steps, we have to increment the text block index
+          // so that we start process the next text block
+          textBlockIndex++;
+        }
+      } else {
+        updateTextEntry({ chunkValue, textBlockIndex, chatEntry: entry });
       }
-      // set the step index that is needed to update the correct step entry
-      stepIndex = matchedStepIndex ? Number(matchedStepIndex) - 1 : stepIndex;
-      updateFollowingStepOrFollowupQuestionEntry({
-        chunkValue,
-        textBlockIndex,
-        stepIndex,
-        isFollowupQuestion,
-        followUpQuestionIndex,
-        chatThread,
-      });
+      const citations = parseCitations(streamedMessageRaw.join(''));
+      updateCitationsEntry({ citations, chatEntry: entry });
+    });
 
-      if (isLastStep) {
-        // we reached the end of the last step. Reset all flags and counters
-        isProcessingStep = false;
-        isLastStep = false;
-        isFollowupQuestion = false;
-        stepIndex = 0;
-
-        // when we reach the end of a series of steps, we have to increment the text block index
-        // so that we start process the next text block
-        textBlockIndex++;
-      }
-    } else {
-      updateTextEntry({ chunkValue, textBlockIndex, chatThread });
-    }
-    const citations = parseCitations(streamedMessageRaw.join(''));
-    updateCitationsEntry({ citations, chatThread });
-
-    onVisit();
+    onVisit(updatedEntry);
   }
-  return result;
 }
 
 // update the citations entry and wrap the citations in a sup tag
-export function updateCitationsEntry({
-  citations,
-  chatThread,
-}: {
-  citations: Citation[];
-  chatThread: ChatThreadEntry[];
-}) {
-  const lastMessageEntry = chatThread.at(-1);
+export function updateCitationsEntry({ citations, chatEntry }: { citations: Citation[]; chatEntry: ChatThreadEntry }) {
+  const lastMessageEntry = chatEntry;
   const updateCitationReference = (match, capture) => {
     const citation = citations.find((citation) => citation.text === capture);
     if (citation) {
@@ -217,13 +217,13 @@ export function parseCitations(inputText: string): Citation[] {
 export function updateTextEntry({
   chunkValue,
   textBlockIndex,
-  chatThread,
+  chatEntry,
 }: {
   chunkValue: string;
   textBlockIndex: number;
-  chatThread: ChatThreadEntry[];
+  chatEntry: ChatThreadEntry;
 }) {
-  const { text: lastChatMessageTextEntry } = chatThread.at(-1) as ChatThreadEntry;
+  const { text: lastChatMessageTextEntry } = chatEntry;
 
   if (!lastChatMessageTextEntry[textBlockIndex]) {
     lastChatMessageTextEntry[textBlockIndex] = {
@@ -241,17 +241,17 @@ export function updateFollowingStepOrFollowupQuestionEntry({
   stepIndex,
   isFollowupQuestion,
   followUpQuestionIndex,
-  chatThread,
+  chatEntry,
 }: {
   chunkValue: string;
   textBlockIndex: number;
   stepIndex: number;
   isFollowupQuestion: boolean;
   followUpQuestionIndex: number;
-  chatThread: ChatThreadEntry[];
+  chatEntry: ChatThreadEntry;
 }) {
   // following steps and followup questions are treated the same way. They are just stored in different arrays
-  const { followupQuestions, text: lastChatMessageTextEntry } = chatThread.at(-1) as ChatThreadEntry;
+  const { followupQuestions, text: lastChatMessageTextEntry } = chatEntry;
   if (isFollowupQuestion && followupQuestions) {
     followupQuestions[followUpQuestionIndex] = (followupQuestions[followUpQuestionIndex] || '') + chunkValue;
     return;
