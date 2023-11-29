@@ -124,22 +124,24 @@ export class ChatController implements ReactiveController {
 
     // Check if message is a bot message to process citations and follow-up questions
 
-    let messageToUpdate = response;
-
-    if (!useStream && !isUserMessage && typeof response !== 'string') {
-      const generatedResponse = (response as BotResponse).choices[0].message;
+    if (isUserMessage || typeof response === 'string') {
+      await updateChatWithMessageOrChunk(response, false);
+    } else if (useStream) {
+      await updateChatWithMessageOrChunk(response, true);
+    } else {
       // non-streamed response
+      const generatedResponse = (response as BotResponse).choices[0].message;
       const processedText = processText(generatedResponse.content, [citations, followingSteps, followupQuestions]);
-      messageToUpdate = processedText.replacedText;
+      const messageToUpdate = processedText.replacedText;
       // Push all lists coming from processText to the corresponding arrays
       citations.push(...(processedText.arrays[0] as unknown as Citation[]));
       followingSteps.push(...(processedText.arrays[1] as string[]));
       followupQuestions.push(...(processedText.arrays[2] as string[]));
       thoughts = generatedResponse.context?.thoughts ?? '';
       dataPoints = generatedResponse.context?.data_points ?? [];
-    }
 
-    await updateChatWithMessageOrChunk(messageToUpdate, !isUserMessage && useStream);
+      await updateChatWithMessageOrChunk(messageToUpdate, false);
+    }
   }
 
   async generateAnswer(requestOptions: ChatRequestOptions, httpOptions: ChatHttpOptions) {
@@ -147,14 +149,15 @@ export class ChatController implements ReactiveController {
 
     if (question) {
       try {
-        this.processingMessage = undefined;
         this.generatingAnswer = true;
-        this.isAwaitingResponse = true;
 
         // for chat messages, process user question as a chat entry
         if (requestOptions.type === 'chat') {
           await this.processResponse(question, true, false);
         }
+
+        this.isAwaitingResponse = true;
+        this.processingMessage = undefined;
 
         const response = (await getAPIResponse(requestOptions, httpOptions)) as BotResponse;
         this.isAwaitingResponse = false;
