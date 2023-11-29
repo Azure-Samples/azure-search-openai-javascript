@@ -15,6 +15,7 @@ import iconDelete from '../../public/svg/delete-icon.svg?raw';
 import iconCancel from '../../public/svg/cancel-icon.svg?raw';
 import iconSend from '../../public/svg/send-icon.svg?raw';
 import iconClose from '../../public/svg/close-icon.svg?raw';
+import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 
 import './loading-indicator.js';
 import './voice-input-button.js';
@@ -26,6 +27,7 @@ import './chat-thread-component.js';
 import './chat-action-button.js';
 import { type TabContent } from './tab-component.js';
 import { ChatController } from './chat-controller.js';
+import { ChatHistoryController } from './chat-history-controller.js';
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -78,6 +80,7 @@ export class ChatComponent extends LitElement {
   isResetInput = false;
 
   private chatController = new ChatController(this);
+  private chatHistoryController = new ChatHistoryController(this);
 
   // Is showing thought process panel
   @state()
@@ -155,6 +158,10 @@ export class ChatComponent extends LitElement {
         stream: this.useStream,
       },
     );
+
+    if (this.interactionModel === 'chat') {
+      this.chatHistoryController.saveChatHistory(this.chatThread);
+    }
   }
 
   // Reset the input field and the current question
@@ -173,6 +180,8 @@ export class ChatComponent extends LitElement {
     this.isDefaultPromptsEnabled = true;
     this.selectedCitation = undefined;
     this.chatController.reset();
+    // clean up the current session content from the history too
+    this.chatHistoryController.saveChatHistory(this.chatThread);
     this.collapseAside(event);
     this.handleUserChatCancel(event);
   }
@@ -309,6 +318,27 @@ export class ChatComponent extends LitElement {
     }
   }
 
+  renderChatThread(chatThread: ChatThreadEntry[]) {
+    return html`<chat-thread-component
+      .chatThread="${chatThread}"
+      .actionButtons="${[
+        {
+          id: 'chat-show-thought-process',
+          label: globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT,
+          svgIcon: iconLightBulb,
+          isDisabled: this.isShowingThoughtProcess,
+        },
+      ] as any}"
+      .isDisabled="${this.isDisabled}"
+      .isProcessingResponse="${this.chatController.isProcessingResponse}"
+      .selectedCitation="${this.selectedCitation}"
+      @on-action-button-click="${this.handleChatEntryActionButtonClick}"
+      @on-citation-click="${this.handleCitationClick}"
+      @on-followup-click="${this.handleQuestionInputClick}"
+    >
+    </chat-thread-component>`;
+  }
+
   // Render the chat component as a web component
   override render() {
     return html`
@@ -318,6 +348,7 @@ export class ChatComponent extends LitElement {
           ${this.isChatStarted
             ? html`
                 <div class="chat__header">
+                  ${this.interactionModel === 'chat' ? this.chatHistoryController.renderHistoryButton() : ''}
                   <chat-action-button
                     .label="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
                     actionId="chat-reset-button"
@@ -326,24 +357,15 @@ export class ChatComponent extends LitElement {
                   >
                   </chat-action-button>
                 </div>
-                <chat-thread-component
-                  .chatThread="${this.chatThread}"
-                  .actionButtons="${[
-                    {
-                      id: 'chat-show-thought-process',
-                      label: globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT,
-                      svgIcon: iconLightBulb,
-                      isDisabled: this.isShowingThoughtProcess,
-                    },
-                  ] as any}"
-                  .isDisabled="${this.isDisabled}"
-                  .isProcessingResponse="${this.chatController.isProcessingResponse}"
-                  .selectedCitation="${this.selectedCitation}"
-                  @on-action-button-click="${this.handleChatEntryActionButtonClick}"
-                  @on-citation-click="${this.handleCitationClick}"
-                  @on-followup-click="${this.handleQuestionInputClick}"
-                >
-                </chat-thread-component>
+                ${this.chatHistoryController.showChatHistory
+                  ? html`<div class="chat-history__container">
+                      ${this.renderChatThread(this.chatHistoryController.chatHistory)}
+                      <div class="chat-history__footer">
+                        ${unsafeSVG(iconUp)} ${globalConfig.CHAT_HISTORY_FOOTER_TEXT} ${unsafeSVG(iconUp)}
+                      </div>
+                    </div>`
+                  : ''}
+                ${this.renderChatThread(this.chatThread)}
               `
             : ''}
           ${this.chatController.isAwaitingResponse

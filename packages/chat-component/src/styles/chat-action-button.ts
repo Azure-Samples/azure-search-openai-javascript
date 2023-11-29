@@ -50,6 +50,7 @@ export const styles = css`
   svg {
     fill: currentColor;
     width: 20px;
+    height: 20px;
     padding: 3px;
   }
   button:hover > span,
