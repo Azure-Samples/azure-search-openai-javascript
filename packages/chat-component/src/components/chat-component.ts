@@ -7,6 +7,7 @@ import { chatHttpOptions, globalConfig, teaserListTexts, requestOptions } from '
 import { chatStyle } from '../styles/chat-component.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { produce } from 'immer';
+import { chatEntryToString } from '../utils/index.js';
 
 // TODO: allow host applications to customize these icons
 
@@ -130,6 +131,27 @@ export class ChatComponent extends LitElement {
     }
   }
 
+  getMessageContext(): Message[] {
+    if (this.interactionModel === 'ask') {
+      return [];
+    }
+
+    const history = [
+      ...this.chatThread,
+      // include the history from the previous session if the user has enabled the chat history
+      ...(this.chatHistoryController.showChatHistory ? this.chatHistoryController.chatHistory : []),
+    ];
+
+    const messages: Message[] = history.map((entry) => {
+      return {
+        content: chatEntryToString(entry),
+        role: entry.isUserMessage ? 'user' : 'assistant',
+      };
+    });
+
+    return messages;
+  }
+
   // Handle the click on the chat button and send the question to the API
   async handleUserChatSubmit(event: Event): Promise<void> {
     event.preventDefault();
@@ -148,6 +170,7 @@ export class ChatComponent extends LitElement {
         },
         question,
         type: this.interactionModel,
+        messages: this.getMessageContext(),
       },
       {
         // use defaults
