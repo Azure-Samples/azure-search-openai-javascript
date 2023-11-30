@@ -165,7 +165,6 @@ export class ChatComponent extends LitElement {
     const question = DOMPurify.sanitize(this.questionInput.value);
     this.isChatStarted = true;
     this.isDefaultPromptsEnabled = false;
-    this.questionInput.value = '';
 
     await this.chatController.generateAnswer(
       {
@@ -191,6 +190,9 @@ export class ChatComponent extends LitElement {
     if (this.interactionModel === 'chat') {
       this.chatHistoryController.saveChatHistory(this.chatThread);
     }
+
+    this.questionInput.value = '';
+    this.isResetInput = false;
   }
 
   // Reset the input field and the current question
