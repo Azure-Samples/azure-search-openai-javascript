@@ -377,7 +377,9 @@ export class ChatComponent extends LitElement {
           ${this.isChatStarted
             ? html`
                 <div class="chat__header">
-                  ${this.interactionModel === 'chat' ? this.chatHistoryController.renderHistoryButton() : ''}
+                  ${this.interactionModel === 'chat'
+                    ? this.chatHistoryController.renderHistoryButton({ disabled: this.isDisabled })
+                    : ''}
                   <chat-action-button
                     .label="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
                     actionId="chat-reset-button"
