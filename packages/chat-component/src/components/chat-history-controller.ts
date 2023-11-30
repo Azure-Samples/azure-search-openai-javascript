@@ -64,12 +64,13 @@ export class ChatHistoryController implements ReactiveController {
     this.showChatHistory = !this.showChatHistory;
   }
 
-  renderHistoryButton() {
+  renderHistoryButton(options: { disabled: boolean } | undefined) {
     return html`
       <chat-action-button
         .label="${this.showChatHistory ? globalConfig.HIDE_CHAT_HISTORY_LABEL : globalConfig.SHOW_CHAT_HISTORY_LABEL}"
         actionId="chat-history-button"
         @click="${(event) => this.handleChatHistoryButtonClick(event)}"
+        .isDisabled="${options?.disabled}"
         .svgIcon="${this.showChatHistory ? iconHistoryDismiss : iconHistory}"
       >
       </chat-action-button>
