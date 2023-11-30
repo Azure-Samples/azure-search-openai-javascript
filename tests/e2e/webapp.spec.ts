@@ -45,6 +45,9 @@ test.describe('default', () => {
       await expect(userMessage.nth(0)).toHaveText(firstQuestionText);
 
       await expect(defaultQuestions).toHaveCount(0);
+
+      // make sure chat history is available for chat interaction mode
+      await expect(page.getByTestId('chat-history-button')).toBeVisible();
     });
 
     // make sure the response is formatted as list items
@@ -108,6 +111,9 @@ test.describe('default', () => {
       // expect some response
       await expect(page.locator('.chat__txt--entry')).not.toHaveText('');
       await expect(defaultQuestions).toHaveCount(0);
+
+      // make sure chat history is not available for ask interaction mode
+      await expect(page.getByTestId('chat-history-button')).not.toBeVisible();
     });
 
     await test.step('Reset chat', async () => {
@@ -131,6 +137,67 @@ test.describe('default', () => {
     await page.getByTestId('submit-question-button').click();
     await expect(page.getByTestId('loading-indicator')).toBeVisible();
     await expect(page.getByTestId('question-input')).not.toBeEnabled();
+  });
+
+  test('chat history', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('default-question').nth(0).click();
+
+    await page.routeFromHAR('./tests/e2e/hars/default-chat-response-stream.har', {
+      url: '/chat',
+      update: false,
+      updateContent: 'embed',
+    });
+
+    await page.getByTestId('submit-question-button').click();
+    // wait for the thought process button to be enabled.
+    await expect(page.getByTestId('chat-show-thought-process')).toBeEnabled({ timeout: 30_000 });
+
+    await test.step('new chat history', async () => {
+      await expect(page.locator('.chat-history__container')).not.toBeVisible();
+      await expect(page.getByTestId('chat-history-button')).toHaveText('Show Chat History');
+
+      await page.getByTestId('chat-history-button').click();
+
+      await expect(page.getByTestId('chat-history-button')).toHaveText('Hide Chat History');
+      await expect(page.locator('.chat-history__container')).toBeVisible();
+
+      // no history in the past yet
+      const chatHistory = page.locator('.chat-history__container .chat__listItem');
+      await expect(chatHistory).toHaveCount(0);
+    });
+
+    const currentChat = page.locator('.chat__txt--entry').nth(-1);
+    const lastChatText = await currentChat.textContent();
+
+    const currentUserMessage = page.locator('.chat__txt.user-message').nth(-1);
+    const lastChatUserMessageText = await currentUserMessage.textContent();
+
+    await test.step('chat history after chat', async () => {
+      // ask another question to get a new thread
+      await page.goto('/');
+      await page.getByTestId('question-input').fill(`testing chat history`);
+
+      await page.getByTestId('submit-question-button').click();
+      // wait for the thought process button to be enabled.
+      await expect(page.getByTestId('chat-show-thought-process')).toBeEnabled({ timeout: 30_000 });
+
+      await page.getByTestId('chat-history-button').click();
+
+      // should show the last two last conversation
+      const chatHistory = page.locator('.chat-history__container .chat__listItem');
+      await expect(chatHistory).toHaveCount(2);
+
+      // check that the last session's chat matches in the one in chat history
+      // which is different from current session's chat
+      const previousChatUserMessage = chatHistory.nth(0).locator('.chat__txt.user-message').nth(-1);
+      await expect(currentUserMessage).not.toHaveText(lastChatUserMessageText);
+      await expect(previousChatUserMessage).toHaveText(lastChatUserMessageText);
+
+      const previousChatLastItem = chatHistory.nth(-1).locator('.chat__txt--entry').nth(-1);
+      await expect(currentChat).not.toHaveText(lastChatText);
+      await expect(previousChatLastItem).toHaveText(lastChatText);
+    });
   });
 });
 
