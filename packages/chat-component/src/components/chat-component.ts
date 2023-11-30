@@ -3,7 +3,13 @@ import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { chatHttpOptions, globalConfig, teaserListTexts, requestOptions } from '../config/global-config.js';
+import {
+  chatHttpOptions,
+  globalConfig,
+  teaserListTexts,
+  requestOptions,
+  MAX_CHAT_HISTORY,
+} from '../config/global-config.js';
 import { chatStyle } from '../styles/chat-component.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { produce } from 'immer';
@@ -384,7 +390,12 @@ export class ChatComponent extends LitElement {
                   ? html`<div class="chat-history__container">
                       ${this.renderChatThread(this.chatHistoryController.chatHistory)}
                       <div class="chat-history__footer">
-                        ${unsafeSVG(iconUp)} ${globalConfig.CHAT_HISTORY_FOOTER_TEXT} ${unsafeSVG(iconUp)}
+                        ${unsafeSVG(iconUp)}
+                        ${globalConfig.CHAT_HISTORY_FOOTER_TEXT.replace(
+                          globalConfig.CHAT_MAX_COUNT_TAG,
+                          MAX_CHAT_HISTORY,
+                        )}
+                        ${unsafeSVG(iconUp)}
                       </div>
                     </div>`
                   : ''}
