@@ -31,7 +31,8 @@ export class ChatHistoryController implements ReactiveController {
   hostConnected() {
     const chatHistory = localStorage.getItem(ChatHistoryController.CHATHISTORY_ID);
     if (chatHistory) {
-      const history = JSON.parse(chatHistory);
+      // decode base64 string and then parse it
+      const history = JSON.parse(atob(chatHistory));
 
       // find last 5 user messages indexes
       const lastUserMessagesIndexes = history
@@ -56,7 +57,8 @@ export class ChatHistoryController implements ReactiveController {
 
   saveChatHistory(currentChat: ChatThreadEntry[]): void {
     const newChatHistory = [...this.chatHistory, ...currentChat];
-    localStorage.setItem(ChatHistoryController.CHATHISTORY_ID, JSON.stringify(newChatHistory));
+    // encode to base64 string and then save it
+    localStorage.setItem(ChatHistoryController.CHATHISTORY_ID, btoa(JSON.stringify(newChatHistory)));
   }
 
   handleChatHistoryButtonClick(event: Event) {
