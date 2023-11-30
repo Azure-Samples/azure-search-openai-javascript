@@ -6,6 +6,7 @@ import { styles } from '../styles/chat-thread-component.js';
 import { globalConfig } from '../config/global-config.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { chatEntryToString } from '../utils/index.js';
 
 import iconSuccess from '../../public/svg/success-icon.svg?raw';
 import iconCopyToClipboard from '../../public/svg/copy-icon.svg?raw';
@@ -42,9 +43,7 @@ export class ChatThreadComponent extends LitElement {
 
   // Copy response to clipboard
   copyResponseToClipboard(entry: ChatThreadEntry): void {
-    const response = entry.text
-      .map((textEntry) => textEntry.value + '\n\n' + textEntry.followingSteps?.map((s) => ' - ' + s).join('\n'))
-      .join('\n\n');
+    const response = chatEntryToString(entry);
 
     navigator.clipboard.writeText(response);
     this.isResponseCopied = true;

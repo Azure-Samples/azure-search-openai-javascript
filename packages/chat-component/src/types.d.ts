@@ -40,6 +40,7 @@ declare interface ChatRequestOptions {
   overrides: RequestOverrides;
   type: string;
   question: string;
+  messages?: Message[];
 }
 
 declare interface RequestOverrides {

@@ -1,7 +1,7 @@
 import { ChatResponseError } from '../../utils/index.js';
 
 export async function callHttpApi(
-  { question, type, approach, overrides }: ChatRequestOptions,
+  { question, type, approach, overrides, messages }: ChatRequestOptions,
   { method, url, stream, signal }: ChatHttpOptions,
 ) {
   return await fetch(`${url}/${type}`, {
@@ -12,6 +12,7 @@ export async function callHttpApi(
     signal,
     body: JSON.stringify({
       messages: [
+        ...(messages ?? []),
         {
           content: question,
           role: 'user',
