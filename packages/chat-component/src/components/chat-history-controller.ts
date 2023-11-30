@@ -1,6 +1,6 @@
 import { type ReactiveController, type ReactiveControllerHost } from 'lit';
 import { html } from 'lit';
-import { globalConfig } from '../config/global-config.js';
+import { globalConfig, MAX_CHAT_HISTORY } from '../config/global-config.js';
 
 import iconHistory from '../../public/svg/history-icon.svg?raw';
 import iconHistoryDismiss from '../../public/svg/history-dismiss-icon.svg?raw';
@@ -41,7 +41,7 @@ export class ChatHistoryController implements ReactiveController {
           }
         })
         .filter((index) => index !== undefined)
-        .slice(-5);
+        .slice(-MAX_CHAT_HISTORY);
 
       // trim everything before the first user message
       const trimmedHistory = lastUserMessagesIndexes.length === 0 ? history : history.slice(lastUserMessagesIndexes[0]);
