@@ -177,19 +177,21 @@ export class ChatThreadComponent extends LitElement {
         <div class="items__listWrapper">
           ${unsafeSVG(iconQuestion)}
           <ul class="items__list followup">
-            ${followupQuestions.map(
-              (followupQuestion) => html`
-                <li class="items__listItem--followup">
-                  <a
-                    class="items__link"
-                    href="#"
-                    data-testid="followUpQuestion"
-                    @click="${(event) => this.handleFollowupQuestionClick(followupQuestion, entry, event)}"
-                    >${followupQuestion}</a
-                  >
-                </li>
-              `,
-            )}
+            ${followupQuestions
+              .filter((q) => q !== null)
+              .map(
+                (followupQuestion) => html`
+                  <li class="items__listItem--followup">
+                    <a
+                      class="items__link"
+                      href="#"
+                      data-testid="followUpQuestion"
+                      @click="${(event) => this.handleFollowupQuestionClick(followupQuestion, entry, event)}"
+                      >${followupQuestion}</a
+                    >
+                  </li>
+                `,
+              )}
           </ul>
         </div>
       `;
