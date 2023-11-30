@@ -188,6 +188,7 @@ test.describe('errors', () => {
     await page.routeFromHAR('./tests/e2e/hars/error-chat-response-stream.har', {
       url: '/chat',
       update: false,
+      updateContent: 'embed',
     });
 
     await page.getByTestId('submit-question-button').click();
@@ -409,6 +410,7 @@ test.describe('developer settings', () => {
     await page.routeFromHAR('./tests/e2e/hars/default-chat-response-nostream.har', {
       url: '/chat',
       update: false,
+      updateContent: 'embed',
     });
 
     await page.getByTestId('button__developer-settings').click();
