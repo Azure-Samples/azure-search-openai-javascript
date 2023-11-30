@@ -40,16 +40,16 @@ declare interface ChatRequestOptions {
 }
 
 declare interface RequestOverrides {
-  retrieval_mode?: string;
+  retrieval_mode?: 'hybrid' | 'text' | 'vectors';
   semantic_ranker?: boolean;
   semantic_captions?: boolean;
+  exclude_category?: string;
   top?: number;
-  suggest_followup_questions?: boolean;
   temperature?: number;
   prompt_template?: string;
   prompt_template_prefix?: string;
   prompt_template_suffix?: string;
-  exclude_category?: string[];
+  suggest_followup_questions?: boolean;
 }
 
 declare interface BotResponse {

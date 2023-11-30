@@ -14,7 +14,7 @@ import { useState } from 'react';
 
 import styles from './OneShot.module.css';
 
-import { Approaches, RetrievalMode, apiBaseUrl } from '../../api/index.js';
+import { Approaches, RetrievalMode, apiBaseUrl, type RequestOverrides } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/SettingsButton.jsx';
 
 import 'chat-component';
@@ -92,15 +92,15 @@ export function Component(): JSX.Element {
     },
   ];
 
-  const overrides = {
-    retrievalMode,
-    retrieveCount,
-    useSemanticRanker,
-    useSemanticCaptions,
-    excludeCategory,
-    promptTemplate,
-    promptTemplatePrefix,
-    promptTemplateSuffix,
+  const overrides: RequestOverrides = {
+    retrieval_mode: retrievalMode,
+    top: retrieveCount,
+    semantic_ranker: useSemanticRanker,
+    semantic_captions: useSemanticCaptions,
+    exclude_category: excludeCategory,
+    prompt_template: promptTemplate,
+    prompt_template_prefix: promptTemplatePrefix,
+    prompt_template_suffix: promptTemplateSuffix,
   };
 
   return (
