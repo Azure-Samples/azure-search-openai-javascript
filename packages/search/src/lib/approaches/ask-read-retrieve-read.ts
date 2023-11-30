@@ -88,8 +88,8 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
     const executor = await initializeAgentExecutorWithOptions(tools, chatModel, {
       agentType: 'chat-zero-shot-react-description',
       agentArgs: {
-        prefix: context?.prompt_template_prefix ?? TEMPLATE_PREFIX,
-        suffix: context?.prompt_template_suffix ?? TEMPLATE_SUFFIX,
+        prefix: context?.prompt_template_prefix || TEMPLATE_PREFIX,
+        suffix: context?.prompt_template_suffix || TEMPLATE_SUFFIX,
         inputVariables: ['input', 'agent_scratchpad'],
       },
       returnIntermediateSteps: true,
