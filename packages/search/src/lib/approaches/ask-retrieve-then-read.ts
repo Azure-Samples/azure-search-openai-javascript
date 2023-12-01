@@ -30,7 +30,7 @@ info3.pdf: Once you've provided the necessary information, submit the report. Ou
 const ANSWER = `If a guest breaks something, report the damage immediately through the platform [info1.txt]. Once you've provided the necessary information, submit the report. Our financial support team will investigate the matter and work to resolve it promptly [info3.pdf].`;
 
 /**
- * Simple retrieve-then-read implementation, using the Cognitive Search and OpenAI APIs directly.
+ * Simple retrieve-then-read implementation, using the AI Search and OpenAI APIs directly.
  * It first retrieves top documents from search, then constructs a prompt with them, and then uses
  * OpenAI to generate an completion (answer) with that prompt.
  */

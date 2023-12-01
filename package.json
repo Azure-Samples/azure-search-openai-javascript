@@ -1,7 +1,7 @@
 {
   "name": "azure-search-openai-javascript",
   "version": "1.0.0",
-  "description": "ChatGPT + Enterprise data with Azure OpenAI and Cognitive Search",
+  "description": "ChatGPT + Enterprise data with Azure OpenAI and AI Search",
   "private": true,
   "directories": {
     "doc": "docs"
