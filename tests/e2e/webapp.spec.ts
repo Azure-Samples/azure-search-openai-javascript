@@ -191,12 +191,12 @@ test.describe('default', () => {
       // check that the last session's chat matches in the one in chat history
       // which is different from current session's chat
       const previousChatUserMessage = chatHistory.nth(0).locator('.chat__txt.user-message').nth(-1);
-      await expect(currentUserMessage).not.toHaveText(lastChatUserMessageText);
-      await expect(previousChatUserMessage).toHaveText(lastChatUserMessageText);
+      await expect(currentUserMessage).not.toHaveText(lastChatUserMessageText!);
+      await expect(previousChatUserMessage).toHaveText(lastChatUserMessageText!);
 
       const previousChatLastItem = chatHistory.nth(-1).locator('.chat__txt--entry').nth(-1);
-      await expect(currentChat).not.toHaveText(lastChatText);
-      await expect(previousChatLastItem).toHaveText(lastChatText);
+      await expect(currentChat).not.toHaveText(lastChatText!);
+      await expect(previousChatLastItem).toHaveText(lastChatText!);
     });
   });
 });
@@ -449,6 +449,7 @@ test.describe('generate answer', () => {
       const questionText = await question.textContent();
       expect(questionText).not.toBeNull();
       expect(questionText).not.toBe('');
+      expect(questionText?.endsWith('?'), 'follow up question should end with ?').toBe(true);
 
       await question.click();
       await expect(chatInput).toHaveValue(questionText!);
