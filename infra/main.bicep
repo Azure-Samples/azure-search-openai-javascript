@@ -78,6 +78,9 @@ param useApplicationInsights bool = false
 
 param allowedOrigin string
 
+// Allow to override the default backend
+param backendUri string = ''
+
 // Only needed for CD due to internal policies restrictions
 param aliasTag string = ''
 // Differentiates between automated and manual deployments
@@ -536,3 +539,4 @@ output SEARCH_API_URI string = searchApi.outputs.uri
 output INDEXER_API_URI string = indexerApi.outputs.uri
 
 output ALLOWED_ORIGINS string = join(allowedOrigins, ',')
+output BACKEND_URI string = !empty(backendUri) ? backendUri : searchApi.outputs.uri
