@@ -13,7 +13,7 @@ export default fp(
   async (fastify, _options) => {
     const config = fastify.config;
 
-    // Use the current user identity to authenticate with Azure OpenAI, Cognitive Search and Blob Storage
+    // Use the current user identity to authenticate with Azure OpenAI, AI Search and Blob Storage
     // (no secrets needed, just use 'az login' locally, and managed identity when deployed on Azure).
     // If you need to use keys, use separate AzureKeyCredential instances with the keys for each service
     const credential = new DefaultAzureCredential();
