@@ -95,3 +95,7 @@ export class ChatResponseError extends Error {
     this.code = code;
   }
 }
+
+export function newListWithEntryAtIndex<T>(list: T[], index: number, entry: T) {
+  return [...list.slice(0, index), entry, ...list.slice(index + 1)];
+}
