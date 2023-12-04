@@ -5,13 +5,6 @@ const globalConfig = {
   IS_DEFAULT_PROMPTS_ENABLED: true,
   // Default prompts to display in the chat
   DISPLAY_DEFAULT_PROMPTS_BUTTON: 'Not sure what to ask? Try our suggestions!',
-  DEFAULT_PROMPTS: [
-    'How to search and book rentals?',
-    'What is the refund policy?',
-    'How to contact a representative?',
-  ],
-  DEFAULT_PROMPTS_HEADING_CHAT: 'Chat with our support team',
-  DEFAULT_PROMPTS_HEADING_ASK: 'Ask now',
   // This are the chat bubbles that will be displayed in the chat
   CHAT_MESSAGES: [],
   // This are the labels for the chat button and input
@@ -32,6 +25,7 @@ const globalConfig = {
   SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT: 'Show thought process',
   HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT: 'Hide thought process',
   LOADING_INDICATOR_TEXT: 'Please wait. We are searching and generating an answer...',
+  LOADING_TEXT: 'Loading...',
   // API ERROR HANDLING IN UI
   API_ERROR_MESSAGE: 'Sorry, we are having some problems. Please try again later.',
   INVALID_REQUEST_ERROR: 'Unable to generate answer for this query. Please modify your question and try again.',
@@ -40,6 +34,23 @@ const globalConfig = {
   SUPPORT_CONTEXT_LABEL: 'Support Context',
   CITATIONS_LABEL: 'Learn More:',
   CITATIONS_TAB_LABEL: 'Citations',
+};
+
+const teaserListTexts = {
+  TEASER_CTA_LABEL: 'Ask now',
+  HEADING_CHAT: 'Chat with our support team',
+  HEADING_ASK: 'Ask a question',
+  DEFAULT_PROMPTS: [
+    {
+      description: 'How to search and book rentals?',
+    },
+    {
+      description: 'What is the refund policy?',
+    },
+    {
+      description: 'How to contact a representative?',
+    },
+  ],
 };
 
 const NEXT_QUESTION_INDICATOR = 'Next Questions:';
@@ -63,4 +74,4 @@ const chatHttpOptions = {
 
 const APPROACH_MODEL = ['rrr', 'rtr'];
 
-export { globalConfig, requestOptions, chatHttpOptions, NEXT_QUESTION_INDICATOR, APPROACH_MODEL };
+export { globalConfig, requestOptions, chatHttpOptions, NEXT_QUESTION_INDICATOR, APPROACH_MODEL, teaserListTexts };

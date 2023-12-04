@@ -228,7 +228,7 @@ To then limit access to a specific set of users or groups, you can follow the st
 
 ### Additional security considerations
 
-We recommend deploying additional security mechanisms. When applicable, consider setting up a [VNet](https://learn.microsoft.com/azure/virtual-network/virtual-networks-overview) or setting up a [Proxy Policy](https://learn.microsoft.com/azure/api-management/proxy-policy).
+We recommend deploying additional security mechanisms. When applicable, consider setting up a [VNet](https://learn.microsoft.com/azure/virtual-network/virtual-networks-overview) or setting up a [Proxy Policy](https://learn.microsoft.com/en-us/azure/api-management/proxy-policy).
 
 ### Enabling CORS for an alternate frontend
 

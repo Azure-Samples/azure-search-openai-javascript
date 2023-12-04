@@ -1,4 +1,4 @@
-import { ChatResponseError } from '../../utils/index.js';
+import { createReader, ChatResponseError } from '../../utils/index.js';
 import { createReader, readStream } from '../stream/index.js';
 
 export async function parseStreamedMessages({

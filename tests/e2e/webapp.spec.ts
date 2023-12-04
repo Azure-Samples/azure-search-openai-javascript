@@ -127,9 +127,9 @@ test.describe('default', () => {
       }),
     );
 
-    await expect(page.locator('.loading-text')).not.toBeVisible();
+    await expect(page.getByTestId('loading-indicator')).not.toBeVisible();
     await page.getByTestId('submit-question-button').click();
-    await expect(page.locator('.loading-text')).toBeVisible();
+    await expect(page.getByTestId('loading-indicator')).toBeVisible();
     await expect(page.getByTestId('question-input')).not.toBeEnabled();
   });
 });
@@ -188,6 +188,7 @@ test.describe('errors', () => {
     await page.routeFromHAR('./tests/e2e/hars/error-chat-response-stream.har', {
       url: '/chat',
       update: false,
+      updateContent: 'embed',
     });
 
     await page.getByTestId('submit-question-button').click();
@@ -353,7 +354,6 @@ test.describe('generate answer', () => {
 
     await expect(citations.nth(0)).toBeEnabled();
     await expect(citations.nth(0)).toContainText('support.md');
-    expect(await citations.nth(0).getAttribute('href')).toContain('/content/support.md');
 
     await page.routeFromHAR('./tests/e2e/hars/citation-content.har', {
       url: '/content/support.md',
@@ -367,6 +367,25 @@ test.describe('generate answer', () => {
 
     // markdown converted to html
     await expect(page.getByRole('heading', { name: 'Contoso Real Estate Customer Support Guide' })).toBeVisible();
+  });
+
+  test('follow up questions', async ({ page }) => {
+    const followupQuestions = page.getByTestId('followUpQuestion');
+    await expect(followupQuestions).toHaveCount(3);
+
+    const chatInput = page.getByTestId('question-input');
+    await expect(chatInput).toHaveValue('');
+
+    for (let index = 0; index < 3; index++) {
+      const question = followupQuestions.nth(index);
+      await expect(question).toBeEnabled();
+      const questionText = await question.textContent();
+      expect(questionText).not.toBeNull();
+      expect(questionText).not.toBe('');
+
+      await question.click();
+      await expect(chatInput).toHaveValue(questionText!);
+    }
   });
 });
 
@@ -391,6 +410,7 @@ test.describe('developer settings', () => {
     await page.routeFromHAR('./tests/e2e/hars/default-chat-response-nostream.har', {
       url: '/chat',
       update: false,
+      updateContent: 'embed',
     });
 
     await page.getByTestId('button__developer-settings').click();

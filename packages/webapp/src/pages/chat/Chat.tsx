@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
-import { RetrievalMode, apiBaseUrl } from '../../api/index.js';
+import { RetrievalMode, apiBaseUrl, type RequestOverrides } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
 import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField, TooltipHost } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
@@ -66,16 +66,16 @@ const Chat = () => {
     setUseSuggestFollowupQuestions(!!checked);
   };
 
-  const overrides = {
-    retrievalMode,
+  const overrides: RequestOverrides = {
+    retrieval_mode: retrievalMode,
     top: retrieveCount,
-    useSemanticRanker,
-    useSemanticCaptions,
-    excludeCategory,
-    promptTemplate,
-    promptTemplatePrefix: '',
-    promptTemplateSuffix: '',
-    suggestFollowupQuestions: useSuggestFollowupQuestions,
+    semantic_ranker: useSemanticRanker,
+    semantic_captions: useSemanticCaptions,
+    exclude_category: excludeCategory,
+    prompt_template: promptTemplate,
+    prompt_template_prefix: '',
+    prompt_template_suffix: '',
+    suggest_followup_questions: useSuggestFollowupQuestions,
   };
 
   return (
