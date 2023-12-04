@@ -174,10 +174,12 @@ export class ChatController implements ReactiveController {
           await this.processResponse('', false, false);
         }
 
-        this.processingMessage = {
-          ...this.processingMessage,
-          error: chatError,
-        };
+        if (this.processingMessage) {
+          this.processingMessage = {
+            ...this.processingMessage,
+            error: chatError,
+          };
+        }
       } finally {
         this.clear();
       }

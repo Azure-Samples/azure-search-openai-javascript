@@ -12,8 +12,7 @@ import {
 } from '../config/global-config.js';
 import { chatStyle } from '../styles/chat-component.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
-import { produce } from 'immer';
-import { chatEntryToString } from '../utils/index.js';
+import { chatEntryToString, newListWithEntryAtIndex } from '../utils/index.js';
 
 // TODO: allow host applications to customize these icons
 
@@ -337,15 +336,13 @@ export class ChatComponent extends LitElement {
     this.isDisabled = this.chatController.generatingAnswer;
 
     if (this.chatController.processingMessage) {
-      this.chatThread = produce(this.chatThread, (draft) => {
-        const processingEntry = this.chatController.processingMessage as ChatThreadEntry;
-        const index = draft.findIndex((entry) => entry.id === processingEntry.id);
-        if (index > -1) {
-          draft[index] = processingEntry;
-        } else {
-          draft.push(processingEntry);
-        }
-      });
+      const processingEntry = this.chatController.processingMessage as ChatThreadEntry;
+      const index = this.chatThread.findIndex((entry) => entry.id === processingEntry.id);
+
+      this.chatThread =
+        index > -1
+          ? newListWithEntryAtIndex(this.chatThread, index, processingEntry)
+          : [...this.chatThread, processingEntry];
     }
   }
 
