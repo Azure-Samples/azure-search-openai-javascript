@@ -97,14 +97,10 @@ export async function parseStreamedMessages({
       followUpQuestionIndex = followUpQuestionIndex + 1;
       isFollowupQuestion = true;
       continue;
-      // also remove the marker with question
-    } else if (chunkValue.includes('?>')) {
-      isFollowupQuestion = true;
-      chunkValue = chunkValue.replaceAll('>', '');
       // additional returns need to be removed, but only after we have processed the whole set of chunks
     } else if (isFollowupQuestion) {
       isFollowupQuestion = true;
-      chunkValue = chunkValue.replace(/:?\n/, '');
+      chunkValue = chunkValue.replace(/:?\n/, '').replaceAll('>', ''); // remove all returns and markers
     }
 
     // if we are here, it means we have previously matched a number, followed by a dot (in current chunk)
