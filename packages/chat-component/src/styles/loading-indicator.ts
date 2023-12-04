@@ -16,7 +16,7 @@ export const styles = css`
   svg {
     width: 30px;
     height: 30px;
-    fill: var(--accent-lighter);
+    fill: var(--c-accent-light);
     animation: spinneranimation 1s linear infinite;
     margin-right: 10px;
   }

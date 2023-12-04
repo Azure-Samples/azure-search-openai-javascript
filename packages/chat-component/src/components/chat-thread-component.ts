@@ -40,6 +40,12 @@ export class ChatThreadComponent extends LitElement {
   @property({ type: Object })
   selectedCitation: Citation | undefined = undefined;
 
+  @property({ type: Boolean })
+  isCustomBranding = false;
+
+  @property({ type: String })
+  svgIcon = '';
+
   // Copy response to clipboard
   copyResponseToClipboard(): void {
     const response = this.chatThread.at(-1)?.text.at(-1)?.value as string;
@@ -86,28 +92,35 @@ export class ChatThreadComponent extends LitElement {
 
   renderResponseActions(entry: ChatThreadEntry) {
     return html`
-      <div class="chat__header">
-        ${this.actionButtons.map(
-          (actionButton) => html`
-            <chat-action-button
-              .label="${actionButton.label}"
-              .svgIcon="${actionButton.svgIcon}"
-              .isDisabled="${actionButton.isDisabled}"
-              .actionId="${actionButton.id}"
-              @click="${(event) => this.actionButtonClicked(actionButton, entry, event)}"
-            ></chat-action-button>
-          `,
-        )}
-        <chat-action-button
-          .label="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-          .svgIcon="${this.isResponseCopied ? iconSuccess : iconCopyToClipboard}"
-          .isDisabled="${this.isDisabled}"
-          actionId="copy-to-clipboard"
-          .tooltip="${this.isResponseCopied
-            ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-            : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-          @click="${this.copyResponseToClipboard}"
-        ></chat-action-button>
+      <div class="chat__header--avatar">
+        <chat-avatar
+          url="${globalConfig.BRANDING_URL}"
+          svgIcon="${this.svgIcon}"
+          isEnabled="${this.isCustomBranding}"
+        ></chat-avatar>
+        <div class="chat__header--button">
+          ${this.actionButtons.map(
+            (actionButton) => html`
+              <chat-action-button
+                .label="${actionButton.label}"
+                .svgIcon="${actionButton.svgIcon}"
+                .isDisabled="${actionButton.isDisabled}"
+                .actionId="${actionButton.id}"
+                @click="${(event) => this.actionButtonClicked(actionButton, entry, event)}"
+              ></chat-action-button>
+            `,
+          )}
+          <chat-action-button
+            .label="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+            .svgIcon="${this.isResponseCopied ? iconSuccess : iconCopyToClipboard}"
+            .isDisabled="${this.isDisabled}"
+            actionId="copy-to-clipboard"
+            .tooltip="${this.isResponseCopied
+              ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
+              : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+            @click="${this.copyResponseToClipboard}"
+          ></chat-action-button>
+        </div>
       </div>
     `;
   }

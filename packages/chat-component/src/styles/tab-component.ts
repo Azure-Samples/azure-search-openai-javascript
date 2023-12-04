@@ -16,8 +16,8 @@ export const styles = css`
     text-align: center;
   }
   .tab-component__link.active {
-    background: linear-gradient(to left, var(--accent-contrast), var(--accent-high));
-    color: var(--white);
+    background: linear-gradient(to left, var(--c-accent-light), var(--c-accent-high));
+    color: var(--c-white);
   }
   .tab-component__link:not(.active):hover {
     background: var(--light-gray);

@@ -4,10 +4,10 @@ export const styles = css`
   button {
     color: var(--text-color);
     text-decoration: underline;
-    border: 1px solid var(--accent-dark);
+    border: 1px solid var(--c-accent-dark);
     text-decoration: none;
     border-radius: 5px;
-    background: var(--white);
+    background: var(--c-white);
     display: flex;
     align-items: center;
     margin-left: 5px;
@@ -27,7 +27,7 @@ export const styles = css`
     position: absolute;
     text-align: right;
     top: -80%;
-    background: var(--accent-dark);
+    background: var(--c-accent-dark);
     color: white;
     opacity: 0;
     right: 0px;
@@ -43,7 +43,7 @@ export const styles = css`
     height: 0;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 8px solid var(--accent-dark);
+    border-top: 8px solid var(--c-accent-dark);
     bottom: -8px;
     right: 5px;
   }

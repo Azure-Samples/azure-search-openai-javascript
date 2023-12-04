@@ -16,7 +16,11 @@ import iconDelete from '../../public/svg/delete-icon.svg?raw';
 import iconCancel from '../../public/svg/cancel-icon.svg?raw';
 import iconSend from '../../public/svg/send-icon.svg?raw';
 import iconClose from '../../public/svg/close-icon.svg?raw';
+import iconLogo from '../../public/branding/brand-logo.svg?raw';
 
+// import only necessary components to reduce bundle size
+import './chat-avatar.js';
+import './chat-stage.js';
 import './loading-indicator.js';
 import './voice-input-button.js';
 import './teaser-list-component.js';
@@ -25,6 +29,7 @@ import './tab-component.js';
 import './citation-list.js';
 import './chat-thread-component.js';
 import './chat-action-button.js';
+
 import { type TabContent } from './tab-component.js';
 
 /**
@@ -52,6 +57,9 @@ export class ChatComponent extends LitElement {
 
   @property({ type: String, attribute: 'data-api-url' })
   apiUrl = chatHttpOptions.url;
+
+  @property({ type: String, attribute: 'data-custom-branding', converter: (value) => value?.toLowerCase() === 'true' })
+  isCustomBranding: boolean = globalConfig.IS_CUSTOM_BRANDING;
 
   @property({ type: String, attribute: 'data-use-stream', converter: (value) => value?.toLowerCase() === 'true' })
   useStream: boolean = chatHttpOptions.stream;
@@ -425,7 +433,7 @@ export class ChatComponent extends LitElement {
         <section class="chat__container" id="chat-container">
           ${this.isChatStarted
             ? html`
-                <div class="chat__header">
+                <div class="chat__header--butons">
                   <chat-action-button
                     .label="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
                     actionId="chat-reset-button"
@@ -436,6 +444,8 @@ export class ChatComponent extends LitElement {
                 </div>
                 <chat-thread-component
                   .chatThread="${this.chatThread}"
+                  .isCustomBranding="${this.isCustomBranding}"
+                  .svgIcon="${iconLogo}"
                   .actionButtons="${[
                     {
                       id: 'chat-show-thought-process',
@@ -459,6 +469,15 @@ export class ChatComponent extends LitElement {
             : ''}
           <!-- Teaser List with Default Prompts -->
           <div class="chat__container">
+            ${this.isChatStarted
+              ? ''
+              : html` <chat-stage
+                  isEnabled="${this.isCustomBranding}"
+                  svgIcon="${iconLogo}"
+                  pagetitle="${globalConfig.BRANDING_HEADLINE}"
+                  url="${globalConfig.BRANDING_URL}"
+                >
+                </chat-stage>`}
             <!-- Conditionally render default prompts based on isDefaultPromptsEnabled -->
             ${this.isDefaultPromptsEnabled
               ? html`

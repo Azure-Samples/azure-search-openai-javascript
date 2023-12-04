@@ -13,7 +13,7 @@ export const styles = css`
   }
   .items__listItem {
     display: inline-block;
-    background-color: var(--accent-lighter);
+    background-color: var(--c-accent-light);
     border-radius: 5px;
     text-decoration: none;
     padding: 5px;
@@ -21,7 +21,7 @@ export const styles = css`
     font-size: small;
   }
   .items__listItem.active {
-    background-color: var(--accent-high);
+    background-color: var(--c-accent-high);
   }
   .items__listItem:not(first-child) {
     margin-left: 5px;
@@ -31,6 +31,6 @@ export const styles = css`
     color: var(--text-color);
   }
   .items__listItem.active .items__link {
-    color: var(--white);
+    color: var(--c-white);
   }
 `;

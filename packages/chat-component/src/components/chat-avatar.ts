@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import { styles } from '../styles/chat-action-button.js';
+import { styles } from '../styles/chat-avatar.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 export interface ChatStage {
@@ -28,6 +28,9 @@ export class ChatAvatarComponent extends LitElement {
   isEnabled = false;
 
   override render() {
+    if (!this.isEnabled) {
+      return html``;
+    }
     return html`
       <a class="chat-avatar__link" title="${this.label}" href="${this.url}" target="_blank" rel="noopener noreferrer">
         ${unsafeSVG(this.svgIcon)}

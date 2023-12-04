@@ -34,6 +34,13 @@ const globalConfig = {
   SUPPORT_CONTEXT_LABEL: 'Support Context',
   CITATIONS_LABEL: 'Learn More:',
   CITATIONS_TAB_LABEL: 'Citations',
+  // Custom Branding
+  IS_CUSTOM_BRANDING: true,
+  // Custom Branding details
+  // All these should come from persistence config
+  BRANDING_URL: '#',
+  BRANDING_LOGO_ALT: 'Brand Logo',
+  BRANDING_HEADLINE: 'Welcome to the Support Assistant of our Brand',
 };
 
 const teaserListTexts = {

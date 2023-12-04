@@ -37,7 +37,7 @@ export const styles = css`
   .teaser-list-item {
     padding: 10px;
     border-radius: 10px;
-    background: var(--white);
+    background: var(--c-white);
     margin: 4px;
     color: var(--text-color);
     justify-content: space-evenly;
@@ -50,13 +50,13 @@ export const styles = css`
   }
   .teaser-list-item:hover,
   .teaser-list-item:focus {
-    color: var(--accent-dark);
+    color: var(--c-accent-dark);
     background: var(--secondary-color);
     transition: all 0.3s ease-in-out;
-    border-color: var(--accent-high);
+    border-color: var(--c-accent-high);
   }
   .teaser-list-item .teaser-click-label {
-    color: var(--accent-high);
+    color: var(--c-accent-high);
     font-weight: bold;
     display: block;
     margin-top: 20px;

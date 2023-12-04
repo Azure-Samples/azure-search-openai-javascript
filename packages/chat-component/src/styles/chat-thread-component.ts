@@ -15,10 +15,16 @@ export const styles = css`
       top: 0px;
     }
   }
-  .chat__header {
+  .chat__header--button,
+  .chat__header--avatar {
     display: flex;
-    justify-content: flex-end;
-    padding: 20px;
+    align-items: center;
+  }
+  .chat__header--avatar {
+    justify-content: space-between;
+  }
+  .chat__header--button {
+    margin-right: 20px;
   }
   .chat__list {
     color: var(--text-color);
@@ -62,9 +68,9 @@ export const styles = css`
     background: var(--error-color-background);
   }
   .chat__txt.user-message {
-    background: linear-gradient(to left, var(--accent-contrast), var(--accent-high));
-    color: var(--white);
-    border: 1px solid var(--accent-lighter);
+    background: linear-gradient(to left, var(--c-accent-dark), var(--c-accent-high));
+    color: var(--c-white);
+    border: 1px solid var(--c-accent-light);
   }
   .chat__listItem.user-message {
     align-self: flex-end;
@@ -88,7 +94,7 @@ export const styles = css`
     grid-template-columns: 1fr 18fr;
   }
   .items__listWrapper svg {
-    fill: var(--accent-high);
+    fill: var(--c-accent-high);
     width: 30px;
     margin: 32px auto;
   }
@@ -119,13 +125,13 @@ export const styles = css`
     cursor: pointer;
     padding: 0 5px;
     border-radius: 10px;
-    border: 1px solid var(--accent-high);
+    border: 1px solid var(--c-accent-high);
     margin: 5px;
     transition: background-color 0.3s ease-in-out;
   }
   .items__listItem--followup:hover,
   .items__listItem--followup:focus {
-    background-color: var(--accent-lighter);
+    background-color: var(--c-accent-light);
     cursor: pointer;
   }
   .items__link {
@@ -138,14 +144,14 @@ export const styles = css`
     line-height: 1;
   }
   .followup .items__link {
-    color: var(--accent-high);
+    color: var(--c-accent-high);
     display: block;
     padding: 5px 0;
     border-bottom: 1px solid var(--light-gray);
     font-size: small;
   }
   .citation {
-    background-color: var(--accent-lighter);
+    background-color: var(--c-accent-light);
     border-radius: 3px;
     padding: 2px;
     margin-left: 3px;

@@ -1,11 +1,9 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-
-import { styles } from '../styles/chat-action-button.js';
-import { globalConfig } from '../config/global-config.js';
-
+import { styles } from '../styles/chat-stage.js';
+import './chat-avatar.js';
 export interface ChatStage {
-  label: string;
+  pagetitle: string;
   svgIcon: string;
   isEnabled: boolean;
 }
@@ -15,23 +13,25 @@ export class ChatStageComponent extends LitElement {
   static override styles = [styles];
 
   @property({ type: String })
-  pagetile = '';
+  pagetitle = '';
+
+  @property({ type: String })
+  url = '';
 
   @property({ type: Boolean })
   isEnabled = false;
+
+  @property({ type: String })
+  svgIcon = '';
 
   override render() {
     if (!this.isEnabled) {
       return html``;
     }
     return html`
-      <header class="branding__banner">
-        <chat-avatar
-          url="${globalConfig.BRANDING_LOGO_URL}"
-          label="${globalConfig.BRANDING_LOGO_ALT_TEXT}"
-          svgIcon=""
-        ></chat-avatar>
-        <h1 class="branding__hl">${globalConfig.BRANDING_HEADLINE}</h1>
+      <header class="chat-stage__header">
+        <chat-avatar url="${this.url}" svgIcon="${this.svgIcon}" isEnabled="${this.isEnabled}"></chat-avatar>
+        <h1 class="chat-stage__hl">${this.pagetitle}</h1>
       </header>
     `;
   }

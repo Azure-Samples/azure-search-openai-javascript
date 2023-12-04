@@ -22,7 +22,7 @@ export const styles = css`
     opacity: 0.8;
   }
   .not-recording svg {
-    fill: var(--black);
+    fill: var(--c-black);
   }
   .recording svg {
     fill: var(--red);
