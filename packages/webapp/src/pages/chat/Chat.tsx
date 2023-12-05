@@ -127,8 +127,6 @@ const Chat = () => {
     }
     // Update the body class and html data-theme
     localStorage.removeItem('customStyles');
-    document.body.classList.toggle('dark', newIsDarkTheme);
-    document.documentElement.dataset.theme = newIsDarkTheme ? 'dark' : '';
 
     // Update the state
     setIsDarkTheme(newIsDarkTheme);
@@ -175,14 +173,6 @@ const Chat = () => {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [customStyles, isBrandingEnabled, isDarkTheme, isLoading]);
-
-  /*   useEffect(() => {
-    const storedTheme = localStorage.getItem('isDarkTheme');
-    if (storedTheme) {
-      const parsedTheme = JSON.parse(storedTheme);
-      handleThemeToggle(parsedTheme);
-    }
-  }, []); */ // Run this effect once, when the component mounts
 
   const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);
 
