@@ -7,18 +7,18 @@ export const styles = css`
   }
   .items__list {
     border-top: none;
-    padding: 0px 20px;
-    margin: 10px 0;
+    padding: 0 var(--d-base);
+    margin: var(--d-small) 0;
     display: block;
   }
   .items__listItem {
     display: inline-block;
     background-color: var(--c-accent-light);
-    border-radius: 5px;
+    border-radius: var(--radius-small);
     text-decoration: none;
-    padding: 5px;
+    padding: var(--d-xsmall);
     margin-top: 5px;
-    font-size: small;
+    font-size: var(--font-small);
   }
   .items__listItem.active {
     background-color: var(--c-accent-high);

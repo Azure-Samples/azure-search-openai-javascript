@@ -14,7 +14,7 @@ export const styles = css`
     align-items: center;
   }
   svg {
-    width: 30px;
+    width: var(--d-large);
     height: 30px;
     fill: var(--c-accent-light);
     animation: spinneranimation 1s linear infinite;

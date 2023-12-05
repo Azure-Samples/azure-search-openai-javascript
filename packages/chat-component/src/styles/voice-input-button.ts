@@ -10,7 +10,7 @@ export const styles = css`
     box-shadow: none;
     border: none;
     cursor: pointer;
-    width: 50px;
+    width: var(--d-xlarge);
     height: 100%;
   }
   button:hover,

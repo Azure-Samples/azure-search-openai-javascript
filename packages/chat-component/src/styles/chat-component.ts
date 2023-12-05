@@ -40,6 +40,7 @@ export const chatStyle = css`
     --d-xsmall: 5px;
     --d-large: 30px;
     --d-xlarge: 50px;
+    --shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100vw;
     display: block;
     padding: var(--d-base);
@@ -205,7 +206,7 @@ export const chatStyle = css`
     z-index: 1;
     border-radius: var(--radius-base);
     background: linear-gradient(0deg, var(--c-base-gray) 0%, var(--c-base-gray) 75%, var(--c-base-gray) 100%);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
     padding: var(--d-small) var(--d-small) var(--d-large);
   }
   .form__label {
@@ -220,7 +221,7 @@ export const chatStyle = css`
   }
   .chatbox__button svg {
     fill: var(--c-accent-high);
-    width: 25px;
+    width: calc(var(--d-base) + var(--d-xsmall));
   }
   .chatbox__container {
     position: relative;
@@ -234,8 +235,8 @@ export const chatStyle = css`
     cursor: pointer;
     border-radius: 4px;
     margin-left: 8px;
-    width: 80px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: calc(var(--d-large) + var(--d-xlarge));
+    box-shadow: var(--shadow);
     transition: background 0.3s ease-in-out;
   }
   .chatbox__button:hover,
@@ -258,12 +259,12 @@ export const chatStyle = css`
     color: var(--c-white);
     font-weight: bold;
     height: 20px;
-    width: 20px;
+    width: var(--d-base);
     cursor: pointer;
   }
   .chatbox__input-container {
     display: flex;
-    border: 1px solid var(--c-black);
+    border: var(--border-thin) solid var(--c-black);
     background: var(--c-white);
     border-radius: 4px;
   }
@@ -274,7 +275,7 @@ export const chatStyle = css`
     background: transparent;
     color: var(--text-color);
     border: none;
-    padding: 8px;
+    padding: var(--d-small);
     flex: 1 1 auto;
     font-size: 1rem;
   }
@@ -286,13 +287,13 @@ export const chatStyle = css`
     justify-content: end;
   }
   .tab-component__content {
-    padding: 20px 20px 20px 0px;
+    padding: var(--d-base) var(--d-base) var(--d-base) 0;
   }
   .tab-component__paragraph {
     font-family: monospace;
-    font-size: large;
-    border: 1px solid var(--light-gray);
-    border-radius: 25px;
-    padding: 20px;
+    font-size: var(--font-large);
+    border: var(--border-thin) solid var(--light-gray);
+    border-radius: var(--radius-large);
+    padding: var(--d-base);
   }
 `;
