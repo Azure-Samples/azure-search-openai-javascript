@@ -1,1 +1,95 @@
-<?xml version="1.0" encoding="UTF-8"?><svg id="a" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 774 239.79"><defs><style>.c{fill:url(#b);}</style><linearGradient id="b" x1="0" y1="119.9" x2="774" y2="119.9" gradientTransform="matrix(1, 0, 0, 1, 0, 0)" gradientUnits="userSpaceOnUse"><stop offset=".17" stop-color="#7c78b8"/><stop offset=".42" stop-color="#08adb0"/><stop offset=".64" stop-color="#00b0b0"/><stop offset=".89" stop-color="#00f4b1"/></linearGradient></defs><path class="c" d="M565.95,2.63c-2.92-3.35-4.48-3.33-7.36-.04-26.85,30.71-53.88,61.2-80.73,91.91-2.75,3.15-4.14,2.79-6.73-.18-26.96-30.81-54.07-61.44-81.07-92.21-2.29-2.61-3.81-2.88-6.22-.12-25.97,29.65-82.47,93.57-85.02,96.35-13.39-15.35-68.28-77.98-82.76-94.27-4.89-5.51-5.01-5.41-9.83,.06C185.72,27.49,2.28,236.71,0,239.41c7.86,0,14.51,.01,21.28-.11,1.03-.02,185.26-210.32,189.24-215.29,25.95,29.56,171.2,197.34,170.41,197.34-19.4,.02-38.81,.1-58.21-.12-1.85-.02-4.04-1.44-5.46-2.95-5.36-5.71-91.77-104.52-107.36-122.32-5.99-6.84-6.85-8.55-10.01-5.36-1.16,1.16-2.62,2.98-4.76,5.43-3.96,4.54-3.92,4.6-.07,8.97,38.45,43.7,76.92,87.37,115.31,131.13,2.17,2.47,4.34,3.64,7.43,3.63,33.28-.09,102.63,.08,105.24,.03-37.95-43.06-75.24-85.91-111.81-127.4,25.82-29.65,50.93-58.49,75.69-86.92,25.33,28.73,143.91,163.48,172.49,195.89-2.36,.01-34.02-.58-48.15,.12-10.43,.52-16.95-2.45-25.74-11.66-10.11-10.58-95.88-108.71-100.06-114-5.44-6.89-7.55-8.1-13.14-1.66-.8,.92-1.49,1.97-2.37,2.76-2.74,2.47-2.46,4.39-.04,7.34,6.74,8.24,107.8,123.27,116.26,132,1.87,1.93,4.95,3.26,7.49,3.28,33.02,.21,101.84,.21,104.81,.23-4.5-5.23-76.76-88.16-109.39-125.03-2.55-2.88-2.38-4.74,.1-7.47,8.03-8.84,54.89-62.1,70.34-79.82,2.23-2.56,3.79-2.63,5.87,.04,2.34,3.01,140.08,159.16,166.44,189.09,1.02,1.16,1.92,2.47,3.72,4.79h-5.83c-16.29,0-32.58-.29-48.86,.14-6.64,.17-11.37-1.68-16.27-7.42-20.38-23.89-41.45-47.02-62.19-70.52-14.53-16.46-28.92-33.08-43.38-49.62-5.58-6.38-6.72-4.87-11.27,.06s-4.97,7.45-2.9,9.79c14.56,16.45,92.39,105.05,116.94,132.67,1.51,1.7,4.07,3.08,6.15,3.09,33.43,.19,105.89,.26,106.08,.19S588.44,28.47,565.95,2.63Z"/></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="533.37976"
+   height="479.4425"
+   viewBox="0 0 141.12339 126.8525"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
+   sodipodi:docname="brand-logo.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.4654497"
+     inkscape:cx="303.64057"
+     inkscape:cy="106.60712"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1187"
+     inkscape:window-height="541"
+     inkscape:window-x="119"
+     inkscape:window-y="131"
+     inkscape:window-maximized="0"
+     units="px"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-18.235046,-25.370501)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:18.7575px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.468938"
+       x="76.622147"
+       y="77.940918"
+       id="text837"
+       transform="scale(0.95147583,1.0509988)"><tspan
+         sodipodi:role="line"
+         id="tspan835"
+         x="76.622147"
+         y="77.940918"
+         style="stroke-width:0.468938">YOUR</tspan><tspan
+         sodipodi:role="line"
+         x="76.622147"
+         y="101.38779"
+         style="stroke-width:0.468938"
+         id="tspan885">BRAND</tspan></text>
+    <path
+       sodipodi:type="star"
+       style="opacity:0.99;fill:#eec4e6;fill-opacity:0.835294;fill-rule:evenodd;stroke-width:4.99999;stroke-linejoin:round"
+       id="path887"
+       sodipodi:sides="5"
+       sodipodi:cx="55.752526"
+       sodipodi:cy="87.899637"
+       sodipodi:r1="26.130005"
+       sodipodi:r2="13.065002"
+       sodipodi:arg1="0.77001476"
+       sodipodi:arg2="1.3983333"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 74.511266,106.08993 57.994602,100.77082 44.249297,111.36137 44.204142,94.009392 29.884399,84.209489 46.373155,78.804488 51.268372,62.157267 61.504139,76.168769 78.849293,75.680123 68.686589,89.744708 Z"
+       inkscape:transform-center-x="1.3856798"
+       inkscape:transform-center-y="-1.1403183" />
+  </g>
+</svg>
