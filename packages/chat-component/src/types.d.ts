@@ -12,6 +12,7 @@ declare interface ChatMessageText {
 // We declare a simple interface for the chat messages
 // and the citations
 declare interface ChatThreadEntry {
+  id: string;
   text: ChatMessageText[];
   citations?: Citation[];
   followupQuestions?: string[];
@@ -20,6 +21,8 @@ declare interface ChatThreadEntry {
   error?: {
     message: string;
   };
+  thoughts?: string;
+  dataPoints?: string[];
 }
 
 declare interface Citation {
@@ -37,6 +40,7 @@ declare interface ChatRequestOptions {
   overrides: RequestOverrides;
   type: string;
   question: string;
+  messages?: Message[];
 }
 
 declare interface RequestOverrides {
@@ -50,14 +54,6 @@ declare interface RequestOverrides {
   prompt_template_prefix?: string;
   prompt_template_suffix?: string;
   suggest_followup_questions?: boolean;
-}
-
-declare interface BotResponse {
-  answer: string;
-  thoughts: string | null;
-  data_points: string[];
-  error?: string;
-  done?: boolean;
 }
 
 declare type MessageRole = 'system' | 'user' | 'assistant' | 'function';

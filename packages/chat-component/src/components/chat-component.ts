@@ -3,12 +3,17 @@ import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { chatHttpOptions, globalConfig, teaserListTexts, requestOptions } from '../config/global-config.js';
-import { getAPIResponse } from '../core/http/index.js';
-import { parseStreamedMessages } from '../core/parser/index.js';
+import {
+  chatHttpOptions,
+  globalConfig,
+  teaserListTexts,
+  requestOptions,
+  MAX_CHAT_HISTORY,
+} from '../config/global-config.js';
 import { chatStyle } from '../styles/chat-component.js';
-import { type ChatResponseError, getTimestamp, processText } from '../utils/index.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import { chatEntryToString, newListWithEntryAtIndex } from '../utils/index.js';
+
 // TODO: allow host applications to customize these icons
 
 import iconLightBulb from '../../public/svg/lightbulb-icon.svg?raw';
@@ -17,6 +22,7 @@ import iconCancel from '../../public/svg/cancel-icon.svg?raw';
 import iconSend from '../../public/svg/send-icon.svg?raw';
 import iconClose from '../../public/svg/close-icon.svg?raw';
 import iconLogo from '../../public/branding/brand-logo.svg?raw';
+import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 
 // import only necessary components to reduce bundle size
 import './chat-avatar.js';
@@ -31,6 +37,8 @@ import './chat-thread-component.js';
 import './chat-action-button.js';
 
 import { type TabContent } from './tab-component.js';
+import { ChatController } from './chat-controller.js';
+import { ChatHistoryController } from './chat-history-controller.js';
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -88,50 +96,26 @@ export class ChatComponent extends LitElement {
   @state()
   isResetInput = false;
 
-  // The program is awaiting response from API
-  @state()
-  isAwaitingResponse = false;
-
-  // Show error message to the end-user, if API call fails
-  @property({ type: Boolean })
-  hasAPIError = false;
-
-  // Has the response been copied to the clipboard
-  @state()
-  isResponseCopied = false;
+  private chatController = new ChatController(this);
+  private chatHistoryController = new ChatHistoryController(this);
 
   // Is showing thought process panel
   @state()
   isShowingThoughtProcess = false;
 
   @state()
-  canShowThoughtProcess = false;
-
-  @state()
   isDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
-
-  @state()
-  isProcessingResponse = false;
 
   @state()
   selectedCitation: Citation | undefined = undefined;
 
+  @state()
+  selectedChatEntry: ChatThreadEntry | undefined = undefined;
+
   selectedAsideTab: 'tab-thought-process' | 'tab-support-context' | 'tab-citations' = 'tab-thought-process';
 
-  // api response
-  apiResponse = {} as BotResponse | Response;
   // These are the chat bubbles that will be displayed in the chat
   chatThread: ChatThreadEntry[] = [];
-  defaultPrompts: string[] = globalConfig.DEFAULT_PROMPTS;
-  defaultPromptsHeading: string = globalConfig.DEFAULT_PROMPTS_HEADING;
-  chatButtonLabelText: string = globalConfig.CHAT_BUTTON_LABEL_TEXT;
-  chatThoughts: string | null = '';
-  chatDataPoints: string[] = [];
-
-  abortController: AbortController = new AbortController();
-
-  chatRequestOptions: ChatRequestOptions = requestOptions;
-  chatHttpOptions: ChatHttpOptions = chatHttpOptions;
 
   static override styles = [chatStyle];
 
@@ -155,90 +139,6 @@ export class ChatComponent extends LitElement {
   }
   // Send the question to the Open AI API and render the answer in the chat
 
-  // Add a message to the chat, when the user or the API sends a message
-  async processApiResponse({ message, isUserMessage }: { message: string; isUserMessage: boolean }) {
-    const citations: Citation[] = [];
-    const followingSteps: string[] = [];
-    const followupQuestions: string[] = [];
-    // Get the timestamp for the message
-    const timestamp = getTimestamp();
-    const updateChatWithMessageOrChunk = async (part: string, isChunk: boolean) => {
-      if (isChunk) {
-        // we need to prepare an empty instance of the chat message so that we can start populating it
-        this.chatThread = [
-          ...this.chatThread,
-          {
-            text: [{ value: '', followingSteps: [] }],
-            followupQuestions: [],
-            citations: [],
-            timestamp: timestamp,
-            isUserMessage,
-          },
-        ];
-
-        this.isProcessingResponse = true;
-
-        const result = await parseStreamedMessages({
-          chatThread: this.chatThread,
-          signal: this.abortController.signal,
-          apiResponseBody: (this.apiResponse as Response).body,
-          onChunkRead: () => {
-            // NOTE: this function is called whenever we mutate sub-properties of the array
-            // so we need to trigger a re-render
-            this.requestUpdate('chatThread');
-          },
-          onCancel: () => {
-            this.isProcessingResponse = false;
-            // TODO: show a message to the user that the response has been cancelled
-          },
-        });
-        // this will be processing thought process only with streaming enabled
-        this.chatThoughts = result.thoughts;
-        this.chatDataPoints = result.data_points;
-        this.canShowThoughtProcess = true;
-
-        this.isProcessingResponse = false;
-
-        return true;
-      }
-
-      this.chatThread = [
-        ...this.chatThread,
-        {
-          text: [
-            {
-              value: part,
-              followingSteps,
-            },
-          ],
-          followupQuestions,
-          citations: [...new Set(citations)],
-          timestamp: timestamp,
-          isUserMessage,
-        },
-      ];
-      return true;
-    };
-
-    // Check if message is a bot message to process citations and follow-up questions
-    if (isUserMessage) {
-      updateChatWithMessageOrChunk(message, false);
-    } else {
-      if (this.useStream) {
-        await updateChatWithMessageOrChunk(message, true);
-      } else {
-        // non-streamed response
-        const processedText = processText(message, [citations, followingSteps, followupQuestions]);
-        message = processedText.replacedText;
-        // Push all lists coming from processText to the corresponding arrays
-        citations.push(...(processedText.arrays[0] as unknown as Citation[]));
-        followingSteps.push(...(processedText.arrays[1] as string[]));
-        followupQuestions.push(...(processedText.arrays[2] as string[]));
-        updateChatWithMessageOrChunk(message, false);
-      }
-    }
-  }
-
   setQuestionInputValue(value: string): void {
     this.questionInput.value = DOMPurify.sanitize(value || '');
     this.currentQuestion = this.questionInput.value;
@@ -259,9 +159,33 @@ export class ChatComponent extends LitElement {
     this.selectedCitation = event?.detail?.citation;
 
     if (!this.isShowingThoughtProcess) {
+      if (event?.detail?.chatThreadEntry) {
+        this.selectedChatEntry = event?.detail?.chatThreadEntry;
+      }
       this.handleExpandAside();
       this.selectedAsideTab = 'tab-citations';
     }
+  }
+
+  getMessageContext(): Message[] {
+    if (this.interactionModel === 'ask') {
+      return [];
+    }
+
+    const history = [
+      ...this.chatThread,
+      // include the history from the previous session if the user has enabled the chat history
+      ...(this.chatHistoryController.showChatHistory ? this.chatHistoryController.chatHistory : []),
+    ];
+
+    const messages: Message[] = history.map((entry) => {
+      return {
+        content: chatEntryToString(entry),
+        role: entry.isUserMessage ? 'user' : 'assistant',
+      };
+    });
+
+    return messages;
   }
 
   // Handle the click on the chat button and send the question to the API
@@ -269,86 +193,36 @@ export class ChatComponent extends LitElement {
     event.preventDefault();
     this.collapseAside(event);
     const question = DOMPurify.sanitize(this.questionInput.value);
-    if (question) {
-      this.currentQuestion = question;
-      try {
-        const type = this.interactionModel;
-        // Remove default prompts
-        this.isChatStarted = true;
-        this.isDefaultPromptsEnabled = false;
-        // Disable the input field and submit button while waiting for the API response
-        this.isDisabled = true;
-        // clear out errors
-        this.hasAPIError = false;
-        // Show loading indicator while waiting for the API response
-        this.isAwaitingResponse = true;
-        if (type === 'chat') {
-          this.processApiResponse({ message: question, isUserMessage: true });
-        }
+    this.isChatStarted = true;
+    this.isDefaultPromptsEnabled = false;
 
-        this.apiResponse = await getAPIResponse(
-          {
-            ...this.chatRequestOptions,
-            overrides: {
-              ...this.chatRequestOptions.overrides,
-              ...this.overrides,
-            },
-            question,
-            type,
-          },
-          {
-            // use defaults
-            ...this.chatHttpOptions,
+    await this.chatController.generateAnswer(
+      {
+        ...requestOptions,
+        overrides: {
+          ...requestOptions.overrides,
+          ...this.overrides,
+        },
+        question,
+        type: this.interactionModel,
+        messages: this.getMessageContext(),
+      },
+      {
+        // use defaults
+        ...chatHttpOptions,
 
-            // override if the user has provided different values
-            url: this.apiUrl,
-            stream: this.useStream,
-          },
-        );
+        // override if the user has provided different values
+        url: this.apiUrl,
+        stream: this.useStream,
+      },
+    );
 
-        this.questionInput.value = '';
-        this.isAwaitingResponse = false;
-        this.isDisabled = false;
-        this.isResetInput = false;
-        const response = this.apiResponse as BotResponse;
-        // adds thought process support when streaming is disabled
-        if (!this.useStream) {
-          this.chatThoughts = response.choices[0].message.context?.thoughts ?? '';
-          this.chatDataPoints = response.choices[0].message.context?.data_points ?? [];
-          this.canShowThoughtProcess = true;
-        }
-        await this.processApiResponse({
-          message: this.useStream ? '' : response.choices[0].message.content,
-          isUserMessage: false,
-        });
-      } catch (error_: any) {
-        console.error(error_);
-
-        const error = error_ as ChatResponseError;
-        const chatError = {
-          message: error?.code === 400 ? globalConfig.INVALID_REQUEST_ERROR : globalConfig.API_ERROR_MESSAGE,
-        };
-
-        if (this.isProcessingResponse && this.chatThread.at(-1)) {
-          const processingThread = this.chatThread.at(-1);
-          if (processingThread) {
-            processingThread.error = chatError;
-          }
-        } else {
-          this.chatThread = [
-            ...this.chatThread,
-            {
-              error: chatError,
-              text: [],
-              timestamp: getTimestamp(),
-              isUserMessage: false,
-            },
-          ];
-        }
-
-        this.handleAPIError();
-      }
+    if (this.interactionModel === 'chat') {
+      this.chatHistoryController.saveChatHistory(this.chatThread);
     }
+
+    this.questionInput.value = '';
+    this.isResetInput = false;
   }
 
   // Reset the input field and the current question
@@ -365,8 +239,10 @@ export class ChatComponent extends LitElement {
     this.chatThread = [];
     this.isDisabled = false;
     this.isDefaultPromptsEnabled = true;
-    this.isResponseCopied = false;
     this.selectedCitation = undefined;
+    this.chatController.reset();
+    // clean up the current session content from the history too
+    this.chatHistoryController.saveChatHistory(this.chatThread);
     this.collapseAside(event);
     this.handleUserChatCancel(event);
   }
@@ -383,22 +259,10 @@ export class ChatComponent extends LitElement {
     this.isResetInput = !!this.questionInput.value;
   }
 
-  // Handle API error
-  handleAPIError(): void {
-    this.hasAPIError = true;
-    this.isDisabled = false;
-    this.isAwaitingResponse = false;
-    this.isProcessingResponse = false;
-  }
-
   // Stop generation
   handleUserChatCancel(event: Event): any {
     event?.preventDefault();
-    this.isProcessingResponse = false;
-    this.abortController.abort();
-
-    // we have to reset the abort controller so that we can use it again
-    this.abortController = new AbortController();
+    this.chatController.cancelRequest();
   }
 
   // show thought process aside
@@ -414,6 +278,7 @@ export class ChatComponent extends LitElement {
   collapseAside(event: Event): void {
     event.preventDefault();
     this.isShowingThoughtProcess = false;
+    this.selectedCitation = undefined;
     this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.remove('aside-open');
     this.shadowRoot?.querySelector('#overlay')?.classList.remove('active');
   }
@@ -437,13 +302,101 @@ export class ChatComponent extends LitElement {
       ${unsafeSVG(iconCancel)}
     </button>`;
 
-    return this.isProcessingResponse ? cancelChatButton : submitChatButton;
+    return this.chatController.isProcessingResponse ? cancelChatButton : submitChatButton;
+  }
+
+  renderChatEntryTabContent(entry: ChatThreadEntry) {
+    return html` <tab-component
+      .tabs="${[
+        {
+          id: 'tab-thought-process',
+          label: globalConfig.THOUGHT_PROCESS_LABEL,
+        },
+        {
+          id: 'tab-support-context',
+          label: globalConfig.SUPPORT_CONTEXT_LABEL,
+        },
+        {
+          id: 'tab-citations',
+          label: globalConfig.CITATIONS_TAB_LABEL,
+        },
+      ] as TabContent[]}"
+      .selectedTabId="${this.selectedAsideTab}"
+    >
+      <div slot="tab-thought-process" class="tab-component__content">
+        ${entry && entry.thoughts ? html` <p class="tab-component__paragraph">${unsafeHTML(entry.thoughts)}</p> ` : ''}
+      </div>
+      <div slot="tab-support-context" class="tab-component__content">
+        ${entry && entry.dataPoints
+          ? html` <teaser-list-component
+              .alwaysRow="${true}"
+              .teasers="${entry.dataPoints.map((d) => {
+                return { description: d };
+              })}"
+            ></teaser-list-component>`
+          : ''}
+      </div>
+      ${entry && entry.citations
+        ? html`
+            <div slot="tab-citations" class="tab-component__content">
+              <citation-list
+                .citations="${entry.citations}"
+                .label="${globalConfig.CITATIONS_LABEL}"
+                .selectedCitation="${this.selectedCitation}"
+                @on-citation-click="${this.handleCitationClick}"
+              ></citation-list>
+              ${this.selectedCitation
+                ? html`<document-previewer
+                    url="${this.apiUrl}/content/${this.selectedCitation.text}"
+                  ></document-previewer>`
+                : ''}
+            </div>
+          `
+        : ''}
+    </tab-component>`;
   }
 
   handleChatEntryActionButtonClick(event: CustomEvent) {
     if (event.detail?.id === 'chat-show-thought-process') {
+      this.selectedChatEntry = event.detail?.chatThreadEntry;
       this.handleExpandAside(event);
     }
+  }
+
+  override willUpdate(): void {
+    this.isDisabled = this.chatController.generatingAnswer;
+
+    if (this.chatController.processingMessage) {
+      const processingEntry = this.chatController.processingMessage as ChatThreadEntry;
+      const index = this.chatThread.findIndex((entry) => entry.id === processingEntry.id);
+
+      this.chatThread =
+        index > -1
+          ? newListWithEntryAtIndex(this.chatThread, index, processingEntry)
+          : [...this.chatThread, processingEntry];
+    }
+  }
+
+  renderChatThread(chatThread: ChatThreadEntry[]) {
+    return html`<chat-thread-component
+      .chatThread="${chatThread}"
+      .actionButtons="${[
+        {
+          id: 'chat-show-thought-process',
+          label: globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT,
+          svgIcon: iconLightBulb,
+          isDisabled: this.isShowingThoughtProcess,
+        },
+      ] as any}"
+      .isDisabled="${this.isDisabled}"
+      .isProcessingResponse="${this.chatController.isProcessingResponse}"
+      .selectedCitation="${this.selectedCitation}"
+      .isEnabled="${this.isBrandingEnabled}"
+      @on-action-button-click="${this.handleChatEntryActionButtonClick}"
+      @on-citation-click="${this.handleCitationClick}"
+      @on-followup-click="${this.handleQuestionInputClick}"
+    >
+    </chat-thread-component>`;
   }
 
   // Render the chat component as a web component
@@ -455,6 +408,9 @@ export class ChatComponent extends LitElement {
           ${this.isChatStarted
             ? html`
                 <div class="chat__header--butons">
+                  ${this.interactionModel === 'chat'
+                    ? this.chatHistoryController.renderHistoryButton({ disabled: this.isDisabled })
+                    : ''}
                   <chat-action-button
                     .label="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
                     actionId="chat-reset-button"
@@ -463,29 +419,23 @@ export class ChatComponent extends LitElement {
                   >
                   </chat-action-button>
                 </div>
-                <chat-thread-component
-                  .chatThread="${this.chatThread}"
-                  .isCustomBranding="${this.isCustomBranding}"
-                  .svgIcon="${iconLogo}"
-                  .actionButtons="${[
-                    {
-                      id: 'chat-show-thought-process',
-                      label: globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT,
-                      svgIcon: iconLightBulb,
-                      isDisabled: this.isShowingThoughtProcess || !this.canShowThoughtProcess,
-                    },
-                  ] as any}"
-                  .isDisabled="${this.isDisabled}"
-                  .isProcessingResponse="${this.isProcessingResponse}"
-                  .selectedCitation="${this.selectedCitation}"
-                  @on-action-button-click="${this.handleChatEntryActionButtonClick}"
-                  @on-citation-click="${this.handleCitationClick}"
-                  @on-followup-click="${this.handleQuestionInputClick}"
-                >
-                </chat-thread-component>
+                ${this.chatHistoryController.showChatHistory
+                  ? html`<div class="chat-history__container">
+                      ${this.renderChatThread(this.chatHistoryController.chatHistory)}
+                      <div class="chat-history__footer">
+                        ${unsafeSVG(iconUp)}
+                        ${globalConfig.CHAT_HISTORY_FOOTER_TEXT.replace(
+                          globalConfig.CHAT_MAX_COUNT_TAG,
+                          MAX_CHAT_HISTORY,
+                        )}
+                        ${unsafeSVG(iconUp)}
+                      </div>
+                    </div>`
+                  : ''}
+                ${this.renderChatThread(this.chatThread)}
               `
             : ''}
-          ${this.isAwaitingResponse && !this.hasAPIError
+          ${this.chatController.isAwaitingResponse
             ? html`<loading-indicator label="${globalConfig.LOADING_INDICATOR_TEXT}"></loading-indicator>`
             : ''}
           <!-- Teaser List with Default Prompts -->
@@ -571,50 +521,7 @@ export class ChatComponent extends LitElement {
                   >
                   </chat-action-button>
                 </div>
-                <tab-component
-                  .tabs="${[
-                    {
-                      id: 'tab-thought-process',
-                      label: globalConfig.THOUGHT_PROCESS_LABEL,
-                    },
-                    {
-                      id: 'tab-support-context',
-                      label: globalConfig.SUPPORT_CONTEXT_LABEL,
-                    },
-                    {
-                      id: 'tab-citations',
-                      label: globalConfig.CITATIONS_TAB_LABEL,
-                    },
-                  ] as TabContent[]}"
-                  .selectedTabId="${this.selectedAsideTab}"
-                >
-                  <div slot="tab-thought-process" class="tab-component__content">
-                    ${this.chatThoughts
-                      ? html` <p class="tab-component__paragraph">${unsafeHTML(this.chatThoughts)}</p> `
-                      : ''}
-                  </div>
-                  <div slot="tab-support-context" class="tab-component__content">
-                    <teaser-list-component
-                      .alwaysRow="${true}"
-                      .teasers="${this.chatDataPoints?.map((d) => {
-                        return { description: d };
-                      })}"
-                    ></teaser-list-component>
-                  </div>
-                  <div slot="tab-citations" class="tab-component__content">
-                    <citation-list
-                      .citations="${this.chatThread.at(-1)?.citations}"
-                      .label="${globalConfig.CITATIONS_LABEL}"
-                      .selectedCitation="${this.selectedCitation}"
-                      @on-citation-click="${this.handleCitationClick}"
-                    ></citation-list>
-                    ${this.selectedCitation
-                      ? html`<document-previewer
-                          url="${this.apiUrl}/content/${this.selectedCitation.text}"
-                        ></document-previewer>`
-                      : ''}
-                  </div>
-                </tab-component>
+                ${this.renderChatEntryTabContent(this.selectedChatEntry as ChatThreadEntry)}
               </aside>
             `
           : ''}

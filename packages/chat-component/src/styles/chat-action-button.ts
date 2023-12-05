@@ -49,8 +49,9 @@ export const styles = css`
   }
   svg {
     fill: currentColor;
-    width: var(--d-base);
     padding: var(--d-xsmall);
+    width: var(--d-base);
+    height: var(--d-base);
   }
   button:hover > span,
   button:focus > span {

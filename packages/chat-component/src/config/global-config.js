@@ -41,6 +41,10 @@ const globalConfig = {
   BRANDING_URL: '#',
   BRANDING_LOGO_ALT: 'Brand Logo',
   BRANDING_HEADLINE: 'Welcome to the Support Assistant of our Brand',
+  SHOW_CHAT_HISTORY_LABEL: 'Show Chat History',
+  HIDE_CHAT_HISTORY_LABEL: 'Hide Chat History',
+  CHAT_MAX_COUNT_TAG: '{MAX_CHAT_HISTORY}',
+  CHAT_HISTORY_FOOTER_TEXT: 'Showing past {MAX_CHAT_HISTORY} conversations',
 };
 
 const teaserListTexts = {
@@ -79,6 +83,16 @@ const chatHttpOptions = {
   stream: true,
 };
 
+const MAX_CHAT_HISTORY = 5;
+
 const APPROACH_MODEL = ['rrr', 'rtr'];
 
-export { globalConfig, requestOptions, chatHttpOptions, NEXT_QUESTION_INDICATOR, APPROACH_MODEL, teaserListTexts };
+export {
+  globalConfig,
+  requestOptions,
+  chatHttpOptions,
+  NEXT_QUESTION_INDICATOR,
+  APPROACH_MODEL,
+  teaserListTexts,
+  MAX_CHAT_HISTORY,
+};

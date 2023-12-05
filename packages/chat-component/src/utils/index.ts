@@ -77,6 +77,15 @@ export function getTimestamp() {
   });
 }
 
+export function chatEntryToString(entry: ChatThreadEntry) {
+  const message = entry.text
+    .map((textEntry) => textEntry.value + '\n\n' + textEntry.followingSteps?.map((s, i) => `${i + 1}.` + s).join('\n'))
+    .join('\n\n')
+    .replaceAll(/<sup[^>]*>(.*?)<\/sup>/g, ''); // remove the <sup> tags from the message
+
+  return message;
+}
+
 // Creates a new chat message error
 export class ChatResponseError extends Error {
   code?: number;
@@ -85,4 +94,8 @@ export class ChatResponseError extends Error {
     super(message);
     this.code = code;
   }
+}
+
+export function newListWithEntryAtIndex<T>(list: T[], index: number, entry: T) {
+  return [...list.slice(0, index), entry, ...list.slice(index + 1)];
 }

@@ -296,4 +296,18 @@ export const chatStyle = css`
     border-radius: var(--radius-large);
     padding: var(--d-base);
   }
+  .chat-history__footer {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: space-between;
+    align-self: center;
+    padding: 20px;
+  }
+  .chat-history__container {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 3px solid var(--light-gray);
+    margin-bottom: 30px;
+  }
 `;

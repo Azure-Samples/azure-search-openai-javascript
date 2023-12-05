@@ -6,6 +6,7 @@ import { styles } from '../styles/chat-thread-component.js';
 import { globalConfig } from '../config/global-config.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { chatEntryToString } from '../utils/index.js';
 
 import iconSuccess from '../../public/svg/success-icon.svg?raw';
 import iconCopyToClipboard from '../../public/svg/copy-icon.svg?raw';
@@ -47,8 +48,9 @@ export class ChatThreadComponent extends LitElement {
   svgIcon = '';
 
   // Copy response to clipboard
-  copyResponseToClipboard(): void {
-    const response = this.chatThread.at(-1)?.text.at(-1)?.value as string;
+  copyResponseToClipboard(entry: ChatThreadEntry): void {
+    const response = chatEntryToString(entry);
+
     navigator.clipboard.writeText(response);
     this.isResponseCopied = true;
   }
@@ -78,16 +80,31 @@ export class ChatThreadComponent extends LitElement {
     }, 500);
   }
 
-  handleFollowupQuestionClick(question: string, event: Event) {
+  handleFollowupQuestionClick(question: string, entry: ChatThreadEntry, event: Event) {
     event.preventDefault();
-    const citationClickedEvent = new CustomEvent('on-followup-click', {
+    const followUpClickEvent = new CustomEvent('on-followup-click', {
       detail: {
         question,
+        chatThreadEntry: entry,
       },
       bubbles: true,
       composed: true,
     });
-    this.dispatchEvent(citationClickedEvent);
+    this.dispatchEvent(followUpClickEvent);
+  }
+
+  handleCitationClick(citation: Citation, entry: ChatThreadEntry, event: Event) {
+    event.preventDefault();
+    this.selectedCitation = citation;
+    const citationClickEvent = new CustomEvent('on-citation-click', {
+      detail: {
+        citation,
+        chatThreadEntry: entry,
+      },
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(citationClickEvent);
   }
 
   renderResponseActions(entry: ChatThreadEntry) {
@@ -144,7 +161,8 @@ export class ChatThreadComponent extends LitElement {
     return html`<div class="chat_txt--entry-container">${entries}</div>`;
   }
 
-  renderCitation(citations: Citation[] | undefined) {
+  renderCitation(entry: ChatThreadEntry) {
+    const citations = entry.citations;
     if (citations && citations.length > 0) {
       return html`
         <div class="chat__citations">
@@ -152,6 +170,8 @@ export class ChatThreadComponent extends LitElement {
             .citations="${citations}"
             .label="${globalConfig.CITATIONS_LABEL}"
             .selectedCitation=${this.selectedCitation}
+            @on-citation-click="${(event: CustomEvent) =>
+              this.handleCitationClick(event.detail.citation, entry, event)}"
           ></citation-list>
         </div>
       `;
@@ -160,7 +180,8 @@ export class ChatThreadComponent extends LitElement {
     return '';
   }
 
-  renderFollowupQuestions(followupQuestions: string[] | undefined) {
+  renderFollowupQuestions(entry: ChatThreadEntry) {
+    const followupQuestions = entry.followupQuestions;
     // render followup questions
     // need to fix first after decoupling of teaserlist
     if (followupQuestions && followupQuestions.length > 0) {
@@ -175,7 +196,7 @@ export class ChatThreadComponent extends LitElement {
                     class="items__link"
                     href="#"
                     data-testid="followUpQuestion"
-                    @click="${(event) => this.handleFollowupQuestionClick(followupQuestion, event)}"
+                    @click="${(event) => this.handleFollowupQuestionClick(followupQuestion, entry, event)}"
                     >${followupQuestion}</a
                   >
                 </li>
@@ -201,9 +222,8 @@ export class ChatThreadComponent extends LitElement {
             <li class="chat__listItem ${message.isUserMessage ? 'user-message' : ''}">
               <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
                 ${message.isUserMessage ? '' : this.renderResponseActions(message)}
-                ${message.text.map((textEntry) => this.renderTextEntry(textEntry))}
-                ${this.renderCitation(message.citations)} ${this.renderFollowupQuestions(message.followupQuestions)}
-                ${message.error ? this.renderError(message.error) : ''}
+                ${message.text.map((textEntry) => this.renderTextEntry(textEntry))} ${this.renderCitation(message)}
+                ${this.renderFollowupQuestions(message)} ${message.error ? this.renderError(message.error) : ''}
               </div>
               <p class="chat__txt--info">
                 <span class="timestamp">${message.timestamp}</span>,
