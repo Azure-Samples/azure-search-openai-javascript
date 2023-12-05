@@ -24,10 +24,11 @@ export const SettingsStyles = ({ onChange }: Props) => {
     AccentDarkDefault: '#5e3c7d',
     TextColorDefault: '#123f58',
     BackgroundColorDefault: '#e3e3e3',
+    ForegroundColorDefault: '#4e5288',
     FormBackgroundColorDefault: '#f5f5f5',
-    BorderRadiusDefault: 25,
-    BorderWidthDefault: 3,
-    FontBaseSizeDefault: 14,
+    BorderRadiusDefault: '10px',
+    BorderWidthDefault: '3px',
+    FontBaseSizeDefault: '14px',
   };
 
   const getInitialStyles = (): CustomStylesState => {
@@ -40,6 +41,7 @@ export const SettingsStyles = ({ onChange }: Props) => {
           AccentDark: styleDefaults.AccentDarkDefault,
           TextColor: styleDefaults.TextColorDefault,
           BackgroundColor: styleDefaults.BackgroundColorDefault,
+          ForegroundColor: styleDefaults.ForegroundColorDefault,
           FormBackgroundColor: styleDefaults.FormBackgroundColorDefault,
           BorderRadius: styleDefaults.BorderRadiusDefault,
           BorderWidth: styleDefaults.BorderWidthDefault,
@@ -72,6 +74,7 @@ export const SettingsStyles = ({ onChange }: Props) => {
           { label: 'Text Color', name: 'TextColor', placeholder: 'Text color' },
           { label: 'Background Color', name: 'BackgroundColor', placeholder: 'Background color' },
           { label: 'Form background', name: 'FormBackgroundColor', placeholder: 'Form Background color' },
+          { label: 'Foreground Color', name: 'ForegroundColor', placeholder: 'Foreground color' },
         ].map((input) => (
           <React.Fragment key={input.name}>
             <label htmlFor={`accent-${input.name.toLowerCase()}-picker`}>{input.label}</label>

@@ -17,6 +17,7 @@ export const enum CustomStyles {
   TextColor = 'TextColor',
   BackgroundColor = 'BackgroundColor',
   FormBackgroundColor = 'FormBackgroundColor',
+  ForegroundColor = 'ForegroundColor',
   BorderRadius = 'BorderRadius',
   BorderWidth = 'BorderWidth',
   FontBaseSize = 'FontBaseSize',
