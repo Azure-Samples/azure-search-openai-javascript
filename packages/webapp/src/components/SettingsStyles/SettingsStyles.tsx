@@ -15,9 +15,10 @@ export type CustomStylesState = {
 
 interface Props {
   onChange: (newStyles: CustomStylesState) => void;
+  isDarkTheme: boolean;
 }
 
-export const SettingsStyles = ({ onChange }: Props) => {
+export const SettingsStyles = ({ onChange, isDarkTheme }: Props) => {
   // this needs to come from an API call to some config persisted in the DB
   const styleDefaultsLight = {
     AccentHighDefault: '#692b61',
@@ -46,8 +47,7 @@ export const SettingsStyles = ({ onChange }: Props) => {
   };
 
   const getInitialStyles = (): CustomStylesState => {
-    const themeStore = localStorage.getItem('isDarkTheme');
-    const styleDefaults = themeStore === 'true' ? styleDefaultsDark : styleDefaultsLight;
+    const styleDefaults = isDarkTheme ? styleDefaultsDark : styleDefaultsLight;
     const storedStyles = localStorage.getItem('customStyles');
     if (storedStyles === '') {
       localStorage.setItem('customStyles', JSON.stringify(styleDefaults));

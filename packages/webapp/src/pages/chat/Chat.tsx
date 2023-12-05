@@ -315,7 +315,7 @@ const Chat = () => {
           {isChatStylesAccordionOpen && (
             <>
               <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
-                <SettingsStyles onChange={handleCustomStylesChange}></SettingsStyles>
+                <SettingsStyles onChange={handleCustomStylesChange} isDarkTheme={isDarkTheme}></SettingsStyles>
               </TooltipHost>
             </>
           )}
