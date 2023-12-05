@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
 import { RetrievalMode, apiBaseUrl } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
-import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField, TooltipHost } from '@fluentui/react';
+import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField, TooltipHost, Toggle } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
 import 'chat-component';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 import { SettingsStyles } from '../../components/SettingsStyles/SettingsStyles.js';
-import type { CustomStylesState } from '../../api/models.js';
+import type { CustomStylesState } from '../../components/SettingsStyles/SettingsStyles.js';
 
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -24,7 +24,10 @@ const Chat = () => {
 
   const [isLoading] = useState<boolean>(false);
 
-  useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' }), [isLoading]);
+  const [enableBranding, setEnableBranding] = useState(() => {
+    const storedBranding = localStorage.getItem('enableBranding');
+    return storedBranding ? JSON.parse(storedBranding) : false;
+  });
 
   const onPromptTemplateChange = (
     _event?: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -61,6 +64,10 @@ const Chat = () => {
     setExcludeCategory(newValue || '');
   };
 
+  const onEnableBrandingChange = (_event?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+    setEnableBranding(!!checked);
+  };
+
   const onUseSuggestFollowupQuestionsChange = (
     _event?: React.FormEvent<HTMLElement | HTMLInputElement>,
     checked?: boolean,
@@ -68,15 +75,61 @@ const Chat = () => {
     setUseSuggestFollowupQuestions(!!checked);
   };
 
-  const [customStyles, setCustomStyles] = useState<CustomStylesState>({
-    AccentHigh: '#ff0000',
-    AccentLighter: '#ff0000',
-    AccentContrast: '#ff0000',
+  const [customStyles, setCustomStyles] = useState(() => {
+    const storedStyles = localStorage.getItem('customStyles');
+    return storedStyles
+      ? JSON.parse(storedStyles)
+      : {
+          AccentHigh: '#692b61',
+          AccentLight: '#f6d5f2',
+          AccentDark: '#5e3c7d',
+          TextColor: '#123f58',
+          BackgroundColor: '#e3e3e3',
+          ForegroundColor: '#4e5288',
+          FormBackgroundColor: '#f5f5f5',
+          BorderRadius: '10px',
+          BorderWidth: '3px',
+          FontBaseSize: '14px',
+        };
   });
 
   const handleCustomStylesChange = (newStyles: CustomStylesState) => {
     setCustomStyles(newStyles);
   };
+
+  useEffect(() => {
+    // Update the state when local storage changes
+    const handleStorageChange = () => {
+      const storedStyles = localStorage.getItem('customStyles');
+      if (storedStyles) {
+        setCustomStyles(JSON.parse(storedStyles));
+      }
+
+      const storedBranding = localStorage.getItem('enableBranding');
+      if (storedBranding) {
+        setEnableBranding(JSON.parse(storedBranding));
+      }
+    };
+
+    // Attach the event listener
+    window.addEventListener('storage', handleStorageChange);
+
+    // Store customStyles in local storage whenever it changes
+    localStorage.setItem('customStyles', JSON.stringify(customStyles));
+
+    // Store enableBranding in local storage whenever it changes
+    localStorage.setItem('enableBranding', JSON.stringify(enableBranding));
+
+    // Scroll into view when isLoading changes
+    chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' });
+
+    // Clean up the event listener when the component is unmounted
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [customStyles, enableBranding, isLoading]);
+
+  const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);
 
   const overrides = {
     retrievalMode,
@@ -106,12 +159,13 @@ const Chat = () => {
             data-approach="rrr"
             data-overrides={JSON.stringify(overrides)}
             data-custom-styles={JSON.stringify(customStyles)}
+            data-custom-branding={JSON.stringify(enableBranding)}
           ></chat-component>
         </div>
       </div>
 
       <Panel
-        headerText="Configure your ChatGPT component styles and answer generation"
+        headerText="Configure answer generation"
         isOpen={isConfigPanelOpen}
         isBlocking={false}
         onDismiss={() => setIsConfigPanelOpen(false)}
@@ -119,9 +173,6 @@ const Chat = () => {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
-        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
-          <SettingsStyles onChange={handleCustomStylesChange}></SettingsStyles>
-        </TooltipHost>
         <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
           <TextField
             className={styles.chatSettingsSeparator}
@@ -206,6 +257,23 @@ const Chat = () => {
             onChange={onUseStreamChange}
           />
         </TooltipHost>
+        <div>
+          <Toggle
+            label="Customize chat styles"
+            checked={isChatStylesAccordionOpen}
+            onChange={() => setIsChatStylesAccordionOpen(!isChatStylesAccordionOpen)}
+          />
+          {isChatStylesAccordionOpen && (
+            <>
+              <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
+                <SettingsStyles onChange={handleCustomStylesChange}></SettingsStyles>
+              </TooltipHost>
+            </>
+          )}
+          <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
+            <Toggle label="Enable Branding" checked={enableBranding} onChange={onEnableBrandingChange} />
+          </TooltipHost>
+        </div>
       </Panel>
     </div>
   );

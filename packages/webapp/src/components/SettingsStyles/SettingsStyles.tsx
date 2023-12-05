@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './SettingsStyles.css';
 
-type CustomStylesState = {
+export type CustomStylesState = {
   AccentHigh: string;
   AccentLight: string;
   AccentDark: string;
