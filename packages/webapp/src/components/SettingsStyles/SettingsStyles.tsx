@@ -67,8 +67,8 @@ export const SettingsStyles = ({ onChange }: Props) => {
       <div className="ms-style-picker colors">
         {[
           { label: 'Accent High', name: 'AccentHigh', placeholder: 'Accent high' },
-          { label: 'Accent Lighter', name: 'AccentLighter', placeholder: 'Accent lighter' },
-          { label: 'Accent Contrast', name: 'AccentContrast', placeholder: 'Accent contrast' },
+          { label: 'Accent Light', name: 'AccentLight', placeholder: 'Accent lighter' },
+          { label: 'Accent Dark', name: 'AccentDark', placeholder: 'Accent contrast' },
           { label: 'Text Color', name: 'TextColor', placeholder: 'Text color' },
           { label: 'Background Color', name: 'BackgroundColor', placeholder: 'Background color' },
           { label: 'Form background', name: 'FormBackgroundColor', placeholder: 'Form Background color' },
@@ -103,7 +103,7 @@ export const SettingsStyles = ({ onChange }: Props) => {
                 placeholder={`Slider for ${slider.name.toLowerCase()}`}
                 value={customStyles[slider.name as keyof CustomStylesState]}
                 onChange={(event) =>
-                  handleInputChange(slider.name as keyof CustomStylesState, Number(event.target.value))
+                  handleInputChange(slider.name as keyof CustomStylesState, `${event.target.value}px`)
                 }
               />
               <span className="ms-setting-value">{customStyles[slider.name as keyof CustomStylesState]}</span>
