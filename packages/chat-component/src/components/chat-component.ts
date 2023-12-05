@@ -135,6 +135,15 @@ export class ChatComponent extends LitElement {
 
   static override styles = [chatStyle];
 
+  override updated(changedProperties: Map<string | number | symbol, unknown>) {
+    super.updated(changedProperties);
+
+    if (changedProperties.has('customStyles')) {
+      this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
+      this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLight);
+      this.style.setProperty('--c-accent-dark', this.customStyles.AccentDark);
+    }
+  }
   // Send the question to the Open AI API and render the answer in the chat
 
   // Add a message to the chat, when the user or the API sends a message

@@ -10,16 +10,16 @@ export const enum RetrievalMode {
   Text = 'text',
 }
 
-export type CustomStylesState = {
-  AccentHigh: string;
-  AccentLighter: string;
-  AccentContrast: string;
-};
-
 export const enum CustomStyles {
   AccentHigh = 'AccentHigh',
-  AccentLighter = 'AccentLighter',
-  AccentContrast = 'AccentContrast',
+  AccentLight = 'AccentLighter',
+  AccentDark = 'AccentContrast',
+  TextColor = 'TextColor',
+  BackgroundColor = 'BackgroundColor',
+  FormBackgroundColor = 'FormBackgroundColor',
+  BorderRadius = 'BorderRadius',
+  BorderWidth = 'BorderWidth',
+  FontBaseSize = 'FontBaseSize',
 }
 
 export type RequestOverrides = {

@@ -3,13 +3,14 @@ import './SettingsStyles.css';
 
 type CustomStylesState = {
   AccentHigh: string;
-  AccentLighter: string;
-  AccentContrast: string;
+  AccentLight: string;
+  AccentDark: string;
   TextColor: string;
   BackgroundColor: string;
-  BorderRadius: number;
-  BorderWidth: number;
-  FontBaseSize: number;
+  FormBackgroundColor: string;
+  BorderRadius: string;
+  BorderWidth: string;
+  FontBaseSize: string;
 };
 
 interface Props {
@@ -17,23 +18,32 @@ interface Props {
 }
 
 export const SettingsStyles = ({ onChange }: Props) => {
-  const defaultColors = ['#692b61', '#f6d5f2', '#5e3c7d', '#123f58', '#e3e3e3', '#f5f5f5'];
-  const defaultDimensions = [25, 3, 14]; // Updated default dimensions to be numbers
+  const styleDefaults = {
+    AccentHighDefault: '#692b61',
+    AccentLightDefault: '#f6d5f2',
+    AccentDarkDefault: '#5e3c7d',
+    TextColorDefault: '#123f58',
+    BackgroundColorDefault: '#e3e3e3',
+    FormBackgroundColorDefault: '#f5f5f5',
+    BorderRadiusDefault: 25,
+    BorderWidthDefault: 3,
+    FontBaseSizeDefault: 14,
+  };
 
   const getInitialStyles = (): CustomStylesState => {
     const storedStyles = localStorage.getItem('customStyles');
     return storedStyles
       ? JSON.parse(storedStyles)
       : {
-          AccentHigh: defaultColors[0],
-          AccentLighter: defaultColors[1],
-          AccentContrast: defaultColors[2],
-          TextColor: defaultColors[3],
-          BackgroundColor: defaultColors[4],
-          FormBackgroundColor: defaultColors[5],
-          BorderRadius: defaultDimensions[0],
-          BorderWidth: defaultDimensions[1],
-          FontBaseSize: defaultDimensions[2],
+          AccentHigh: styleDefaults.AccentHighDefault,
+          AccentLight: styleDefaults.AccentLightDefault,
+          AccentDark: styleDefaults.AccentDarkDefault,
+          TextColor: styleDefaults.TextColorDefault,
+          BackgroundColor: styleDefaults.BackgroundColorDefault,
+          FormBackgroundColor: styleDefaults.FormBackgroundColorDefault,
+          BorderRadius: styleDefaults.BorderRadiusDefault,
+          BorderWidth: styleDefaults.BorderWidthDefault,
+          FontBaseSize: styleDefaults.FontBaseSizeDefault,
         };
   };
 
