@@ -96,7 +96,7 @@ export class ChatThreadComponent extends LitElement {
         <chat-avatar
           url="${globalConfig.BRANDING_URL}"
           svgIcon="${this.svgIcon}"
-          isEnabled="${this.isCustomBranding}"
+          .isEnabled="${this.isCustomBranding}"
         ></chat-avatar>
         <div class="chat__header--button">
           ${this.actionButtons.map(

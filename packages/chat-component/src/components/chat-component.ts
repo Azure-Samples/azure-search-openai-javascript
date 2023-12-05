@@ -493,7 +493,7 @@ export class ChatComponent extends LitElement {
             ${this.isChatStarted
               ? ''
               : html` <chat-stage
-                  isEnabled="${this.isCustomBranding}"
+                  .isEnabled="${this.isCustomBranding}"
                   svgIcon="${iconLogo}"
                   pagetitle="${globalConfig.BRANDING_HEADLINE}"
                   url="${globalConfig.BRANDING_URL}"
