@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
-import { RetrievalMode, apiBaseUrl, type RequestOverrides } from '../../api/index.js';
+import { RetrievalMode, apiBaseUrl } from '../../api/index.js';
 import { SettingsButton } from '../../components/SettingsButton/index.js';
 import { Checkbox, DefaultButton, Dropdown, Panel, SpinButton, TextField, TooltipHost } from '@fluentui/react';
 import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
 import 'chat-component';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
+import { SettingsStyles } from '../../components/SettingsStyles/SettingsStyles.js';
+import type { CustomStylesState } from '../../api/models.js';
 
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -66,16 +68,26 @@ const Chat = () => {
     setUseSuggestFollowupQuestions(!!checked);
   };
 
-  const overrides: RequestOverrides = {
-    retrieval_mode: retrievalMode,
+  const [customStyles, setCustomStyles] = useState<CustomStylesState>({
+    AccentHigh: '#ff0000',
+    AccentLighter: '#ff0000',
+    AccentContrast: '#ff0000',
+  });
+
+  const handleCustomStylesChange = (newStyles: CustomStylesState) => {
+    setCustomStyles(newStyles);
+  };
+
+  const overrides = {
+    retrievalMode,
     top: retrieveCount,
-    semantic_ranker: useSemanticRanker,
-    semantic_captions: useSemanticCaptions,
-    exclude_category: excludeCategory,
-    prompt_template: promptTemplate,
-    prompt_template_prefix: '',
-    prompt_template_suffix: '',
-    suggest_followup_questions: useSuggestFollowupQuestions,
+    useSemanticRanker,
+    useSemanticCaptions,
+    excludeCategory,
+    promptTemplate,
+    promptTemplatePrefix: '',
+    promptTemplateSuffix: '',
+    suggestFollowupQuestions: useSuggestFollowupQuestions,
   };
 
   return (
@@ -93,12 +105,13 @@ const Chat = () => {
             data-use-stream={useStream}
             data-approach="rrr"
             data-overrides={JSON.stringify(overrides)}
+            data-custom-styles={JSON.stringify(customStyles)}
           ></chat-component>
         </div>
       </div>
 
       <Panel
-        headerText="Configure answer generation"
+        headerText="Configure your ChatGPT component styles and answer generation"
         isOpen={isConfigPanelOpen}
         isBlocking={false}
         onDismiss={() => setIsConfigPanelOpen(false)}
@@ -106,6 +119,9 @@ const Chat = () => {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
+          <SettingsStyles onChange={handleCustomStylesChange}></SettingsStyles>
+        </TooltipHost>
         <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
           <TextField
             className={styles.chatSettingsSeparator}

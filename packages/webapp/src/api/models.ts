@@ -10,6 +10,18 @@ export const enum RetrievalMode {
   Text = 'text',
 }
 
+export type CustomStylesState = {
+  AccentHigh: string;
+  AccentLighter: string;
+  AccentContrast: string;
+};
+
+export const enum CustomStyles {
+  AccentHigh = 'AccentHigh',
+  AccentLighter = 'AccentLighter',
+  AccentContrast = 'AccentContrast',
+}
+
 export type RequestOverrides = {
   retrieval_mode?: RetrievalMode;
   semantic_ranker?: boolean;
