@@ -109,12 +109,7 @@ export class ChatThreadComponent extends LitElement {
 
   renderResponseActions(entry: ChatThreadEntry) {
     return html`
-      <div class="chat__header--avatar">
-        <chat-avatar
-          url="${globalConfig.BRANDING_URL}"
-          svgIcon="${this.svgIcon}"
-          .isEnabled="${this.isCustomBranding}"
-        ></chat-avatar>
+      <header class="chat__header">
         <div class="chat__header--button">
           ${this.actionButtons.map(
             (actionButton) => html`
@@ -138,7 +133,7 @@ export class ChatThreadComponent extends LitElement {
             @click="${this.copyResponseToClipboard}"
           ></chat-action-button>
         </div>
-      </div>
+      </header>
     `;
   }
 

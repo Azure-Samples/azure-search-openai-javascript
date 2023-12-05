@@ -8,7 +8,6 @@ export interface ChatStage {
   label: string;
   svgIcon: string;
   url: string;
-  isEnabled: boolean;
 }
 
 @customElement('chat-avatar')
@@ -24,13 +23,7 @@ export class ChatAvatarComponent extends LitElement {
   @property({ type: String })
   url = '';
 
-  @property({ type: Boolean })
-  isEnabled = false;
-
   override render() {
-    if (!this.isEnabled) {
-      return html``;
-    }
     return html`
       <a class="chat-avatar__link" title="${this.label}" href="${this.url}" target="_blank" rel="noopener noreferrer">
         ${unsafeSVG(this.svgIcon)}

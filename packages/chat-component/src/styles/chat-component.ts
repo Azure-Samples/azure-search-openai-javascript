@@ -150,6 +150,11 @@ export const chatStyle = css`
     font-size: var(--font-small);
     display: inline-block;
   }
+  .chat__header--thread {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
   .chat__container {
     min-width: 100%;
     transition: width 0.3s ease-in-out;

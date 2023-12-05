@@ -391,7 +391,8 @@ export class ChatComponent extends LitElement {
       .isDisabled="${this.isDisabled}"
       .isProcessingResponse="${this.chatController.isProcessingResponse}"
       .selectedCitation="${this.selectedCitation}"
-      .isEnabled="${this.isBrandingEnabled}"
+      .isCustomBranding="${this.isCustomBranding}"
+      .svgIcon="${iconLogo}"
       @on-action-button-click="${this.handleChatEntryActionButtonClick}"
       @on-citation-click="${this.handleCitationClick}"
       @on-followup-click="${this.handleQuestionInputClick}"
@@ -407,7 +408,7 @@ export class ChatComponent extends LitElement {
         <section class="chat__container" id="chat-container">
           ${this.isChatStarted
             ? html`
-                <div class="chat__header--butons">
+                <div class="chat__header--thread">
                   ${this.interactionModel === 'chat'
                     ? this.chatHistoryController.renderHistoryButton({ disabled: this.isDisabled })
                     : ''}

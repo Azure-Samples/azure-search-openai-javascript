@@ -20,11 +20,14 @@ export const styles = css`
     display: flex;
     align-items: center;
   }
-  .chat__header--avatar {
-    justify-content: space-between;
+  .chat__header {
+    display: flex;
+    align-items: top;
+    justify-content: flex-end;
+    padding: var(--d-base);
   }
   .chat__header--button {
-    margin-right: 20px;
+    margin-right: var(--d-base);
   }
   .chat__list {
     color: var(--text-color);
@@ -35,7 +38,7 @@ export const styles = css`
   }
   .chat__footer {
     width: 100%;
-    height: 70px;
+    height: calc(var(--d-large) + var(--d-base));
   }
   .chat__listItem {
     max-width: var(--width-wide);
@@ -48,6 +51,20 @@ export const styles = css`
       max-width: 55%;
       min-width: var(--width-narrow);
     }
+  }
+  .chat-history__footer {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: space-between;
+    align-self: center;
+    padding: 20px;
+  }
+  .chat-history__container {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 3px solid var(--light-gray);
+    margin-bottom: 30px;
   }
   .chat__txt {
     animation: chatmessageanimation 0.5s ease-in-out;
@@ -82,7 +99,7 @@ export const styles = css`
     font-size: smaller;
     font-style: italic;
     margin: 0;
-    margin-top: 1px;
+    margin-top: var(--border-thin);
   }
   .user-message .chat__txt--info {
     text-align: right;
