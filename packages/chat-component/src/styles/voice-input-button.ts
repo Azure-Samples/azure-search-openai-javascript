@@ -15,7 +15,7 @@ export const styles = css`
   }
   button:hover,
   button:focus {
-    background: var(--secondary-color);
+    background: var(--c-secondary);
   }
   button:hover svg,
   button:focus svg {

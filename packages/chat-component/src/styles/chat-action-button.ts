@@ -61,7 +61,7 @@ export const styles = css`
   button:focus,
   button:hover > svg,
   button:focus > svg {
-    background-color: var(--light-gray);
+    background-color: var(--c-light-gray);
     border-radius: var(--radius-small);
     transition: background 0.3s ease-in-out;
   }

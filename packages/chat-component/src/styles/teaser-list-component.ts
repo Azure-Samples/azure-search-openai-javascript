@@ -51,7 +51,7 @@ export const styles = css`
   .teaser-list-item:hover,
   .teaser-list-item:focus {
     color: var(--c-accent-dark);
-    background: var(--secondary-color);
+    background: var(--c-secondary);
     transition: all 0.3s ease-in-out;
     border-color: var(--c-accent-high);
   }

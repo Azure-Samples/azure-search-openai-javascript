@@ -9,6 +9,11 @@ body {
   padding: 0;
 }
 
+body.dark {
+  background: #1e1e1e;
+  color: #fff;
+}
+
 html {
   background: #f2f2f2;
 

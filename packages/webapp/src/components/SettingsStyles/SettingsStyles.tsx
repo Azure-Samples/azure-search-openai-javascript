@@ -18,7 +18,8 @@ interface Props {
 }
 
 export const SettingsStyles = ({ onChange }: Props) => {
-  const styleDefaults = {
+  // this needs to come from an API call to some config persisted in the DB
+  const styleDefaultsLight = {
     AccentHighDefault: '#692b61',
     AccentLightDefault: '#f6d5f2',
     AccentDarkDefault: '#5e3c7d',
@@ -31,8 +32,26 @@ export const SettingsStyles = ({ onChange }: Props) => {
     FontBaseSizeDefault: '14px',
   };
 
+  const styleDefaultsDark = {
+    AccentHighDefault: '#dcdef8',
+    AccentLightDefault: '#032219',
+    AccentDarkDefault: '#fdfeff',
+    TextColorDefault: '#fdfeff',
+    BackgroundColorDefault: '#e3e3e3',
+    ForegroundColorDefault: '#4e5288',
+    FormBackgroundColorDefault: '#32343e',
+    BorderRadiusDefault: '10px',
+    BorderWidthDefault: '3px',
+    FontBaseSizeDefault: '14px',
+  };
+
   const getInitialStyles = (): CustomStylesState => {
+    const themeStore = localStorage.getItem('isDarkTheme');
+    const styleDefaults = themeStore === 'true' ? styleDefaultsDark : styleDefaultsLight;
     const storedStyles = localStorage.getItem('customStyles');
+    if (storedStyles === '') {
+      localStorage.setItem('customStyles', JSON.stringify(styleDefaults));
+    }
     return storedStyles
       ? JSON.parse(storedStyles)
       : {
@@ -69,12 +88,12 @@ export const SettingsStyles = ({ onChange }: Props) => {
       <div className="ms-style-picker colors">
         {[
           { label: 'Accent High', name: 'AccentHigh', placeholder: 'Accent high' },
-          { label: 'Accent Light', name: 'AccentLight', placeholder: 'Accent lighter' },
-          { label: 'Accent Dark', name: 'AccentDark', placeholder: 'Accent contrast' },
+          { label: 'Accent Light', name: 'AccentLight', placeholder: 'Accent light' },
+          { label: 'Accent Dark', name: 'AccentDark', placeholder: 'Accent dark' },
           { label: 'Text Color', name: 'TextColor', placeholder: 'Text color' },
           { label: 'Background Color', name: 'BackgroundColor', placeholder: 'Background color' },
-          { label: 'Form background', name: 'FormBackgroundColor', placeholder: 'Form Background color' },
           { label: 'Foreground Color', name: 'ForegroundColor', placeholder: 'Foreground color' },
+          { label: 'Form background', name: 'FormBackgroundColor', placeholder: 'Form Background color' },
         ].map((input) => (
           <React.Fragment key={input.name}>
             <label htmlFor={`accent-${input.name.toLowerCase()}-picker`}>{input.label}</label>
@@ -91,7 +110,7 @@ export const SettingsStyles = ({ onChange }: Props) => {
       <div className="ms-style-picker sliders">
         {/* Sliders */}
         {[
-          { label: 'Border Radius', name: 'BorderRadius', min: 0, max: 35 },
+          { label: 'Border Radius', name: 'BorderRadius', min: 0, max: 25 },
           { label: 'Border Width', name: 'BorderWidth', min: 1, max: 5 },
           { label: 'Font Base Size', name: 'FontBaseSize', min: 12, max: 20 },
         ].map((slider) => (

@@ -20,7 +20,7 @@ export const styles = css`
     color: var(--c-white);
   }
   .tab-component__link:not(.active):hover {
-    background: var(--light-gray);
+    background: var(--c-light-gray);
     cursor: pointer;
   }
   .tab-component__link {

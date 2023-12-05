@@ -51,7 +51,7 @@ export const styles = css`
   }
   .chat__txt {
     animation: chatmessageanimation 0.5s ease-in-out;
-    background-color: var(--secondary-color);
+    background-color: var(--c-secondary);
     color: var(--text-color);
     border-radius: var(--radius-base);
     margin-top: 8px;
@@ -59,7 +59,7 @@ export const styles = css`
     margin-block-end: 0;
     position: relative;
     box-shadow: var(--shadow);
-    border: var(--border-thin) solid var(--light-gray);
+    border: var(--border-thin) solid var(--c-light-gray);
   }
   .chat__txt.error {
     border: var(--border-base) solid var(--error-color);
@@ -88,7 +88,7 @@ export const styles = css`
     text-align: right;
   }
   .items__listWrapper {
-    border-top: var(--border-thin) solid var(--light-gray);
+    border-top: var(--border-thin) solid var(--c-light-gray);
     display: grid;
     padding: 0 var(--d-base);
     grid-template-columns: 1fr 18fr;
@@ -114,7 +114,7 @@ export const styles = css`
     list-style-type: disc;
   }
   .chat__citations {
-    border-top: var(--border-thin) solid var(--light-gray);
+    border-top: var(--border-thin) solid var(--c-light-gray);
   }
   .items__list {
     margin: var(--d-small) 0;
@@ -147,7 +147,7 @@ export const styles = css`
     color: var(--c-accent-high);
     display: block;
     padding: var(--d-xsmall) 0;
-    border-bottom: var(--border-thin) solid var(--light-gray);
+    border-bottom: var(--border-thin) solid var(--c-light-gray);
     font-size: var(--font-small);
   }
   .citation {

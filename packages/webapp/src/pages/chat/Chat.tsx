@@ -8,6 +8,7 @@ import 'chat-component';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 import { SettingsStyles } from '../../components/SettingsStyles/SettingsStyles.js';
 import type { CustomStylesState } from '../../components/SettingsStyles/SettingsStyles.js';
+import { ThemeSwitch } from '../../components/ThemeSwitch/ThemeSwitch.js';
 
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -24,8 +25,8 @@ const Chat = () => {
 
   const [isLoading] = useState<boolean>(false);
 
-  const [enableBranding, setEnableBranding] = useState(() => {
-    const storedBranding = localStorage.getItem('enableBranding');
+  const [isBrandingEnabled, setEnableBranding] = useState(() => {
+    const storedBranding = localStorage.getItem('isBrandingEnabled');
     return storedBranding ? JSON.parse(storedBranding) : false;
   });
 
@@ -75,26 +76,62 @@ const Chat = () => {
     setUseSuggestFollowupQuestions(!!checked);
   };
 
+  const [isDarkTheme, setIsDarkTheme] = useState(() => {
+    const storedTheme = localStorage.getItem('isDarkTheme');
+    return storedTheme ? JSON.parse(storedTheme) : false;
+  });
+
   const [customStyles, setCustomStyles] = useState(() => {
+    const styleDefaultsLight = {
+      AccentHigh: '#692b61',
+      AccentLight: '#f6d5f2',
+      AccentDark: '#5e3c7d',
+      TextColor: '#123f58',
+      BackgroundColor: '#e3e3e3',
+      ForegroundColor: '#4e5288',
+      FormBackgroundColor: '#f5f5f5',
+      BorderRadius: '10px',
+      BorderWidth: '3px',
+      FontBaseSize: '14px',
+    };
+
+    const styleDefaultsDark = {
+      AccentHigh: '#dcdef8',
+      AccentLight: '#032219',
+      AccentDark: '#fdfeff',
+      TextColor: '#fdfeff',
+      BackgroundColor: '#32343e',
+      ForegroundColor: '#4e5288',
+      FormBackgroundColor: '#32343e',
+      BorderRadius: '10px',
+      BorderWidth: '3px',
+      FontBaseSize: '14px',
+    };
+    const defaultStyles = isDarkTheme ? styleDefaultsDark : styleDefaultsLight;
     const storedStyles = localStorage.getItem('customStyles');
-    return storedStyles
-      ? JSON.parse(storedStyles)
-      : {
-          AccentHigh: '#692b61',
-          AccentLight: '#f6d5f2',
-          AccentDark: '#5e3c7d',
-          TextColor: '#123f58',
-          BackgroundColor: '#e3e3e3',
-          ForegroundColor: '#4e5288',
-          FormBackgroundColor: '#f5f5f5',
-          BorderRadius: '10px',
-          BorderWidth: '3px',
-          FontBaseSize: '14px',
-        };
+    return storedStyles ? JSON.parse(storedStyles) : defaultStyles;
   });
 
   const handleCustomStylesChange = (newStyles: CustomStylesState) => {
     setCustomStyles(newStyles);
+  };
+
+  const handleThemeToggle = (newIsDarkTheme: boolean) => {
+    // Get the ChatComponent instance (modify this according to how you manage your components)
+    const chatComponent = document.querySelector('chat-component');
+    if (chatComponent) {
+      // Remove existing style attributes
+      chatComponent.removeAttribute('style');
+      // eslint-disable-next-line unicorn/prefer-dom-node-dataset
+      chatComponent.setAttribute('data-theme', newIsDarkTheme ? 'dark' : '');
+    }
+    // Update the body class and html data-theme
+    localStorage.removeItem('customStyles');
+    document.body.classList.toggle('dark', newIsDarkTheme);
+    document.documentElement.dataset.theme = newIsDarkTheme ? 'dark' : '';
+
+    // Update the state
+    setIsDarkTheme(newIsDarkTheme);
   };
 
   useEffect(() => {
@@ -105,9 +142,14 @@ const Chat = () => {
         setCustomStyles(JSON.parse(storedStyles));
       }
 
-      const storedBranding = localStorage.getItem('enableBranding');
+      const storedBranding = localStorage.getItem('isBrandingEnabled');
       if (storedBranding) {
         setEnableBranding(JSON.parse(storedBranding));
+      }
+
+      const storedTheme = localStorage.getItem('isDarkTheme');
+      if (storedTheme) {
+        setIsDarkTheme(JSON.parse(storedTheme));
       }
     };
 
@@ -117,17 +159,30 @@ const Chat = () => {
     // Store customStyles in local storage whenever it changes
     localStorage.setItem('customStyles', JSON.stringify(customStyles));
 
-    // Store enableBranding in local storage whenever it changes
-    localStorage.setItem('enableBranding', JSON.stringify(enableBranding));
+    // Store isBrandingEnabled in local storage whenever it changes
+    localStorage.setItem('isBrandingEnabled', JSON.stringify(isBrandingEnabled));
+
+    // Store isDarkTheme in local storage whenever it changes
+    localStorage.setItem('isDarkTheme', JSON.stringify(isDarkTheme));
 
     // Scroll into view when isLoading changes
     chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' });
-
+    // Toggle 'dark' class on the shell app body element based on the isDarkTheme prop and isConfigPanelOpen
+    document.body.classList.toggle('dark', isDarkTheme);
+    document.documentElement.dataset.theme = isDarkTheme ? 'dark' : '';
     // Clean up the event listener when the component is unmounted
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [customStyles, enableBranding, isLoading]);
+  }, [customStyles, isBrandingEnabled, isDarkTheme, isLoading]);
+
+  /*   useEffect(() => {
+    const storedTheme = localStorage.getItem('isDarkTheme');
+    if (storedTheme) {
+      const parsedTheme = JSON.parse(storedTheme);
+      handleThemeToggle(parsedTheme);
+    }
+  }, []); */ // Run this effect once, when the component mounts
 
   const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);
 
@@ -159,7 +214,8 @@ const Chat = () => {
             data-approach="rrr"
             data-overrides={JSON.stringify(overrides)}
             data-custom-styles={JSON.stringify(customStyles)}
-            data-custom-branding={JSON.stringify(enableBranding)}
+            data-custom-branding={JSON.stringify(isBrandingEnabled)}
+            data-theme={isDarkTheme ? 'dark' : ''}
           ></chat-component>
         </div>
       </div>
@@ -173,6 +229,9 @@ const Chat = () => {
         onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
         isFooterAtBottom={true}
       >
+        <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
+          <ThemeSwitch onToggle={handleThemeToggle} isDarkTheme={isDarkTheme} isConfigPanelOpen={isConfigPanelOpen} />
+        </TooltipHost>
         <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
           <TextField
             className={styles.chatSettingsSeparator}
@@ -271,7 +330,7 @@ const Chat = () => {
             </>
           )}
           <TooltipHost calloutProps={toolTipTextCalloutProps} content={toolTipText.promptTemplate}>
-            <Toggle label="Enable Branding" checked={enableBranding} onChange={onEnableBrandingChange} />
+            <Toggle label="Enable Branding" checked={isBrandingEnabled} onChange={onEnableBrandingChange} />
           </TooltipHost>
         </div>
       </Panel>

@@ -241,7 +241,7 @@ export const chatStyle = css`
   }
   .chatbox__button:hover,
   .chatbox__button:focus {
-    background: var(--secondary-color);
+    background: var(--c-secondary);
   }
   .chatbox__button:hover svg,
   .chatbox__button:focus svg {
@@ -292,7 +292,7 @@ export const chatStyle = css`
   .tab-component__paragraph {
     font-family: monospace;
     font-size: var(--font-large);
-    border: var(--border-thin) solid var(--light-gray);
+    border: var(--border-thin) solid var(--c-light-gray);
     border-radius: var(--radius-large);
     padding: var(--d-base);
   }
