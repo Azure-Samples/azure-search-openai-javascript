@@ -25,7 +25,7 @@ import iconLogo from '../../public/branding/brand-logo.svg?raw';
 import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 
 // import only necessary components to reduce bundle size
-import './chat-avatar.js';
+import './link-icon.js';
 import './chat-stage.js';
 import './loading-indicator.js';
 import './voice-input-button.js';

@@ -1,13 +1,13 @@
 import { css } from 'lit';
 
 export const styles = css`
-  .chat-avatar__link svg {
+  a svg {
     width: calc(var(--width-base) - var(--d-small));
     height: calc(var(--width-base) - var(--d-small));
     position: relative;
     z-index: 1;
   }
-  .chat-avatar__link {
+  a {
     flex-shrink: 0;
     border-radius: calc(var(--radius-large) * 3);
     border: var(--border-thicker) solid transparent;
@@ -25,7 +25,7 @@ export const styles = css`
     padding: var(--d-small);
     position: relative;
   }
-  .chat-avatar__link::after {
+  a::after {
     content: '';
     border-radius: calc(var(--radius-large) * 3);
     width: calc(var(--width-base) - var(--d-small));

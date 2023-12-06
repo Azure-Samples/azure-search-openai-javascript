@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { styles } from '../styles/chat-stage.js';
-import './chat-avatar.js';
+import './link-icon.js';
 export interface ChatStage {
   pagetitle: string;
   svgIcon: string;
@@ -25,12 +25,9 @@ export class ChatStageComponent extends LitElement {
   svgIcon = '';
 
   override render() {
-    if (!this.isEnabled) {
-      return html``;
-    }
     return html`
       <header class="chat-stage__header">
-        <chat-avatar url="${this.url}" svgIcon="${this.svgIcon}" isEnabled="${this.isEnabled}"></chat-avatar>
+        <link-icon url="${this.url}" svgIcon="${this.svgIcon}" isEnabled="${this.isEnabled}"></link-icon>
         <h1 class="chat-stage__hl">${this.pagetitle}</h1>
       </header>
     `;
