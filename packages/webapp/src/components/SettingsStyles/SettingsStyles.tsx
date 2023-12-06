@@ -20,29 +20,29 @@ interface Props {
 export const SettingsStyles = ({ onChange }: Props) => {
   // this needs to come from an API call to some config persisted in the DB
   const styleDefaultsLight = {
-    AccentHighDefault: '#692b61',
-    AccentLightDefault: '#f6d5f2',
-    AccentDarkDefault: '#5e3c7d',
-    TextColorDefault: '#123f58',
-    BackgroundColorDefault: '#e3e3e3',
-    ForegroundColorDefault: '#4e5288',
-    FormBackgroundColorDefault: '#f5f5f5',
-    BorderRadiusDefault: '10px',
-    BorderWidthDefault: '3px',
-    FontBaseSizeDefault: '14px',
+    AccentHigh: '#692b61',
+    AccentLight: '#f6d5f2',
+    AccentDark: '#5e3c7d',
+    TextColor: '#123f58',
+    BackgroundColor: '#e3e3e3',
+    ForegroundColor: '#4e5288',
+    FormBackgroundColor: '#f5f5f5',
+    BorderRadius: '10px',
+    BorderWidth: '3px',
+    FontBaseSize: '14px',
   };
 
   const styleDefaultsDark = {
-    AccentHighDefault: '#dcdef8',
-    AccentLightDefault: '#032219',
-    AccentDarkDefault: '#fdfeff',
-    TextColorDefault: '#fdfeff',
-    BackgroundColorDefault: '#e3e3e3',
-    ForegroundColorDefault: '#4e5288',
-    FormBackgroundColorDefault: '#32343e',
-    BorderRadiusDefault: '10px',
-    BorderWidthDefault: '3px',
-    FontBaseSizeDefault: '14px',
+    AccentHigh: '#dcdef8',
+    AccentLight: '#032219',
+    AccentDark: '#fdfeff',
+    TextColor: '#fdfeff',
+    BackgroundColor: '#e3e3e3',
+    ForegroundColor: '#4e5288',
+    FormBackgroundColor: '#32343e',
+    BorderRadius: '10px',
+    BorderWidth: '3px',
+    FontBaseSize: '14px',
   };
 
   const getInitialStyles = (): CustomStylesState => {
@@ -55,16 +55,16 @@ export const SettingsStyles = ({ onChange }: Props) => {
     return storedStyles
       ? JSON.parse(storedStyles)
       : {
-          AccentHigh: styleDefaults.AccentHighDefault,
-          AccentLight: styleDefaults.AccentLightDefault,
-          AccentDark: styleDefaults.AccentDarkDefault,
-          TextColor: styleDefaults.TextColorDefault,
-          BackgroundColor: styleDefaults.BackgroundColorDefault,
-          ForegroundColor: styleDefaults.ForegroundColorDefault,
-          FormBackgroundColor: styleDefaults.FormBackgroundColorDefault,
-          BorderRadius: styleDefaults.BorderRadiusDefault,
-          BorderWidth: styleDefaults.BorderWidthDefault,
-          FontBaseSize: styleDefaults.FontBaseSizeDefault,
+          AccentHigh: styleDefaults.AccentHigh,
+          AccentLight: styleDefaults.AccentLight,
+          AccentDark: styleDefaults.AccentDark,
+          TextColor: styleDefaults.TextColor,
+          BackgroundColor: styleDefaults.BackgroundColor,
+          ForegroundColor: styleDefaults.ForegroundColor,
+          FormBackgroundColor: styleDefaults.FormBackgroundColor,
+          BorderRadius: styleDefaults.BorderRadius,
+          BorderWidth: styleDefaults.BorderWidth,
+          FontBaseSize: styleDefaults.FontBaseSize,
         };
   };
 
