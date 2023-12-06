@@ -68,7 +68,7 @@ export const styles = css`
     border: var(--border-base) solid var(--error-color);
     color: var(--error-color);
     padding: var(--d-base);
-    background: var(--error-color-background);
+    background: var(--c-error-background);
   }
   .chat__txt.user-message {
     background: linear-gradient(to left, var(--c-accent-dark), var(--c-accent-high));
