@@ -77,24 +77,6 @@ export const chatStyle = css`
     cursor: pointer;
     text-decoration: underline;
   }
-  @keyframes chatmessageanimation {
-    0% {
-      opacity: 0.5;
-      top: calc(--var(--d-xlarge) * 3);
-    }
-    100% {
-      opacity: 1;
-      top: 0;
-    }
-  }
-  @keyframes spinneranimation {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
   .overlay {
     position: fixed;
     top: 0;
@@ -128,27 +110,6 @@ export const chatStyle = css`
   }
   .container-row {
     flex-direction: row;
-  }
-  .headline {
-    color: var(--c-text);
-    font-size: var(--font-r-large);
-    padding: 0;
-    margin: var(--d-small) 0 var(--d-large);
-
-    @media (min-width: 1024px) {
-      font-size: var(--font-r-base);
-      text-align: center;
-    }
-  }
-  .subheadline {
-    color: var(--c-text);
-    font-size: var(--font-r-base);
-    padding: 0;
-    margin: 0;
-  }
-  .subheadline--small {
-    font-size: var(--font-small);
-    display: inline-block;
   }
   .chat__header--thread {
     display: flex;
