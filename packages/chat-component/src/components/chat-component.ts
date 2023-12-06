@@ -441,7 +441,7 @@ export class ChatComponent extends LitElement {
             : ''}
           <!-- Teaser List with Default Prompts -->
           <div class="chat__container">
-            ${this.isChatStarted
+            ${this.isChatStarted && this.isCustomBranding
               ? ''
               : html` <chat-stage
                   .isEnabled="${this.isCustomBranding}"

@@ -41,12 +41,6 @@ export class ChatThreadComponent extends LitElement {
   @property({ type: Object })
   selectedCitation: Citation | undefined = undefined;
 
-  @property({ type: Boolean })
-  isCustomBranding = false;
-
-  @property({ type: String })
-  svgIcon = '';
-
   // Copy response to clipboard
   copyResponseToClipboard(entry: ChatThreadEntry): void {
     const response = chatEntryToString(entry);
