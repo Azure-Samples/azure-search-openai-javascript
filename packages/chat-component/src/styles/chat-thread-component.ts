@@ -52,20 +52,6 @@ export const styles = css`
       min-width: var(--width-narrow);
     }
   }
-  .chat-history__footer {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    justify-content: space-between;
-    align-self: center;
-    padding: 20px;
-  }
-  .chat-history__container {
-    display: flex;
-    flex-direction: column;
-    border-bottom: 3px solid var(--light-gray);
-    margin-bottom: 30px;
-  }
   .chat__txt {
     animation: chatmessageanimation 0.5s ease-in-out;
     background-color: var(--c-secondary);
