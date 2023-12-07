@@ -438,6 +438,8 @@ test.describe('generate answer', () => {
 
   test('follow up questions', async ({ page }) => {
     const followupQuestions = page.getByTestId('followUpQuestion');
+    await followupQuestions.waitFor();
+
     await expect(followupQuestions).toHaveCount(3);
 
     const chatInput = page.getByTestId('question-input');
