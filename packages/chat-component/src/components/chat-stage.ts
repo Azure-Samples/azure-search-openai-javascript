@@ -4,8 +4,8 @@ import { styles } from '../styles/chat-stage.js';
 import './link-icon.js';
 export interface ChatStage {
   pagetitle: string;
+  url: string;
   svgIcon: string;
-  isEnabled: boolean;
 }
 
 @customElement('chat-stage')
@@ -18,16 +18,13 @@ export class ChatStageComponent extends LitElement {
   @property({ type: String })
   url = '';
 
-  @property({ type: Boolean })
-  isEnabled = false;
-
   @property({ type: String })
   svgIcon = '';
 
   override render() {
     return html`
       <header class="chat-stage__header">
-        <link-icon url="${this.url}" svgIcon="${this.svgIcon}" isEnabled="${this.isEnabled}"></link-icon>
+        <link-icon url="${this.url}" svgIcon="${this.svgIcon}"></link-icon>
         <h1 class="chat-stage__hl">${this.pagetitle}</h1>
       </header>
     `;
