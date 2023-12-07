@@ -27,9 +27,6 @@ export const SettingsStyles = ({ onChange }: Props) => {
     BackgroundColor: '#e3e3e3',
     ForegroundColor: '#4e5288',
     FormBackgroundColor: '#f5f5f5',
-    BorderRadius: '10px',
-    BorderWidth: '3px',
-    FontBaseSize: '14px',
   };
 
   const styleDefaultsDark = {
@@ -40,9 +37,6 @@ export const SettingsStyles = ({ onChange }: Props) => {
     BackgroundColor: '#e3e3e3',
     ForegroundColor: '#4e5288',
     FormBackgroundColor: '#32343e',
-    BorderRadius: '10px',
-    BorderWidth: '3px',
-    FontBaseSize: '14px',
   };
 
   const getInitialStyles = (): CustomStylesState => {
@@ -62,9 +56,9 @@ export const SettingsStyles = ({ onChange }: Props) => {
           BackgroundColor: styleDefaults.BackgroundColor,
           ForegroundColor: styleDefaults.ForegroundColor,
           FormBackgroundColor: styleDefaults.FormBackgroundColor,
-          BorderRadius: styleDefaults.BorderRadius,
-          BorderWidth: styleDefaults.BorderWidth,
-          FontBaseSize: styleDefaults.FontBaseSize,
+          BorderRadius: '10px',
+          BorderWidth: '3px',
+          FontBaseSize: '14px',
         };
   };
 
