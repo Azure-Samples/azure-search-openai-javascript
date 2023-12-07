@@ -23,7 +23,7 @@ export class ChatStageComponent extends LitElement {
 
   override render() {
     return html`
-      <header class="chat-stage__header">
+      <header class="chat-stage__header" data-testid="chat-branding">
         <link-icon url="${this.url}" svgIcon="${this.svgIcon}"></link-icon>
         <h1 class="chat-stage__hl">${this.pagetitle}</h1>
       </header>
