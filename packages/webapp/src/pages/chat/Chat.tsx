@@ -26,7 +26,7 @@ const Chat = () => {
   const [isLoading] = useState<boolean>(false);
 
   const [isBrandingEnabled, setEnableBranding] = useState(() => {
-    const storedBranding = localStorage.getItem('isBrandingEnabled');
+    const storedBranding = localStorage.getItem('ms-azoaicc:isBrandingEnabled');
     return storedBranding ? JSON.parse(storedBranding) : false;
   });
 
@@ -77,7 +77,7 @@ const Chat = () => {
   };
 
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
-    const storedTheme = localStorage.getItem('isDarkTheme');
+    const storedTheme = localStorage.getItem('ms-azoaicc:isDarkTheme');
     return storedTheme ? JSON.parse(storedTheme) : false;
   });
 
@@ -108,7 +108,7 @@ const Chat = () => {
       FontBaseSize: '14px',
     };
     const defaultStyles = isDarkTheme ? styleDefaultsDark : styleDefaultsLight;
-    const storedStyles = localStorage.getItem('customStyles');
+    const storedStyles = localStorage.getItem('ms-azoaicc:customStyles');
     return storedStyles ? JSON.parse(storedStyles) : defaultStyles;
   });
 
@@ -126,7 +126,7 @@ const Chat = () => {
       chatComponent.setAttribute('data-theme', newIsDarkTheme ? 'dark' : '');
     }
     // Update the body class and html data-theme
-    localStorage.removeItem('customStyles');
+    localStorage.removeItem('ms-azoaicc:customStyles');
 
     // Update the state
     setIsDarkTheme(newIsDarkTheme);
@@ -135,17 +135,17 @@ const Chat = () => {
   useEffect(() => {
     // Update the state when local storage changes
     const handleStorageChange = () => {
-      const storedStyles = localStorage.getItem('customStyles');
+      const storedStyles = localStorage.getItem('ms-azoaicc:customStyles');
       if (storedStyles) {
         setCustomStyles(JSON.parse(storedStyles));
       }
 
-      const storedBranding = localStorage.getItem('isBrandingEnabled');
+      const storedBranding = localStorage.getItem('ms-azoaicc:isBrandingEnabled');
       if (storedBranding) {
         setEnableBranding(JSON.parse(storedBranding));
       }
 
-      const storedTheme = localStorage.getItem('isDarkTheme');
+      const storedTheme = localStorage.getItem('ms-azoaicc:isDarkTheme');
       if (storedTheme) {
         setIsDarkTheme(JSON.parse(storedTheme));
       }
@@ -155,13 +155,13 @@ const Chat = () => {
     window.addEventListener('storage', handleStorageChange);
 
     // Store customStyles in local storage whenever it changes
-    localStorage.setItem('customStyles', JSON.stringify(customStyles));
+    localStorage.setItem('ms-azoaicc:customStyles', JSON.stringify(customStyles));
 
     // Store isBrandingEnabled in local storage whenever it changes
-    localStorage.setItem('isBrandingEnabled', JSON.stringify(isBrandingEnabled));
+    localStorage.setItem('ms-azoaicc:isBrandingEnabled', JSON.stringify(isBrandingEnabled));
 
     // Store isDarkTheme in local storage whenever it changes
-    localStorage.setItem('isDarkTheme', JSON.stringify(isDarkTheme));
+    localStorage.setItem('ms-azoaicc:isDarkTheme', JSON.stringify(isDarkTheme));
 
     // Scroll into view when isLoading changes
     chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' });

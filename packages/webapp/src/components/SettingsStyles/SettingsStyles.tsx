@@ -40,11 +40,11 @@ export const SettingsStyles = ({ onChange }: Props) => {
   };
 
   const getInitialStyles = (): CustomStylesState => {
-    const storedStyles = localStorage.getItem('customStyles');
-    const themeStore = localStorage.getItem('isDarkTheme');
+    const storedStyles = localStorage.getItem('ms-azoaicc:customStyles');
+    const themeStore = localStorage.getItem('ms-azoaicc:isDarkTheme');
     const styleDefaults = themeStore === 'true' ? styleDefaultsDark : styleDefaultsLight;
     if (storedStyles === '') {
-      localStorage.setItem('customStyles', JSON.stringify(styleDefaults));
+      localStorage.setItem('ms-azoaicc:customStyles', JSON.stringify(styleDefaults));
     }
     return storedStyles
       ? JSON.parse(storedStyles)
