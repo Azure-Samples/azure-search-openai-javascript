@@ -504,7 +504,7 @@ test.describe('developer settings', () => {
     await page.waitForTimeout(1000);
     // check if localStorage has an item called 'customStyles' and it's not empty
     const hasCustomStyles = await page.evaluate(() => {
-      const customStyles = localStorage.getItem('customStyles');
+      const customStyles = localStorage.getItem('ms-azoaicc:customStyles');
       return customStyles !== null && customStyles.trim() !== '';
     });
 
