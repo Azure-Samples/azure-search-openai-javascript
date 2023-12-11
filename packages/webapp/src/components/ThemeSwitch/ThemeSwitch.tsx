@@ -22,16 +22,14 @@ export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ onToggle, isDarkTheme,
   }, [isDarkTheme, isConfigPanelOpen]);
 
   return (
-    <>
-      <div className="ms-toggle-wrapper">
-        <Toggle
-          label="Select theme"
-          onText="Dark Theme"
-          offText="Light Theme"
-          checked={isDarkTheme}
-          onChange={handleToggleChange}
-        />
-      </div>
-    </>
+    <div className="ms-toggle-wrapper">
+      <Toggle
+        label="Select theme"
+        onText="Dark Theme"
+        offText="Light Theme"
+        checked={isDarkTheme}
+        onChange={handleToggleChange}
+      />
+    </div>
   );
 };
