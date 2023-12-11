@@ -1,7 +1,7 @@
 import { type BaseLogger } from 'pino';
 import { getBlobNameFromFile } from './blob-storage.js';
 import { type ContentPage, type ContentSection, type Section } from './document.js';
-import { extractTextFromPdf } from './formats/index.js';
+import { extractText, extractTextFromPdf } from './formats/index.js';
 
 const SENTENCE_ENDINGS = new Set(['.', '!', '?']);
 const WORD_BREAKS = new Set([',', ';', ':', ' ', '(', ')', '[', ']', '{', '}', '\t', '\n']);
@@ -10,7 +10,13 @@ const SENTENCE_SEARCH_LIMIT = 100;
 const SECTION_OVERLAP = 100;
 
 export class DocumentProcessor {
-  constructor(private logger: BaseLogger) {}
+  formatHandlers = new Map<string, (data: Buffer) => Promise<ContentPage[]>>();
+
+  constructor(private logger: BaseLogger) {
+    this.registerFormatHandler('text/plain', extractText);
+    this.registerFormatHandler('text/markdown', extractText);
+    this.registerFormatHandler('application/pdf', extractTextFromPdf);
+  }
 
   async createDocumentFromFile(filename: string, data: Buffer, type: string, category: string) {
     const pages = await this.extractText(data, type);
@@ -19,18 +25,20 @@ export class DocumentProcessor {
     return { filename, type, category, sections };
   }
 
+  private registerFormatHandler(type: string, handler: (data: Buffer) => Promise<ContentPage[]>) {
+    this.formatHandlers.set(type, handler);
+  }
+
   private async extractText(data: Buffer, type: string): Promise<ContentPage[]> {
     const pages: ContentPage[] = [];
-    if (type === 'text/plain' || type === 'text/markdown') {
-      const text = data.toString('utf8');
-      pages.push({ content: text, offset: 0, page: 0 });
-    } else if (type === 'application/pdf') {
-      const pdfContent = await extractTextFromPdf(data);
-      pages.push(...pdfContent);
-    } else {
-      // You can add support for other file types here
+
+    const formatHandler = this.formatHandlers.get(type);
+    if (!formatHandler) {
       throw new Error(`Unsupported file type: ${type}`);
     }
+
+    const contentPages = await formatHandler(data);
+    pages.push(...contentPages);
 
     return pages;
   }
