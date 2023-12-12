@@ -13,4 +13,4 @@ npx index-files \
   --wait \
   --indexer-url "${INDEXER_API_URI}" \
   --index-name "${AZURE_SEARCH_INDEX}" \
-  ./data/*.md
+  ./data/*.*
