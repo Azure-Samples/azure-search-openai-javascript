@@ -15,8 +15,7 @@ export const styles = css`
       top: 0;
     }
   }
-  .chat__header--button,
-  .chat__header--avatar {
+  .chat__header--button {
     display: flex;
     align-items: center;
   }
