@@ -1,7 +1,6 @@
 import { type BaseLogger } from 'pino';
 import { getBlobNameFromFile } from './blob-storage.js';
 import { type ContentPage, type ContentSection, type Section } from './document.js';
-import { extractText, extractTextFromPdf } from './formats/index.js';
 
 const SENTENCE_ENDINGS = new Set(['.', '!', '?']);
 const WORD_BREAKS = new Set([',', ';', ':', ' ', '(', ')', '[', ']', '{', '}', '\t', '\n']);
@@ -12,11 +11,7 @@ const SECTION_OVERLAP = 100;
 export class DocumentProcessor {
   formatHandlers = new Map<string, (data: Buffer) => Promise<ContentPage[]>>();
 
-  constructor(private logger: BaseLogger) {
-    this.registerFormatHandler('text/plain', extractText);
-    this.registerFormatHandler('text/markdown', extractText);
-    this.registerFormatHandler('application/pdf', extractTextFromPdf);
-  }
+  constructor(private logger: BaseLogger) {}
 
   async createDocumentFromFile(filename: string, data: Buffer, type: string, category: string) {
     const pages = await this.extractText(data, type);
@@ -25,7 +20,7 @@ export class DocumentProcessor {
     return { filename, type, category, sections };
   }
 
-  private registerFormatHandler(type: string, handler: (data: Buffer) => Promise<ContentPage[]>) {
+  public registerFormatHandler(type: string, handler: (data: Buffer) => Promise<ContentPage[]>) {
     this.formatHandlers.set(type, handler);
   }
 

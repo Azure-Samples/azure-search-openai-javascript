@@ -5,6 +5,7 @@ import { type AzureClients } from '../plugins/azure.js';
 import { type OpenAiService } from '../plugins/openai.js';
 import { wait } from './util/index.js';
 import { DocumentProcessor } from './document-processor.js';
+import { extractText, extractTextFromPdf } from './formats/index.js';
 import { MODELS_SUPPORTED_BATCH_SIZE } from './model-limits.js';
 import { BlobStorage } from './blob-storage.js';
 import { type Section } from './document.js';
@@ -137,6 +138,9 @@ export class Indexer {
       }
 
       const documentProcessor = new DocumentProcessor(this.logger);
+      documentProcessor.registerFormatHandler('text/plain', extractText);
+      documentProcessor.registerFormatHandler('text/markdown', extractText);
+      documentProcessor.registerFormatHandler('application/pdf', extractTextFromPdf);
       const document = await documentProcessor.createDocumentFromFile(filename, data, type, category);
       const sections = document.sections;
       if (options.useVectors) {
