@@ -3,12 +3,12 @@ import { css } from 'lit';
 export const styles = css`
   .headline {
     color: var(--text-color);
-    font-size: 5vw;
+    font-size: var(--font-r-large);
     padding: 0;
-    margin: 10px 0 30px;
+    margin: var(--d-small) 0 var(--d-large);
 
     @media (min-width: 1024px) {
-      font-size: 3vw;
+      font-size: var(--font-r-base);
       text-align: center;
     }
   }
@@ -16,7 +16,7 @@ export const styles = css`
     text-decoration: none;
     color: var(--text-color);
     display: block;
-    font-size: 1.2rem;
+    font-size: var(--font-rel-base);
   }
   .teaser-list {
     list-style-type: none;
@@ -35,14 +35,14 @@ export const styles = css`
     }
   }
   .teaser-list-item {
-    padding: 10px;
-    border-radius: 10px;
-    background: var(--white);
-    margin: 4px;
+    padding: var(--d-small);
+    border-radius: var(--radius-base);
+    background: var(--c-white);
+    margin: var(--d-xsmall);
     color: var(--text-color);
     justify-content: space-evenly;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border: 3px solid transparent;
+    box-shadow: var(--shadow);
+    border: var(--border-base) solid transparent;
 
     @media (min-width: 768px) {
       min-height: 100px;
@@ -50,13 +50,13 @@ export const styles = css`
   }
   .teaser-list-item:hover,
   .teaser-list-item:focus {
-    color: var(--accent-dark);
-    background: var(--secondary-color);
+    color: var(--c-accent-dark);
+    background: var(--c-secondary);
     transition: all 0.3s ease-in-out;
-    border-color: var(--accent-high);
+    border-color: var(--c-accent-high);
   }
   .teaser-list-item .teaser-click-label {
-    color: var(--accent-high);
+    color: var(--c-accent-high);
     font-weight: bold;
     display: block;
     margin-top: 20px;

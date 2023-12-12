@@ -9,7 +9,7 @@ import './chat-action-button.js';
 
 export class ChatHistoryController implements ReactiveController {
   host: ReactiveControllerHost;
-  static CHATHISTORY_ID = 'component:chat-history';
+  static CHATHISTORY_ID = 'ms-azoaicc:history';
 
   chatHistory: ChatThreadEntry[] = [];
 

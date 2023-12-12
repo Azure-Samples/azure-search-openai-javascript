@@ -21,8 +21,12 @@ import iconDelete from '../../public/svg/delete-icon.svg?raw';
 import iconCancel from '../../public/svg/cancel-icon.svg?raw';
 import iconSend from '../../public/svg/send-icon.svg?raw';
 import iconClose from '../../public/svg/close-icon.svg?raw';
+import iconLogo from '../../public/branding/brand-logo.svg?raw';
 import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 
+// import only necessary components to reduce bundle size
+import './link-icon.js';
+import './chat-stage.js';
 import './loading-indicator.js';
 import './voice-input-button.js';
 import './teaser-list-component.js';
@@ -31,6 +35,7 @@ import './tab-component.js';
 import './citation-list.js';
 import './chat-thread-component.js';
 import './chat-action-button.js';
+
 import { type TabContent } from './tab-component.js';
 import { ChatController } from './chat-controller.js';
 import { ChatHistoryController } from './chat-history-controller.js';
@@ -61,11 +66,17 @@ export class ChatComponent extends LitElement {
   @property({ type: String, attribute: 'data-api-url' })
   apiUrl = chatHttpOptions.url;
 
+  @property({ type: String, attribute: 'data-custom-branding', converter: (value) => value?.toLowerCase() === 'true' })
+  isCustomBranding: boolean = globalConfig.IS_CUSTOM_BRANDING;
+
   @property({ type: String, attribute: 'data-use-stream', converter: (value) => value?.toLowerCase() === 'true' })
   useStream: boolean = chatHttpOptions.stream;
 
   @property({ type: String, attribute: 'data-overrides', converter: (value) => JSON.parse(value || '{}') })
   overrides: RequestOverrides = {};
+
+  @property({ type: String, attribute: 'data-custom-styles', converter: (value) => JSON.parse(value || '{}') })
+  customStyles: any = {};
 
   //--
 
@@ -107,6 +118,26 @@ export class ChatComponent extends LitElement {
   chatThread: ChatThreadEntry[] = [];
 
   static override styles = [chatStyle];
+
+  override updated(changedProperties: Map<string | number | symbol, unknown>) {
+    super.updated(changedProperties);
+    // The following block is only necessary when you want to override the component from settings in the outside.
+    // Remove this block when not needed, considering that updated() is a LitElement lifecycle method
+    // that may be used by other components if you update this code.
+    if (changedProperties.has('customStyles')) {
+      this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
+      this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLight);
+      this.style.setProperty('--c-accent-dark', this.customStyles.AccentDark);
+      this.style.setProperty('--c-text-color', this.customStyles.TextColor);
+      this.style.setProperty('--c-light-gray', this.customStyles.BackgroundColor);
+      this.style.setProperty('--c-dark-gray', this.customStyles.ForegroundColor);
+      this.style.setProperty('--c-base-gray', this.customStyles.FormBackgroundColor);
+      this.style.setProperty('--radius-base', this.customStyles.BorderRadius);
+      this.style.setProperty('--border-base', this.customStyles.BorderWidth);
+      this.style.setProperty('--font-base', this.customStyles.FontBaseSize);
+    }
+  }
+  // Send the question to the Open AI API and render the answer in the chat
 
   setQuestionInputValue(value: string): void {
     this.questionInput.value = DOMPurify.sanitize(value || '');
@@ -360,6 +391,8 @@ export class ChatComponent extends LitElement {
       .isDisabled="${this.isDisabled}"
       .isProcessingResponse="${this.chatController.isProcessingResponse}"
       .selectedCitation="${this.selectedCitation}"
+      .isCustomBranding="${this.isCustomBranding}"
+      .svgIcon="${iconLogo}"
       @on-action-button-click="${this.handleChatEntryActionButtonClick}"
       @on-citation-click="${this.handleCitationClick}"
       @on-followup-click="${this.handleQuestionInputClick}"
@@ -372,10 +405,18 @@ export class ChatComponent extends LitElement {
     return html`
       <div id="overlay" class="overlay"></div>
       <section id="chat__containerWrapper" class="chat__containerWrapper">
+        ${this.isCustomBranding && !this.isChatStarted
+          ? html` <chat-stage
+              svgIcon="${iconLogo}"
+              pagetitle="${globalConfig.BRANDING_HEADLINE}"
+              url="${globalConfig.BRANDING_URL}"
+            >
+            </chat-stage>`
+          : ''}
         <section class="chat__container" id="chat-container">
           ${this.isChatStarted
             ? html`
-                <div class="chat__header">
+                <div class="chat__header--thread">
                   ${this.interactionModel === 'chat'
                     ? this.chatHistoryController.renderHistoryButton({ disabled: this.isDisabled })
                     : ''}

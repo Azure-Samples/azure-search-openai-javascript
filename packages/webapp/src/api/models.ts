@@ -10,6 +10,19 @@ export const enum RetrievalMode {
   Text = 'text',
 }
 
+export const enum CustomStyles {
+  AccentHigh = 'AccentHigh',
+  AccentLight = 'AccentLighter',
+  AccentDark = 'AccentContrast',
+  TextColor = 'TextColor',
+  BackgroundColor = 'BackgroundColor',
+  FormBackgroundColor = 'FormBackgroundColor',
+  ForegroundColor = 'ForegroundColor',
+  BorderRadius = 'BorderRadius',
+  BorderWidth = 'BorderWidth',
+  FontBaseSize = 'FontBaseSize',
+}
+
 export type RequestOverrides = {
   retrieval_mode?: RetrievalMode;
   semantic_ranker?: boolean;

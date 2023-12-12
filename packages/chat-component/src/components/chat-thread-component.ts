@@ -103,29 +103,31 @@ export class ChatThreadComponent extends LitElement {
 
   renderResponseActions(entry: ChatThreadEntry) {
     return html`
-      <div class="chat__header">
-        ${this.actionButtons.map(
-          (actionButton) => html`
-            <chat-action-button
-              .label="${actionButton.label}"
-              .svgIcon="${actionButton.svgIcon}"
-              .isDisabled="${actionButton.isDisabled || this.isDisabled}"
-              .actionId="${actionButton.id}"
-              @click="${(event) => this.actionButtonClicked(actionButton, entry, event)}"
-            ></chat-action-button>
-          `,
-        )}
-        <chat-action-button
-          .label="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-          .svgIcon="${this.isResponseCopied ? iconSuccess : iconCopyToClipboard}"
-          .isDisabled="${this.isDisabled}"
-          actionId="copy-to-clipboard"
-          .tooltip="${this.isResponseCopied
-            ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-            : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-          @click="${() => this.copyResponseToClipboard(entry)}"
-        ></chat-action-button>
-      </div>
+      <header class="chat__header">
+        <div class="chat__header--button">
+          ${this.actionButtons.map(
+            (actionButton) => html`
+              <chat-action-button
+                .label="${actionButton.label}"
+                .svgIcon="${actionButton.svgIcon}"
+                .isDisabled="${actionButton.isDisabled}"
+                .actionId="${actionButton.id}"
+                @click="${(event) => this.actionButtonClicked(actionButton, entry, event)}"
+              ></chat-action-button>
+            `,
+          )}
+          <chat-action-button
+            .label="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+            .svgIcon="${this.isResponseCopied ? iconSuccess : iconCopyToClipboard}"
+            .isDisabled="${this.isDisabled}"
+            actionId="copy-to-clipboard"
+            .tooltip="${this.isResponseCopied
+              ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
+              : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
+            @click="${this.copyResponseToClipboard}"
+          ></chat-action-button>
+        </div>
+      </header>
     `;
   }
 

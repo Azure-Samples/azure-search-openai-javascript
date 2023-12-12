@@ -438,6 +438,8 @@ test.describe('generate answer', () => {
 
   test('follow up questions', async ({ page }) => {
     const followupQuestions = page.getByTestId('followUpQuestion');
+    await followupQuestions.waitFor();
+
     await expect(followupQuestions).toHaveCount(3);
 
     const chatInput = page.getByTestId('question-input');
@@ -469,6 +471,44 @@ test.describe('developer settings', () => {
     await expect(page.locator('label').filter({ hasText: 'follow-up questions' }).locator('i')).toBeChecked();
     await expect(page.locator('label').filter({ hasText: 'Stream chat' }).locator('i')).toBeChecked();
     await expect(page.getByLabel('Retrieval mode')).toContainText('Vectors + Text (Hybrid)');
+  });
+
+  test('enable branding toggled', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('button__developer-settings').click();
+    // toggle enable branding
+    await page.locator('label').filter({ hasText: 'Enable branding' }).click();
+    await page.waitForTimeout(1000);
+    // await for brading to be visible
+    await expect(page.getByTestId('chat-branding')).toBeVisible();
+  });
+
+  test('select dark theme', async ({ page }) => {
+    await page.goto('/');
+    expect(await page.getAttribute('html', 'data-theme')).toBe('');
+    await page.getByTestId('button__developer-settings').click();
+    await page.locator('label').filter({ hasText: 'Select theme' }).click();
+    // Wait for the state to update
+    await page.waitForFunction(() => {
+      return document.querySelector('html')?.dataset.theme === 'dark';
+    });
+    // Check the updated state
+    expect(await page.getAttribute('html', 'data-theme')).toBe('dark');
+  });
+
+  test('customize chat styles toggled and check localStorage', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('button__developer-settings').click();
+    await page.locator('label').filter({ hasText: 'Customize chat styles' }).click();
+
+    await page.waitForTimeout(1000);
+    // check if localStorage has an item called 'customStyles' and it's not empty
+    const hasCustomStyles = await page.evaluate(() => {
+      const customStyles = localStorage.getItem('ms-azoaicc:customStyles');
+      return customStyles !== null && customStyles.trim() !== '';
+    });
+
+    await expect(hasCustomStyles).toBe(true);
   });
 
   test('handle no stream parsing', async ({ page }) => {

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="533.37976"
+   height="479.4425"
+   viewBox="0 0 141.12339 126.8525"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
+   sodipodi:docname="brand-logo.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.4654497"
+     inkscape:cx="303.64057"
+     inkscape:cy="106.60712"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1187"
+     inkscape:window-height="541"
+     inkscape:window-x="119"
+     inkscape:window-y="131"
+     inkscape:window-maximized="0"
+     units="px"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-18.235046,-25.370501)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:18.7575px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.468938"
+       x="76.622147"
+       y="77.940918"
+       id="text837"
+       transform="scale(0.95147583,1.0509988)"><tspan
+         sodipodi:role="line"
+         id="tspan835"
+         x="76.622147"
+         y="77.940918"
+         style="stroke-width:0.468938">YOUR</tspan><tspan
+         sodipodi:role="line"
+         x="76.622147"
+         y="101.38779"
+         style="stroke-width:0.468938"
+         id="tspan885">BRAND</tspan></text>
+    <path
+       sodipodi:type="star"
+       style="opacity:0.99;fill:#eec4e6;fill-opacity:0.835294;fill-rule:evenodd;stroke-width:4.99999;stroke-linejoin:round"
+       id="path887"
+       sodipodi:sides="5"
+       sodipodi:cx="55.752526"
+       sodipodi:cy="87.899637"
+       sodipodi:r1="26.130005"
+       sodipodi:r2="13.065002"
+       sodipodi:arg1="0.77001476"
+       sodipodi:arg2="1.3983333"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 74.511266,106.08993 57.994602,100.77082 44.249297,111.36137 44.204142,94.009392 29.884399,84.209489 46.373155,78.804488 51.268372,62.157267 61.504139,76.168769 78.849293,75.680123 68.686589,89.744708 Z"
+       inkscape:transform-center-x="1.3856798"
+       inkscape:transform-center-y="-1.1403183" />
+  </g>
+</svg>

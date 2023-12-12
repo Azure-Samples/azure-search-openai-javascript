@@ -4,15 +4,15 @@ export const styles = css`
   button {
     color: var(--text-color);
     text-decoration: underline;
-    border: 1px solid var(--accent-dark);
+    border: var(--border-thin) solid var(--c-accent-dark);
     text-decoration: none;
-    border-radius: 5px;
-    background: var(--white);
+    border-radius: var(--radius-small);
+    background: var(--c-white);
     display: flex;
     align-items: center;
     margin-left: 5px;
     opacity: 1;
-    padding: 5px;
+    padding: var(--d-xsmall);
     transition: all 0.3s ease-in-out;
     position: relative;
     cursor: pointer;
@@ -27,12 +27,12 @@ export const styles = css`
     position: absolute;
     text-align: right;
     top: -80%;
-    background: var(--accent-dark);
-    color: white;
+    background: var(--c-accent-dark);
+    color: var(--c-white);
     opacity: 0;
-    right: 0px;
-    padding: 5px 10px;
-    border-radius: 5px;
+    right: 0;
+    padding: var(--d-xsmall) var(--d-small);
+    border-radius: var(--radius-small);
     font-weight: bold;
     word-wrap: nowrap;
   }
@@ -43,15 +43,15 @@ export const styles = css`
     height: 0;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 8px solid var(--accent-dark);
+    border-top: var(--border-thick) solid var(--c-accent-dark);
     bottom: -8px;
     right: 5px;
   }
   svg {
     fill: currentColor;
-    width: 20px;
-    height: 20px;
-    padding: 3px;
+    padding: var(--d-xsmall);
+    width: var(--d-base);
+    height: var(--d-base);
   }
   button:hover > span,
   button:focus > span {
@@ -62,8 +62,8 @@ export const styles = css`
   button:focus,
   button:hover > svg,
   button:focus > svg {
-    background-color: var(--light-gray);
-    border-radius: 5px;
+    background-color: var(--c-light-gray);
+    border-radius: var(--radius-small);
     transition: background 0.3s ease-in-out;
   }
 `;

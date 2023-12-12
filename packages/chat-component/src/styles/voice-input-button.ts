@@ -10,19 +10,19 @@ export const styles = css`
     box-shadow: none;
     border: none;
     cursor: pointer;
-    width: 50px;
+    width: var(--d-xlarge);
     height: 100%;
   }
   button:hover,
   button:focus {
-    background: var(--secondary-color);
+    background: var(--c-secondary);
   }
   button:hover svg,
   button:focus svg {
     opacity: 0.8;
   }
   .not-recording svg {
-    fill: var(--black);
+    fill: var(--c-black);
   }
   .recording svg {
     fill: var(--red);

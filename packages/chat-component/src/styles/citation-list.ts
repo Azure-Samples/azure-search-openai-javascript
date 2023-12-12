@@ -7,21 +7,21 @@ export const styles = css`
   }
   .items__list {
     border-top: none;
-    padding: 0px 20px;
-    margin: 10px 0;
+    padding: 0 var(--d-base);
+    margin: var(--d-small) 0;
     display: block;
   }
   .items__listItem {
     display: inline-block;
-    background-color: var(--accent-lighter);
-    border-radius: 5px;
+    background-color: var(--c-accent-light);
+    border-radius: var(--radius-small);
     text-decoration: none;
-    padding: 5px;
+    padding: var(--d-xsmall);
     margin-top: 5px;
-    font-size: small;
+    font-size: var(--font-small);
   }
   .items__listItem.active {
-    background-color: var(--accent-high);
+    background-color: var(--c-accent-high);
   }
   .items__listItem:not(first-child) {
     margin-left: 5px;
@@ -31,6 +31,6 @@ export const styles = css`
     color: var(--text-color);
   }
   .items__listItem.active .items__link {
-    color: var(--white);
+    color: var(--c-white);
   }
 `;
