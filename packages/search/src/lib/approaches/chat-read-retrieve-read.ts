@@ -78,7 +78,9 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
             content: chatContent,
             role: 'assistant',
             context: {
-              data_points: dataPoints,
+              data_points: {
+                text: dataPoints,
+              },
               thoughts: thoughts,
             },
           },
@@ -108,7 +110,7 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
               content: chunk.choices[0].delta.content ?? '',
               role: 'assistant' as const,
               context: {
-                data_points: id === 0 ? dataPoints : undefined,
+                data_points: id === 0 ? { text: dataPoints } : undefined,
                 thoughts: id === 0 ? thoughts : undefined,
               },
             },

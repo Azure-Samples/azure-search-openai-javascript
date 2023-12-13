@@ -138,7 +138,7 @@ export class ChatController implements ReactiveController {
       followingSteps.push(...(processedText.arrays[1] as string[]));
       followupQuestions.push(...(processedText.arrays[2] as string[]));
       thoughts = generatedResponse.context?.thoughts ?? '';
-      dataPoints = generatedResponse.context?.data_points ?? [];
+      dataPoints = generatedResponse.context?.data_points?.text ?? [];
 
       await updateChatWithMessageOrChunk(messageToUpdate, false);
     }

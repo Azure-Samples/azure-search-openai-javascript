@@ -59,8 +59,17 @@ export const messageSchema = {
       type: 'object',
       properties: {
         data_points: {
-          type: 'array',
-          items: { type: 'string' },
+          type: 'object',
+          properties: {
+            text: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+            images: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+          },
         },
         thoughts: { type: 'string' },
       },
