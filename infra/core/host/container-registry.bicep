@@ -4,7 +4,7 @@ param location string = resourceGroup().location
 param tags object = {}
 
 @description('Indicates whether admin user is enabled')
-param adminUserEnabled bool = false
+param adminUserEnabled bool = true
 
 @description('Indicates whether anonymous pull is enabled')
 param anonymousPullEnabled bool = false
