@@ -68,6 +68,8 @@ The application is made from multiple components, including:
 
 ![Chat screen](docs/chat-screenshot.png)
 
+[📺 Watch a video overview of the app](https://youtu.be/uckVTuS36H0)
+
 ## Getting started
 
 ## Azure account prerequisites
