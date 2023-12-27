@@ -49,7 +49,7 @@ export async function parseStreamedMessages({
 
     const { content, context } = chunk.choices[0].delta;
     if (context?.data_points) {
-      updatedEntry.dataPoints = context.data_points ?? [];
+      updatedEntry.dataPoints = context.data_points?.text ?? [];
       updatedEntry.thoughts = context.thoughts ?? '';
 
       continue;
