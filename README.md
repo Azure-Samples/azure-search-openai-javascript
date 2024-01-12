@@ -12,7 +12,7 @@ products:
   - azure-openai
 urlFragment: azure-search-openai-javascript
 name: ChatGPT + Enterprise data (javascript)
-description: A javascript sample app that chats with your data using OpenAI and AI Search. (javascript)
+description: A javascript sample app that chats with your data using OpenAI and AI Search.
 ---
 <!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
 
