@@ -1,10 +1,15 @@
 .main {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6rem;
-  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+
+  @media screen and (min-width: 1024px) {
+    grid-template-columns: 1fr 1fr 3fr;
+    column-gap: 5px;
+  }
+}
+
+.main > * {
+  border: 1px solid red;
 }
 
 .description {
@@ -182,7 +187,6 @@
     border-bottom: 1px solid rgba(var(--callout-border-rgb), 0.25);
     background: linear-gradient(to bottom, rgba(var(--background-start-rgb), 1), rgba(var(--callout-rgb), 0.5));
     background-clip: padding-box;
-    backdrop-filter: blur(24px);
   }
 
   .description div {
