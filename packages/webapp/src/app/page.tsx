@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
-import styles from './page.module.css';
+import styles from './homepage.module.css';
 import 'chat-component';
-import Head from 'next/head';
+import Link from 'next/link';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -25,15 +25,13 @@ export default function Home() {
   const ChatComponent = 'chat-component';
   return (
     <>
-      <Head>
-        <title>Azure OpenAI Chatbot</title>
-      </Head>
-      <main className={styles.main}>
+      <main>
         <aside>
-          <div className={styles.sidebar}>sidebar goes here</div>
-        </aside>
-        <aside>
-          <form className={styles.form}></form>
+          <div className={styles.sidebar}>
+            <Link href="/settings" title="Settings">
+              Settings
+            </Link>
+          </div>
         </aside>
         <div className={styles.description}>menu bar goes here</div>
         <ChatComponent

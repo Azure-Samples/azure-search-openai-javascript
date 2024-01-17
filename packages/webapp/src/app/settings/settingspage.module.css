@@ -1,0 +1,39 @@
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.formgroupinline {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.formgroupinline > *:first-child {
+  margin-right: 0.5rem;
+}
+
+.formgroupinline > *:last-child {
+  width: 20px;
+  height: 20px;
+}
+
+.formgroup {
+  margin-bottom: 1rem;
+}
+
+.buttonwrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #4caf50;
+  color: white;
+  text-decoration: none;
+  width: 50%;
+  transition: background-color 200ms;
+}

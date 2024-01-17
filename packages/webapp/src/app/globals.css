@@ -75,3 +75,41 @@ a {
     color-scheme: dark;
   }
 }
+
+form {
+  padding-top: 20px;
+}
+
+input[type='text'],
+input[type='number'],
+select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+input[type='submit'] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 10px;
+  background-color: #4caf50;
+  color: white;
+}
+
+input[type='submit']:hover,
+input[type='submit']:focus {
+  background-color: #45a049;
+}
+
+main {
+  display: block;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
