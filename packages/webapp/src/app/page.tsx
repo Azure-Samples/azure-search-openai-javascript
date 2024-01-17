@@ -1,7 +1,8 @@
 'use client';
+import React from 'react';
 import styles from './page.module.css';
 import 'chat-component';
-// mport { useState, useRef } from 'react';
+import Head from 'next/head';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -22,12 +23,17 @@ export const enum RetrievalMode {
 
 export default function Home() {
   const ChatComponent = 'chat-component';
-
   return (
     <>
+      <Head>
+        <title>Azure OpenAI Chatbot</title>
+      </Head>
       <main className={styles.main}>
         <aside>
           <div className={styles.sidebar}>sidebar goes here</div>
+        </aside>
+        <aside>
+          <form className={styles.form}></form>
         </aside>
         <div className={styles.description}>menu bar goes here</div>
         <ChatComponent
