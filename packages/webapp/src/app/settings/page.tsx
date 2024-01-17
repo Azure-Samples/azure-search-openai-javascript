@@ -3,7 +3,7 @@ import styles from './settingspage.module.css';
 export default function SettingsPage() {
   return (
     <>
-      <main>
+      <main className={styles.main}>
         <h1>Settings</h1>
         <form>
           <div className={styles.formgroup}>

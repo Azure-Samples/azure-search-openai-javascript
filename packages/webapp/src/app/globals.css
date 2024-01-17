@@ -65,6 +65,15 @@ body {
   background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
 }
 
+header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #323232;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -105,11 +114,4 @@ input[type='submit'] {
 input[type='submit']:hover,
 input[type='submit']:focus {
   background-color: #45a049;
-}
-
-main {
-  display: block;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 20px;
 }

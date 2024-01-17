@@ -37,3 +37,10 @@
   width: 50%;
   transition: background-color 200ms;
 }
+
+.main {
+  display: block;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
