@@ -121,21 +121,24 @@ export class ChatComponent extends LitElement {
 
   override updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
-    // The following block is only necessary when you want to override the component from settings in the outside.
-    // Remove this block when not needed, considering that updated() is a LitElement lifecycle method
-    // that may be used by other components if you update this code.
-    if (changedProperties.has('customStyles')) {
-      this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
-      this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLight);
-      this.style.setProperty('--c-accent-dark', this.customStyles.AccentDark);
-      this.style.setProperty('--c-text-color', this.customStyles.TextColor);
-      this.style.setProperty('--c-light-gray', this.customStyles.BackgroundColor);
-      this.style.setProperty('--c-dark-gray', this.customStyles.ForegroundColor);
-      this.style.setProperty('--c-base-gray', this.customStyles.FormBackgroundColor);
-      this.style.setProperty('--radius-base', this.customStyles.BorderRadius);
-      this.style.setProperty('--border-base', this.customStyles.BorderWidth);
-      this.style.setProperty('--font-base', this.customStyles.FontBaseSize);
-    }
+    // debounce the style update to avoid flickering
+    setTimeout(() => {
+      // The following block is only necessary when you want to override the component from settings in the outside.
+      // Remove this block when not needed, considering that updated() is a LitElement lifecycle method
+      // that may be used by other components if you update this code.
+      if (changedProperties.has('customStyles')) {
+        this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
+        this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLight);
+        this.style.setProperty('--c-accent-dark', this.customStyles.AccentDark);
+        this.style.setProperty('--c-text-color', this.customStyles.TextColor);
+        this.style.setProperty('--c-light-gray', this.customStyles.BackgroundColor);
+        this.style.setProperty('--c-dark-gray', this.customStyles.ForegroundColor);
+        this.style.setProperty('--c-base-gray', this.customStyles.FormBackgroundColor);
+        this.style.setProperty('--radius-base', this.customStyles.BorderRadius);
+        this.style.setProperty('--border-base', this.customStyles.BorderWidth);
+        this.style.setProperty('--font-base', this.customStyles.FontBaseSize);
+      }
+    }, 1000);
   }
   // Send the question to the Open AI API and render the answer in the chat
 

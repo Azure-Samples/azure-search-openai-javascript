@@ -87,6 +87,32 @@ const MAX_CHAT_HISTORY = 5;
 
 const APPROACH_MODEL = ['rrr', 'rtr'];
 
+const STYLE_DEFAULTS_LIGHT = {
+  AccentHigh: '#692b61',
+  AccentLight: '#f6d5f2',
+  AccentDark: '#5e3c7d',
+  TextColor: '#123f58',
+  BackgroundColor: '#e3e3e3',
+  ForegroundColor: '#4e5288',
+  FormBackgroundColor: '#f5f5f5',
+  BorderRadius: '10px',
+  BorderWidth: '3px',
+  FontBaseSize: '14px',
+};
+
+const STYLE_DEFAULTS_DARK = {
+  AccentHigh: '#dcdef8',
+  AccentLight: '#032219',
+  AccentDark: '#fdfeff',
+  TextColor: '#fdfeff',
+  BackgroundColor: '#32343e',
+  ForegroundColor: '#4e5288',
+  FormBackgroundColor: '#32343e',
+  BorderRadius: '10px',
+  BorderWidth: '3px',
+  FontBaseSize: '14px',
+};
+
 export {
   globalConfig,
   requestOptions,
@@ -95,4 +121,6 @@ export {
   APPROACH_MODEL,
   teaserListTexts,
   MAX_CHAT_HISTORY,
+  STYLE_DEFAULTS_LIGHT,
+  STYLE_DEFAULTS_DARK,
 };
