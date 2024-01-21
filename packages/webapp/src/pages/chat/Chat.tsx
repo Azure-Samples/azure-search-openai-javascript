@@ -9,7 +9,7 @@ import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 import { SettingsStyles } from '../../components/SettingsStyles/SettingsStyles.js';
 import { ThemeSwitch } from '../../components/ThemeSwitch/ThemeSwitch.js';
 // encapsulate logic to a hook
-import useCustomStyles, { type CustomStylesState } from '../../hooks/UseCustomStyles.js';
+import useCustomStyles, { type CustomStylesState } from '../../hooks/useCustomStyles.js';
 
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -23,6 +23,7 @@ const Chat = () => {
   const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(true);
 
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
+  const chatComponent = useRef<HTMLDivElement | null>(null);
 
   const [isLoading] = useState<boolean>(false);
 
@@ -90,13 +91,8 @@ const Chat = () => {
 
   const handleThemeToggle = (newIsDarkTheme: boolean) => {
     // Get the ChatComponent instance (modify this according to how you manage your components)
-    const chatComponent = document.querySelector('chat-component');
-    if (chatComponent) {
-      // Remove existing style attributes
-      chatComponent.removeAttribute('style');
-      // eslint-disable-next-line unicorn/prefer-dom-node-dataset
-      chatComponent.setAttribute('data-theme', newIsDarkTheme ? 'dark' : '');
-    }
+    chatComponent.current?.removeAttribute('style');
+    chatComponent.current?.setAttribute('data-theme', newIsDarkTheme ? 'dark' : '');
     // Update the body class and html data-theme
     localStorage.removeItem('ms-azoaicc:customStyles');
 
@@ -169,6 +165,7 @@ const Chat = () => {
       <div className={styles.chatRoot}>
         <div className={styles.chatEmptyState}>
           <chat-component
+            ref={chatComponent}
             title="Ask anything or try an example"
             data-input-position="sticky"
             data-interaction-model="chat"
