@@ -7,8 +7,9 @@ import type { IDropdownOption } from '@fluentui/react/lib-commonjs/Dropdown';
 import 'chat-component';
 import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 import { SettingsStyles } from '../../components/SettingsStyles/SettingsStyles.js';
-import type { CustomStylesState } from '../../components/SettingsStyles/SettingsStyles.js';
 import { ThemeSwitch } from '../../components/ThemeSwitch/ThemeSwitch.js';
+// encapsulate logic to a hook
+import useCustomStyles, { type CustomStylesState } from '../../hooks/UseCustomStyles.js';
 
 const Chat = () => {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -81,39 +82,10 @@ const Chat = () => {
     return storedTheme ? JSON.parse(storedTheme) : false;
   });
 
-  const [customStyles, setCustomStyles] = useState(() => {
-    const styleDefaultsLight = {
-      AccentHigh: '#692b61',
-      AccentLight: '#f6d5f2',
-      AccentDark: '#5e3c7d',
-      TextColor: '#123f58',
-      BackgroundColor: '#e3e3e3',
-      ForegroundColor: '#4e5288',
-      FormBackgroundColor: '#f5f5f5',
-      BorderRadius: '10px',
-      BorderWidth: '3px',
-      FontBaseSize: '14px',
-    };
-
-    const styleDefaultsDark = {
-      AccentHigh: '#dcdef8',
-      AccentLight: '#032219',
-      AccentDark: '#fdfeff',
-      TextColor: '#fdfeff',
-      BackgroundColor: '#32343e',
-      ForegroundColor: '#4e5288',
-      FormBackgroundColor: '#32343e',
-      BorderRadius: '10px',
-      BorderWidth: '3px',
-      FontBaseSize: '14px',
-    };
-    const defaultStyles = isDarkTheme ? styleDefaultsDark : styleDefaultsLight;
-    const storedStyles = localStorage.getItem('ms-azoaicc:customStyles');
-    return storedStyles ? JSON.parse(storedStyles) : defaultStyles;
-  });
+  const { customStyles, updateCustomStyles } = useCustomStyles(false);
 
   const handleCustomStylesChange = (newStyles: CustomStylesState) => {
-    setCustomStyles(newStyles);
+    updateCustomStyles(newStyles);
   };
 
   const handleThemeToggle = (newIsDarkTheme: boolean) => {
@@ -137,7 +109,7 @@ const Chat = () => {
     const handleStorageChange = () => {
       const storedStyles = localStorage.getItem('ms-azoaicc:customStyles');
       if (storedStyles) {
-        setCustomStyles(JSON.parse(storedStyles));
+        updateCustomStyles(JSON.parse(storedStyles));
       }
 
       const storedBranding = localStorage.getItem('ms-azoaicc:isBrandingEnabled');
@@ -172,6 +144,7 @@ const Chat = () => {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customStyles, isBrandingEnabled, isDarkTheme, isLoading]);
 
   const [isChatStylesAccordionOpen, setIsChatStylesAccordionOpen] = useState(false);

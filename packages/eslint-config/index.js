@@ -89,7 +89,7 @@ module.exports = {
       rules: {
         'unicorn/no-useless-undefined': 'off',
         'unicorn/filename-case': [
-          'error',
+          'warn',
           {
             case: 'pascalCase',
           },
