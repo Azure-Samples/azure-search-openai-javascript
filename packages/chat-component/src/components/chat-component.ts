@@ -9,6 +9,7 @@ import {
   teaserListTexts,
   requestOptions,
   MAX_CHAT_HISTORY,
+  STYLE_DEFAULTS_LIGHT,
 } from '../config/global-config.js';
 import { chatStyle } from '../styles/chat-component.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
@@ -76,7 +77,13 @@ export class ChatComponent extends LitElement {
   overrides: RequestOverrides = {};
 
   @property({ type: String, attribute: 'data-custom-styles', converter: (value) => JSON.parse(value || '{}') })
-  customStyles: any = {};
+  customStyles: CustomStyles = STYLE_DEFAULTS_LIGHT || {};
+
+  @property({ type: String, attribute: 'data-use-customstyles', converter: (value) => value?.toLowerCase() === 'true' })
+  useCustomStyles: boolean = false;
+
+  @property({ type: String, attribute: 'data-theme' })
+  theme: string = '';
 
   //--
 
@@ -120,12 +127,14 @@ export class ChatComponent extends LitElement {
   static override styles = [chatStyle];
 
   override updated(changedProperties: Map<string | number | symbol, unknown>) {
+    console.log('updated');
     super.updated(changedProperties);
     // debounce the style update to avoid flickering
     setTimeout(() => {
       // The following block is only necessary when you want to override the component from settings in the outside.
       // Remove this block when not needed, considering that updated() is a LitElement lifecycle method
       // that may be used by other components if you update this code.
+
       if (changedProperties.has('customStyles')) {
         this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
         this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLight);

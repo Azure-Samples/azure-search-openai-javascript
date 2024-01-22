@@ -94,3 +94,7 @@ declare interface BotResponseError {
   code: string;
   message: string;
 }
+
+declare interface CustomStyles {
+  [key: string]: string;
+}

@@ -96,7 +96,7 @@ const Chat = () => {
     chatComponent.current?.setAttribute('data-theme', newIsDarkTheme ? 'dark' : '');
     // Update the body class and html data-theme
     chatComponent.current?.removeAttribute('data-custom-styles');
-    chatComponent.current?.setAttribute('data-custom-styles', JSON.stringify(customStyles));
+    // chatComponent.current?.setAttribute('data-custom-styles', JSON.stringify(customStyles));
     // Update the state
     setIsDarkTheme(newIsDarkTheme);
   };
@@ -128,9 +128,6 @@ const Chat = () => {
 
     // Store isBrandingEnabled in local storage whenever it changes
     localStorage.setItem('ms-azoaicc:isBrandingEnabled', JSON.stringify(isBrandingEnabled));
-
-    // Store isDarkTheme in local storage whenever it changes
-    localStorage.setItem('ms-azoaicc:isDarkTheme', JSON.stringify(isDarkTheme));
 
     // Scroll into view when isLoading changes
     chatMessageStreamEnd.current?.scrollIntoView({ behavior: 'smooth' });
