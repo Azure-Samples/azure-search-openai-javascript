@@ -10,6 +10,7 @@ import {
   requestOptions,
   MAX_CHAT_HISTORY,
   STYLE_DEFAULTS_LIGHT,
+  STYLE_DEFAULTS_DARK,
 } from '../config/global-config.js';
 import { chatStyle } from '../styles/chat-component.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
@@ -77,13 +78,10 @@ export class ChatComponent extends LitElement {
   overrides: RequestOverrides = {};
 
   @property({ type: String, attribute: 'data-custom-styles', converter: (value) => JSON.parse(value || '{}') })
-  customStyles: CustomStyles = STYLE_DEFAULTS_LIGHT || {};
-
-  @property({ type: String, attribute: 'data-use-customstyles', converter: (value) => value?.toLowerCase() === 'true' })
-  useCustomStyles: boolean = false;
+  customStyles: CustomStyles = {};
 
   @property({ type: String, attribute: 'data-theme' })
-  theme: string = '';
+  theme = '';
 
   //--
 
@@ -102,6 +100,9 @@ export class ChatComponent extends LitElement {
 
   @state()
   isResetInput = false;
+
+  @state()
+  isNotCustomStylesNull = false;
 
   private chatController = new ChatController(this);
   private chatHistoryController = new ChatHistoryController(this);
@@ -126,29 +127,39 @@ export class ChatComponent extends LitElement {
 
   static override styles = [chatStyle];
 
+  override attributeChangedCallback(name, oldValue, newValue) {
+    if (name === 'data-custom-styles') {
+      this.isNotCustomStylesNull = !!newValue;
+    }
+    if (name === 'data-theme') {
+      this.theme = newValue.toString();
+    }
+  }
+
   override updated(changedProperties: Map<string | number | symbol, unknown>) {
-    console.log('updated');
     super.updated(changedProperties);
     // debounce the style update to avoid flickering
     setTimeout(() => {
       // The following block is only necessary when you want to override the component from settings in the outside.
       // Remove this block when not needed, considering that updated() is a LitElement lifecycle method
       // that may be used by other components if you update this code.
-
-      if (changedProperties.has('customStyles')) {
-        this.style.setProperty('--c-accent-high', this.customStyles.AccentHigh);
-        this.style.setProperty('--c-accent-lighter', this.customStyles.AccentLight);
-        this.style.setProperty('--c-accent-dark', this.customStyles.AccentDark);
-        this.style.setProperty('--c-text-color', this.customStyles.TextColor);
-        this.style.setProperty('--c-light-gray', this.customStyles.BackgroundColor);
-        this.style.setProperty('--c-dark-gray', this.customStyles.ForegroundColor);
-        this.style.setProperty('--c-base-gray', this.customStyles.FormBackgroundColor);
-        this.style.setProperty('--radius-base', this.customStyles.BorderRadius);
-        this.style.setProperty('--border-base', this.customStyles.BorderWidth);
-        this.style.setProperty('--font-base', this.customStyles.FontBaseSize);
+      const currentThemeStyles = this.theme === 'dark' ? STYLE_DEFAULTS_DARK : STYLE_DEFAULTS_LIGHT;
+      const currentStyles = JSON.stringify(this.customStyles) === '{}' ? currentThemeStyles : this.customStyles;
+      if (changedProperties.has('customStyles') && this.isNotCustomStylesNull) {
+        this.style.setProperty('--c-accent-high', currentStyles.AccentHigh);
+        this.style.setProperty('--c-accent-lighter', currentStyles.AccentLight);
+        this.style.setProperty('--c-accent-dark', currentStyles.AccentDark);
+        this.style.setProperty('--c-text-color', currentStyles.TextColor);
+        this.style.setProperty('--c-light-gray', currentStyles.BackgroundColor);
+        this.style.setProperty('--c-dark-gray', currentStyles.ForegroundColor);
+        this.style.setProperty('--c-base-gray', currentStyles.FormBackgroundColor);
+        this.style.setProperty('--radius-base', currentStyles.BorderRadius);
+        this.style.setProperty('--border-base', currentStyles.BorderWidth);
+        this.style.setProperty('--font-base', currentStyles.FontBaseSize);
       }
     }, 1000);
   }
+
   // Send the question to the Open AI API and render the answer in the chat
 
   setQuestionInputValue(value: string): void {

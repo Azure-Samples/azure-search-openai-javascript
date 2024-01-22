@@ -96,7 +96,6 @@ const Chat = () => {
     chatComponent.current?.setAttribute('data-theme', newIsDarkTheme ? 'dark' : '');
     // Update the body class and html data-theme
     chatComponent.current?.removeAttribute('data-custom-styles');
-    // chatComponent.current?.setAttribute('data-custom-styles', JSON.stringify(customStyles));
     // Update the state
     setIsDarkTheme(newIsDarkTheme);
   };
