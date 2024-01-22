@@ -92,7 +92,7 @@ const Chat = () => {
   const handleThemeToggle = (newIsDarkTheme: boolean) => {
     localStorage.removeItem('ms-azoaicc:customStyles');
     // Get the ChatComponent instance (modify this according to how you manage your components)
-    chatComponent.current?.removeAttribute('style');
+    // chatComponent.current?.removeAttribute('style');
     chatComponent.current?.setAttribute('data-theme', newIsDarkTheme ? 'dark' : '');
     // Update the body class and html data-theme
     chatComponent.current?.removeAttribute('data-custom-styles');
