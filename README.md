@@ -325,6 +325,7 @@ For more details, read [Azure OpenAI Landing Zone reference architecture](https:
 
 ## Resources
 
+- [Generative AI For Beginners](https://github.com/microsoft/generative-ai-for-beginners)
 - [Revolutionize your Enterprise Data with ChatGPT: Next-gen Apps w/ Azure OpenAI and AI Search](https://aka.ms/entgptsearchblog)
 - [Azure AI Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search)
 - [Azure OpenAI Service](https://learn.microsoft.com/azure/cognitive-services/openai/overview)
