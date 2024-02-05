@@ -49,8 +49,8 @@
   // Set minimal host requirements for the container.
   "hostRequirements": {
     "memory": "8gb"
-  },
+  }
 
-  // More info: https://aka.ms/dev-containers-non-root.
-  "remoteUser": "root"
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
 }
