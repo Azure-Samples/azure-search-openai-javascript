@@ -1,0 +1,63 @@
+<mat-sidenav-container class="sidenav__wrapper">
+  <mat-sidenav #sidenav mode="side" [(opened)]="opened">
+    <div class="sidenav__container">
+      <h2 class="sidenav__hl">{{ settingsDefaults.panelTitle }}</h2>
+      <p>
+        <mat-form-field class="example-full-width">
+          <mat-label>Override prompt template</mat-label>
+          <textarea matInput placeholder="Current prompt template"></textarea>
+        </mat-form-field>
+      </p>
+      <div>
+        <h3>Retrieval Mode</h3>
+        <mat-button-toggle-group #group="matButtonToggleGroup" aria-label="Retrieval Mode" value="hybrid">
+          <mat-button-toggle value="hybrid">Hybrid</mat-button-toggle>
+          <mat-button-toggle value="vector">Vector</mat-button-toggle>
+          <mat-button-toggle value="text">Text</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+      <p>
+        <mat-form-field class="example-full-width">
+          <mat-label>Retrieve this many search results</mat-label>
+          <input matNativeControl type="number" min="1" max="20" placeholder="3" value="3" />
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-form-field class="example-full-width">
+          <mat-label>Exclude category</mat-label>
+          <input matInput placeholder="Violence" value="Violence" />
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-checkbox [(ngModel)]="settingsDefaults.semanticRanker">Use semantic ranker for retrieval</mat-checkbox>
+      </p>
+      <p>
+        <mat-checkbox [(ngModel)]="settingsDefaults.semanticCaptions"
+          >Use query-contextural summaries instead of whole documents</mat-checkbox
+        >
+      </p>
+      <p><mat-checkbox [(ngModel)]="settingsDefaults.followUpQuestions">Suggest follow-up questions</mat-checkbox></p>
+      <p>
+        <mat-checkbox [(ngModel)]="streaming"> Stream chat completion responses </mat-checkbox>
+      </p>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="inner-wrapper">
+      <button class="button__button settings" title="Application Settings" (click)="sidenav.toggle()">
+        <img src="./assets/svg/gear-solid.svg?raw" alt="Settings" class="icon__img" />
+        <span>{{ settingsDefaults.panelLabel }}</span>
+      </button>
+
+      <chat-component
+        [title]="title"
+        [attr.data-input-position]="inputPosition"
+        [attr.data-interaction-model]="interactionModel"
+        data-api-url=""
+        [attr.data-use-stream]="streaming"
+        [attr.data-approach]="approach"
+        [attr.data-overrides]="overrides"
+      ></chat-component>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
