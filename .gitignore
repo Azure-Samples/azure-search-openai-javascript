@@ -8,6 +8,7 @@ packages/*/test-dist/
 
 # Environments
 .env
+*env*
 
 # NPM
 npm-debug.log*

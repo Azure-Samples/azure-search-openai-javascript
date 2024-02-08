@@ -72,6 +72,7 @@ export class AppSettingsComponent {
     BorderWidth: '3px',
     FontBaseSize: '14px',
   };
+  apiUrl = 'https://search.blackhill-f5c34daf.eastus2.azurecontainerapps.io';
   customStyles = JSON.stringify(this.customStylesObj, undefined, 2);
   overrides = JSON.stringify(this.dataOverrides, undefined, 2);
   approach: string = Approaches.ReadRetrieveRead;
