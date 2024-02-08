@@ -60,6 +60,19 @@ export class AppSettingsComponent {
     promptTemplateSuffix: '',
     suggestFollowupQuestions: this.settingsDefaults.followUpQuestions,
   };
+  customStylesObj = {
+    AccentHigh: '#692b61',
+    AccentLight: '#f6d5f2',
+    AccentDark: '#5e3c7d',
+    TextColor: '#123f58',
+    BackgroundColor: '#e3e3e3',
+    ForegroundColor: '#4e5288',
+    FormBackgroundColor: '#f5f5f5',
+    BorderRadius: '10px',
+    BorderWidth: '3px',
+    FontBaseSize: '14px',
+  };
+  customStyles = JSON.stringify(this.customStylesObj, undefined, 2);
   overrides = JSON.stringify(this.dataOverrides, undefined, 2);
   approach: string = Approaches.ReadRetrieveRead;
   interactionModel: string = 'chat';
