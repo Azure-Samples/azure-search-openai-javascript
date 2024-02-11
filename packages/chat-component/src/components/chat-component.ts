@@ -21,7 +21,7 @@ import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 import { type TabContent } from './tab-component.js';
 import { ChatController } from './chat-controller.js';
 import { ChatHistoryController } from './chat-history-controller.js';
-import { container, type ChatInputComponent, ComponentType } from './composable.js';
+import { container, type ChatInputComponent, ComponentType, type ChatInputFooterComponent } from './composable.js';
 import getDecorators from 'inversify-inject-decorators';
 const { lazyMultiInject } = getDecorators(container);
 
@@ -89,9 +89,6 @@ export class ChatComponent extends LitElement {
   isShowingThoughtProcess = false;
 
   @state()
-  isDefaultPromptsEnabled: boolean = globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !this.isChatStarted;
-
-  @state()
   selectedCitation: Citation | undefined = undefined;
 
   @state()
@@ -106,6 +103,9 @@ export class ChatComponent extends LitElement {
 
   @lazyMultiInject(ComponentType.ChatInputComponent)
   chatInputComponents: ChatInputComponent[];
+
+  @lazyMultiInject(ComponentType.ChatInputFooterComponent)
+  chatInputFooterComponets: ChatInputFooterComponent[];
 
   override updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
@@ -177,7 +177,6 @@ export class ChatComponent extends LitElement {
     this.collapseAside(event);
     const question = DOMPurify.sanitize(this.questionInput.value);
     this.isChatStarted = true;
-    this.isDefaultPromptsEnabled = false;
 
     await this.chatController.generateAnswer(
       {
@@ -221,20 +220,12 @@ export class ChatComponent extends LitElement {
     this.isChatStarted = false;
     this.chatThread = [];
     this.isDisabled = false;
-    this.isDefaultPromptsEnabled = true;
     this.selectedCitation = undefined;
     this.chatController.reset();
     // clean up the current session content from the history too
     this.chatHistoryController.saveChatHistory(this.chatThread);
     this.collapseAside(event);
     this.handleUserChatCancel(event);
-  }
-
-  // Show the default prompts when enabled
-  showDefaultPrompts(event: Event): void {
-    if (!this.isDefaultPromptsEnabled) {
-      this.resetCurrentChat(event);
-    }
   }
 
   // Handle the change event on the input field
@@ -477,13 +468,9 @@ export class ChatComponent extends LitElement {
               </button>
             </div>
 
-            ${this.isDefaultPromptsEnabled
-              ? ''
-              : html`<div class="chat__containerFooter">
-                  <button type="button" @click="${this.showDefaultPrompts}" class="defaults__span button">
-                    ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
-                  </button>
-                </div>`}
+            ${this.chatInputFooterComponets.map((component) =>
+              component.render(this.resetCurrentChat, this.isChatStarted),
+            )}
           </form>
         </section>
         ${this.isShowingThoughtProcess
