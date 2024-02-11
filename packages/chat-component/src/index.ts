@@ -1,7 +1,9 @@
+import 'reflect-metadata';
+
+export * from './components/index.js';
 export * from './components/teaser-list-component.js';
 export * from './components/tab-component.js';
 export * from './components/chat-component.js';
-export * from './components/voice-input-button.js';
 export * from './components/document-previewer.js';
 export * from './components/loading-indicator.js';
 export * from './components/citation-list.js';

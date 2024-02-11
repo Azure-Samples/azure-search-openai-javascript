@@ -28,7 +28,6 @@ import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 import './link-icon.js';
 import './chat-stage.js';
 import './loading-indicator.js';
-import './voice-input-button.js';
 import './teaser-list-component.js';
 import './document-previewer.js';
 import './tab-component.js';
@@ -39,6 +38,9 @@ import './chat-action-button.js';
 import { type TabContent } from './tab-component.js';
 import { ChatController } from './chat-controller.js';
 import { ChatHistoryController } from './chat-history-controller.js';
+import { container, type ChatInputComponent, ComponentType, type SetInputEvent } from './compose.js';
+import getDecorators from 'inversify-inject-decorators';
+const { lazyMultiInject } = getDecorators(container);
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -119,6 +121,9 @@ export class ChatComponent extends LitElement {
 
   static override styles = [chatStyle];
 
+  @lazyMultiInject(ComponentType.ChatInputComponent)
+  chatInputComponents: ChatInputComponent[];
+
   override updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
     // The following block is only necessary when you want to override the component from settings in the outside.
@@ -144,9 +149,9 @@ export class ChatComponent extends LitElement {
     this.currentQuestion = this.questionInput.value;
   }
 
-  handleVoiceInput(event: CustomEvent): void {
+  handleInput(event: SetInputEvent): void {
     event?.preventDefault();
-    this.setQuestionInputValue(event?.detail?.input);
+    this.setQuestionInputValue(event?.detail?.value);
   }
 
   handleQuestionInputClick(event: CustomEvent): void {
@@ -400,6 +405,14 @@ export class ChatComponent extends LitElement {
     </chat-thread-component>`;
   }
 
+  renderChatInputComponents(position: 'left' | 'right') {
+    return this.isResetInput
+      ? ''
+      : this.chatInputComponents
+          .filter((component) => component.position === position)
+          .map((component) => component.render(this.handleInput));
+  }
+
   // Render the chat component as a web component
   override render() {
     return html`
@@ -470,6 +483,7 @@ export class ChatComponent extends LitElement {
           >
             <div class="chatbox__container container-col container-row">
               <div class="chatbox__input-container display-flex-grow container-row">
+                ${this.renderChatInputComponents('left')}
                 <input
                   class="chatbox__input display-flex-grow"
                   data-testid="question-input"
@@ -484,7 +498,7 @@ export class ChatComponent extends LitElement {
                   autocomplete="off"
                   @keyup="${this.handleOnInputChange}"
                 />
-                ${this.isResetInput ? '' : html`<voice-input-button @on-voice-input="${this.handleVoiceInput}" />`}
+                ${this.renderChatInputComponents('right')}
               </div>
               ${this.renderChatOrCancelButton()}
               <button
