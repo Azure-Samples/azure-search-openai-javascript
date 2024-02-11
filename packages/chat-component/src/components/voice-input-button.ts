@@ -3,9 +3,21 @@ import { customElement, state } from 'lit/decorators.js';
 import { styles } from '../styles/voice-input-button.js';
 import { globalConfig } from '../config/global-config.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
-
+import { injectable } from 'inversify';
 import iconMicOff from '../../public/svg/mic-icon.svg?raw';
 import iconMicOn from '../../public/svg/mic-record-on-icon.svg?raw';
+import { container, type ChatInputComponent, ComponentType, SetInputEvent } from './compose.js';
+
+@injectable()
+export class VoiceInputComponentProvider implements ChatInputComponent {
+  position = 'right';
+
+  render(handleInput: (event: CustomEvent) => void) {
+    return html`<voice-input-button @on-voice-input="${handleInput}" />`;
+  }
+}
+
+container.bind<ChatInputComponent>(ComponentType.ChatInputComponent).to(VoiceInputComponentProvider);
 
 @customElement('voice-input-button')
 export class VoiceInputButton extends LitElement {
@@ -40,9 +52,9 @@ export class VoiceInputButton extends LitElement {
         }
 
         // dispatch event
-        const voiceInputEvent = new CustomEvent('on-voice-input', {
+        const voiceInputEvent = new SetInputEvent('on-voice-input', {
           detail: {
-            input,
+            value: input,
           },
           bubbles: true,
           composed: true,
