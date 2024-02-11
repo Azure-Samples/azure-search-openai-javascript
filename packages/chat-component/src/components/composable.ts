@@ -7,11 +7,13 @@ export const ComponentType = {
   ChatInputComponent: Symbol.for('ChatInputComponent'),
 };
 
-export class SetInputEvent extends CustomEvent<{ value: string }> {}
-
 export interface ChatInputComponent {
-  position: 'left' | 'right';
-  render: (handleInput: (event: SetInputEvent) => void) => TemplateResult;
+  position: 'left' | 'right' | 'top';
+  render: (
+    handleInput: (event: CustomEvent<InputValue>) => void,
+    isChatStarted: boolean,
+    interactionModel: 'ask' | 'chat',
+  ) => TemplateResult;
 }
 
 // Add a default component since inversify currently doesn't seem to support optional bindings
