@@ -94,3 +94,7 @@ declare interface BotResponseError {
   code: string;
   message: string;
 }
+
+declare interface InputValue {
+  value: string;
+}

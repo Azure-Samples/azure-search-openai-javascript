@@ -3,13 +3,7 @@ import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import {
-  chatHttpOptions,
-  globalConfig,
-  teaserListTexts,
-  requestOptions,
-  MAX_CHAT_HISTORY,
-} from '../config/global-config.js';
+import { chatHttpOptions, globalConfig, requestOptions, MAX_CHAT_HISTORY } from '../config/global-config.js';
 import { chatStyle } from '../styles/chat-component.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { chatEntryToString, newListWithEntryAtIndex } from '../utils/index.js';
@@ -24,21 +18,10 @@ import iconClose from '../../public/svg/close-icon.svg?raw';
 import iconLogo from '../../public/branding/brand-logo.svg?raw';
 import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 
-// import only necessary components to reduce bundle size
-import './link-icon.js';
-import './chat-stage.js';
-import './loading-indicator.js';
-import './teaser-list-component.js';
-import './document-previewer.js';
-import './tab-component.js';
-import './citation-list.js';
-import './chat-thread-component.js';
-import './chat-action-button.js';
-
 import { type TabContent } from './tab-component.js';
 import { ChatController } from './chat-controller.js';
 import { ChatHistoryController } from './chat-history-controller.js';
-import { container, type ChatInputComponent, ComponentType, type SetInputEvent } from './compose.js';
+import { container, type ChatInputComponent, ComponentType } from './composable.js';
 import getDecorators from 'inversify-inject-decorators';
 const { lazyMultiInject } = getDecorators(container);
 
@@ -149,14 +132,9 @@ export class ChatComponent extends LitElement {
     this.currentQuestion = this.questionInput.value;
   }
 
-  handleInput(event: SetInputEvent): void {
+  handleInput(event: CustomEvent<InputValue>): void {
     event?.preventDefault();
     this.setQuestionInputValue(event?.detail?.value);
-  }
-
-  handleQuestionInputClick(event: CustomEvent): void {
-    event?.preventDefault();
-    this.setQuestionInputValue(event?.detail?.question);
   }
 
   handleCitationClick(event: CustomEvent): void {
@@ -410,7 +388,7 @@ export class ChatComponent extends LitElement {
       ? ''
       : this.chatInputComponents
           .filter((component) => component.position === position)
-          .map((component) => component.render(this.handleInput));
+          .map((component) => component.render(this.handleInput, this.isChatStarted, this.interactionModel));
   }
 
   // Render the chat component as a web component
@@ -461,22 +439,7 @@ export class ChatComponent extends LitElement {
             ? html`<loading-indicator label="${globalConfig.LOADING_INDICATOR_TEXT}"></loading-indicator>`
             : ''}
           <!-- Teaser List with Default Prompts -->
-          <div class="chat__container">
-            <!-- Conditionally render default prompts based on isDefaultPromptsEnabled -->
-            ${this.isDefaultPromptsEnabled
-              ? html`
-                  <teaser-list-component
-                    .heading="${this.interactionModel === 'chat'
-                      ? teaserListTexts.HEADING_CHAT
-                      : teaserListTexts.HEADING_ASK}"
-                    .clickable="${true}"
-                    .actionLabel="${teaserListTexts.TEASER_CTA_LABEL}"
-                    @teaser-click="${this.handleQuestionInputClick}"
-                    .teasers="${teaserListTexts.DEFAULT_PROMPTS}"
-                  ></teaser-list-component>
-                `
-              : ''}
-          </div>
+          <div class="chat__container">${this.renderChatInputComponents('top')}</div>
           <form
             id="chat-form"
             class="form__container ${this.inputPosition === 'sticky' ? 'form__container-sticky' : ''}"
