@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { container, type ChatInputComponent, ComponentType } from './composable.js';
+import { container, type ChatInputComponent, ComponentType, type ChatInputFooterComponent } from './composable.js';
 import { globalConfig, teaserListTexts } from '../config/global-config.js';
 import { html } from 'lit';
 
@@ -27,4 +27,20 @@ export class DefaultQuestionsInputComponent implements ChatInputComponent {
   }
 }
 
+@injectable()
+export class DefaultQuestionFooterComponent implements ChatInputFooterComponent {
+  render(handleClick: (event: Event) => void, isChatStarted: boolean) {
+    const footer = html`
+      <div class="chat__containerFooter">
+        <button type="button" @click="${handleClick}" class="defaults__span button">
+          ${globalConfig.DISPLAY_DEFAULT_PROMPTS_BUTTON}
+        </button>
+      </div>
+    `;
+
+    return globalConfig.IS_DEFAULT_PROMPTS_ENABLED && !isChatStarted ? '' : footer;
+  }
+}
+
 container.bind<ChatInputComponent>(ComponentType.ChatInputComponent).to(DefaultQuestionsInputComponent);
+container.bind<ChatInputFooter>(ComponentType.ChatInputFooterComponent).to(DefaultQuestionFooterComponent);
