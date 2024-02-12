@@ -1,7 +1,10 @@
 import { injectable, Container } from 'inversify';
 import { type TemplateResult } from 'lit';
 import { html } from 'lit';
+import getDecorators from 'inversify-inject-decorators';
+
 export const container = new Container();
+export const { lazyMultiInject } = getDecorators(container);
 
 export const ComponentType = {
   ChatInputComponent: Symbol.for('ChatInputComponent'),
@@ -32,11 +35,11 @@ export class DefaultEmptyComponent {
 
 @injectable()
 export class DefaultInputComponent extends DefaultEmptyComponent implements ChatInputComponent {
-  position = 'right';
+  position: 'left' | 'right' | 'top' = 'left';
 }
 
 @injectable()
 export class DefaultFooterComponent extends DefaultEmptyComponent implements ChatInputFooterComponent {}
 
 container.bind<ChatInputComponent>(ComponentType.ChatInputComponent).to(DefaultInputComponent);
-container.bind<ChatInputFooter>(ComponentType.ChatInputFooterComponent).to(DefaultFooterComponent);
+container.bind<ChatInputFooterComponent>(ComponentType.ChatInputFooterComponent).to(DefaultFooterComponent);
