@@ -21,9 +21,12 @@ import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 import { type TabContent } from './tab-component.js';
 import { ChatController } from './chat-controller.js';
 import { ChatHistoryController } from './chat-history-controller.js';
-import { container, type ChatInputComponent, ComponentType, type ChatInputFooterComponent } from './composable.js';
-import getDecorators from 'inversify-inject-decorators';
-const { lazyMultiInject } = getDecorators(container);
+import {
+  lazyMultiInject,
+  type ChatInputComponent,
+  ComponentType,
+  type ChatInputFooterComponent,
+} from './composable.js';
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -102,10 +105,10 @@ export class ChatComponent extends LitElement {
   static override styles = [chatStyle];
 
   @lazyMultiInject(ComponentType.ChatInputComponent)
-  chatInputComponents: ChatInputComponent[];
+  chatInputComponents: ChatInputComponent[] | undefined;
 
   @lazyMultiInject(ComponentType.ChatInputFooterComponent)
-  chatInputFooterComponets: ChatInputFooterComponent[];
+  chatInputFooterComponets: ChatInputFooterComponent[] | undefined;
 
   override updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
@@ -375,7 +378,7 @@ export class ChatComponent extends LitElement {
   }
 
   renderChatInputComponents(position: 'left' | 'right') {
-    return this.isResetInput
+    return this.isResetInput || this.chatInputComponents === undefined
       ? ''
       : this.chatInputComponents
           .filter((component) => component.position === position)
@@ -468,7 +471,7 @@ export class ChatComponent extends LitElement {
               </button>
             </div>
 
-            ${this.chatInputFooterComponets.map((component) =>
+            ${this.chatInputFooterComponets?.map((component) =>
               component.render(this.resetCurrentChat, this.isChatStarted),
             )}
           </form>
