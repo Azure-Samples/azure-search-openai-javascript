@@ -6,15 +6,11 @@ import { styles } from '../styles/chat-thread-component.js';
 import { globalConfig } from '../config/global-config.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { chatEntryToString } from '../utils/index.js';
 
-import iconSuccess from '../../public/svg/success-icon.svg?raw';
-import iconCopyToClipboard from '../../public/svg/copy-icon.svg?raw';
 import iconQuestion from '../../public/svg/bubblequestion-icon.svg?raw';
 
-import './citation-list.js';
-import './chat-action-button.js';
 import { type ChatActionButton } from './chat-action-button.js';
+import { type ChatEntryActionButtonComponent, ComponentType, lazyMultiInject } from './composable.js';
 
 @customElement('chat-thread-component')
 export class ChatThreadComponent extends LitElement {
@@ -41,12 +37,16 @@ export class ChatThreadComponent extends LitElement {
   @property({ type: Object })
   selectedCitation: Citation | undefined = undefined;
 
-  // Copy response to clipboard
-  copyResponseToClipboard(entry: ChatThreadEntry): void {
-    const response = chatEntryToString(entry);
+  @lazyMultiInject(ComponentType.ChatEntryActionButtonComponent)
+  actionCompontents: ChatEntryActionButtonComponent[] | undefined;
 
-    navigator.clipboard.writeText(response);
-    this.isResponseCopied = true;
+  constructor() {
+    super();
+    if (this.actionCompontents) {
+      for (const component of this.actionCompontents) {
+        component.attach(this);
+      }
+    }
   }
 
   actionButtonClicked(actionButton: ChatActionButton, entry: ChatThreadEntry, event: Event) {
@@ -116,16 +116,7 @@ export class ChatThreadComponent extends LitElement {
               ></chat-action-button>
             `,
           )}
-          <chat-action-button
-            .label="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-            .svgIcon="${this.isResponseCopied ? iconSuccess : iconCopyToClipboard}"
-            .isDisabled="${this.isDisabled}"
-            actionId="copy-to-clipboard"
-            .tooltip="${this.isResponseCopied
-              ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-              : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-            @click="${this.copyResponseToClipboard}"
-          ></chat-action-button>
+          ${this.actionCompontents?.map((component) => component.render(entry, this.isDisabled, () => {}))}
         </div>
       </header>
     `;
