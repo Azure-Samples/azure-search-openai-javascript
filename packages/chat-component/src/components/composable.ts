@@ -9,6 +9,7 @@ export const ComponentType = {
   ChatInputComponent: Symbol.for('ChatInputComponent'),
   ChatInputFooterComponent: Symbol.for('ChatInputFooterComponent'),
   ChatEntryActionButtonComponent: Symbol.for('ChatEntryActionButtonComponent'),
+  CitationActionComponent: Symbol.for('CitationActionComponent'),
 };
 
 export interface ComposableComponent {
@@ -33,10 +34,16 @@ export interface ChatEntryActionButtonComponent extends ComposableComponent {
   render: (entry: ChatThreadEntry, isDisabled: boolean, handleClick: (event: Event) => void) => TemplateResult;
 }
 
+export interface CitationActionComponent {
+  render: (citation: Citation, url: string) => TemplateResult;
+}
+
 // Add a default component since inversify currently doesn't seem to support optional bindings
 // and bindings fail if no component is provided
 @injectable()
-export class DefaultEmptyComponent {
+export class DefaultEmptyComponent implements ComposableComponent {
+  attach() {}
+
   render() {
     return html``;
   }
@@ -52,3 +59,5 @@ export class DefaultFooterComponent extends DefaultEmptyComponent implements Cha
 
 container.bind<ChatInputComponent>(ComponentType.ChatInputComponent).to(DefaultInputComponent);
 container.bind<ChatInputFooterComponent>(ComponentType.ChatInputFooterComponent).to(DefaultFooterComponent);
+container.bind<ChatEntryActionButtonComponent>(ComponentType.ChatEntryActionButtonComponent).to(DefaultEmptyComponent);
+container.bind<CitationActionComponent>(ComponentType.CitationActionComponent).to(DefaultEmptyComponent);

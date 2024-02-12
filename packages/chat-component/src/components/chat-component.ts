@@ -23,9 +23,10 @@ import { ChatController } from './chat-controller.js';
 import { ChatHistoryController } from './chat-history-controller.js';
 import {
   lazyMultiInject,
-  type ChatInputComponent,
   ComponentType,
+  type ChatInputComponent,
   type ChatInputFooterComponent,
+  type CitationActionComponent,
 } from './composable.js';
 
 /**
@@ -74,7 +75,6 @@ export class ChatComponent extends LitElement {
   @query('#question-input')
   questionInput!: HTMLInputElement;
 
-  // Default prompts to display in the chat
   @state()
   isDisabled = false;
 
@@ -109,6 +109,9 @@ export class ChatComponent extends LitElement {
 
   @lazyMultiInject(ComponentType.ChatInputFooterComponent)
   chatInputFooterComponets: ChatInputFooterComponent[] | undefined;
+
+  @lazyMultiInject(ComponentType.CitationActionComponent)
+  citationActionComponents: CitationActionComponent[] | undefined;
 
   override updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
@@ -323,9 +326,9 @@ export class ChatComponent extends LitElement {
                 @on-citation-click="${this.handleCitationClick}"
               ></citation-list>
               ${this.selectedCitation
-                ? html`<document-previewer
-                    url="${this.apiUrl}/content/${this.selectedCitation.text}"
-                  ></document-previewer>`
+                ? this.citationActionComponents?.map((component) =>
+                    component.render(this.selectedCitation, `${this.apiUrl}/content/${this.selectedCitation.text}`),
+                  )
                 : ''}
             </div>
           `
