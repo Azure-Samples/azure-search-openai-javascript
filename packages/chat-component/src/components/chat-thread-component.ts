@@ -78,7 +78,7 @@ export class ChatThreadComponent extends LitElement {
     event.preventDefault();
     const followUpClickEvent = new CustomEvent('on-followup-click', {
       detail: {
-        question,
+        value: question,
         chatThreadEntry: entry,
       },
       bubbles: true,
