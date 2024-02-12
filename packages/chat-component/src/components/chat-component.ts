@@ -372,7 +372,7 @@ export class ChatComponent extends LitElement {
       .svgIcon="${iconLogo}"
       @on-action-button-click="${this.handleChatEntryActionButtonClick}"
       @on-citation-click="${this.handleCitationClick}"
-      @on-followup-click="${this.handleQuestionInputClick}"
+      @on-followup-click="${this.handleInput}"
     >
     </chat-thread-component>`;
   }
