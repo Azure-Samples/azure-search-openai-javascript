@@ -8,6 +8,8 @@ import './citation-list.js';
 import './chat-thread-component.js';
 import './chat-action-button.js';
 
+import './copy-entry-to-clipboard.js';
+
 // [COMPOSE COMPONENTS START]
 import './voice-input.js';
 import './voice-input-button.js';

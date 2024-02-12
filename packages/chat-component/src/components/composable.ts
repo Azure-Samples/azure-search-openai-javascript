@@ -1,6 +1,5 @@
 import { injectable, Container } from 'inversify';
-import { type TemplateResult } from 'lit';
-import { html } from 'lit';
+import { html, type ReactiveControllerHost, type TemplateResult } from 'lit';
 import getDecorators from 'inversify-inject-decorators';
 
 export const container = new Container();
@@ -9,9 +8,14 @@ export const { lazyMultiInject } = getDecorators(container);
 export const ComponentType = {
   ChatInputComponent: Symbol.for('ChatInputComponent'),
   ChatInputFooterComponent: Symbol.for('ChatInputFooterComponent'),
+  ChatEntryActionButtonComponent: Symbol.for('ChatEntryActionButtonComponent'),
 };
 
-export interface ChatInputComponent {
+export interface ComposableComponent {
+  attach: (host: ReactiveControllerHost) => void;
+}
+
+export interface ChatInputComponent extends ComposableComponent {
   position: 'left' | 'right' | 'top';
   render: (
     handleInput: (event: CustomEvent<InputValue>) => void,
@@ -20,8 +24,13 @@ export interface ChatInputComponent {
   ) => TemplateResult;
 }
 
-export interface ChatInputFooterComponent {
+export interface ChatInputFooterComponent extends ComposableComponent {
   render: (handleClick: (event: Event) => void, isChatStarted: boolean) => TemplateResult;
+}
+
+export interface ChatEntryActionButtonComponent extends ComposableComponent {
+  attach: (host: ReactiveControllerHost) => void;
+  render: (entry: ChatThreadEntry, isDisabled: boolean, handleClick: (event: Event) => void) => TemplateResult;
 }
 
 // Add a default component since inversify currently doesn't seem to support optional bindings
