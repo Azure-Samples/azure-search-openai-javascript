@@ -23,11 +23,13 @@ import { ChatController } from './chat-controller.js';
 import { ChatHistoryController } from './chat-history-controller.js';
 import {
   lazyMultiInject,
-  ComponentType,
-  type ChatInputComponent,
-  type ChatInputFooterComponent,
-  type CitationActionComponent,
+  ControllerType,
+  type ChatInputController,
+  type ChatInputFooterController,
+  type CitationController,
+  type ChatSectionController,
 } from './composable.js';
+import { ChatContextController } from './chat-context.js';
 
 /**
  * A chat component that allows the user to ask questions and get answers from an API.
@@ -50,10 +52,22 @@ export class ChatComponent extends LitElement {
   inputPosition = 'sticky';
 
   @property({ type: String, attribute: 'data-interaction-model' })
-  interactionModel: 'ask' | 'chat' = 'chat';
+  set interactionModel(value: 'ask' | 'chat') {
+    this.chatContext.interactionModel = value || 'chat';
+  }
+
+  get interactionModel(): 'ask' | 'chat' {
+    return this.chatContext.interactionModel;
+  }
 
   @property({ type: String, attribute: 'data-api-url' })
-  apiUrl = chatHttpOptions.url;
+  set apiUrl(value: string = chatHttpOptions.url) {
+    this.chatContext.apiUrl = value;
+  }
+
+  get apiUrl(): string {
+    return this.chatContext.apiUrl;
+  }
 
   @property({ type: String, attribute: 'data-custom-branding', converter: (value) => value?.toLowerCase() === 'true' })
   isCustomBranding: boolean = globalConfig.IS_CUSTOM_BRANDING;
@@ -78,14 +92,20 @@ export class ChatComponent extends LitElement {
   @state()
   isDisabled = false;
 
-  @state()
-  isChatStarted = false;
+  set isChatStarted(value: boolean) {
+    this.chatContext.isChatStarted = value;
+  }
+
+  get isChatStarted(): boolean {
+    return this.chatContext.isChatStarted;
+  }
 
   @state()
   isResetInput = false;
 
   private chatController = new ChatController(this);
   private chatHistoryController = new ChatHistoryController(this);
+  private chatContext = new ChatContextController(this);
 
   // Is showing thought process panel
   @state()
@@ -104,14 +124,42 @@ export class ChatComponent extends LitElement {
 
   static override styles = [chatStyle];
 
-  @lazyMultiInject(ComponentType.ChatInputComponent)
-  chatInputComponents: ChatInputComponent[] | undefined;
+  @lazyMultiInject(ControllerType.ChatInput)
+  chatInputComponents: ChatInputController[] | undefined;
 
-  @lazyMultiInject(ComponentType.ChatInputFooterComponent)
-  chatInputFooterComponets: ChatInputFooterComponent[] | undefined;
+  @lazyMultiInject(ControllerType.ChatInputFooter)
+  chatInputFooterComponets: ChatInputFooterController[] | undefined;
 
-  @lazyMultiInject(ComponentType.CitationActionComponent)
-  citationActionComponents: CitationActionComponent[] | undefined;
+  @lazyMultiInject(ControllerType.Citation)
+  citationControllers: CitationController[] | undefined;
+
+  @lazyMultiInject(ControllerType.ChatSection)
+  chatFooterComponents: ChatSectionController[] | undefined;
+
+  // Lifecycle method that runs when the component is first connected to the DOM
+  override connectedCallback(): void {
+    super.connectedCallback();
+    if (this.chatInputComponents) {
+      for (const component of this.chatInputComponents) {
+        component.attach(this, this.chatContext);
+      }
+    }
+    if (this.chatInputFooterComponets) {
+      for (const component of this.chatInputFooterComponets) {
+        component.attach(this, this.chatContext);
+      }
+    }
+    if (this.citationControllers) {
+      for (const component of this.citationControllers) {
+        component.attach(this, this.chatContext);
+      }
+    }
+    if (this.chatFooterComponents) {
+      for (const component of this.chatFooterComponents) {
+        component.attach(this, this.chatContext);
+      }
+    }
+  }
 
   override updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
@@ -326,7 +374,7 @@ export class ChatComponent extends LitElement {
                 @on-citation-click="${this.handleCitationClick}"
               ></citation-list>
               ${this.selectedCitation
-                ? this.citationActionComponents?.map((component) =>
+                ? this.citationControllers?.map((component) =>
                     component.render(this.selectedCitation, `${this.apiUrl}/content/${this.selectedCitation.text}`),
                   )
                 : ''}
@@ -373,6 +421,7 @@ export class ChatComponent extends LitElement {
       .selectedCitation="${this.selectedCitation}"
       .isCustomBranding="${this.isCustomBranding}"
       .svgIcon="${iconLogo}"
+      .context="${this.chatContext}"
       @on-action-button-click="${this.handleChatEntryActionButtonClick}"
       @on-citation-click="${this.handleCitationClick}"
       @on-followup-click="${this.handleInput}"
@@ -385,7 +434,7 @@ export class ChatComponent extends LitElement {
       ? ''
       : this.chatInputComponents
           .filter((component) => component.position === position)
-          .map((component) => component.render(this.handleInput, this.isChatStarted, this.interactionModel));
+          .map((component) => component.render(this.handleInput));
   }
 
   // Render the chat component as a web component
@@ -479,7 +528,7 @@ export class ChatComponent extends LitElement {
             )}
           </form>
         </section>
-        ${this.isShowingThoughtProcess
+        <!-- ${this.isShowingThoughtProcess
           ? html`
               <aside class="aside" data-testid="aside-thought-process">
                 <div class="aside__header">
@@ -494,7 +543,8 @@ export class ChatComponent extends LitElement {
                 ${this.renderChatEntryTabContent(this.selectedChatEntry as ChatThreadEntry)}
               </aside>
             `
-          : ''}
+          : ''} -->
+        ${this.chatFooterComponents?.map((component) => component.render())}
       </section>
     `;
   }

@@ -6,7 +6,11 @@ import './tab-component.js';
 import './citation-list.js';
 import './chat-thread-component.js';
 import './chat-action-button.js';
+
+import './chat-context.js';
+
+export * from './composable.js';
+import './features.js';
 import './copy-entry-to-clipboard.js';
 
-import './features.js';
 export * from './chat-component.js';

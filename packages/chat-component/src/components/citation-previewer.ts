@@ -1,12 +1,12 @@
 import { injectable } from 'inversify';
-import { container, type CitationActionComponent, ComponentType } from './composable.js';
+import { container, type CitationController, ControllerType, ComposableReactiveControllerBase } from './composable.js';
 import { html } from 'lit';
 
 @injectable()
-export class CitationPreviewer implements CitationActionComponent {
+export class CitationPreviewer extends ComposableReactiveControllerBase implements CitationController {
   render(citation: Citation, url: string) {
     return html`<document-previewer url="${url}"></document-previewer>`;
   }
 }
 
-container.bind<CitationActionComponent>(ComponentType.CitationActionComponent).to(CitationPreviewer);
+container.bind<CitationController>(ControllerType.Citation).to(CitationPreviewer);

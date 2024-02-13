@@ -1,63 +1,74 @@
-import { injectable, Container } from 'inversify';
 import { html, type ReactiveControllerHost, type TemplateResult } from 'lit';
+import { injectable, Container } from 'inversify';
 import getDecorators from 'inversify-inject-decorators';
+import { type ChatContextController } from '../chat-context.js';
 
 export const container = new Container();
 export const { lazyMultiInject } = getDecorators(container);
 
-export const ComponentType = {
-  ChatInputComponent: Symbol.for('ChatInputComponent'),
-  ChatInputFooterComponent: Symbol.for('ChatInputFooterComponent'),
-  ChatEntryActionButtonComponent: Symbol.for('ChatEntryActionButtonComponent'),
-  CitationActionComponent: Symbol.for('CitationActionComponent'),
+export const ControllerType = {
+  ChatInput: Symbol.for('ChatInputController'),
+  ChatInputFooter: Symbol.for('ChatInputFooterController'),
+  ChatSection: Symbol.for('ChatSectionController'),
+  ChatEntryAction: Symbol.for('ChatEntryActionController'),
+  Citation: Symbol.for('CitationController'),
 };
 
-export interface ComposableComponent {
-  attach: (host: ReactiveControllerHost) => void;
+export interface ComposableReactiveController extends ReactiveController {
+  attach: (host: ReactiveControllerHost, context: ChatContextController) => void;
 }
 
-export interface ChatInputComponent extends ComposableComponent {
+@injectable()
+export abstract class ComposableReactiveControllerBase implements ComposableReactiveController {
+  protected host: ReactiveControllerHost;
+  protected context: ChatContextController;
+
+  attach(host: ReactiveControllerHost, context: ChatContextController) {
+    this.host = host;
+    this.context = context;
+  }
+
+  hostConnected() {}
+  hostDisconnected() {}
+}
+
+export interface ChatInputController extends ComposableReactiveController {
   position: 'left' | 'right' | 'top';
-  render: (
-    handleInput: (event: CustomEvent<InputValue>) => void,
-    isChatStarted: boolean,
-    interactionModel: 'ask' | 'chat',
-  ) => TemplateResult;
+  render: (handleInput: (event: CustomEvent<InputValue>) => void) => TemplateResult;
 }
 
-export interface ChatInputFooterComponent extends ComposableComponent {
-  render: (handleClick: (event: Event) => void, isChatStarted: boolean) => TemplateResult;
+export interface ChatInputFooterController extends ComposableReactiveController {
+  render: (handleClick: (event: Event) => void) => TemplateResult;
 }
 
-export interface ChatEntryActionButtonComponent extends ComposableComponent {
-  attach: (host: ReactiveControllerHost) => void;
-  render: (entry: ChatThreadEntry, isDisabled: boolean, handleClick: (event: Event) => void) => TemplateResult;
+export interface ChatSectionController extends ComposableReactiveController {
+  render: () => TemplateResult;
 }
 
-export interface CitationActionComponent {
+export interface ChatEntryActionController extends ComposableReactiveController {
+  render: (entry: ChatThreadEntry, isDisabled: boolean) => TemplateResult;
+}
+
+export interface CitationController extends ComposableReactiveController {
   render: (citation: Citation, url: string) => TemplateResult;
 }
 
 // Add a default component since inversify currently doesn't seem to support optional bindings
 // and bindings fail if no component is provided
 @injectable()
-export class DefaultEmptyComponent implements ComposableComponent {
-  attach() {}
-
+export class DefaultController extends ComposableReactiveControllerBase {
   render() {
     return html``;
   }
 }
 
 @injectable()
-export class DefaultInputComponent extends DefaultEmptyComponent implements ChatInputComponent {
+export class DefaultInputController extends DefaultController implements ChatInputController {
   position: 'left' | 'right' | 'top' = 'left';
 }
 
-@injectable()
-export class DefaultFooterComponent extends DefaultEmptyComponent implements ChatInputFooterComponent {}
-
-container.bind<ChatInputComponent>(ComponentType.ChatInputComponent).to(DefaultInputComponent);
-container.bind<ChatInputFooterComponent>(ComponentType.ChatInputFooterComponent).to(DefaultFooterComponent);
-container.bind<ChatEntryActionButtonComponent>(ComponentType.ChatEntryActionButtonComponent).to(DefaultEmptyComponent);
-container.bind<CitationActionComponent>(ComponentType.CitationActionComponent).to(DefaultEmptyComponent);
+container.bind<ChatInputController>(ControllerType.ChatInput).to(DefaultInputController);
+container.bind<ChatInputFooterController>(ControllerType.ChatInputFooter).to(DefaultController);
+container.bind<ChatSectionController>(ControllerType.ChatSection).to(DefaultController);
+container.bind<ChatEntryActionController>(ControllerType.ChatEntryAction).to(DefaultController);
+container.bind<CitationController>(ControllerType.Citation).to(DefaultController);

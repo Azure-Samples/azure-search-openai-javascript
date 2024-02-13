@@ -1,9 +1,9 @@
 import { injectable } from 'inversify';
-import { container, type ChatInputComponent, ComponentType } from './composable.js';
+import { container, type ChatInputController, ControllerType, ComposableReactiveControllerBase } from './composable.js';
 import { html } from 'lit';
 
 @injectable()
-export class VoiceInputComponentProvider implements ChatInputComponent {
+export class VoiceInputController extends ComposableReactiveControllerBase implements ChatInputController {
   position = 'right';
 
   render(handleInput: (event: CustomEvent<InputValue>) => void) {
@@ -11,4 +11,4 @@ export class VoiceInputComponentProvider implements ChatInputComponent {
   }
 }
 
-container.bind<ChatInputComponent>(ComponentType.ChatInputComponent).to(VoiceInputComponentProvider);
+container.bind<ChatInputController>(ControllerType.ChatInput).to(VoiceInputController);
