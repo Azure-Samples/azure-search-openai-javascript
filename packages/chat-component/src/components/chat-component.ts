@@ -102,10 +102,6 @@ export class ChatComponent extends LitElement {
   private chatHistoryController = new ChatHistoryController(this);
   private chatContext = new ChatContextController(this);
 
-  // Is showing thought process panel
-  @state()
-  isShowingThoughtProcess = false;
-
   // These are the chat bubbles that will be displayed in the chat
   chatThread: ChatThreadEntry[] = [];
 
