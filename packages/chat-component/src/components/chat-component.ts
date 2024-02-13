@@ -56,7 +56,7 @@ export class ChatComponent extends LitElement {
   }
 
   @property({ type: String, attribute: 'data-api-url' })
-  set apiUrl(value: string = chatHttpOptions.url) {
+  set apiUrl(value: string) {
     this.chatContext.apiUrl = value;
   }
 
@@ -172,8 +172,14 @@ export class ChatComponent extends LitElement {
 
   handleCitationClick(event: CustomEvent): void {
     event?.preventDefault();
-    this.chatContext.selectedCitation = event?.detail?.citation;
-    this.chatContext.selectedChatEntry = event?.detail?.chatThreadEntry;
+    const citation = event?.detail?.citation;
+    const chatThreadEntry = event?.detail?.chatThreadEntry;
+    if (citation) {
+      this.chatContext.selectedCitation = citation;
+    }
+    if (chatThreadEntry) {
+      this.chatContext.selectedChatEntry = chatThreadEntry;
+    }
     this.chatContext.setState('showCitations', true);
   }
 

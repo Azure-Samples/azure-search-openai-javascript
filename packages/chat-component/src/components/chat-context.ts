@@ -1,4 +1,5 @@
 import { type ReactiveController, type ReactiveControllerHost } from 'lit';
+import { chatHttpOptions } from '../config/global-config.js';
 
 export class ChatContextController implements ReactiveController {
   host: ReactiveControllerHost;
@@ -19,7 +20,7 @@ export class ChatContextController implements ReactiveController {
 
   private _selectedChatEntry: ChatThreadEntry | undefined = undefined;
 
-  private _apiUrl: string = '';
+  private _apiUrl: string = chatHttpOptions.url;
 
   private _interactionModel: 'ask' | 'chat' = 'chat';
 
