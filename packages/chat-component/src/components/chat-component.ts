@@ -120,6 +120,11 @@ export class ChatComponent extends LitElement {
   @lazyMultiInject(ControllerType.ChatSection)
   chatSectionControllers: ChatSectionController[] | undefined;
 
+  public constructor() {
+    super();
+    this.setQuestionInputValue = this.setQuestionInputValue.bind(this);
+  }
+
   // Lifecycle method that runs when the component is first connected to the DOM
   override connectedCallback(): void {
     super.connectedCallback();
@@ -328,7 +333,7 @@ export class ChatComponent extends LitElement {
       .svgIcon="${iconLogo}"
       .context="${this.chatContext}"
       @on-citation-click="${this.handleCitationClick}"
-      @on-followup-click="${this.handleInput}"
+      @on-input="${this.handleInput}"
     >
     </chat-thread-component>`;
   }
@@ -338,7 +343,7 @@ export class ChatComponent extends LitElement {
       ? ''
       : this.chatInputComponents
           .filter((component) => component.position === position)
-          .map((component) => component.render(this.handleInput));
+          .map((component) => component.render(this.setQuestionInputValue));
   }
 
   // Render the chat component as a web component

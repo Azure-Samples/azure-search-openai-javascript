@@ -12,6 +12,7 @@ export const ControllerType = {
   ChatSection: Symbol.for('ChatSectionController'),
   ChatEntryAction: Symbol.for('ChatEntryActionController'),
   Citation: Symbol.for('CitationController'),
+  ChatEntryInlineInput: Symbol.for('ChatEntryInlineInputController'),
 };
 
 export interface ComposableReactiveController extends ReactiveController {
@@ -24,7 +25,7 @@ export abstract class ComposableReactiveControllerBase implements ComposableReac
   protected context: ChatContextController;
 
   attach(host: ReactiveControllerHost, context: ChatContextController) {
-    this.host = host;
+    (this.host = host).addController(this);
     this.context = context;
   }
 
@@ -34,7 +35,7 @@ export abstract class ComposableReactiveControllerBase implements ComposableReac
 
 export interface ChatInputController extends ComposableReactiveController {
   position: 'left' | 'right' | 'top';
-  render: (handleInput: (event: CustomEvent<InputValue>) => void) => TemplateResult;
+  render: (handleInput: (input: string) => void) => TemplateResult;
 }
 
 export interface ChatInputFooterController extends ComposableReactiveController {
@@ -49,6 +50,10 @@ export interface ChatSectionController extends ComposableReactiveController {
 
 export interface ChatEntryActionController extends ComposableReactiveController {
   render: (entry: ChatThreadEntry, isDisabled: boolean) => TemplateResult;
+}
+
+export interface ChatEntryInlineInputController extends ComposableReactiveController {
+  render: (entry: ChatThreadEntry, handleInput: (event: CustomEvent<InputValue>) => void) => TemplateResult;
 }
 
 export interface CitationController extends ComposableReactiveController {
@@ -80,3 +85,4 @@ container.bind<ChatInputFooterController>(ControllerType.ChatInputFooter).to(Def
 container.bind<ChatSectionController>(ControllerType.ChatSection).to(DefaultChatSectionController);
 container.bind<ChatEntryActionController>(ControllerType.ChatEntryAction).to(DefaultController);
 container.bind<CitationController>(ControllerType.Citation).to(DefaultController);
+container.bind<ChatEntryInlineInputController>(ControllerType.ChatEntryInlineInput).to(DefaultController);
