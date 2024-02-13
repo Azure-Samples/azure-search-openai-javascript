@@ -13,7 +13,7 @@ import { html } from 'lit';
 export class DefaultQuestionsInputController extends ComposableReactiveControllerBase implements ChatInputController {
   position = 'top';
 
-  render(handleInput: (event: CustomEvent<InputValue>) => void) {
+  render(handleInput: (input: string) => void) {
     const promptTemplate = html`
       <teaser-list-component
         .heading="${this.context.interactionModel === 'chat'
@@ -21,7 +21,7 @@ export class DefaultQuestionsInputController extends ComposableReactiveControlle
           : teaserListTexts.HEADING_ASK}"
         .clickable="${true}"
         .actionLabel="${teaserListTexts.TEASER_CTA_LABEL}"
-        @teaser-click="${handleInput}"
+        @teaser-click="${(event) => handleInput(event?.detail?.value)}"
         .teasers="${teaserListTexts.DEFAULT_PROMPTS}"
       ></teaser-list-component>
     `;

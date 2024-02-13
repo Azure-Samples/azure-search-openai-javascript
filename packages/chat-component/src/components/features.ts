@@ -12,4 +12,5 @@ import './teaser-list-component.js';
 import './document-previewer.js';
 import './citation-previewer.js';
 
+import './follow-up-questions.js';
 // [COMPOSE COMPONENTS END]

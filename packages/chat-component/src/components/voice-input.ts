@@ -6,8 +6,8 @@ import { html } from 'lit';
 export class VoiceInputController extends ComposableReactiveControllerBase implements ChatInputController {
   position = 'right';
 
-  render(handleInput: (event: CustomEvent<InputValue>) => void) {
-    return html`<voice-input-button @on-voice-input="${handleInput}" />`;
+  render(handleInput: (input: string) => void) {
+    return html`<voice-input-button @on-voice-input="${(event) => handleInput(event?.detail?.value)}" />`;
   }
 }
 
