@@ -110,7 +110,9 @@ export class AskReadRetrieveRead extends ApproachBase implements AskApproach {
             content: answer,
             role: 'assistant' as const,
             context: {
-              data_points: searchResults,
+              data_points: {
+                text: searchResults,
+              },
               thoughts: htmlTracer.getAndResetLog(),
             },
           },

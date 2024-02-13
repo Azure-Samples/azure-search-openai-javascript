@@ -82,7 +82,10 @@ declare interface BotResponseChunk {
 
 declare type BotResponseMessage = Message & {
   context?: Record<string, any> & {
-    data_points?: string[];
+    data_points?: {
+      text?: string[];
+      images?: string[];
+    };
     thoughts?: string;
   };
   session_state?: Record<string, any>;
