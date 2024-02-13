@@ -10,7 +10,8 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import iconQuestion from '../../public/svg/bubblequestion-icon.svg?raw';
 
 import { type ChatActionButton } from './chat-action-button.js';
-import { type ChatEntryActionButtonComponent, ComponentType, lazyMultiInject } from './composable.js';
+import { type ChatEntryActionController, ControllerType, lazyMultiInject } from './composable.js';
+import { type ChatContextController } from './chat-context.js';
 
 @customElement('chat-thread-component')
 export class ChatThreadComponent extends LitElement {
@@ -18,9 +19,6 @@ export class ChatThreadComponent extends LitElement {
 
   @property({ type: Array })
   chatThread: ChatThreadEntry[] = [];
-
-  @property({ type: Array })
-  actionButtons: ChatActionButton[] = [];
 
   @property({ type: Boolean })
   isDisabled = false;
@@ -37,14 +35,17 @@ export class ChatThreadComponent extends LitElement {
   @property({ type: Object })
   selectedCitation: Citation | undefined = undefined;
 
-  @lazyMultiInject(ComponentType.ChatEntryActionButtonComponent)
-  actionCompontents: ChatEntryActionButtonComponent[] | undefined;
+  @property({ type: Object })
+  context: ChatContextController | undefined = undefined;
 
-  constructor() {
-    super();
+  @lazyMultiInject(ControllerType.ChatEntryAction)
+  actionCompontents: ChatEntryActionController[] | undefined;
+
+  connectedCallback() {
+    super.connectedCallback();
     if (this.actionCompontents) {
       for (const component of this.actionCompontents) {
-        component.attach(this);
+        component.attach(this, this.context);
       }
     }
   }
@@ -105,18 +106,7 @@ export class ChatThreadComponent extends LitElement {
     return html`
       <header class="chat__header">
         <div class="chat__header--button">
-          ${this.actionButtons.map(
-            (actionButton) => html`
-              <chat-action-button
-                .label="${actionButton.label}"
-                .svgIcon="${actionButton.svgIcon}"
-                .isDisabled="${actionButton.isDisabled}"
-                .actionId="${actionButton.id}"
-                @click="${(event) => this.actionButtonClicked(actionButton, entry, event)}"
-              ></chat-action-button>
-            `,
-          )}
-          ${this.actionCompontents?.map((component) => component.render(entry, this.isDisabled, () => {}))}
+          ${this.actionCompontents?.map((component) => component.render(entry, this.isDisabled))}
         </div>
       </header>
     `;
