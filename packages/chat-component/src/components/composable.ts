@@ -42,6 +42,8 @@ export interface ChatInputFooterController extends ComposableReactiveController 
 }
 
 export interface ChatSectionController extends ComposableReactiveController {
+  isEnabled: boolean;
+  close: () => void;
   render: () => TemplateResult;
 }
 
@@ -67,8 +69,14 @@ export class DefaultInputController extends DefaultController implements ChatInp
   position: 'left' | 'right' | 'top' = 'left';
 }
 
+@injectable()
+export class DefaultChatSectionController extends DefaultController implements ChatSectionController {
+  isEnabled = false;
+  close() {}
+}
+
 container.bind<ChatInputController>(ControllerType.ChatInput).to(DefaultInputController);
 container.bind<ChatInputFooterController>(ControllerType.ChatInputFooter).to(DefaultController);
-container.bind<ChatSectionController>(ControllerType.ChatSection).to(DefaultController);
+container.bind<ChatSectionController>(ControllerType.ChatSection).to(DefaultChatSectionController);
 container.bind<ChatEntryActionController>(ControllerType.ChatEntryAction).to(DefaultController);
 container.bind<CitationController>(ControllerType.Citation).to(DefaultController);

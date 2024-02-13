@@ -25,6 +25,17 @@ export class ChatContextController implements ReactiveController {
 
   private _isChatStarted: boolean = false;
 
+  private _selectedCitation: Citation | undefined = undefined;
+
+  public set selectedCitation(citation: Citation | undefined) {
+    this._selectedCitation = citation;
+    this.host.requestUpdate();
+  }
+
+  public get selectedCitation() {
+    return this._selectedCitation;
+  }
+
   public set isChatStarted(value: boolean) {
     this._isChatStarted = value;
     this.host.requestUpdate();

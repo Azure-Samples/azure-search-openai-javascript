@@ -2,7 +2,6 @@
 import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { chatHttpOptions, globalConfig, requestOptions, MAX_CHAT_HISTORY } from '../config/global-config.js';
 import { chatStyle } from '../styles/chat-component.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
@@ -10,15 +9,12 @@ import { chatEntryToString, newListWithEntryAtIndex } from '../utils/index.js';
 
 // TODO: allow host applications to customize these icons
 
-import iconLightBulb from '../../public/svg/lightbulb-icon.svg?raw';
 import iconDelete from '../../public/svg/delete-icon.svg?raw';
 import iconCancel from '../../public/svg/cancel-icon.svg?raw';
 import iconSend from '../../public/svg/send-icon.svg?raw';
-import iconClose from '../../public/svg/close-icon.svg?raw';
 import iconLogo from '../../public/branding/brand-logo.svg?raw';
 import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 
-import { type TabContent } from './tab-component.js';
 import { ChatController } from './chat-controller.js';
 import { ChatHistoryController } from './chat-history-controller.js';
 import {
@@ -26,7 +22,6 @@ import {
   ControllerType,
   type ChatInputController,
   type ChatInputFooterController,
-  type CitationController,
   type ChatSectionController,
 } from './composable.js';
 import { ChatContextController } from './chat-context.js';
@@ -111,14 +106,6 @@ export class ChatComponent extends LitElement {
   @state()
   isShowingThoughtProcess = false;
 
-  @state()
-  selectedCitation: Citation | undefined = undefined;
-
-  @state()
-  selectedChatEntry: ChatThreadEntry | undefined = undefined;
-
-  selectedAsideTab: 'tab-thought-process' | 'tab-support-context' | 'tab-citations' = 'tab-thought-process';
-
   // These are the chat bubbles that will be displayed in the chat
   chatThread: ChatThreadEntry[] = [];
 
@@ -130,11 +117,8 @@ export class ChatComponent extends LitElement {
   @lazyMultiInject(ControllerType.ChatInputFooter)
   chatInputFooterComponets: ChatInputFooterController[] | undefined;
 
-  @lazyMultiInject(ControllerType.Citation)
-  citationControllers: CitationController[] | undefined;
-
   @lazyMultiInject(ControllerType.ChatSection)
-  chatFooterComponents: ChatSectionController[] | undefined;
+  chatSectionControllers: ChatSectionController[] | undefined;
 
   // Lifecycle method that runs when the component is first connected to the DOM
   override connectedCallback(): void {
@@ -149,13 +133,8 @@ export class ChatComponent extends LitElement {
         component.attach(this, this.chatContext);
       }
     }
-    if (this.citationControllers) {
-      for (const component of this.citationControllers) {
-        component.attach(this, this.chatContext);
-      }
-    }
-    if (this.chatFooterComponents) {
-      for (const component of this.chatFooterComponents) {
+    if (this.chatSectionControllers) {
+      for (const component of this.chatSectionControllers) {
         component.attach(this, this.chatContext);
       }
     }
@@ -193,15 +172,9 @@ export class ChatComponent extends LitElement {
 
   handleCitationClick(event: CustomEvent): void {
     event?.preventDefault();
-    this.selectedCitation = event?.detail?.citation;
-
-    if (!this.isShowingThoughtProcess) {
-      if (event?.detail?.chatThreadEntry) {
-        this.selectedChatEntry = event?.detail?.chatThreadEntry;
-      }
-      this.handleExpandAside();
-      this.selectedAsideTab = 'tab-citations';
-    }
+    this.chatContext.selectedCitation = event?.detail?.citation;
+    this.chatContext.selectedChatEntry = event?.detail?.chatThreadEntry;
+    this.chatContext.setState('showCitations', true);
   }
 
   getMessageContext(): Message[] {
@@ -274,7 +247,7 @@ export class ChatComponent extends LitElement {
     this.isChatStarted = false;
     this.chatThread = [];
     this.isDisabled = false;
-    this.selectedCitation = undefined;
+    this.chatContext.selectedCitation = undefined;
     this.chatController.reset();
     // clean up the current session content from the history too
     this.chatHistoryController.saveChatHistory(this.chatThread);
@@ -293,22 +266,14 @@ export class ChatComponent extends LitElement {
     this.chatController.cancelRequest();
   }
 
-  // show thought process aside
-  handleExpandAside(event: Event | undefined = undefined): void {
-    event?.preventDefault();
-    this.isShowingThoughtProcess = true;
-    this.selectedAsideTab = 'tab-thought-process';
-    this.shadowRoot?.querySelector('#overlay')?.classList.add('active');
-    this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.add('aside-open');
-  }
-
   // hide thought process aside
   collapseAside(event: Event): void {
-    event.preventDefault();
-    this.isShowingThoughtProcess = false;
-    this.selectedCitation = undefined;
-    this.shadowRoot?.querySelector('#chat__containerWrapper')?.classList.remove('aside-open');
-    this.shadowRoot?.querySelector('#overlay')?.classList.remove('active');
+    event?.preventDefault();
+    if (this.chatSectionControllers) {
+      for (const component of this.chatSectionControllers) {
+        component.close();
+      }
+    }
   }
 
   renderChatOrCancelButton() {
@@ -333,64 +298,6 @@ export class ChatComponent extends LitElement {
     return this.chatController.isProcessingResponse ? cancelChatButton : submitChatButton;
   }
 
-  renderChatEntryTabContent(entry: ChatThreadEntry) {
-    return html` <tab-component
-      .tabs="${[
-        {
-          id: 'tab-thought-process',
-          label: globalConfig.THOUGHT_PROCESS_LABEL,
-        },
-        {
-          id: 'tab-support-context',
-          label: globalConfig.SUPPORT_CONTEXT_LABEL,
-        },
-        {
-          id: 'tab-citations',
-          label: globalConfig.CITATIONS_TAB_LABEL,
-        },
-      ] as TabContent[]}"
-      .selectedTabId="${this.selectedAsideTab}"
-    >
-      <div slot="tab-thought-process" class="tab-component__content">
-        ${entry && entry.thoughts ? html` <p class="tab-component__paragraph">${unsafeHTML(entry.thoughts)}</p> ` : ''}
-      </div>
-      <div slot="tab-support-context" class="tab-component__content">
-        ${entry && entry.dataPoints
-          ? html` <teaser-list-component
-              .alwaysRow="${true}"
-              .teasers="${entry.dataPoints.map((d) => {
-                return { description: d };
-              })}"
-            ></teaser-list-component>`
-          : ''}
-      </div>
-      ${entry && entry.citations
-        ? html`
-            <div slot="tab-citations" class="tab-component__content">
-              <citation-list
-                .citations="${entry.citations}"
-                .label="${globalConfig.CITATIONS_LABEL}"
-                .selectedCitation="${this.selectedCitation}"
-                @on-citation-click="${this.handleCitationClick}"
-              ></citation-list>
-              ${this.selectedCitation
-                ? this.citationControllers?.map((component) =>
-                    component.render(this.selectedCitation, `${this.apiUrl}/content/${this.selectedCitation.text}`),
-                  )
-                : ''}
-            </div>
-          `
-        : ''}
-    </tab-component>`;
-  }
-
-  handleChatEntryActionButtonClick(event: CustomEvent) {
-    if (event.detail?.id === 'chat-show-thought-process') {
-      this.selectedChatEntry = event.detail?.chatThreadEntry;
-      this.handleExpandAside(event);
-    }
-  }
-
   override willUpdate(): void {
     this.isDisabled = this.chatController.generatingAnswer;
 
@@ -408,21 +315,12 @@ export class ChatComponent extends LitElement {
   renderChatThread(chatThread: ChatThreadEntry[]) {
     return html`<chat-thread-component
       .chatThread="${chatThread}"
-      .actionButtons="${[
-        {
-          id: 'chat-show-thought-process',
-          label: globalConfig.SHOW_THOUGH_PROCESS_BUTTON_LABEL_TEXT,
-          svgIcon: iconLightBulb,
-          isDisabled: this.isShowingThoughtProcess,
-        },
-      ] as any}"
       .isDisabled="${this.isDisabled}"
       .isProcessingResponse="${this.chatController.isProcessingResponse}"
-      .selectedCitation="${this.selectedCitation}"
+      .selectedCitation="${this.chatContext.selectedCitation}"
       .isCustomBranding="${this.isCustomBranding}"
       .svgIcon="${iconLogo}"
       .context="${this.chatContext}"
-      @on-action-button-click="${this.handleChatEntryActionButtonClick}"
       @on-citation-click="${this.handleCitationClick}"
       @on-followup-click="${this.handleInput}"
     >
@@ -439,9 +337,10 @@ export class ChatComponent extends LitElement {
 
   // Render the chat component as a web component
   override render() {
+    const isAsideEnabled = this.chatSectionControllers?.some((controller) => controller.isEnabled);
     return html`
-      <div id="overlay" class="overlay"></div>
-      <section id="chat__containerWrapper" class="chat__containerWrapper">
+      <div id="overlay" class="overlay ${isAsideEnabled ? 'active' : ''}"></div>
+      <section id="chat__containerWrapper" class="chat__containerWrapper ${isAsideEnabled ? 'aside-open' : ''}">
         ${this.isCustomBranding && !this.isChatStarted
           ? html` <chat-stage
               svgIcon="${iconLogo}"
@@ -528,23 +427,7 @@ export class ChatComponent extends LitElement {
             )}
           </form>
         </section>
-        <!-- ${this.isShowingThoughtProcess
-          ? html`
-              <aside class="aside" data-testid="aside-thought-process">
-                <div class="aside__header">
-                  <chat-action-button
-                    .label="${globalConfig.HIDE_THOUGH_PROCESS_BUTTON_LABEL_TEXT}"
-                    actionId="chat-hide-thought-process"
-                    @click="${this.collapseAside}"
-                    .svgIcon="${iconClose}"
-                  >
-                  </chat-action-button>
-                </div>
-                ${this.renderChatEntryTabContent(this.selectedChatEntry as ChatThreadEntry)}
-              </aside>
-            `
-          : ''} -->
-        ${this.chatFooterComponents?.map((component) => component.render())}
+        ${isAsideEnabled ? this.chatSectionControllers?.map((component) => component.render()) : ''}
       </section>
     `;
   }
