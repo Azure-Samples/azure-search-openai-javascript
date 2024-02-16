@@ -2,7 +2,7 @@
 import { LitElement, html } from 'lit';
 import DOMPurify from 'dompurify';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { chatHttpOptions, globalConfig, requestOptions, MAX_CHAT_HISTORY } from '../config/global-config.js';
+import { chatHttpOptions, globalConfig, requestOptions } from '../config/global-config.js';
 import { chatStyle } from '../styles/chat-component.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { chatEntryToString, newListWithEntryAtIndex } from '../utils/index.js';
@@ -13,16 +13,16 @@ import iconDelete from '../../public/svg/delete-icon.svg?raw';
 import iconCancel from '../../public/svg/cancel-icon.svg?raw';
 import iconSend from '../../public/svg/send-icon.svg?raw';
 import iconLogo from '../../public/branding/brand-logo.svg?raw';
-import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 
 import { ChatController } from './chat-controller.js';
-import { ChatHistoryController } from './chat-history-controller.js';
 import {
   lazyMultiInject,
   ControllerType,
   type ChatInputController,
   type ChatInputFooterController,
   type ChatSectionController,
+  type ChatActionController,
+  type ChatThreadController,
 } from './composable.js';
 import { ChatContextController } from './chat-context.js';
 
@@ -99,7 +99,6 @@ export class ChatComponent extends LitElement {
   isResetInput = false;
 
   private chatController = new ChatController(this);
-  private chatHistoryController = new ChatHistoryController(this);
   private chatContext = new ChatContextController(this);
 
   // These are the chat bubbles that will be displayed in the chat
@@ -116,9 +115,16 @@ export class ChatComponent extends LitElement {
   @lazyMultiInject(ControllerType.ChatSection)
   chatSectionControllers: ChatSectionController[] | undefined;
 
+  @lazyMultiInject(ControllerType.ChatAction)
+  chatActionControllers: ChatActionController[] | undefined;
+
+  @lazyMultiInject(ControllerType.ChatThread)
+  chatThreadControllers: ChatThreadController[] | undefined;
+
   public constructor() {
     super();
     this.setQuestionInputValue = this.setQuestionInputValue.bind(this);
+    this.renderChatThread = this.renderChatThread.bind(this);
   }
 
   // Lifecycle method that runs when the component is first connected to the DOM
@@ -136,6 +142,16 @@ export class ChatComponent extends LitElement {
     }
     if (this.chatSectionControllers) {
       for (const component of this.chatSectionControllers) {
+        component.attach(this, this.chatContext);
+      }
+    }
+    if (this.chatActionControllers) {
+      for (const component of this.chatActionControllers) {
+        component.attach(this, this.chatContext);
+      }
+    }
+    if (this.chatThreadControllers) {
+      for (const component of this.chatThreadControllers) {
         component.attach(this, this.chatContext);
       }
     }
@@ -189,13 +205,14 @@ export class ChatComponent extends LitElement {
       return [];
     }
 
-    const history = [
-      ...this.chatThread,
-      // include the history from the previous session if the user has enabled the chat history
-      ...(this.chatHistoryController.showChatHistory ? this.chatHistoryController.chatHistory : []),
-    ];
+    let thread: ChatThreadEntry[] = [...this.chatThread];
+    if (this.chatThreadControllers) {
+      for (const controller of this.chatThreadControllers) {
+        thread = controller.merge(thread);
+      }
+    }
 
-    const messages: Message[] = history.map((entry) => {
+    const messages: Message[] = thread.map((entry) => {
       return {
         content: chatEntryToString(entry),
         role: entry.isUserMessage ? 'user' : 'assistant',
@@ -234,7 +251,7 @@ export class ChatComponent extends LitElement {
     );
 
     if (this.interactionModel === 'chat') {
-      this.chatHistoryController.saveChatHistory(this.chatThread);
+      this.saveChatThreads(this.chatThread);
     }
 
     this.questionInput.value = '';
@@ -249,6 +266,14 @@ export class ChatComponent extends LitElement {
     this.isResetInput = false;
   }
 
+  saveChatThreads(chatThread: ChatThreadEntry[]): void {
+    if (this.chatThreadControllers) {
+      for (const component of this.chatThreadControllers) {
+        component.save(chatThread);
+      }
+    }
+  }
+
   // Reset the chat and show the default prompts
   resetCurrentChat(event: Event): void {
     this.isChatStarted = false;
@@ -256,8 +281,7 @@ export class ChatComponent extends LitElement {
     this.isDisabled = false;
     this.chatContext.selectedCitation = undefined;
     this.chatController.reset();
-    // clean up the current session content from the history too
-    this.chatHistoryController.saveChatHistory(this.chatThread);
+    this.saveChatThreads(this.chatThread);
     this.collapseAside(event);
     this.handleUserChatCancel(event);
   }
@@ -360,9 +384,7 @@ export class ChatComponent extends LitElement {
           ${this.isChatStarted
             ? html`
                 <div class="chat__header--thread">
-                  ${this.interactionModel === 'chat'
-                    ? this.chatHistoryController.renderHistoryButton({ disabled: this.isDisabled })
-                    : ''}
+                  ${this.chatActionControllers?.map((component) => component.render(this.isDisabled))}
                   <chat-action-button
                     .label="${globalConfig.RESET_CHAT_BUTTON_TITLE}"
                     actionId="chat-reset-button"
@@ -371,19 +393,7 @@ export class ChatComponent extends LitElement {
                   >
                   </chat-action-button>
                 </div>
-                ${this.chatHistoryController.showChatHistory
-                  ? html`<div class="chat-history__container">
-                      ${this.renderChatThread(this.chatHistoryController.chatHistory)}
-                      <div class="chat-history__footer">
-                        ${unsafeSVG(iconUp)}
-                        ${globalConfig.CHAT_HISTORY_FOOTER_TEXT.replace(
-                          globalConfig.CHAT_MAX_COUNT_TAG,
-                          MAX_CHAT_HISTORY,
-                        )}
-                        ${unsafeSVG(iconUp)}
-                      </div>
-                    </div>`
-                  : ''}
+                ${this.chatThreadControllers?.map((component) => component.render(this.renderChatThread))}
                 ${this.renderChatThread(this.chatThread)}
               `
             : ''}

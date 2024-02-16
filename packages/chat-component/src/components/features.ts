@@ -14,4 +14,6 @@ import './document-previewer.js';
 import './citation-previewer.js';
 
 import './follow-up-questions.js';
+
+import './chat-history-controller.js';
 // [COMPOSE COMPONENTS END]

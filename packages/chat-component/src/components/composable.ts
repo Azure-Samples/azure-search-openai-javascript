@@ -13,6 +13,8 @@ export const ControllerType = {
   ChatEntryAction: Symbol.for('ChatEntryActionController'),
   Citation: Symbol.for('CitationController'),
   ChatEntryInlineInput: Symbol.for('ChatEntryInlineInputController'),
+  ChatAction: Symbol.for('ChatActionController'),
+  ChatThread: Symbol.for('ChatThreadController'),
 };
 
 export interface ComposableReactiveController extends ReactiveController {
@@ -48,6 +50,10 @@ export interface ChatSectionController extends ComposableReactiveController {
   render: () => TemplateResult;
 }
 
+export interface ChatActionController extends ComposableReactiveController {
+  render: (isDisabled: boolean) => TemplateResult;
+}
+
 export interface ChatEntryActionController extends ComposableReactiveController {
   render: (entry: ChatThreadEntry, isDisabled: boolean) => TemplateResult;
 }
@@ -58,6 +64,14 @@ export interface ChatEntryInlineInputController extends ComposableReactiveContro
 
 export interface CitationController extends ComposableReactiveController {
   render: (citation: Citation, url: string) => TemplateResult;
+}
+
+export interface ChatThreadController extends ComposableReactiveController {
+  save(thread: ChatThreadEntry[]): void;
+  reset(): void;
+  merge: (thread: ChatThreadEntry[]) => ChatThreadEntry[];
+  // wrap the way the chat thread is rendered with additional components
+  render: (threadRenderer: (thread: ChatThreadEntry[]) => TemplateResult) => TemplateResult;
 }
 
 // Add a default component since inversify currently doesn't seem to support optional bindings
@@ -80,9 +94,23 @@ export class DefaultChatSectionController extends DefaultController implements C
   close() {}
 }
 
+@injectable()
+export class DefaultChatThreadController extends ComposableReactiveControllerBase implements ChatThreadController {
+  save() {}
+  reset() {}
+  merge(thread: ChatThreadEntry[]) {
+    return thread;
+  }
+  render() {
+    return html``;
+  }
+}
+
 container.bind<ChatInputController>(ControllerType.ChatInput).to(DefaultInputController);
 container.bind<ChatInputFooterController>(ControllerType.ChatInputFooter).to(DefaultController);
 container.bind<ChatSectionController>(ControllerType.ChatSection).to(DefaultChatSectionController);
 container.bind<ChatEntryActionController>(ControllerType.ChatEntryAction).to(DefaultController);
 container.bind<CitationController>(ControllerType.Citation).to(DefaultController);
 container.bind<ChatEntryInlineInputController>(ControllerType.ChatEntryInlineInput).to(DefaultController);
+container.bind<ChatActionController>(ControllerType.ChatAction).to(DefaultController);
+container.bind<ChatThreadController>(ControllerType.ChatThread).to(DefaultChatThreadController);
