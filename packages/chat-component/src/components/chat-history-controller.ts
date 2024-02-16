@@ -6,8 +6,6 @@ import iconHistory from '../../public/svg/history-icon.svg?raw';
 import iconHistoryDismiss from '../../public/svg/history-dismiss-icon.svg?raw';
 import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 
-import './chat-action-button.js';
-
 import { injectable } from 'inversify';
 import {
   container,
