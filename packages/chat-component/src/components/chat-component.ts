@@ -72,6 +72,9 @@ export class ChatComponent extends LitElement {
   @property({ type: String, attribute: 'data-use-stream', converter: (value) => value?.toLowerCase() === 'true' })
   useStream: boolean = chatHttpOptions.stream;
 
+  @property({ type: String, attribute: 'data-approach' })
+  approach = requestOptions.approach;
+
   @property({ type: String, attribute: 'data-overrides', converter: (value) => JSON.parse(value || '{}') })
   overrides: RequestOverrides = {};
 
@@ -199,6 +202,7 @@ export class ChatComponent extends LitElement {
     await this.chatController.generateAnswer(
       {
         ...requestOptions,
+        approach: this.approach,
         overrides: {
           ...requestOptions.overrides,
           ...this.overrides,

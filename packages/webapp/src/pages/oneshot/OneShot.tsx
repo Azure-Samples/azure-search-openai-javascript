@@ -113,7 +113,7 @@ export function Component(): JSX.Element {
           data-interaction-model="ask"
           data-api-url={apiBaseUrl}
           data-use-stream="false"
-          data-approach="rrr"
+          data-approach={approach}
           data-overrides={JSON.stringify(overrides)}
         ></chat-component>
       </div>
