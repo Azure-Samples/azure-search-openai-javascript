@@ -22,7 +22,7 @@ import { toolTipText, toolTipTextCalloutProps } from '../../i18n/tooltips.js';
 
 export function Component(): JSX.Element {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
-  const [approach, setApproach] = useState<Approaches>(Approaches.RetrieveThenRead);
+  const [approach, setApproach] = useState<Approaches>(Approaches.ReadRetrieveRead);
   const [promptTemplate, setPromptTemplate] = useState<string>('');
   const [promptTemplatePrefix, setPromptTemplatePrefix] = useState<string>('');
   const [promptTemplateSuffix, setPromptTemplateSuffix] = useState<string>('');
@@ -113,7 +113,7 @@ export function Component(): JSX.Element {
           data-interaction-model="ask"
           data-api-url={apiBaseUrl}
           data-use-stream="false"
-          data-approach="rrr"
+          data-approach={approach}
           data-overrides={JSON.stringify(overrides)}
         ></chat-component>
       </div>
