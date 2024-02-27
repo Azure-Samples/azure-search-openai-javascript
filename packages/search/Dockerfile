@@ -17,6 +17,7 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY ./package*.json ./
 COPY ./packages/search/package.json ./packages/search/
+COPY ./packages/search/data/employee-info.csv ./packages/search/data/employee-info.csv
 RUN npm ci --omit=dev --workspace=search --cache /tmp/empty-cache
 COPY --from=build app/packages/search/dist packages/search/dist
 EXPOSE 3000

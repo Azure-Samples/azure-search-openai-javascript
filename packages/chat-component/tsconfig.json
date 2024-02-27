@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "es2019",
     "module": "es2020",
-    "lib": ["esnext", "DOM", "DOM.Iterable"],
+    "lib": ["esnext", "DOM", "DOM.Iterable", "es6"],
+    "types": ["reflect-metadata"],
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -19,6 +20,7 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
     "emitDeclarationOnly": true,

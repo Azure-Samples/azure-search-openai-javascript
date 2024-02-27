@@ -4,17 +4,16 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { styles } from '../styles/chat-thread-component.js';
 
 import { globalConfig } from '../config/global-config.js';
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { chatEntryToString } from '../utils/index.js';
 
-import iconSuccess from '../../public/svg/success-icon.svg?raw';
-import iconCopyToClipboard from '../../public/svg/copy-icon.svg?raw';
-import iconQuestion from '../../public/svg/bubblequestion-icon.svg?raw';
-
-import './citation-list.js';
-import './chat-action-button.js';
 import { type ChatActionButton } from './chat-action-button.js';
+import {
+  type ChatEntryActionController,
+  type ChatEntryInlineInputController,
+  ControllerType,
+  lazyMultiInject,
+} from './composable.js';
+import { type ChatContextController } from './chat-context.js';
 
 @customElement('chat-thread-component')
 export class ChatThreadComponent extends LitElement {
@@ -22,9 +21,6 @@ export class ChatThreadComponent extends LitElement {
 
   @property({ type: Array })
   chatThread: ChatThreadEntry[] = [];
-
-  @property({ type: Array })
-  actionButtons: ChatActionButton[] = [];
 
   @property({ type: Boolean })
   isDisabled = false;
@@ -41,12 +37,33 @@ export class ChatThreadComponent extends LitElement {
   @property({ type: Object })
   selectedCitation: Citation | undefined = undefined;
 
-  // Copy response to clipboard
-  copyResponseToClipboard(entry: ChatThreadEntry): void {
-    const response = chatEntryToString(entry);
+  @property({ type: Object })
+  context: ChatContextController | undefined = undefined;
 
-    navigator.clipboard.writeText(response);
-    this.isResponseCopied = true;
+  @lazyMultiInject(ControllerType.ChatEntryAction)
+  actionCompontents: ChatEntryActionController[] | undefined;
+
+  @lazyMultiInject(ControllerType.ChatEntryInlineInput)
+  inlineInputComponents: ChatEntryInlineInputController[] | undefined;
+
+  public constructor() {
+    super();
+    this.handleInput = this.handleInput.bind(this);
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    if (this.actionCompontents) {
+      for (const component of this.actionCompontents) {
+        component.attach(this, this.context);
+      }
+    }
+
+    if (this.inlineInputComponents) {
+      for (const component of this.inlineInputComponents) {
+        component.attach(this, this.context);
+      }
+    }
   }
 
   actionButtonClicked(actionButton: ChatActionButton, entry: ChatThreadEntry, event: Event) {
@@ -74,12 +91,10 @@ export class ChatThreadComponent extends LitElement {
     }, 500);
   }
 
-  handleFollowupQuestionClick(question: string, entry: ChatThreadEntry, event: Event) {
-    event.preventDefault();
-    const followUpClickEvent = new CustomEvent('on-followup-click', {
+  handleInput(input: string) {
+    const followUpClickEvent = new CustomEvent('on-input', {
       detail: {
-        question,
-        chatThreadEntry: entry,
+        value: input,
       },
       bubbles: true,
       composed: true,
@@ -105,27 +120,7 @@ export class ChatThreadComponent extends LitElement {
     return html`
       <header class="chat__header">
         <div class="chat__header--button">
-          ${this.actionButtons.map(
-            (actionButton) => html`
-              <chat-action-button
-                .label="${actionButton.label}"
-                .svgIcon="${actionButton.svgIcon}"
-                .isDisabled="${actionButton.isDisabled}"
-                .actionId="${actionButton.id}"
-                @click="${(event) => this.actionButtonClicked(actionButton, entry, event)}"
-              ></chat-action-button>
-            `,
-          )}
-          <chat-action-button
-            .label="${globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-            .svgIcon="${this.isResponseCopied ? iconSuccess : iconCopyToClipboard}"
-            .isDisabled="${this.isDisabled}"
-            actionId="copy-to-clipboard"
-            .tooltip="${this.isResponseCopied
-              ? globalConfig.COPIED_SUCCESSFULLY_MESSAGE
-              : globalConfig.COPY_RESPONSE_BUTTON_LABEL_TEXT}"
-            @click="${this.copyResponseToClipboard}"
-          ></chat-action-button>
+          ${this.actionCompontents?.map((component) => component.render(entry, this.isDisabled))}
         </div>
       </header>
     `;
@@ -169,36 +164,6 @@ export class ChatThreadComponent extends LitElement {
     return '';
   }
 
-  renderFollowupQuestions(entry: ChatThreadEntry) {
-    const followupQuestions = entry.followupQuestions;
-    // render followup questions
-    // need to fix first after decoupling of teaserlist
-    if (followupQuestions && followupQuestions.length > 0) {
-      return html`
-        <div class="items__listWrapper">
-          ${unsafeSVG(iconQuestion)}
-          <ul class="items__list followup">
-            ${followupQuestions.map(
-              (followupQuestion) => html`
-                <li class="items__listItem--followup">
-                  <a
-                    class="items__link"
-                    href="#"
-                    data-testid="followUpQuestion"
-                    @click="${(event) => this.handleFollowupQuestionClick(followupQuestion, entry, event)}"
-                    >${followupQuestion}</a
-                  >
-                </li>
-              `,
-            )}
-          </ul>
-        </div>
-      `;
-    }
-
-    return '';
-  }
-
   renderError(error: { message: string }) {
     return html`<p class="chat__txt error">${error.message}</p>`;
   }
@@ -212,7 +177,8 @@ export class ChatThreadComponent extends LitElement {
               <div class="chat__txt ${message.isUserMessage ? 'user-message' : ''}">
                 ${message.isUserMessage ? '' : this.renderResponseActions(message)}
                 ${message.text.map((textEntry) => this.renderTextEntry(textEntry))} ${this.renderCitation(message)}
-                ${this.renderFollowupQuestions(message)} ${message.error ? this.renderError(message.error) : ''}
+                ${this.inlineInputComponents?.map((component) => component.render(message, this.handleInput))}
+                ${message.error ? this.renderError(message.error) : ''}
               </div>
               <p class="chat__txt--info">
                 <span class="timestamp">${message.timestamp}</span>,

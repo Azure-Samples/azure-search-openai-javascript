@@ -45,9 +45,6 @@ test.describe('default', () => {
       await expect(userMessage.nth(0)).toHaveText(firstQuestionText);
 
       await expect(defaultQuestions).toHaveCount(0);
-
-      // make sure chat history is available for chat interaction mode
-      await expect(page.getByTestId('chat-history-button')).toBeVisible();
     });
 
     // make sure the response is formatted as list items
@@ -152,6 +149,9 @@ test.describe('default', () => {
     await page.getByTestId('submit-question-button').click();
     // wait for the thought process button to be enabled.
     await expect(page.getByTestId('chat-show-thought-process')).toBeEnabled({ timeout: 30_000 });
+
+    // make sure chat history is available for chat interaction mode
+    await expect(page.getByTestId('chat-history-button')).toBeVisible();
 
     await test.step('new chat history', async () => {
       await expect(page.locator('.chat-history__container')).not.toBeVisible();
@@ -438,7 +438,6 @@ test.describe('generate answer', () => {
 
   test('follow up questions', async ({ page }) => {
     const followupQuestions = page.getByTestId('followUpQuestion');
-    await followupQuestions.waitFor();
 
     await expect(followupQuestions).toHaveCount(3);
 

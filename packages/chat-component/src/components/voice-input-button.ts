@@ -3,7 +3,6 @@ import { customElement, state } from 'lit/decorators.js';
 import { styles } from '../styles/voice-input-button.js';
 import { globalConfig } from '../config/global-config.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
-
 import iconMicOff from '../../public/svg/mic-icon.svg?raw';
 import iconMicOn from '../../public/svg/mic-record-on-icon.svg?raw';
 
@@ -40,9 +39,9 @@ export class VoiceInputButton extends LitElement {
         }
 
         // dispatch event
-        const voiceInputEvent = new CustomEvent('on-voice-input', {
+        const voiceInputEvent = new CustomEvent<InputValue>('on-voice-input', {
           detail: {
-            input,
+            value: input,
           },
           bubbles: true,
           composed: true,
