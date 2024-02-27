@@ -1,38 +1,77 @@
-import { type ReactiveController, type ReactiveControllerHost } from 'lit';
-import { html } from 'lit';
+import { html, type TemplateResult } from 'lit';
 import { globalConfig, MAX_CHAT_HISTORY } from '../config/global-config.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 import iconHistory from '../../public/svg/history-icon.svg?raw';
 import iconHistoryDismiss from '../../public/svg/history-dismiss-icon.svg?raw';
+import iconUp from '../../public/svg/chevron-up-icon.svg?raw';
 
-import './chat-action-button.js';
+import { injectable } from 'inversify';
+import {
+  container,
+  type ChatActionController,
+  type ChatThreadController,
+  ControllerType,
+  ComposableReactiveControllerBase,
+} from './composable.js';
 
-export class ChatHistoryController implements ReactiveController {
-  host: ReactiveControllerHost;
+const CHATHISTORY_FEATURE_FLAG = 'showChatHistory';
+
+@injectable()
+export class ChatHistoryActionButton extends ComposableReactiveControllerBase implements ChatActionController {
+  constructor() {
+    super();
+    this.getShowChatHistory = this.getShowChatHistory.bind(this);
+    this.setShowChatHistory = this.setShowChatHistory.bind(this);
+  }
+
+  getShowChatHistory() {
+    return this.context.getState(CHATHISTORY_FEATURE_FLAG);
+  }
+
+  setShowChatHistory(value: boolean) {
+    this.context.setState(CHATHISTORY_FEATURE_FLAG, value);
+  }
+
+  render(isDisabled: boolean) {
+    if (this.context.interactionModel === 'ask') {
+      return html``;
+    }
+
+    const showChatHistory = this.getShowChatHistory();
+    return html`
+      <chat-action-button
+        .label="${showChatHistory ? globalConfig.HIDE_CHAT_HISTORY_LABEL : globalConfig.SHOW_CHAT_HISTORY_LABEL}"
+        actionId="chat-history-button"
+        @click="${() => this.setShowChatHistory(!showChatHistory)}"
+        .isDisabled="${isDisabled}"
+        .svgIcon="${showChatHistory ? iconHistoryDismiss : iconHistory}"
+      >
+      </chat-action-button>
+    `;
+  }
+}
+
+@injectable()
+export class ChatHistoryController extends ComposableReactiveControllerBase implements ChatThreadController {
   static CHATHISTORY_ID = 'ms-azoaicc:history';
 
-  chatHistory: ChatThreadEntry[] = [];
+  private _chatHistory: ChatThreadEntry[] = [];
 
-  private _showChatHistory: boolean = false;
-
-  get showChatHistory() {
-    return this._showChatHistory;
+  constructor() {
+    super();
+    this.getShowChatHistory = this.getShowChatHistory.bind(this);
   }
 
-  set showChatHistory(value: boolean) {
-    this._showChatHistory = value;
-    this.host.requestUpdate();
+  getShowChatHistory() {
+    return this.context.getState(CHATHISTORY_FEATURE_FLAG);
   }
 
-  constructor(host: ReactiveControllerHost) {
-    (this.host = host).addController(this);
-  }
-
-  hostConnected() {
+  override hostConnected() {
     const chatHistory = localStorage.getItem(ChatHistoryController.CHATHISTORY_ID);
     if (chatHistory) {
       // decode base64 string and then parse it
-      const history = JSON.parse(atob(chatHistory));
+      const history = JSON.parse(decodeURIComponent(atob(chatHistory)));
 
       // find last 5 user messages indexes
       const lastUserMessagesIndexes = history
@@ -47,35 +86,46 @@ export class ChatHistoryController implements ReactiveController {
       // trim everything before the first user message
       const trimmedHistory = lastUserMessagesIndexes.length === 0 ? history : history.slice(lastUserMessagesIndexes[0]);
 
-      this.chatHistory = trimmedHistory;
+      this._chatHistory = trimmedHistory;
     }
   }
 
-  hostDisconnected() {
-    // no-op
-  }
-
-  saveChatHistory(currentChat: ChatThreadEntry[]): void {
-    const newChatHistory = [...this.chatHistory, ...currentChat];
+  save(currentChat: ChatThreadEntry[]): void {
+    const newChatHistory = [...this._chatHistory, ...currentChat];
     // encode to base64 string and then save it
-    localStorage.setItem(ChatHistoryController.CHATHISTORY_ID, btoa(JSON.stringify(newChatHistory)));
+    localStorage.setItem(
+      ChatHistoryController.CHATHISTORY_ID,
+      btoa(encodeURIComponent(JSON.stringify(newChatHistory))),
+    );
   }
 
-  handleChatHistoryButtonClick(event: Event) {
-    event.preventDefault();
-    this.showChatHistory = !this.showChatHistory;
+  reset(): void {
+    this._chatHistory = [];
   }
 
-  renderHistoryButton(options: { disabled: boolean } | undefined) {
+  merge(thread: ChatThreadEntry[]): ChatThreadEntry[] {
+    // include the history from the previous session if the user has enabled the chat history
+    return [...this._chatHistory, ...thread];
+  }
+
+  render(threadRenderer: (thread: ChatThreadEntry[]) => TemplateResult) {
+    const showChatHistory = this.getShowChatHistory();
+    if (!showChatHistory) {
+      return html``;
+    }
+
     return html`
-      <chat-action-button
-        .label="${this.showChatHistory ? globalConfig.HIDE_CHAT_HISTORY_LABEL : globalConfig.SHOW_CHAT_HISTORY_LABEL}"
-        actionId="chat-history-button"
-        @click="${(event) => this.handleChatHistoryButtonClick(event)}"
-        .isDisabled="${options?.disabled}"
-        .svgIcon="${this.showChatHistory ? iconHistoryDismiss : iconHistory}"
-      >
-      </chat-action-button>
+      <div class="chat-history__container">
+        ${threadRenderer(this._chatHistory)}
+        <div class="chat-history__footer">
+          ${unsafeSVG(iconUp)}
+          ${globalConfig.CHAT_HISTORY_FOOTER_TEXT.replace(globalConfig.CHAT_MAX_COUNT_TAG, MAX_CHAT_HISTORY)}
+          ${unsafeSVG(iconUp)}
+        </div>
+      </div>
     `;
   }
 }
+
+container.bind<ChatActionController>(ControllerType.ChatAction).to(ChatHistoryActionButton);
+container.bind<ChatThreadController>(ControllerType.ChatThread).to(ChatHistoryController);

@@ -28,9 +28,9 @@ export class TeaserListComponent extends LitElement {
   // Handle the click on a default prompt
   handleTeaserClick(teaser: Teaser, event?: Event): void {
     event?.preventDefault();
-    const teaserClickEvent = new CustomEvent('teaser-click', {
+    const teaserClickEvent = new CustomEvent<InputValue>('teaser-click', {
       detail: {
-        question: teaser.description,
+        value: teaser.description,
       },
       bubbles: true,
       composed: true,
