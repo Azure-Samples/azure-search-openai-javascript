@@ -68,9 +68,6 @@ param embeddingModelName string = 'text-embedding-ada-002'
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
 
-@description('Use Application Insights for monitoring and performance tracing')
-param useApplicationInsights bool = false
-
 param allowedOrigin string
 
 // Allow to override the default backend
@@ -116,8 +113,8 @@ module monitoring './core/monitor/monitoring.bicep' = {
     location: location
     tags: tags
     logAnalyticsName: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
-    applicationInsightsName: useApplicationInsights ? (!empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}') : ''
-    applicationInsightsDashboardName: useApplicationInsights ? !empty(applicationInsightsDashboardName) ? applicationInsightsDashboardName : '${abbrs.portalDashboards}${resourceToken}' : ''
+    applicationInsightsName: !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
+    applicationInsightsDashboardName: !empty(applicationInsightsDashboardName) ? applicationInsightsDashboardName : '${abbrs.portalDashboards}${resourceToken}'
   }
 }
 
@@ -131,6 +128,7 @@ module containerApps './core/host/container-apps.bicep' = {
     containerRegistryName: !empty(containerRegistryName) ? containerRegistryName : '${abbrs.containerRegistryRegistries}${resourceToken}'
     location: location
     tags: tags
+    applicationInsightsName: monitoring.outputs.applicationInsightsName
     logAnalyticsWorkspaceName: monitoring.outputs.logAnalyticsWorkspaceName
     containerRegistryAdminUserEnabled: true
   }
@@ -171,13 +169,13 @@ module searchApi './core/host/container-app.bicep' = {
     allowedOrigins: allowedOrigins
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
-    secrets: useApplicationInsights ? [
+    secrets: [
       {
         name: 'appinsights-cs'
         value: monitoring.outputs.applicationInsightsConnectionString
       }
-    ] : []
-    env: concat([
+    ]
+    env: [
       {
         name: 'AZURE_OPENAI_CHATGPT_DEPLOYMENT'
         value: chatGptDeploymentName
@@ -214,10 +212,11 @@ module searchApi './core/host/container-app.bicep' = {
         name: 'AZURE_STORAGE_CONTAINER'
         value: storageContainerName
       }
-    ], useApplicationInsights ? [{
+      {
       name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
       secretRef: 'appinsights-cs'
-    }] : [])
+      }
+    ]
     imageName: !empty(searchApiImageName) ? searchApiImageName : 'nginx:latest'
     targetPort: 3000
   }
@@ -246,13 +245,13 @@ module indexerApi './core/host/container-app.bicep' = {
     identityName: indexerApiIdentityName
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
-    secrets: useApplicationInsights ? [
+    secrets: [
       {
         name: 'appinsights-cs'
         value: monitoring.outputs.applicationInsightsConnectionString
       }
-    ] : []
-    env: concat([
+    ]
+    env: [
       {
         name: 'AZURE_OPENAI_CHATGPT_DEPLOYMENT'
         value: chatGptDeploymentName
@@ -289,10 +288,11 @@ module indexerApi './core/host/container-app.bicep' = {
         name: 'AZURE_STORAGE_CONTAINER'
         value: storageContainerName
       }
-    ], useApplicationInsights ? [{
+      {
       name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
       secretRef: 'appinsights-cs'
-    }] : [])
+      }
+    ]
     imageName: !empty(indexerApiImageName) ? indexerApiImageName : 'nginx:latest'
     targetPort: 3001
   }
