@@ -23,7 +23,7 @@ description: A javascript sample app that chats with your data using OpenAI and 
 
 - [Features](#features)
 - [Getting started](#getting-started)
-- [Azure account requirements](#azure-account-requirements)
+- [Azure account requirements](#azure-account-prerequisites)
 - [Azure deployment](#azure-deployment)
   - [Cost estimation](#cost-estimation)
   - [Project setup](#project-setup)
