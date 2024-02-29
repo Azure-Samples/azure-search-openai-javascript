@@ -4,7 +4,7 @@ param location string = resourceGroup().location
 param tags object = {}
 
 @description('Indicates whether admin user is enabled')
-param adminUserEnabled bool = true
+param adminUserEnabled bool = false
 
 @description('Indicates whether anonymous pull is enabled')
 param anonymousPullEnabled bool = false
@@ -34,8 +34,8 @@ param zoneRedundancy string = 'Disabled'
 @description('The log analytics workspace ID used for logging and monitoring')
 param workspaceId string = ''
 
-// 2022-02-01-preview needed for anonymousPullEnabled
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2022-02-01-preview' = {
+// 2023-01-01-preview needed for anonymousPullEnabled
+resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
   name: name
   location: location
   tags: tags

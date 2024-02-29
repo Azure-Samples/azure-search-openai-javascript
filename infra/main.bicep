@@ -132,6 +132,7 @@ module containerApps './core/host/container-apps.bicep' = {
     location: location
     tags: tags
     logAnalyticsWorkspaceName: monitoring.outputs.logAnalyticsWorkspaceName
+    containerRegistryAdminUserEnabled: true
   }
 }
 
