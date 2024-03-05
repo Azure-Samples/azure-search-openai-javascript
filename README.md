@@ -97,7 +97,7 @@ You may try the [Azure pricing calculator](https://azure.com/e/8ffbe5b1919c4c72a
 
 - Azure Container Apps: Pay-as-you-go tier. Costs based on vCPU and memory used. [Pricing](https://azure.microsoft.com/pricing/details/container-apps/)
 - Azure Static Web Apps: Free Tier. [Pricing](https://azure.microsoft.com/pricing/details/app-service/static/)
-- Azure OpenAI: Standard tier, ChatGPT and Ada models. Pricing per 1K tokens used, and at least 1K tokens are used per question. [Pricing](https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/)
+- Azure OpenAI: Standard tier, ChatGPT and Ada models. Pricing per 1K tokens used, and at least 1K tokens are used per question. [Pricing](https://azure.microsoft.com/pricing/details/search/)
 - Azure AI Search: Standard tier, 1 replica, free level of semantic search\*. Pricing per hour.[Pricing](https://azure.microsoft.com/pricing/details/search/) (_The pricing may vary or reflect an outdated tier model. Please visit the linked page for more accurate information_)
 - Azure Blob Storage: Standard tier with ZRS (Zone-redundant storage). Pricing per storage and read operations. [Pricing](https://azure.microsoft.com/pricing/details/storage/blobs/)
 - Azure Monitor: Pay-as-you-go tier. Costs based on data ingested. [Pricing](https://azure.microsoft.com/pricing/details/monitor/)
@@ -328,7 +328,7 @@ For more details, read [Azure OpenAI Landing Zone reference architecture](https:
 - [Generative AI For Beginners](https://github.com/microsoft/generative-ai-for-beginners)
 - [Revolutionize your Enterprise Data with ChatGPT: Next-gen Apps w/ Azure OpenAI and AI Search](https://aka.ms/entgptsearchblog)
 - [Azure AI Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search)
-- [Azure OpenAI Service](https://learn.microsoft.com/azure/cognitive-services/openai/overview)
+- [Azure OpenAI Service](https://learn.microsoft.com/azure/ai-services/openai/overview)
 - [Building ChatGPT-Like Experiences with Azure: A Guide to Retrieval Augmented Generation for JavaScript applications](https://devblogs.microsoft.com/azure-sdk/building-chatgpt-like-experiences-with-azure-a-guide-to-retrieval-augmented-generation-for-javascript-applications/)
 
 ## Clean up
@@ -440,7 +440,7 @@ Here are the most common failure scenarios and solutions:
 
 1. You've exceeded a quota, most often number of resources per region. See [this article on quotas and limits](https://aka.ms/oai/quotas).
 
-1. You're getting "same resource name not allowed" conflicts. That's likely because you've run the sample multiple times and deleted the resources you've been creating each time, but are forgetting to purge them. Azure keeps resources for 48 hours unless you purge from soft delete. See [this article on purging resources](https://learn.microsoft.com/azure/cognitive-services/manage-resources?tabs=azure-portal#purge-a-deleted-resource).
+1. You're getting "same resource name not allowed" conflicts. That's likely because you've run the sample multiple times and deleted the resources you've been creating each time, but are forgetting to purge them. Azure keeps resources for 48 hours unless you purge from soft delete. See [this article on purging resources](https://learn.microsoft.com/azure/ai-services/recover-purge-resources?tabs=azure-portal#purge-a-deleted-resource).
 
 1. After running `azd up` and visiting the website, you see a '404 Not Found' in the browser. Wait 10 minutes and try again, as it might be still starting up. Then try running `azd deploy` and wait again. If you still encounter errors with the deployed app, consult these [tips for debugging App Service app deployments](http://blog.pamelafox.org/2023/06/tips-for-debugging-flask-deployments-to.html) and file an issue if the error logs don't help you resolve the issue.
 
