@@ -2,8 +2,8 @@ import { type BaseLogger } from 'pino';
 import { getBlobNameFromFile } from './blob-storage.js';
 import { type ContentPage, type ContentSection, type Section } from './document.js';
 
-const SENTENCE_ENDINGS = new Set(['.', '!', '?']);
-const WORD_BREAKS = new Set([',', ';', ':', ' ', '(', ')', '[', ']', '{', '}', '\t', '\n']);
+const SENTENCE_ENDINGS = new Set(['.', '。', '．', '!', '?', '‼', '⁇', '⁈', '⁉']);
+const WORD_BREAKS = new Set([',', '、', ';', ':', ' ', '(', ')', '[', ']', '{', '}', '\t', '\n']);
 const MAX_SECTION_LENGTH = 1000;
 const SENTENCE_SEARCH_LIMIT = 100;
 const SECTION_OVERLAP = 100;
