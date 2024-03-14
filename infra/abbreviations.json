@@ -1,7 +1,7 @@
 {
   "analysisServicesServers": "as",
   "apiManagementService": "apim-",
-  "appConfigurationConfigurationStores": "appcs-",
+  "appConfigurationStores": "appcs-",
   "appManagedEnvironments": "cae-",
   "appContainerApps": "ca-",
   "authorizationPolicyDefinitions": "policy-",
@@ -55,6 +55,7 @@
   "kubernetesConnectedClusters": "arck",
   "kustoClusters": "dec",
   "kustoClustersDatabases": "dedb",
+  "loadTesting": "lt-",
   "logicIntegrationAccounts": "ia-",
   "logicWorkflows": "logic-",
   "machineLearningServicesWorkspaces": "mlw-",

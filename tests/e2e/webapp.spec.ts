@@ -124,11 +124,12 @@ test.describe('default', () => {
     await page.goto('/');
     await page.getByTestId('default-question').nth(0).click();
 
-    await page.route('/chat', (route) =>
+    await page.route('/chat', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
       route.fulfill({
-        status: -1,
-      }),
-    );
+        status: 200,
+      });
+    });
 
     await expect(page.getByTestId('loading-indicator')).not.toBeVisible();
     await page.getByTestId('submit-question-button').click();

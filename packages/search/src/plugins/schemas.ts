@@ -10,10 +10,10 @@ export const chatRequestSchema = {
         type: 'object',
         properties: {
           content: { type: 'string' },
-          // can be only: assistant, user, system or function
+          // can be only: assistant, user, system
           role: {
             type: 'string',
-            enum: ['system', 'user', 'assistant', 'function'],
+            enum: ['system', 'user', 'assistant'],
           },
         },
         required: ['content', 'role'],

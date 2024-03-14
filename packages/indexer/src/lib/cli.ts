@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { join, dirname, extname } from 'node:path';
 import { type OptionValues, program } from 'commander';
 import * as dotenv from 'dotenv';
-import mime from 'mime/lite.js';
+import mime from 'mime/lite';
 
 export interface IndexFilesOptions {
   indexerUrl: string;
