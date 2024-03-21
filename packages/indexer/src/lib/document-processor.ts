@@ -75,6 +75,10 @@ export class DocumentProcessor {
     let start = 0;
     let end = length;
 
+    if (end <= MAX_SECTION_LENGTH) {
+      return [{ content: allText, page: findPage(0) }];
+    }
+
     while (start + SECTION_OVERLAP < length) {
       let lastWord = -1;
       end = start + MAX_SECTION_LENGTH;
