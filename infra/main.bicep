@@ -213,16 +213,17 @@ module searchApi './core/host/container-app.bicep' = {
         value: storageContainerName
       }
       {
-      name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-      secretRef: 'appinsights-cs'
+        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        secretRef: 'appinsights-cs'
+      }
+      {
+        name: 'AZURE_CLIENT_ID'
+        value: searchApiIdentity.outputs.clientId
       }
     ]
     imageName: !empty(searchApiImageName) ? searchApiImageName : 'nginx:latest'
     targetPort: 3000
   }
-  dependsOn: [
-    searchApiIdentity
-  ]
 }
 
 // Indexer API identity
@@ -292,16 +293,17 @@ module indexerApi './core/host/container-app.bicep' = {
         value: storageContainerName
       }
       {
-      name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-      secretRef: 'appinsights-cs'
+        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        secretRef: 'appinsights-cs'
+      }
+      {
+        name: 'AZURE_CLIENT_ID'
+        value: indexerApiIdentity.outputs.clientId
       }
     ]
     imageName: !empty(indexerApiImageName) ? indexerApiImageName : 'nginx:latest'
     targetPort: 3001
   }
-  dependsOn: [
-    indexerApiIdentity
-  ]
 }
 
 module openAi 'core/ai/cognitiveservices.bicep' = {
