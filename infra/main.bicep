@@ -152,7 +152,7 @@ module searchApi './core/host/container-app.bicep' = {
     tags: union(tags, { 'azd-service-name': searchApiName })
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
-    identityType: 'SystemAssigned'
+    identityName: '${abbrs.managedIdentityUserAssignedIdentities}search-api-${resourceToken}'
     allowedOrigins: allowedOrigins
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
@@ -219,7 +219,7 @@ module indexerApi './core/host/container-app.bicep' = {
     tags: union(tags, { 'azd-service-name': indexerApiName })
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
-    identityType: 'SystemAssigned'
+    identityName: '${abbrs.managedIdentityUserAssignedIdentities}indexer-api-${resourceToken}'
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
     secrets: [
