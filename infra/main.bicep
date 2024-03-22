@@ -83,6 +83,9 @@ var resourceToken = toLower(uniqueString(subscription().id, environmentName, loc
 var tags = union({ 'azd-env-name': environmentName }, empty(aliasTag) ? {} : { alias: aliasTag })
 var allowedOrigins = empty(allowedOrigin) ? [webApp.outputs.uri] : [webApp.outputs.uri, allowedOrigin]
 
+var indexerApiIdentityName = '${abbrs.managedIdentityUserAssignedIdentities}indexer-api-${resourceToken}'
+var searchApiIdentityName = '${abbrs.managedIdentityUserAssignedIdentities}search-api-${resourceToken}'
+
 // Organize resources in a resource group
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}'
@@ -142,6 +145,16 @@ module webApp './core/host/staticwebapp.bicep' = {
   }
 }
 
+// search API identity
+module searchApiIdentity 'core/security/managed-identity.bicep' = {
+  name: 'search-api-identity'
+  scope: resourceGroup
+  params: {
+    name: searchApiIdentityName
+    location: location
+  }
+}
+
 // The search API
 module searchApi './core/host/container-app.bicep' = {
   name: 'search-api'
@@ -152,7 +165,7 @@ module searchApi './core/host/container-app.bicep' = {
     tags: union(tags, { 'azd-service-name': searchApiName })
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
-    identityType: 'SystemAssigned'
+    identityName: searchApiIdentityName
     allowedOrigins: allowedOrigins
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
@@ -200,12 +213,26 @@ module searchApi './core/host/container-app.bicep' = {
         value: storageContainerName
       }
       {
-      name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-      secretRef: 'appinsights-cs'
+        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        secretRef: 'appinsights-cs'
+      }
+      {
+        name: 'AZURE_CLIENT_ID'
+        value: searchApiIdentity.outputs.clientId
       }
     ]
     imageName: !empty(searchApiImageName) ? searchApiImageName : 'nginx:latest'
     targetPort: 3000
+  }
+}
+
+// Indexer API identity
+module indexerApiIdentity 'core/security/managed-identity.bicep' = {
+  name: 'indexer-api-identity'
+  scope: resourceGroup
+  params: {
+    name: indexerApiIdentityName
+    location: location
   }
 }
 
@@ -219,7 +246,7 @@ module indexerApi './core/host/container-app.bicep' = {
     tags: union(tags, { 'azd-service-name': indexerApiName })
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
-    identityType: 'SystemAssigned'
+    identityName: indexerApiIdentityName
     containerCpuCoreCount: '1.0'
     containerMemory: '2.0Gi'
     secrets: [
@@ -266,8 +293,12 @@ module indexerApi './core/host/container-app.bicep' = {
         value: storageContainerName
       }
       {
-      name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-      secretRef: 'appinsights-cs'
+        name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+        secretRef: 'appinsights-cs'
+      }
+      {
+        name: 'AZURE_CLIENT_ID'
+        value: indexerApiIdentity.outputs.clientId
       }
     ]
     imageName: !empty(indexerApiImageName) ? indexerApiImageName : 'nginx:latest'
@@ -505,3 +536,6 @@ output INDEXER_API_URI string = indexerApi.outputs.uri
 
 output ALLOWED_ORIGINS string = join(allowedOrigins, ',')
 output BACKEND_URI string = !empty(backendUri) ? backendUri : searchApi.outputs.uri
+
+output INDEXER_PRINCIPAL_ID string = indexerApi.outputs.identityPrincipalId
+output SEARCH_API_PRINCIPAL_ID string = searchApi.outputs.identityPrincipalId
