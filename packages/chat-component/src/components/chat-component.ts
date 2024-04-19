@@ -13,7 +13,7 @@ import {
 import { chatStyle } from '../styles/chat-component.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { chatEntryToString, newListWithEntryAtIndex } from '../utils/index.js';
-
+import type { AIChatMessage } from '@microsoft/ai-chat-protocol';
 // TODO: allow host applications to customize these icons
 
 import iconLightBulb from '../../public/svg/lightbulb-icon.svg?raw';
@@ -167,7 +167,7 @@ export class ChatComponent extends LitElement {
     }
   }
 
-  getMessageContext(): Message[] {
+  getMessageContext(): AIChatMessage[] {
     if (this.interactionModel === 'ask') {
       return [];
     }
