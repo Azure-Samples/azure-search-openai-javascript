@@ -1,9 +1,11 @@
 import { ChatResponseError } from '../../utils/index.js';
+import type { AIChatRole } from '@microsoft/ai-chat-protocol';
 
 export async function callHttpApi(
   { question, type, approach, overrides, messages }: ChatRequestOptions,
   { method, url, stream, signal }: ChatHttpOptions,
 ) {
+  const roleUser: AIChatRole = 'user';
   return await fetch(`${url}/${type}`, {
     method: method,
     headers: {
@@ -15,7 +17,7 @@ export async function callHttpApi(
         ...(messages ?? []),
         {
           content: question,
-          role: 'user',
+          role: roleUser,
         },
       ],
       context: {
