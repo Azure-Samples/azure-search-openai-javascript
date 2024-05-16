@@ -107,14 +107,14 @@ export class ChatReadRetrieveRead extends ApproachBase implements ChatApproach {
           {
             index: 0,
             delta: {
-              content: chunk.choices[0].delta.content ?? '',
+              content: chunk.choices[0]?.delta.content ?? '',
               role: 'assistant' as const,
               context: {
                 data_points: id === 0 ? { text: dataPoints } : undefined,
                 thoughts: id === 0 ? thoughts : undefined,
               },
             },
-            finish_reason: chunk.choices[0].finish_reason,
+            finish_reason: chunk.choices[0]?.finish_reason,
           },
         ],
         object: 'chat.completion.chunk' as const,
