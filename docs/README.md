@@ -1,3 +1,22 @@
+---
+page_type: sample
+languages:
+  - azdeveloper
+  - javascript
+  - typescript
+  - nodejs
+  - bicep
+products:
+  - azure
+  - ai-services
+  - azure-openai
+urlFragment: azure-search-openai-javascript
+name: ChatGPT + Enterprise data (javascript)
+description: A javascript sample app that chats with your data using OpenAI and AI Search.
+---
+
+<!-- YAML front-matter schema: https://review.learn.microsoft.com/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
+
 # ChatGPT + Enterprise data with Azure OpenAI and Azure AI Search
 
 ## Table of Contents
@@ -33,7 +52,7 @@
 
 This sample demonstrates a few approaches for creating ChatGPT-like experiences over your own data using the Retrieval Augmented Generation pattern. It uses Azure OpenAI Service to access the ChatGPT model (gpt-35-turbo), and Azure AI Search for data indexing and retrieval.
 
-![Retrieval Augmented Generation Architecture](docs/rag-architecture.png)
+![Retrieval Augmented Generation Architecture](rag-architecture.png)
 
 The repo includes sample data so it's ready to try end to end. In this sample application we use a fictitious company called Contoso Real Estate, and the experience allows its customers to ask support questions about the usage of its products. The sample data includes a set of documents that describe its terms of service, privacy policy and a support guide.
 
@@ -43,7 +62,7 @@ The application is made from multiple components, including:
 - **Indexer service**: the service that indexes the data and creates the search indexes.
 - **Web app**: the frontend web application that provides the user interface and orchestrates the interaction between the user and the backend services.
 
-![App Architecture](docs/app-architecture.drawio.png)
+![App Architecture](app-architecture.drawio.png)
 
 ## Features
 
@@ -53,7 +72,7 @@ The application is made from multiple components, including:
 - Settings directly in the UX to tweak the behavior and experiment with options
 - Optional performance tracing and monitoring with Application Insights
 
-![Chat screen](docs/chat-screenshot.png)
+![Chat screen](chat-screenshot.png)
 
 [📺 Watch a video overview of the app](https://youtu.be/uckVTuS36H0)
 
@@ -133,7 +152,7 @@ Execute the following command, if you don't have any pre-existing Azure services
 
 It will look like the following:
 
-!['Output from running azd up'](docs/deployment.png)
+!['Output from running azd up'](deployment.png)
 
 > NOTE: It can take 15+ minutes for the application to be fully deployed.
 
@@ -204,7 +223,7 @@ To enable Application Insights and the tracing of each request, along with the l
 To see the performance data, go to the Application Insights resource in your resource group, click on the "Investigate -> Performance" blade and navigate to any HTTP request to see the timing data.
 To inspect the performance of chat requests, use the "Drill into Samples" button to see end-to-end traces of all the API calls made for any chat request:
 
-![Tracing screenshot](docs/transaction-tracing.png)
+![Tracing screenshot](transaction-tracing.png)
 
 To see any exceptions and server errors, navigate to the "Investigate -> Failures" blade and use the filtering tools to locate a specific exception. You can see Python stack traces on the right-hand side. -->
 
