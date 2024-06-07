@@ -247,7 +247,7 @@ Once in the web app:
 
 ## Using a different backend
 
-The Search API service implements the [HTTP protocol for AI chat apps](https://github.com/Azure-Samples/ai-chat-app-protocol). It can be swapped with any service that implements the same protocol, like the [Python backend client in this repository](https://github.com/Azure-Samples/azure-search-openai-demo) instead of the Node.js implementation featured in this repo.
+The Search API service implements the [HTTP protocol for AI chat apps](https://aka.ms/chatprotocol). It can be swapped with any service that implements the same protocol, like the [Python backend client in this repository](https://github.com/Azure-Samples/azure-search-openai-demo) instead of the Node.js implementation featured in this repo.
 
 To do so, follow these steps:
 
