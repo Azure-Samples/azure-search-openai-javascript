@@ -57,7 +57,7 @@ The application is made from multiple components, including:
 
 [📺 Watch a video overview of the app](https://youtu.be/uckVTuS36H0)
 
-## Getting started
+## Getting Started
 
 ## Azure account prerequisites
 
@@ -194,20 +194,6 @@ either you or they can follow these steps:
 
 ## Enabling optional features
 
-<!-- ### Enabling Application Insights
-
-To enable Application Insights and the tracing of each request, along with the logging of errors, set the `AZURE_USE_APPLICATION_INSIGHTS` variable to true before running `azd up`
-
-1. Run `azd env set AZURE_USE_APPLICATION_INSIGHTS true`
-1. Run `azd up`
-
-To see the performance data, go to the Application Insights resource in your resource group, click on the "Investigate -> Performance" blade and navigate to any HTTP request to see the timing data.
-To inspect the performance of chat requests, use the "Drill into Samples" button to see end-to-end traces of all the API calls made for any chat request:
-
-![Tracing screenshot](docs/transaction-tracing.png)
-
-To see any exceptions and server errors, navigate to the "Investigate -> Failures" blade and use the filtering tools to locate a specific exception. You can see Python stack traces on the right-hand side. -->
-
 ### Enabling authentication
 
 By default, the deployed Azure web app will have no authentication or access restrictions enabled, meaning anyone with routable network access to the web app can chat with your indexed data. You can require authentication to your Azure Entra ID by following the [Add app authentication](https://learn.microsoft.com/training/modules/publish-static-web-app-authentication/) tutorial and set it up against the deployed web app.
@@ -300,9 +286,26 @@ This sample is designed to be a starting point for your own production applicati
   See [Enabling authentication](#enabling-authentication) above for how to enable authentication.
 - **Networking**: We recommend deploying inside a Virtual Network. If the app is only for internal enterprise use, use a private DNS zone. Also consider using Azure API Management (APIM) for firewalls and other forms of protection.
 For more details, read [Azure OpenAI Landing Zone reference architecture](https://techcommunity.microsoft.com/t5/azure-architecture-blog/azure-openai-landing-zone-reference-architecture/ba-p/3882102).
-<!-- * **Loadtesting**: We recommend running a loadtest for your expected number of users.
-  You can use the [locust tool](https://docs.locust.io/) with the `locustfile.py` in this sample
-  or set up a loadtest with Azure Load Testing. -->
+
+## Guidance
+
+### Region Availability
+
+This template uses [MODEL 1] and [MODEL 2] which may not be available in all Azure regions. Check for [up-to-date region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) and select a region during deployment accordingly
+  * We recommend using [SUGGESTED REGION]
+
+### Costs
+
+You can estimate the cost of this project's architecture with [Azure's pricing calculator](https://azure.microsoft.com/pricing/calculator/)
+
+* [Azure Product] - [plan type] [link to pricing for product](https://azure.microsoft.com/pricing/)
+
+### Security
+
+> [!NOTE]
+> When implementing this template please specify whether the template uses Managed Identity or Key Vault
+
+This template has either [Managed Identity](https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview) or Key Vault built in to eliminate the need for developers to manage these credentials. Applications can use managed identities to obtain Microsoft Entra tokens without having to manage any credentials. Additionally, we have added a [GitHub Action tool](https://github.com/microsoft/security-devops-action) that scans the infrastructure-as-code files and generates a report containing any detected issues. To ensure best practices in your repo we recommend anyone creating solutions based on our templates ensure that the [Github secret scanning](https://docs.github.com/code-security/secret-scanning/about-secret-scanning) setting is enabled in your repos.
 
 ## Resources
 
