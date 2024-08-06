@@ -3,7 +3,7 @@
 ## Table of Contents
 
 - [Features](#features)
-- [Getting started](#getting-started)
+- [Getting Started](#getting-started)
 - [Azure account requirements](#azure-account-prerequisites)
 - [Azure deployment](#azure-deployment)
   - [Cost estimation](#cost-estimation)
@@ -23,6 +23,7 @@
 - [Using a different backend](#using-a-different-backend)
 - [Productionizing](#productionizing)
 - [Clean up](#clean-up)
+- [Guidance](#guidance)
 - [Resources](#resources)
   - [Note](#note)
   - [FAQ](#faq)
