@@ -15,18 +15,19 @@
   - [Deploying with existing resources](#deploying-with-existing-resources)
   - [Deploying again](#deploying-again)
 - [Sharing environments](#sharing-environments)
+- [Clean up](#clean-up)
 - [Enabling optional features](#enabling-optional-features)
   <!-- - [Enabling Application Insights](#enabling-application-insights) -->
   - [Enabling authentication](#enabling-authentication)
 - [Using the app](#using-the-app)
-- [Running locally](#running-locally)
-- [Using a different backend](#using-a-different-backend)
-- [Productionizing](#productionizing)
-- [Clean up](#clean-up)
-- [Resources](#resources)
-  - [Note](#note)
+- [Guidance](#guidance)
+  - [Running locally](#running-locally)
+  - [Using a different backend](#using-a-different-backend)
+  - [Productionizing](#productionizing)
+  - [Resources](#resources)
   - [FAQ](#faq)
   - [Troubleshooting](#troubleshooting)
+- [Note](#note)
 
 [![Open in GitHub Codespaces](https://img.shields.io/static/v1?style=for-the-badge&label=GitHub+Codespaces&message=Open&color=brightgreen&logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=684521881&machine=standardLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestUs2)
 [![Open in Remote - Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/azure-search-openai-javascript)
@@ -192,6 +193,16 @@ either you or they can follow these steps:
 1. Set the environment variable `AZURE_PRINCIPAL_ID` either in that `.env` file or in the active shell to their Azure ID, which they can get with `az ad signed-in-user show`.
 1. Run `./scripts/roles.ps1` or `./scripts/roles.sh` to assign all of the necessary roles to the user. If they do not have the necessary permission to create roles in the subscription, then you may need to run this script for them. Once the script runs, they should be able to run the app locally.
 
+## Clean up
+
+To clean up all the resources created by this sample:
+
+1. Run `azd down --purge`
+2. When asked if you are sure you want to continue, enter `y`
+3. When asked if you want to permanently delete the resources, enter `y`
+
+The resource group and all the resources will be deleted.
+
 ## Enabling optional features
 
 <!-- ### Enabling Application Insights
@@ -245,7 +256,9 @@ Once in the web app:
 - Explore citations and sources
 - Click on "settings" to try different options, tweak prompts, etc.
 
-## Using a different backend
+## Guidance
+
+### Using a different backend
 
 The Search API service implements the [HTTP protocol for AI chat apps](https://aka.ms/chatprotocol). It can be swapped with any service that implements the same protocol, like the [Python backend client in this repository](https://github.com/Azure-Samples/azure-search-openai-demo) instead of the Node.js implementation featured in this repo.
 
@@ -277,13 +290,13 @@ To do so, follow these steps:
   npm start --workspace=webapp
   ```
 
-## Enabling Authentication
+### Enabling Authentication
 
 This sample is composed by two applications: a backend service and API, deployed to [Azure Container Apps](https://learn.microsoft.com/azure/container-apps/overview), and a frontend application, deployed to [Azure Static Web Apps](https://azure.microsoft.com/products/app-service/static/). By default, the deployed Azure Container App will have no authentication or access restrictions enabled, meaning anyone with routable network access to the container app can chat with your indexed data. You can require authentication to your Azure Entra ID by following the [Add container app authentication](https://learn.microsoft.com/azure/container-apps/authentication-azure-active-directory) tutorial and set it up against the deployed Azure Container App.
 
 To limit access to a specific set of users or groups, you can follow the steps from [Restrict your Azure Entra app to a set of users](https://learn.microsoft.com/entra/identity-platform/howto-restrict-your-app-to-a-set-of-users) by changing "Assignment Required?" option under the Enterprise Application, and then assigning users/groups access. Users not granted explicit access will receive the error message -AADSTS50105: Your administrator has configured the application <app_name> to block users unless they are specifically granted ('assigned') access to the application.-
 
-## Productionizing
+### Productionizing
 
 This sample is designed to be a starting point for your own production application, but you should do a thorough review of the security and performance before deploying to production. Here are some things to consider:
 
@@ -311,20 +324,6 @@ For more details, read [Azure OpenAI Landing Zone reference architecture](https:
 - [Azure AI Search](https://learn.microsoft.com/azure/search/search-what-is-azure-search)
 - [Azure OpenAI Service](https://learn.microsoft.com/azure/ai-services/openai/overview)
 - [Building ChatGPT-Like Experiences with Azure: A Guide to Retrieval Augmented Generation for JavaScript applications](https://devblogs.microsoft.com/azure-sdk/building-chatgpt-like-experiences-with-azure-a-guide-to-retrieval-augmented-generation-for-javascript-applications/)
-
-## Clean up
-
-To clean up all the resources created by this sample:
-
-1. Run `azd down --purge`
-2. When asked if you are sure you want to continue, enter `y`
-3. When asked if you want to permanently delete the resources, enter `y`
-
-The resource group and all the resources will be deleted.
-
-### Note
-
-> Note: The documents used in this demo contain information generated using a language model (Azure OpenAI Service). The information contained in these documents is only for demonstration purposes and does not reflect the opinions or beliefs of Microsoft. Microsoft makes no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability with respect to the information contained in this document. All rights reserved to Microsoft.
 
 ### FAQ
 
@@ -426,3 +425,7 @@ Here are the most common failure scenarios and solutions:
 1. After running `azd up` and visiting the website, you see a '404 Not Found' in the browser. Wait 10 minutes and try again, as it might be still starting up. Then try running `azd deploy` and wait again. If you still encounter errors with the deployed app, consult these [tips for debugging App Service app deployments](http://blog.pamelafox.org/2023/06/tips-for-debugging-flask-deployments-to.html) and file an issue if the error logs don't help you resolve the issue.
 
 1. You're getting an error `401 Principal does not have access to API/Operation` while running the project locally or trying to deploy. That's likely because your environment variables include `AZURE_TENANT_ID`, `AZURE_CLIENT_ID` and `AZURE_CLIENT_SECRET`. You should either grant permissions to the related _Service Principal_ or remove these variables from your environment to ensure normal access. For more details, please refer to [Azure identity SDK](https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/identity/identity/README.md#defaultazurecredential).
+
+### Note
+
+> Note: The documents used in this demo contain information generated using a language model (Azure OpenAI Service). The information contained in these documents is only for demonstration purposes and does not reflect the opinions or beliefs of Microsoft. Microsoft makes no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability with respect to the information contained in this document. All rights reserved to Microsoft.
