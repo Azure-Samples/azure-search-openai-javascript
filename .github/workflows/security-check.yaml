@@ -1,0 +1,20 @@
+on:
+  workflow_dispatch:
+  push:
+    # Run when commits are pushed to mainline branch (main or master)
+    # Set this to the mainline branch you are using
+    branches:
+      - ci/test-ps-rule
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+        # GitHub Actions workflow to deploy to Azure using azd
+      - name: Analyze templates for MI compliance
+        uses: microsoft/ps-rule@v2.9.0
+        id: run_psrule
+        with:
+          source: '.ps-rule'
+          modules: 'PSRule.Rules.Azure'
+          baseline: 'TemplateValidation.MI_2024_10'
