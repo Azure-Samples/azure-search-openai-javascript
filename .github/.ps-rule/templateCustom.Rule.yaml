@@ -1,0 +1,16 @@
+# Synopsis: Analyze Azure resources using PSRule for Azure
+apiVersion: github.com/microsoft/PSRule/v1
+kind: Baseline
+metadata:
+  name: 'TemplateValidation.MI_2024_10'
+spec:
+  rule:
+    include:
+    - Azure.ContainerApp.ManagedIdentity
+    - Azure.AKS.ManagedIdentity
+    - Azure.APIM.ManagedIdentity
+    - Azure.AppService.ManagedIdentity
+    - Azure.Search.ManagedIdentity
+    - Azure.AI.ManagedIdentity
+    - Azure.SQLMI.ManagedIdentity
+    - Azure.EventGrid.ManagedIdentity
