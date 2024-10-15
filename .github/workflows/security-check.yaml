@@ -17,4 +17,4 @@ jobs:
         with:
           source: 'https://github.com/Azure-Samples/azure-search-openai-javascript/.github/.ps-rule/'
           modules: 'PSRule.Rules.Azure'
-          baseline: 'TemplateValidation.MI_2024_10templateCustom'
+          baseline: 'templateCustom'
