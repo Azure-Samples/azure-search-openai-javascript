@@ -15,6 +15,6 @@ jobs:
         uses: microsoft/ps-rule@v2.9.0
         id: run_psrule
         with:
-          source: '/.github/.ps-rule/'
+          source: '${{ github.action_path }}/.github/.ps-rule/'
           modules: 'PSRule.Rules.Azure'
           baseline: 'templateCustom'
