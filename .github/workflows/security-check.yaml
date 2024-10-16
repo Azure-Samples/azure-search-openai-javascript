@@ -5,16 +5,19 @@ on:
     # Set this to the mainline branch you are using
     branches:
       - ci/test-ps-rule
+      - bewhite/ci-debugging
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-        # GitHub Actions workflow to deploy to Azure using azd
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # GitHub Actions workflow to deploy to Azure using azd
       - name: Analyze templates for MI compliance
         uses: microsoft/ps-rule@v2.9.0
         id: run_psrule
         with:
-          source: '${{ github.action_path }}/.github/.ps-rule/'
           modules: 'PSRule.Rules.Azure'
           baseline: 'templateCustom'

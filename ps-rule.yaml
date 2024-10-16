@@ -1,0 +1,12 @@
+#
+# PSRule options for infrastructure as code (IaC) testing
+#
+
+input:
+  pathIgnore:
+    - '**'
+    - '!**/*.test.bicep'
+
+configuration:
+  AZURE_BICEP_FILE_EXPANSION: true
+  AZURE_BICEP_FILE_EXPANSION_TIMEOUT: 30
