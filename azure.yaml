@@ -29,6 +29,7 @@ services:
     host: containerapp
     docker:
       context: ../..
+      remoteBuild: true
 
   indexer:
     project: ./packages/indexer
@@ -36,6 +37,7 @@ services:
     host: containerapp
     docker:
       context: ../..
+      remoteBuild: true
 
 hooks:
   postup:
