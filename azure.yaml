@@ -3,6 +3,8 @@
 name: azure-search-openai-javascript
 metadata:
   template: azure-search-openai-javascript@1.0.0
+requiredVersions:
+  azd: ">= 1.10.0"
 
 services:
   webapp:
@@ -29,6 +31,7 @@ services:
     host: containerapp
     docker:
       context: ../..
+      remoteBuild: true
 
   indexer:
     project: ./packages/indexer
@@ -36,6 +39,7 @@ services:
     host: containerapp
     docker:
       context: ../..
+      remoteBuild: true
 
 hooks:
   postup:
