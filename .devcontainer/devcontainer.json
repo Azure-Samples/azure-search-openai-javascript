@@ -4,13 +4,10 @@
   "name": "Azure Search OpenAI Js",
 
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:18-bullseye",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bookworm",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "18"
-    },
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
       "version": 20,
       "moby": "false"

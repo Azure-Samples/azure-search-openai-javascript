@@ -43,8 +43,8 @@
     "tap": "^18.5.2"
   },
   "engines": {
-    "node": ">=18",
-    "npm": ">=9"
+    "node": ">=20",
+    "npm": ">=10"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
