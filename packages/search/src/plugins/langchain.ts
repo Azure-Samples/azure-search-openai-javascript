@@ -1,11 +1,9 @@
 import fp from 'fastify-plugin';
-import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { type OpenAIChatInput } from 'langchain/dist/types/openai-types';
+import { AzureChatOpenAI, AzureOpenAIEmbeddings, type OpenAIChatInput } from '@langchain/openai';
 
 export type LangchainService = {
-  getChat(options?: Partial<OpenAIChatInput>): Promise<ChatOpenAI>;
-  getEmbeddings(options?: Partial<OpenAIChatInput>): Promise<OpenAIEmbeddings>;
+  getChat(options?: Partial<OpenAIChatInput>): Promise<AzureChatOpenAI>;
+  getEmbeddings(options?: Partial<OpenAIChatInput>): Promise<AzureOpenAIEmbeddings>;
 };
 
 export default fp(
@@ -21,7 +19,7 @@ export default fp(
     fastify.decorate('langchain', {
       async getChat(options?: Partial<OpenAIChatInput>) {
         const apiToken = await fastify.openai.getApiToken();
-        return new ChatOpenAI({
+        return new AzureChatOpenAI({
           ...options,
           ...getAzureOpenAiOptions(apiToken),
           azureOpenAIApiDeploymentName: config.azureOpenAiChatGptDeployment,
@@ -29,7 +27,7 @@ export default fp(
       },
       async getEmbeddings(options?: Partial<OpenAIChatInput>) {
         const apiToken = await fastify.openai.getApiToken();
-        return new OpenAIEmbeddings({
+        return new AzureOpenAIEmbeddings({
           ...options,
           ...getAzureOpenAiOptions(apiToken),
           azureOpenAIApiDeploymentName: config.azureOpenAiEmbeddingDeployment,
@@ -37,10 +35,7 @@ export default fp(
       },
     });
   },
-  {
-    name: 'langchain',
-    dependencies: ['azure', 'config', 'openai'],
-  },
+  { name: 'langchain', dependencies: ['azure', 'config', 'openai'] },
 );
 
 // When using .decorate you have to specify added properties for Typescript

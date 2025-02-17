@@ -411,7 +411,6 @@ You may also need to adjust the capacity in `infra/main.bicep` file, depending o
 
 The chat tab uses the approach programmed in [chat-read-retrieve-read.ts](https://github.com/Azure-Samples/azure-search-openai-javascript/blob/main/packages/search/src/lib/approaches/chat-read-retrieve-read.ts).
 The ask tab uses the approach programmed in [ask-retrieve-then-read.ts](https://github.com/Azure-Samples/azure-search-openai-javascript/blob/main/packages/search/src/lib/approaches/ask-retrieve-then-read.ts).
-There is also another one /ask approach available, [using an agent](https://github.com/Azure-Samples/azure-search-openai-javascript/blob/main/packages/search/src/lib/approaches/ask-read-retrieve-read.ts.
 
 </details>
 
