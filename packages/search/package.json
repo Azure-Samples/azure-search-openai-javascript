@@ -21,6 +21,7 @@
     "clean": "rimraf dist *.tgz"
   },
   "dependencies": {
+    "@azure/core-http": "^3.0.5",
     "@azure/identity": "^4.0.1",
     "@azure/monitor-opentelemetry": "^1.0.0-beta.2",
     "@azure/search-documents": "12.0.0-beta.3",
