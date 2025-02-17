@@ -2,7 +2,7 @@
 
 # Build Node.js app
 # ------------------------------------
-FROM node:20-alpine as build
+FROM node:22-alpine as build
 WORKDIR /app
 COPY ./package*.json ./
 COPY ./packages/indexer ./packages/indexer
@@ -11,7 +11,7 @@ RUN npm run build --workspace=indexer
 
 # Run Node.js app
 # ------------------------------------
-FROM node:20-alpine
+FROM node:22-alpine
 ENV NODE_ENV=production
 
 WORKDIR /app
