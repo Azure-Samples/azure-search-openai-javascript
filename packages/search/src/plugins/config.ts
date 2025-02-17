@@ -34,7 +34,7 @@ export default fp(
       azureSearchIndex: process.env.AZURE_SEARCH_INDEX || '',
       azureOpenAiService: process.env.AZURE_OPENAI_SERVICE || '',
       azureOpenAiChatGptDeployment: process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT || '',
-      azureOpenAiChatGptModel: process.env.AZURE_OPENAI_CHATGPT_MODEL || 'gpt-35-turbo',
+      azureOpenAiChatGptModel: process.env.AZURE_OPENAI_CHATGPT_MODEL || 'gpt-4o-mini',
       azureOpenAiEmbeddingDeployment: process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT || '',
       azureOpenAiEmbeddingModel: process.env.AZURE_OPENAI_EMBEDDING_MODEL || 'text-embedding-ada-002',
       kbFieldsContent: process.env.KB_FIELDS_CONTENT || 'content',
@@ -54,9 +54,7 @@ export default fp(
 
     fastify.decorate('config', config);
   },
-  {
-    name: 'config',
-  },
+  { name: 'config' },
 );
 
 // When using .decorate you have to specify added properties for Typescript
