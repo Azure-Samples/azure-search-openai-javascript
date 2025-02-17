@@ -24,6 +24,7 @@
     "clean": "rimraf dist *.tgz"
   },
   "dependencies": {
+    "@azure/core-http": "^3.0.5",
     "@azure/identity": "^4.0.1",
     "@azure/monitor-opentelemetry": "^1.0.0-beta.2",
     "@azure/search-documents": "12.0.0-beta.3",
@@ -47,11 +48,11 @@
   },
   "devDependencies": {
     "@types/mime": "^3.0.1",
-    "@types/node": "^18.0.0",
+    "@types/node": "^20.17.19",
     "@types/tap": "^15.0.5",
-    "concurrently": "^8.2.0",
+    "concurrently": "^9.1.2",
     "fastify-tsconfig": "^2.0.0",
-    "rimraf": "^5.0.1",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },
