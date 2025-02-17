@@ -30,7 +30,7 @@ async function config() {
     // Use fixed values when .env file is not present
     // Note: if you update snapshots, you must also update the values here to match your .env file
     process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT = 'chat';
-    process.env.AZURE_OPENAI_CHATGPT_MODEL = 'gpt-3.5-turbo';
+    process.env.AZURE_OPENAI_CHATGPT_MODEL = 'gpt-4o-mini';
     process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT = 'embedding';
     process.env.AZURE_OPENAI_EMBEDDING_MODEL = '';
     process.env.AZURE_OPENAI_SERVICE = 'cog-x2y5k2ccncqou';

@@ -19,7 +19,7 @@ async function config() {
   await fs.copyFile(path.join(__dirname, '../../package.json'), path.join(__dirname, '../../test-dist/package.json'));
 
   process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT = 'chat';
-  process.env.AZURE_OPENAI_CHATGPT_MODEL = 'gpt-3.5-turbo';
+  process.env.AZURE_OPENAI_CHATGPT_MODEL = 'gpt-4o-mini';
   process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT = 'embeddings';
   process.env.AZURE_OPENAI_EMBEDDING_MODEL = '';
   process.env.AZURE_OPENAI_SERVICE = 'https://example.com';

@@ -8,6 +8,8 @@ const MODEL_TOKEN_LIMITS: Record<string, number> = {
   'gpt-3.5-turbo-16k': 16_000,
   'gpt-4': 8100,
   'gpt-4-32k': 32_000,
+  'gpt-4o': 128_000,
+  'gpt-4o-mini': 128_000,
 };
 
 const AZURE_OPENAI_TO_TIKTOKEN_MODELS: Record<string, string> = {
