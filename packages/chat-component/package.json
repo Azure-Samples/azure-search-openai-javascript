@@ -32,8 +32,8 @@
   "devDependencies": {
     "@types/dom-speech-recognition": "^0.0.4",
     "@types/dompurify": "^3.0.3",
-    "rimraf": "^5.0.1",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.2"
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0"
   }
 }
