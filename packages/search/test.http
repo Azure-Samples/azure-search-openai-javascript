@@ -71,22 +71,3 @@ Content-Type: application/json
   }
 }
 
-###
-
-# Ask a question using the rrr approach
-POST {{api_host}}/ask
-Content-Type: application/json
-
-{
-  "messages": [{
-    "content": "How to contact a representative?",
-    "role": "user"
-  }],
-  "context": {
-    "approach":"rrr",
-    "retrieval_mode": "hybrid",
-    "semantic_ranker": true,
-    "semantic_captions": false,
-    "top": 3
-  }
-}
