@@ -241,10 +241,10 @@ By default, the deployed search API will only allow requests from the same origi
 You can only run locally **after** having successfully run the `azd up` command.
 
 1. Run `azd auth login`
-2. Run `azd env get-values > .env` to get the environment variables for the app
-3. Run `az login`
-4. Run `npm start` or run the "VS Code Task: Start App" to start the project locally.
-5. Run `./scripts/index-data.sh` or `./scripts/index-data.ps1` to index the data locally.
+2. Run `azd env get-values > .env` to get the environment variables for the app.
+3. Run `./scripts/index-data.sh` or `./scripts/index-data.ps1` to index the data.
+4. Run `az login` to log in to your Azure account (needed for managed identity)
+5. Run `npm start` or run the "VS Code Task: Start App" to start the project locally.
 
 ## Using the app
 
