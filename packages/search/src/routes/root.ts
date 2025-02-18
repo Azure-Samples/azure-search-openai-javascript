@@ -5,6 +5,7 @@ import { Readable } from 'node:stream';
 import { type FastifyPluginAsync } from 'fastify';
 import { type JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import { type SchemaTypes } from '../plugins/schemas.js';
+import { type ApproachContext } from '../lib/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -74,6 +75,11 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       }
 
       const { messages, context, stream } = request.body;
+      let approachContext: ApproachContext = (context as any) ?? {};
+      if (this.config.azureSearchSemanticRanker !== 'enabled') {
+        approachContext = { ...approachContext, semantic_ranker: false };
+      }
+
       try {
         if (stream) {
           const buffer = new Readable();
@@ -81,14 +87,14 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
           buffer._read = () => {};
           reply.type('application/x-ndjson').send(buffer);
 
-          const chunks = await chatApproach.runWithStreaming(messages, (context as any) ?? {});
+          const chunks = await chatApproach.runWithStreaming(messages, approachContext);
           for await (const chunk of chunks) {
             buffer.push(JSON.stringify(chunk) + '\n');
           }
           // eslint-disable-next-line unicorn/no-null
           buffer.push(null);
         } else {
-          return await chatApproach.run(messages, (context as any) ?? {});
+          return await chatApproach.run(messages, approachContext);
         }
       } catch (_error: unknown) {
         const error = _error as Error & { error?: any; status?: number };
@@ -121,6 +127,11 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       }
 
       const { messages, context, stream } = request.body;
+      let approachContext: ApproachContext = (context as any) ?? {};
+      if (this.config.azureSearchSemanticRanker !== 'enabled') {
+        approachContext = { ...approachContext, semantic_ranker: false };
+      }
+
       try {
         if (stream) {
           const buffer = new Readable();
@@ -128,14 +139,14 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
           buffer._read = () => {};
           reply.type('application/x-ndjson').send(buffer);
 
-          const chunks = await askApproach.runWithStreaming(messages[0].content, (context as any) ?? {});
+          const chunks = await askApproach.runWithStreaming(messages[0].content, approachContext);
           for await (const chunk of chunks) {
             buffer.push(JSON.stringify(chunk) + '\n');
           }
           // eslint-disable-next-line unicorn/no-null
           buffer.push(null);
         } else {
-          return await askApproach.run(messages[0].content, (context as any) ?? {});
+          return await askApproach.run(messages[0].content, approachContext);
         }
       } catch (_error: unknown) {
         const error = _error as Error & { error?: any; status?: number };

@@ -8,6 +8,7 @@ export interface AppConfig {
   azureStorageContainer: string;
   azureSearchService: string;
   azureSearchIndex: string;
+  azureSearchSemanticRanker: string;
   azureOpenAiService: string;
   azureOpenAiEmbeddingDeployment: string;
   azureOpenAiEmbeddingModel: string;
@@ -28,6 +29,7 @@ export default fp(
       azureStorageAccount: process.env.AZURE_STORAGE_ACCOUNT || '',
       azureStorageContainer: process.env.AZURE_STORAGE_CONTAINER || '',
       azureSearchService: process.env.AZURE_SEARCH_SERVICE || '',
+      azureSearchSemanticRanker: process.env.AZURE_SEARCH_SEMANTIC_RANKER || 'disabled',
       azureSearchIndex: process.env.AZURE_SEARCH_INDEX || '',
       azureOpenAiService: process.env.AZURE_OPENAI_SERVICE || '',
       azureOpenAiEmbeddingDeployment: process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT || '',

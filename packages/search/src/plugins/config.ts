@@ -8,6 +8,7 @@ export interface AppConfig {
   azureStorageContainer: string;
   azureSearchService: string;
   azureSearchIndex: string;
+  azureSearchSemanticRanker: string;
   azureOpenAiService: string;
   azureOpenAiChatGptDeployment: string;
   azureOpenAiChatGptModel: string;
@@ -32,6 +33,7 @@ export default fp(
       azureStorageContainer: process.env.AZURE_STORAGE_CONTAINER || '',
       azureSearchService: process.env.AZURE_SEARCH_SERVICE || '',
       azureSearchIndex: process.env.AZURE_SEARCH_INDEX || '',
+      azureSearchSemanticRanker: process.env.AZURE_SEARCH_SEMANTIC_RANKER || 'disabled',
       azureOpenAiService: process.env.AZURE_OPENAI_SERVICE || '',
       azureOpenAiChatGptDeployment: process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT || '',
       azureOpenAiChatGptModel: process.env.AZURE_OPENAI_CHATGPT_MODEL || 'gpt-4o-mini',

@@ -37,7 +37,7 @@ export class Indexer {
     this.blobStorage = new BlobStorage(logger, azure);
   }
 
-  async createSearchIndex(indexName: string) {
+  async createSearchIndex(indexName: string, useSemanticRanker = false) {
     this.logger.debug(`Ensuring search index "${indexName}" exists`);
 
     const searchIndexClient = this.azure.searchIndex;
@@ -72,21 +72,25 @@ export class Indexer {
             },
           ],
         },
-        semanticSearch: {
-          defaultConfigurationName: 'semantic-search-config',
-          configurations: [
-            {
-              name: 'semantic-search-config',
-              prioritizedFields: {
-                contentFields: [
+        ...(useSemanticRanker
+          ? {
+              semanticSearch: {
+                defaultConfigurationName: 'semantic-search-config',
+                configurations: [
                   {
-                    name: 'content',
+                    name: 'semantic-search-config',
+                    prioritizedFields: {
+                      contentFields: [
+                        {
+                          name: 'content',
+                        },
+                      ],
+                    },
                   },
                 ],
               },
-            },
-          ],
-        },
+            }
+          : {}),
         fields: [
           {
             name: 'id',
