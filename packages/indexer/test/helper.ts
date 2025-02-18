@@ -1,23 +1,20 @@
 // This file contains code that we reuse between our tests.
 import * as helper from 'fastify-cli/helper.js';
 import * as path from 'node:path';
-import fs from 'node:fs/promises';
-import type * as tap from 'tap';
+import type * as test from 'node:test';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
+export type TestContext = { after: typeof test.after };
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-export type Test = (typeof tap)['Test']['prototype'];
 
-const AppPath = path.join(__dirname, '..', 'src', 'app.js');
+const AppPath = path.join(__dirname, '..', 'src', 'app.ts');
 
 // Fill in this config with all the configurations
 // needed for testing the application
 async function config() {
-  // Copy package.json to the test directory
-  await fs.copyFile(path.join(__dirname, '../../package.json'), path.join(__dirname, '../../test-dist/package.json'));
-
   process.env.AZURE_OPENAI_CHATGPT_DEPLOYMENT = 'chat';
   process.env.AZURE_OPENAI_CHATGPT_MODEL = 'gpt-4o-mini';
   process.env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT = 'embeddings';
@@ -31,7 +28,7 @@ async function config() {
 }
 
 // Automatically build and tear down our instance
-async function build(t: Test) {
+async function build(t: TestContext) {
   // you can set all the options supported by the fastify CLI command
   const argv = [AppPath];
 
@@ -41,7 +38,7 @@ async function build(t: Test) {
   const app = await helper.build(argv, await config());
 
   // Tear down our app after we are done
-  t.teardown(() => void app.close());
+  t.after(() => void app.close());
 
   return app;
 }
