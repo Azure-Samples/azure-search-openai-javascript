@@ -79,10 +79,8 @@ export class AskRetrieveThenRead extends ApproachBase implements AskApproach {
             role: 'assistant' as const,
             content: chatCompletion.choices[0].message.content ?? '',
             context: {
-              data_points: {
-                text: results,
-              },
-              thoughts: `Question:<br>${query}<br><br>Prompt:<br>${messageToDisplay.replace('\n', '<br>')}`,
+              data_points: { text: results },
+              thoughts: `Question:<br>${query}<br><br>Prompt:<br>${messageToDisplay.replaceAll('\n', '<br>')}`,
             },
           },
         },

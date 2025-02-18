@@ -25,16 +25,13 @@ export class ApproachBase {
     const useSemanticCaption = parseBoolean(context?.semantic_captions) && hasText;
     const top = context?.top ? Number(context?.top) : 3;
     const excludeCategory: string | undefined = context?.exclude_category;
-    const filter = excludeCategory ? `category ne '${excludeCategory.replace("'", "''")}'` : undefined;
+    const filter = excludeCategory ? `category ne '${excludeCategory.replaceAll("'", "''")}'` : undefined;
 
     // If retrieval mode includes vectors, compute an embedding for the query
     let queryVector;
     if (hasVectors) {
       const openAiEmbeddings = await this.openai.getEmbeddings();
-      const result = await openAiEmbeddings.create({
-        model: this.embeddingModel,
-        input: query!,
-      });
+      const result = await openAiEmbeddings.create({ model: this.embeddingModel, input: query! });
       queryVector = result.data[0].embedding;
     }
 
@@ -88,11 +85,7 @@ export class ApproachBase {
       }
     }
     const content = results.join('\n');
-    return {
-      query: queryText ?? '',
-      results,
-      content,
-    };
+    return { query: queryText ?? '', results, content };
   }
 
   protected async lookupDocument(query: string): Promise<any> {

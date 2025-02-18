@@ -127,5 +127,5 @@ function tryJsonStringify(object: unknown, fallback: string) {
 
 function toHtml(text: string | unknown): string {
   const s = typeof text === 'string' ? text : String(text);
-  return s.replace('<', '&lt;').replace('>', '&gt;').replaceAll(/\r?\n/g, '<br>');
+  return s.replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll(/\r?\n/g, '<br>');
 }
