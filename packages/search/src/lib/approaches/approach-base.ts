@@ -43,29 +43,40 @@ export class ApproachBase {
       ? this.search.search(queryText, {
           filter,
           queryType: 'semantic',
-          queryLanguage: 'en-us',
-          speller: 'lexicon',
-          semanticConfiguration: 'default',
+          semanticSearchOptions: {
+            configurationName: 'semantic-search-config',
+            captions: useSemanticCaption
+              ? {
+                  captionType: 'extractive',
+                  highlight: false,
+                }
+              : undefined,
+          },
           top,
-          captions: useSemanticCaption ? 'extractive|highlight-false' : undefined,
-          vectors: [
-            {
-              value: queryVector,
-              kNearestNeighborsCount: queryVector ? 50 : undefined,
-              fields: queryVector ? ['embedding'] : undefined,
-            },
-          ],
+          vectorSearchOptions: {
+            queries: [
+              {
+                kind: 'vector',
+                vector: queryVector!,
+                kNearestNeighborsCount: queryVector ? 50 : undefined,
+                fields: queryVector ? ['embedding'] : undefined,
+              },
+            ],
+          },
         })
       : this.search.search(queryText, {
           filter,
           top,
-          vectors: [
-            {
-              value: queryVector,
-              kNearestNeighborsCount: queryVector ? 50 : undefined,
-              fields: queryVector ? ['embedding'] : undefined,
-            },
-          ],
+          vectorSearchOptions: {
+            queries: [
+              {
+                kind: 'vector',
+                vector: queryVector!,
+                kNearestNeighborsCount: queryVector ? 50 : undefined,
+                fields: queryVector ? ['embedding'] : undefined,
+              },
+            ],
+          },
         }));
 
     const results: string[] = [];
@@ -86,33 +97,5 @@ export class ApproachBase {
     }
     const content = results.join('\n');
     return { query: queryText ?? '', results, content };
-  }
-
-  protected async lookupDocument(query: string): Promise<any> {
-    const searchResults = await this.search.search(query, {
-      top: 1,
-      includeTotalCount: true,
-      queryType: 'semantic',
-      queryLanguage: 'en-us',
-      speller: 'lexicon',
-      semanticConfiguration: 'default',
-      answers: 'extractive|count-1',
-      captions: 'extractive|highlight-false',
-    });
-
-    const answers = await searchResults.answers;
-    if (answers && answers.length > 0) {
-      return answers[0].text;
-    }
-    if (searchResults.count ?? 0 > 0) {
-      const results: string[] = [];
-      for await (const result of searchResults.results) {
-        // TODO: ensure typings
-        const document = result.document as any;
-        results.push(document[this.contentField]);
-      }
-      return results.join('\n');
-    }
-    return undefined;
   }
 }

@@ -52,6 +52,41 @@ export class Indexer {
     } else {
       const index: SearchIndex = {
         name: indexName,
+        vectorSearch: {
+          algorithms: [
+            {
+              name: 'vector-search-algorithm',
+              kind: 'hnsw',
+              parameters: {
+                m: 4,
+                efSearch: 500,
+                metric: 'cosine',
+                efConstruction: 400,
+              },
+            },
+          ],
+          profiles: [
+            {
+              name: 'vector-search-profile',
+              algorithmConfigurationName: 'vector-search-algorithm',
+            },
+          ],
+        },
+        semanticSearch: {
+          defaultConfigurationName: 'semantic-search-config',
+          configurations: [
+            {
+              name: 'semantic-search-config',
+              prioritizedFields: {
+                contentFields: [
+                  {
+                    name: 'content',
+                  },
+                ],
+              },
+            },
+          ],
+        },
         fields: [
           {
             name: 'id',
@@ -73,7 +108,7 @@ export class Indexer {
             sortable: false,
             facetable: false,
             vectorSearchDimensions: 1536,
-            vectorSearchConfiguration: 'default',
+            vectorSearchProfileName: 'vector-search-profile',
           },
           {
             name: 'category',
@@ -94,27 +129,6 @@ export class Indexer {
             facetable: true,
           },
         ],
-        semanticSettings: {
-          configurations: [
-            {
-              name: 'default',
-              prioritizedFields: {
-                prioritizedContentFields: [{ name: 'content' }],
-              },
-            },
-          ],
-        },
-        vectorSearch: {
-          algorithmConfigurations: [
-            {
-              name: 'default',
-              kind: 'hnsw',
-              parameters: {
-                metric: 'cosine',
-              },
-            },
-          ],
-        },
       };
       this.logger.debug(`Creating "${indexName}" search index...`);
       await searchIndexClient.createIndex(index);
