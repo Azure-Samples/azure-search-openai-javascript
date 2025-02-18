@@ -7,9 +7,6 @@ export default fp(async (fastify) => {
   fastify.register(multipart, {
     attachFieldsToBody: true,
     sharedSchemaId: 'multipartField',
-    limits: {
-      fileSize: FILE_UPLOAD_LIMIT,
-      files: 1,
-    },
+    limits: { fileSize: FILE_UPLOAD_LIMIT, files: 1 },
   });
 });
