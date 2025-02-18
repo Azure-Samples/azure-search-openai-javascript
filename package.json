@@ -32,7 +32,7 @@
   ],
   "devDependencies": {
     "@playwright/test": "^1.39.0",
-    "@tapjs/nock": "^3.1.13",
+    "@tapjs/nock": "^6.0.0",
     "@types/k6": "^0.47.1",
     "@types/node": "^18.15.3",
     "concurrently": "^9.1.2",
@@ -40,7 +40,7 @@
     "lint-staged": "^14.0.1",
     "prettier": "^3.0.3",
     "simple-git-hooks": "^2.9.0",
-    "tap": "^18.5.2"
+    "tap": "^21.0.2"
   },
   "engines": {
     "node": ">=22",
