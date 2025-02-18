@@ -9,15 +9,17 @@ import { type SchemaTypes } from '../plugins/schemas.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
-  const fastify = _fastify.withTypeProvider<JsonSchemaToTsProvider<{ references: SchemaTypes }>>();
+  const fastify =
+    _fastify.withTypeProvider<
+      JsonSchemaToTsProvider<{
+        ValidatorSchemaOptions: { references: SchemaTypes };
+        SerializerSchemaOptions: { references: SchemaTypes };
+      }>
+    >();
 
   fastify.get('/', async function (_request, _reply) {
     const packageJson = JSON.parse(await fs.readFile(path.join(__dirname, '../../package.json'), 'utf8'));
-    return {
-      service: packageJson.name,
-      description: packageJson.description,
-      version: packageJson.version,
-    };
+    return { service: packageJson.name, description: packageJson.description, version: packageJson.version };
   });
 
   fastify.get('/content/:path', {
@@ -25,19 +27,9 @@ const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
       description: 'Get content file',
       tags: ['content'],
       produces: ['*/*'],
-      params: {
-        type: 'object',
-        properties: {
-          path: { type: 'string' },
-        },
-        required: ['path'],
-      },
+      params: { type: 'object', properties: { path: { type: 'string' } }, required: ['path'] },
       response: {
-        200: {
-          type: 'object',
-          format: 'binary',
-          additionalProperties: false,
-        },
+        200: { type: 'object', format: 'binary', additionalProperties: false },
         404: { $ref: 'httpError' },
         500: { $ref: 'httpError' },
       },
