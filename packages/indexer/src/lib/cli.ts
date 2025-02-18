@@ -37,13 +37,7 @@ export async function run(arguments_: string[] = process.argv) {
     .showHelpAfterError()
     .action(async (files: string[], options: OptionValues) => {
       const { indexerUrl, indexName, upload, vectors, wait } = options;
-      await indexFiles(files, {
-        indexerUrl,
-        indexName,
-        uploadToBlobStorage: upload,
-        useVectors: vectors,
-        wait,
-      });
+      await indexFiles(files, { indexerUrl, indexName, uploadToBlobStorage: upload, useVectors: vectors, wait });
     });
   program.parse(arguments_);
 }
@@ -72,15 +66,11 @@ async function ensureSearchIndex(options: IndexFilesOptions) {
   const { indexerUrl, indexName } = options;
   const response = await fetch(`${indexerUrl}/indexes`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      name: indexName?.trim(),
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: indexName?.trim() }),
   });
   if (!response.ok) {
-    const errorDetails = await response.json();
+    const errorDetails: any = await response.json();
     throw new Error(`Index creating "${indexName}": ${errorDetails.message}`);
   }
 }
@@ -89,22 +79,14 @@ async function indexFile(file: string, options: IndexFilesOptions) {
   console.log(`Indexing file "${file}"...`);
   const { indexerUrl, indexName, category, uploadToBlobStorage, useVectors, wait } = options;
   const formData = new FormData();
-  const fileIndexOptions = {
-    category,
-    uploadToBlobStorage,
-    useVectors,
-    wait,
-  };
+  const fileIndexOptions = { category, uploadToBlobStorage, useVectors, wait };
   const type = mime.getType(extname(file)) ?? 'application/octet-stream';
   const fileData = await fs.readFile(file);
   formData.append('file', new Blob([fileData], { type }), file);
   formData.append('options', JSON.stringify(fileIndexOptions));
-  const response = await fetch(`${indexerUrl}/indexes/${indexName}/files`, {
-    method: 'POST',
-    body: formData,
-  });
+  const response = await fetch(`${indexerUrl}/indexes/${indexName}/files`, { method: 'POST', body: formData });
   if (!response.ok) {
-    const errorDetails = await response.json();
+    const errorDetails: any = await response.json();
     throw new Error(`Error indexing file "${file}": ${errorDetails.message}`);
   }
   console.log(`File "${file}" indexed successfully`);

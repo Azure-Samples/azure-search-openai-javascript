@@ -1,4 +1,4 @@
-import * as pdfjs from 'pdfjs-dist';
+import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { type TextItem } from 'pdfjs-dist/types/src/display/api.js';
 import { type ContentPage } from '../document.js';
 
