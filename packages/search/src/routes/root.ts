@@ -9,13 +9,12 @@ import { type SchemaTypes } from '../plugins/schemas.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const root: FastifyPluginAsync = async (_fastify, _options): Promise<void> => {
-  const fastify =
-    _fastify.withTypeProvider<
-      JsonSchemaToTsProvider<{
-        ValidatorSchemaOptions: { references: SchemaTypes };
-        SerializerSchemaOptions: { references: SchemaTypes };
-      }>
-    >();
+  const fastify = _fastify.withTypeProvider<
+    JsonSchemaToTsProvider<{
+      ValidatorSchemaOptions: { references: SchemaTypes };
+      SerializerSchemaOptions: { references: SchemaTypes };
+    }>
+  >();
 
   fastify.get('/', async function (_request, _reply) {
     const packageJson = JSON.parse(await fs.readFile(path.join(__dirname, '../../package.json'), 'utf8'));
