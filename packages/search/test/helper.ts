@@ -26,9 +26,7 @@ async function config() {
   process.env.AZURE_STORAGE_ACCOUNT = 'stx2y5k2ccncqou';
   process.env.AZURE_STORAGE_CONTAINER = 'content';
 
-  return {
-    pluginTimeout: 30_000,
-  };
+  return {};
 }
 
 // Automatically build and tear down our instance

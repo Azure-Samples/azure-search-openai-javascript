@@ -24,9 +24,8 @@ async function config() {
   process.env.AZURE_SEARCH_SERVICE = 'https://example.com';
   process.env.AZURE_STORAGE_ACCOUNT = 'dummystorage';
   process.env.AZURE_STORAGE_CONTAINER = 'testfiles';
-  return {
-    pluginTimeout: 30_000,
-  };
+
+  return {};
 }
 
 // Automatically build and tear down our instance
