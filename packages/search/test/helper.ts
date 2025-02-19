@@ -27,7 +27,7 @@ async function config() {
   process.env.AZURE_STORAGE_CONTAINER = 'content';
 
   return {
-    pluginTimeout: 30000,
+    pluginTimeout: 30_000,
   };
 }
 

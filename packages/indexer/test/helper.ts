@@ -25,7 +25,7 @@ async function config() {
   process.env.AZURE_STORAGE_ACCOUNT = 'dummystorage';
   process.env.AZURE_STORAGE_CONTAINER = 'testfiles';
   return {
-    pluginTimeout: 30000,
+    pluginTimeout: 30_000,
   };
 }
 
