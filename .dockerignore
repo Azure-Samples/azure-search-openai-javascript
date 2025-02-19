@@ -1,2 +1,10 @@
 node_modules/
 dist/
+.azure
+.env*
+static/
+dist/
+/test-results/
+/playwright-report/
+/playwright/.cache/
+coverage/
