@@ -19,7 +19,7 @@ jobs:
     name: ${{ matrix.platform }} / Node.js v${{ matrix.node-version }}
     runs-on: ${{ matrix.platform }}
     steps:
-      - run: git config --global core.autocrlf false # Preserve line endings
+      # - run: git config --global core.autocrlf false # Preserve line endings
       - uses: actions/checkout@v4
       - name: Setup Node.js v${{ matrix.node-version }}
         uses: actions/setup-node@v4

@@ -33,7 +33,7 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
     handler: async function (request, reply) {
       const { name } = request.body;
       try {
-        await fastify.indexer.createSearchIndex(name);
+        await fastify.indexer.createSearchIndex(name, fastify.config.azureSearchSemanticRanker !== 'enabled');
         reply.code(204);
       } catch (_error: unknown) {
         const error = _error as Error;

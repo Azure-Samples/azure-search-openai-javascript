@@ -358,7 +358,7 @@ module searchService 'core/search/search-services.bicep' = {
     sku: {
       name: searchServiceSkuName
     }
-    semanticSearch: 'free'
+    semanticSearch: searchServiceSkuName == 'standard' ? 'free' : 'disabled'
   }
 }
 
@@ -526,6 +526,7 @@ output AZURE_OPENAI_EMBEDDING_MODEL string = embeddingModelName
 output AZURE_SEARCH_INDEX string = searchIndexName
 output AZURE_SEARCH_SERVICE string = searchService.outputs.name
 output AZURE_SEARCH_SERVICE_RESOURCE_GROUP string = searchServiceResourceGroup.name
+output AZURE_SEARCH_SEMANTIC_RANKER string = searchServiceSkuName == 'standard' ? 'enabled' : 'disabled'
 
 output AZURE_STORAGE_ACCOUNT string = storage.outputs.name
 output AZURE_STORAGE_CONTAINER string = storageContainerName
