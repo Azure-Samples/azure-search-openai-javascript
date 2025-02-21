@@ -9,7 +9,6 @@
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
-      "version": 20,
       "moby": "false"
     },
     "ghcr.io/devcontainers/features/powershell:1": {},
@@ -18,7 +17,7 @@
       "installBicep": true
     },
     "ghcr.io/azure/azure-dev/azd:latest": {},
-    "ghcr.io/devcontainers-contrib/features/k6:1": {}
+    "ghcr.io/grafana/devcontainer-features/k6:1": {}
   },
 
   // Configure tool-specific properties.
