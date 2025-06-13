@@ -21,9 +21,9 @@ module containerAppsEnvironment 'container-apps-environment.bicep' = {
   }
 }
 
-module containerRegistry 'container-registry.bicep' = {
+// Deploy container registry to specified resource group or current resource group
+module containerRegistry 'container-registry.bicep' = if (empty(containerRegistryResourceGroupName)) {
   name: '${name}-container-registry'
-  scope: !empty(containerRegistryResourceGroupName) ? resourceGroup(containerRegistryResourceGroupName) : resourceGroup()
   params: {
     name: containerRegistryName
     location: location
