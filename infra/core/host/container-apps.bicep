@@ -10,6 +10,10 @@ param containerRegistryAdminUserEnabled bool = false
 param logAnalyticsWorkspaceName string
 param applicationInsightsName string = ''
 
+var containerRegistryScope = !empty(containerRegistryResourceGroupName)
+  ? resourceGroup(containerRegistryResourceGroupName)
+  : resourceGroup()
+
 module containerAppsEnvironment 'container-apps-environment.bicep' = {
   name: '${name}-container-apps-environment'
   params: {
@@ -23,7 +27,7 @@ module containerAppsEnvironment 'container-apps-environment.bicep' = {
 
 module containerRegistry 'container-registry.bicep' = {
   name: '${name}-container-registry'
-  scope: !empty(containerRegistryResourceGroupName) ? resourceGroup(containerRegistryResourceGroupName) : resourceGroup()
+  scope: containerRegistryScope
   params: {
     name: containerRegistryName
     location: location
