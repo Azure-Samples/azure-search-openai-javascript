@@ -76,7 +76,7 @@ The application is made from multiple components, including:
 ### Cost estimation
 
 Pricing may vary per region and usage. Exact costs cannot be estimated.
-You may try the [Azure pricing calculator](https://azure.com/e/8ffbe5b1919c4c72aed89b022294df76) for the resources below.
+You may try the [Azure pricing calculator](https://azure.com/e/8468fee268374b6fbd32db323deec786) for the resources below.
 
 - Azure Container Apps: Pay-as-you-go tier. Costs based on vCPU and memory used. [Pricing](https://azure.microsoft.com/pricing/details/container-apps/)
 - Azure Static Web Apps: Free Tier. [Pricing](https://azure.microsoft.com/pricing/details/app-service/static/)
