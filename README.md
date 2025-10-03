@@ -432,7 +432,7 @@ Here are the most common failure scenarios and solutions:
 
 See [this doc for reducing costs](./docs/low-cost.md).
 
-## Getting Help
+### Getting Help
 
 If you get stuck or have any questions about building AI apps, join:
 
