@@ -195,6 +195,9 @@ export class Indexer {
     if (typeof filename !== 'string' || filename.length === 0) {
       throw new TypeError('Filename is required to delete a file from the index');
     }
+    if (filename.includes('/') || filename.includes('\\')) {
+      throw new TypeError('Filename must not contain directory separators');
+    }
 
     this.logger.debug(`Removing sections from "${filename}" from search index "${indexName}"`);
     const searchClient = this.azure.searchIndex.getSearchClient(indexName);

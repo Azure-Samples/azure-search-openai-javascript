@@ -135,3 +135,20 @@ test('rejects absent, empty and non-string filenames before any search or blob d
   assert.deepEqual([...state.documents.keys()], ['other']);
   assert.deepEqual([...state.storedBlobs], ['other.txt']);
 });
+
+test('rejects path aliases instead of deleting the blob of an unrelated basename', async () => {
+  const state = createIndexer([{ id: 'other', sourcefile: 'other.txt' }], ['other.txt']);
+
+  for (const filename of ['folder/other.txt', 'folder\\other.txt']) {
+    await assert.rejects(state.indexer.deleteFromIndex('test-index', filename), {
+      name: 'TypeError',
+      message: 'Filename must not contain directory separators',
+    });
+  }
+
+  assert.deepEqual(state.filters, []);
+  assert.deepEqual(state.deletedIds, []);
+  assert.deepEqual(state.deletedBlobs, []);
+  assert.deepEqual([...state.documents.keys()], ['other']);
+  assert.deepEqual([...state.storedBlobs], ['other.txt']);
+});
