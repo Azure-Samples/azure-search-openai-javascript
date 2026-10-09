@@ -21,22 +21,15 @@ export class BlobStorage {
   }
 
   async delete(filename: string) {
+    if (typeof filename !== 'string' || filename.length === 0) {
+      throw new TypeError('Filename is required');
+    }
+
     const blobContainer = this.azure.blobContainer;
     if (await blobContainer.exists()) {
-      if (filename) {
-        const name = getBlobNameFromFile(filename);
-        const re = new RegExp(`${name}`, 'i');
-
-        const allBlobs = await blobContainer.listBlobsFlat({ prefix: name });
-        for await (const blob of allBlobs) {
-          if (re.test(blob.name)) {
-            this.logger.debug(`Removing blob: ${blob.name}...`);
-            await blobContainer.deleteBlob(blob.name);
-          }
-        }
-      } else {
-        throw new Error('Filename is required');
-      }
+      const name = getBlobNameFromFile(filename);
+      this.logger.debug(`Removing blob: ${name}...`);
+      await blobContainer.getBlockBlobClient(name).deleteIfExists();
     }
   }
 
