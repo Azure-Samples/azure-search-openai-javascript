@@ -10,6 +10,14 @@ test('file deletion API rejects encoded directory separators', async (t) => {
       method: 'DELETE',
       url: `/indexes/test-index/files/${filename}`,
     });
+
     assert.equal(response.statusCode, 400);
   }
+});
+
+test('file deletion API rejects an empty filename as a client error', async (t) => {
+  const app = await build(t);
+  const response = await app.inject({ method: 'DELETE', url: '/indexes/test-index/files/' });
+
+  assert.equal(response.statusCode, 400);
 });

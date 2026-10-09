@@ -182,6 +182,9 @@ const root: FastifyPluginAsyncJsonSchemaToTs = async (fastify, _options): Promis
     } as const,
     handler: async function (request, reply) {
       const { name, filename } = request.params;
+      if (!filename) {
+        return reply.badRequest('Filename is required');
+      }
       if (filename.includes('/') || filename.includes('\\')) {
         return reply.badRequest('Filename must not contain directory separators');
       }
