@@ -1,5 +1,5 @@
 import { type BaseLogger } from 'pino';
-import { type SearchIndex } from '@azure/search-documents';
+import { odata, type SearchIndex } from '@azure/search-documents';
 import { encoding_for_model, type TiktokenModel } from '@dqbd/tiktoken';
 import { type AzureClients } from '../plugins/azure.js';
 import { type OpenAiService } from '../plugins/openai.js';
@@ -191,14 +191,21 @@ export class Indexer {
     }
   }
 
-  async deleteFromIndex(indexName: string, filename?: string) {
-    this.logger.debug(`Removing sections from "${filename ?? '<all>'}" from search index "${indexName}"`);
+  async deleteFromIndex(indexName: string, filename: string) {
+    if (typeof filename !== 'string' || filename.length === 0) {
+      throw new TypeError('Filename is required to delete a file from the index');
+    }
+    if (filename.includes('/') || filename.includes('\\')) {
+      throw new TypeError('Filename must not contain directory separators');
+    }
+
+    this.logger.debug(`Removing sections from "${filename}" from search index "${indexName}"`);
     const searchClient = this.azure.searchIndex.getSearchClient(indexName);
+    const filter = odata`sourcefile eq ${filename}`;
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const filter = filename ? `sourcefile eq '${filename}'` : undefined;
-      const r = await searchClient.search('', { filter: filter, top: 1000, includeTotalCount: true });
+      const r = await searchClient.search('', { filter, top: 1000, includeTotalCount: true });
       if (r.count === 0) {
         break;
       }
@@ -210,11 +217,11 @@ export class Indexer {
       const { results } = await searchClient.deleteDocuments(documents);
       this.logger.debug(`Removed ${results.length} sections from index`);
 
-      await (filename ? this.blobStorage.delete(filename) : this.blobStorage.deleteAll());
-
       // It can take a few seconds for search results to reflect changes, so wait a bit
       await wait(2000);
     }
+
+    await this.blobStorage.delete(filename);
   }
 
   async createEmbedding(text: string): Promise<number[]> {
